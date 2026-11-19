@@ -1,0 +1,36 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Desativar cliente | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_confirmar.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo-form">
+    <div>
+        <h1>Desativar cliente</h1>
+        <p>{{ cliente.nome_exibicao }}</p>
+    </div>
+</header>
+
+<div class="confirmar-card">
+    <div class="confirmar-alerta">
+        <strong>Atenção</strong>
+        O cliente deixará de aparecer ao criar novas propostas.
+        Nada é apagado: o histórico de propostas e compras continua
+        salvo e você pode reativá-lo quando quiser.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="confirmar-acoes">
+            <a href="{% url 'detalhes_cliente' cliente.pk %}" class="btn-voltar">Cancelar</a>
+            <button type="submit" class="btn-perigo">Confirmar desativação</button>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

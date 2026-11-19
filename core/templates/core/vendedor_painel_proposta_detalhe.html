@@ -62,7 +62,7 @@
             </div>
             <div class="prop-links-relacionados">
                 <a class="prop-btn prop-btn-secundario prop-btn-pequeno" href="{% url 'detalhes_cliente' proposta.cliente.pk %}">Abrir ficha do cliente ↗</a>
-                <a class="prop-btn prop-btn-secundario prop-btn-pequeno" href="{% url 'detalhes_veiculo' proposta.veiculo.pk %}">Abrir ficha do veículo ↗</a>
+                <a class="prop-btn prop-btn-secundario prop-btn-pequeno" href="{% url 'detalhes_veiculo_vendedor' proposta.veiculo.pk %}">Abrir ficha do veículo ↗</a>
             </div>
         </section>
 
@@ -75,6 +75,78 @@
                 <div class="prop-financeiro-item"><span>Desconto percentual</span><strong>{{ proposta.desconto_percentual|default:0|floatformat:2 }}%</strong></div>
             </div>
         </section>
+
+        <!-- CONFIRMAÇÃO DA PROPOSTA E RESERVA -->
+        {% if reserva_gerada %}
+            <section class="prop-card prop-card-p prop-span-total">
+                <h2 class="prop-card-titulo">Reserva do veículo</h2>
+
+                {% if reserva_gerada.cancelada %}
+                    <p>Esta reserva foi encerrada.</p>
+
+                    {% if reserva_gerada.motivo_cancelamento %}
+                        <p>
+                            <strong>Motivo:</strong>
+                            {{ reserva_gerada.motivo_cancelamento }}
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p>O veículo está reservado para esta negociação.</p>
+
+                    <div class="prop-dados-grid">
+                        <div class="prop-dado">
+                            <span>Cliente</span>
+                            <strong>{{ reserva_gerada.cliente_nome }}</strong>
+                        </div>
+
+                        <div class="prop-dado">
+                            <span>Prazo da reserva</span>
+                            <strong>
+                                {{ reserva_gerada.expira_em|date:"d/m/Y H:i" }}
+                            </strong>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+        {% elif pode_confirmar %}
+            <section class="prop-card prop-card-p prop-span-total">
+                <h2 class="prop-card-titulo">Confirmar negociação</h2>
+
+                <p>
+                    Confirme a proposta para reservar o veículo para este cliente.
+                    Informe por quanto tempo a reserva permanecerá válida.
+                </p>
+
+                <form
+                    method="post"
+                    action="{% url 'confirmar_proposta' proposta.pk %}"
+                    class="prop-form-confirmacao"
+                >
+                    {% csrf_token %}
+
+                    <div class="prop-dado">
+                        {{ form_confirmacao.prazo_horas.label_tag }}
+                        {{ form_confirmacao.prazo_horas }}
+
+                        {% if form_confirmacao.prazo_horas.help_text %}
+                            <small>
+                                {{ form_confirmacao.prazo_horas.help_text }}
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="prop-btn prop-btn-primario"
+                        onclick="return confirm('Confirmar a negociação e reservar este veículo?');"
+                    >
+                        <i data-lucide="check-circle"></i>
+                        Confirmar proposta e reservar veículo
+                    </button>
+                </form>
+            </section>
+        {% endif %}
 
         {% if proposta.status_aprovacao == "CONTRAPROPOSTA" %}
             <section class="prop-card prop-card-p prop-span-total">

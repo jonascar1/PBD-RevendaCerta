@@ -482,130 +482,124 @@
 }
 
 
-/* FORMULÁRIOS */
-
+/* FORMULÁRIOS DA SITUAÇÃO */
 .form-situacao {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
 }
 
-.form-situacao > * {
+.form-situacao .campo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
     min-width: 0;
-    max-width: 100%;
 }
 
-.form-situacao input {
-    flex: 1;
-    min-width: 0;
-    height: 38px;
-    padding: 0 11px;
-    border: 1px solid #d1d5db;
-    border-radius: 7px;
-    background: #fff;
-    color: #1f2937;
+.form-situacao label {
     font-size: 13px;
-    outline: none;
-    box-sizing: border-box;
+    font-weight: 600;
+    color: #334155;
 }
 
-.form-situacao input:focus {
+.form-situacao input:not([type="hidden"]),
+.form-situacao select,
+.form-situacao textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.form-situacao textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.form-situacao input:focus,
+.form-situacao select:focus,
+.form-situacao textarea:focus {
+    outline: none;
     border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
 }
 
 .form-linha {
-    display: flex;
-    flex: 1;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
 }
 
-.form-linha input {
-    width: 50%;
-}
-
-
-/* BOTÕES */
-
+/* BOTÕES DA SITUAÇÃO */
 .btn-situacao {
-    height: 38px;
-    padding: 0 14px;
-    border: none;
-    border-radius: 7px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 9px;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 11px 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
     box-sizing: border-box;
+    transition: background .2s, border-color .2s;
 }
 
-.btn-disponivel {
-    background: #dcfce7;
-    color: #15803d;
-}
+.btn-disponivel { background: #dcfce7; color: #15803d; }
+.btn-disponivel:hover { background: #bbf7d0; }
+.btn-reservar { background: #eff6ff; color: #2563eb; }
+.btn-reservar:hover { background: #dbeafe; }
+.btn-vendido { background: #fef3c7; color: #92400e; }
+.btn-vendido:hover { background: #fde68a; }
+.btn-liberar { background: #fff1f2; color: #be123c; }
+.btn-liberar:hover { background: #ffe4e6; }
+.btn-entregue { background: #dcfce7; color: #15803d; }
+.btn-entregue:hover { background: #bbf7d0; }
 
-.btn-disponivel:hover {
-    background: #bbf7d0;
-}
-
-.btn-reservar {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.btn-reservar:hover {
-    background: #dbeafe;
-}
-
-.btn-vendido {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.btn-vendido:hover {
-    background: #fde68a;
-}
-
-.btn-liberar {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-liberar:hover {
-    background: #e5e7eb;
-}
-
-.btn-entregue {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.btn-entregue:hover {
-    background: #bbf7d0;
-}
-
-
-/* DUAS AÇÕES */
-
+/* VENDA E CANCELAMENTO: DOIS CARDS RESPONSIVOS */
 .acoes-situacao {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 22px;
 }
 
-.acao-venda {
-    padding-right: 14px;
-    border-right: 1px solid #e5e7eb;
+.acoes-situacao .form-situacao {
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
 }
 
+.acoes-situacao .form-situacao h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.acoes-situacao .btn-situacao {
+    width: 100%;
+    margin-top: auto;
+}
 
 /* STATUS */
 
@@ -692,32 +686,13 @@
         flex-direction: column;
     }
 
-    .form-situacao {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .form-linha {
-        flex-direction: column;
-    }
-
-    .form-linha input {
-        width: 100%;
-    }
-
-    .btn-situacao {
-        width: 100%;
-    }
-
+    .form-linha,
     .acoes-situacao {
         grid-template-columns: 1fr;
     }
 
-    .acao-venda {
-        padding-right: 0;
-        padding-bottom: 14px;
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
+    .btn-situacao {
+        width: 100%;
     }
 }
 
@@ -736,5 +711,197 @@
     .card-info,
     .titulo-veiculo {
         padding: 16px;
+    }
+}
+
+/* A coluna da galeria pode ficar estreita antes do breakpoint geral. */
+@media (max-width: 1350px) {
+    .acoes-situacao {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .acoes-situacao .form-situacao {
+        padding: 14px;
+    }
+    .situacao-conteudo {
+        padding: 16px;
+    }
+    .situacao-mensagem {
+        flex-wrap: wrap;
+    }
+}
+
+/* Ajustes finais: situação dentro da coluna da galeria */
+.galeria, .galeria .situacao-card, .situacao-conteudo { min-width: 0; }
+.situacao-card .acoes-situacao { grid-template-columns: minmax(0, 1fr); }
+.situacao-card .acoes-situacao .form-situacao { width: 100%; min-width: 0; }
+.situacao-card .acoes-situacao h4 { margin: 0 0 3px; font-size: 14px; color: #1f2937; }
+.situacao-card .acoes-situacao .campo-form { width: 100%; }
+.situacao-card .acoes-situacao .btn-situacao { width: 100%; }
+.situacao-card .prazo-reserva { margin-left: auto; max-width: 100%; box-sizing: border-box; }
+@media (max-width: 700px) { .situacao-card { padding: 0; } }
+
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 20px;
+}
+
+.message {
+    padding: 13px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid transparent;
+}
+
+.message-error {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #9f1239;
+}
+
+.message-success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.message-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.separador-reserva {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    margin: 12px 0;
+}
+
+.form-situacao .campo-form {
+    width: 100%;
+    min-width: 0;
+}
+
+.form-situacao .form-linha {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+}
+
+.form-situacao .form-linha .campo-form {
+    flex: 1;
+}
+
+@media (max-width: 700px) {
+    .form-situacao .form-linha {
+        flex-direction: column;
+    }
+}
+
+/* =========================================
+   HISTÓRICO DE RESERVAS
+========================================= */
+
+.historico-reservas {
+    margin-top: 28px;
+    padding: 24px;
+    background: var(--card-bg, #fff);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.historico-reservas__cabecalho {
+    margin-bottom: 22px;
+}
+
+.historico-reservas__cabecalho h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+}
+
+.historico-reservas__cabecalho p {
+    margin: 0;
+    color: #64748b;
+}
+
+.historico-reservas__lista {
+    display: grid;
+    gap: 16px;
+}
+
+.historico-reservas__item {
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.historico-reservas__topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.historico-reservas__status {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.historico-reservas__status.ativa {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.historico-reservas__status.cancelado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.historico-reservas__status.expirado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.historico-reservas__dados {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 20px;
+}
+
+.historico-reservas__dados p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.historico-reservas__motivo {
+    grid-column: 1 / -1;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.historico-reservas__vazio {
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+@media (max-width: 700px) {
+    .historico-reservas {
+        padding: 16px;
+    }
+
+    .historico-reservas__dados {
+        grid-template-columns: 1fr;
     }
 }

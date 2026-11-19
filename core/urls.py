@@ -50,4 +50,9 @@ urlpatterns = [
     # Operações em Veículos (Gerente / Administrativo)
     path("veiculos/<int:veiculo_id>/situacao/", views.alterar_situacao_veiculo_view, name="alterar_situacao_veiculo"),
     path("veiculos/<int:veiculo_id>/reservar/", views.reservar_veiculo_view, name="reservar_veiculo"),
+    path("painel/vendedor/veiculos/<int:veiculo_id>/", views.detalhes_veiculo_vendedor_view, name="detalhes_veiculo_vendedor"),
+    path("painel/vendedor/clientes/<int:cliente_id>/reativar/", views.reativar_cliente_view, name="reativar_cliente"),
+    path("painel/vendedor/propostas/<int:proposta_id>/confirmar/",views.confirmar_proposta_view,name="confirmar_proposta",),
+    path( "veiculos/reservas/<int:reserva_id>/cancelar/",views.cancelar_reserva_view,name="cancelar_reserva",),
+    path("painel/gerente/propostas/<int:proposta_id>/recusar/",views.recusar_proposta_fila_view,name="recusar_proposta_fila",),
 ]

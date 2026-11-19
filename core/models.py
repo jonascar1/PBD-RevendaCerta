@@ -307,36 +307,95 @@ class ReservaVeiculo(models.Model):
     expira_em = models.DateTimeField()
 
     cancelada = models.BooleanField(default=False)
+    proposta_origem = models.OneToOneField(
+        "Proposta",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reserva_gerada",
+    )
 
+    cancelada_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    cancelada_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reservas_canceladas",
+        editable=False,
+    )
+
+    motivo_cancelamento = models.TextField(
+        blank=True,
+        editable=False,
+    )
     def esta_valida(self):
         return not self.cancelada and timezone.now() < self.expira_em
-
+    
     def expirar(self):
-        if self.cancelada or timezone.now() < self.expira_em:
-            return
+        with transaction.atomic():
 
-        self.cancelada = True
-        self.save(update_fields=["cancelada"])
-
-        veiculo = Veiculo.objects.filter(
-            pk=self.veiculo_id,
-            situacao=Veiculo.Situacao.RESERVADO,
-        ).first()
-
-        if veiculo:
-            veiculo.situacao = Veiculo.Situacao.DISPONIVEL
-            veiculo.status = Veiculo.Status.DISPONIVEL
-            veiculo.save(update_fields=["situacao", "status"])
-
-            HistoricoSituacaoVeiculo.objects.create(
-                veiculo=veiculo,
-                situacao_anterior=Veiculo.Situacao.RESERVADO,
-                situacao_nova=Veiculo.Situacao.DISPONIVEL,
-                alterado_por=self.vendedor,
-                motivo="Reserva expirada",
+            veiculo = Veiculo.objects.select_for_update().get(
+                pk=self.veiculo_id
             )
 
-        Proposta.ativar_aguardando(self.veiculo_id)
+            reserva = ReservaVeiculo.objects.select_for_update().get(
+                pk=self.pk
+            )
+
+            agora = timezone.now()
+
+            if reserva.cancelada or reserva.expira_em > agora:
+                return False
+
+            reserva.cancelada = True
+            reserva.cancelada_em = agora
+            reserva.motivo_cancelamento = "Reserva expirada automaticamente"
+
+            reserva.save(
+                update_fields=[
+                    "cancelada",
+                    "cancelada_em",
+                    "motivo_cancelamento",
+                ]
+            )
+
+            if reserva.proposta_origem_id:
+                Proposta.objects.filter(
+                    pk=reserva.proposta_origem_id,
+                ).exclude(
+                    situacao=Proposta.Situacao.CANCELADA,
+                ).update(
+                    situacao=Proposta.Situacao.CANCELADA,
+                    atualizada_em=agora,
+                )
+
+            if veiculo.situacao == Veiculo.Situacao.RESERVADO:
+                veiculo.situacao = Veiculo.Situacao.DISPONIVEL
+                veiculo.status = Veiculo.Status.DISPONIVEL
+
+                veiculo.save(
+                    update_fields=["situacao", "status"]
+                )
+
+                HistoricoSituacaoVeiculo.objects.create(
+                    veiculo=veiculo,
+                    situacao_anterior=Veiculo.Situacao.RESERVADO,
+                    situacao_nova=Veiculo.Situacao.DISPONIVEL,
+                    alterado_por=reserva.vendedor,
+                    motivo="Reserva expirada automaticamente",
+                )
+
+            Proposta.ativar_aguardando(veiculo.pk)
+
+            self.refresh_from_db()
+
+            return True
 
     def clean(self):
         if self.expira_em and self.expira_em <= timezone.now():
@@ -473,7 +532,8 @@ class Cliente(models.Model):
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
-
+    responsavel = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
     class Meta:
         ordering = ["nome", "razao_social"]
         constraints = [
@@ -536,9 +596,16 @@ class Cliente(models.Model):
         self.ativo = False
         self.save(update_fields=["ativo", "atualizado_em"])
 
+    def desativar(self):
+        self.ativo = False
+        self.save(update_fields=["ativo", "atualizado_em"])
+
+    def reativar(self):
+        self.ativo = True
+        self.save(update_fields=["ativo", "atualizado_em"])
+        
     def __str__(self):
         return self.nome_exibicao
-
 
 class TelefoneCliente(models.Model):
     class Tipo(models.TextChoices):
@@ -821,12 +888,12 @@ class Proposta(models.Model):
                 self.registrar_pedido(usuario or self.vendedor)
 
             self._valor_original = self.valor_oferecido
+            
     def aceitar_contraproposta(self, usuario):
         """
         Permite que o vendedor responsável aceite a contraproposta
         registrada pelo gerente.
         """
-
         if not (
             getattr(usuario, "is_authenticated", False)
             and usuario.ativo
@@ -837,7 +904,6 @@ class Proposta(models.Model):
             )
 
         with transaction.atomic():
-
             # Bloqueia o veículo para evitar conflitos com outras propostas.
             veiculo_id = Proposta.objects.only("veiculo_id").get(
                 pk=self.pk
@@ -867,9 +933,13 @@ class Proposta(models.Model):
                 )
 
             # Recupera a contraproposta mais recente do gerente.
-            decisao = proposta.decisoes.filter(
-                tipo=DecisaoProposta.Tipo.CONTRAPROPOSTA
-            ).order_by("-feito_em", "-id").first()
+            decisao = (
+                proposta.decisoes.filter(
+                    tipo=DecisaoProposta.Tipo.CONTRAPROPOSTA
+                )
+                .order_by("-feito_em", "-id")
+                .first()
+            )
 
             if not decisao:
                 raise ValidationError(
@@ -879,23 +949,6 @@ class Proposta(models.Model):
             valor_anterior = proposta.valor_oferecido
             novo_valor = decisao.valor_referencia
 
-            # Verifica se a proposta pode sair da fila de espera.
-            if proposta.situacao == self.Situacao.AGUARDANDO:
-
-                reserva_ativa = veiculo.reservas.filter(
-                    cancelada=False,
-                    expira_em__gt=timezone.now(),
-                ).exists()
-
-                outra_proposta_ativa = Proposta.objects.filter(
-                    veiculo_id=veiculo.pk,
-                    situacao=self.Situacao.ATIVA,
-                ).exclude(pk=proposta.pk).exists()
-
-                if not reserva_ativa and not outra_proposta_ativa:
-                    proposta.situacao = self.Situacao.ATIVA
-
-                    proposta.reserva_aguardada = None
 
             # Registra o novo valor e a aprovação.
             proposta.valor_oferecido = novo_valor
@@ -921,16 +974,16 @@ class Proposta(models.Model):
 
             # Registra o aceite na trilha de auditoria.
             aceite = DecisaoProposta.objects.create(
-                    proposta=proposta,
-                    tipo=DecisaoProposta.Tipo.ACEITE_CONTRAPROPOSTA,
-                    valor_referencia=novo_valor,
-                    desconto_percentual_no_momento=(
-                        proposta._desconto_percentual_de(novo_valor)
-                    ),
-                    alcada_no_momento=proposta._alcada_texto(),
-                    parecer="Contraproposta aceita pelo vendedor.",
-                    feito_por=usuario,
-                )
+                proposta=proposta,
+                tipo=DecisaoProposta.Tipo.ACEITE_CONTRAPROPOSTA,
+                valor_referencia=novo_valor,
+                desconto_percentual_no_momento=(
+                    proposta._desconto_percentual_de(novo_valor)
+                ),
+                alcada_no_momento=proposta._alcada_texto(),
+                parecer="Contraproposta aceita pelo vendedor.",
+                feito_por=usuario,
+            )
 
             self.refresh_from_db()
 
@@ -951,7 +1004,18 @@ class Proposta(models.Model):
             )
 
         with transaction.atomic():
-            proposta = Proposta.objects.select_for_update().get(pk=self.pk)
+            veiculo_id = Proposta.objects.only(
+                "veiculo_id"
+            ).get(pk=self.pk).veiculo_id
+
+            Veiculo.objects.select_for_update().get(
+                pk=veiculo_id
+            )
+
+            proposta = Proposta.objects.select_for_update().get(
+                pk=self.pk,
+                veiculo_id=veiculo_id,
+            )
 
             if proposta.vendedor_id != usuario.pk:
                 raise PermissionDenied(
@@ -1001,44 +1065,32 @@ class Proposta(models.Model):
     
     @classmethod
     def ativar_aguardando(cls, veiculo_id):
+        """Promove a proposta aguardando mais antiga, se o veículo estiver livre."""
         with transaction.atomic():
-            veiculo = Veiculo.objects.select_for_update().get(
-                pk=veiculo_id
-            )
-
+            veiculo = Veiculo.objects.select_for_update().get(pk=veiculo_id)
+            if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+                return
             if veiculo.reserva_ativa:
-                return None
-
+                return
+            
             if cls.objects.filter(
-                veiculo_id=veiculo_id,
-                situacao=cls.Situacao.ATIVA,
+                veiculo_id=veiculo_id, situacao=cls.Situacao.ATIVA
             ).exists():
-                return None
+                return
 
-            proxima = cls.objects.select_for_update().filter(
-                veiculo_id=veiculo_id,
-                situacao=cls.Situacao.AGUARDANDO,
-                status_aprovacao__in=[
-                    cls.StatusAprovacao.NAO_NECESSARIA,
-                    cls.StatusAprovacao.APROVADA,
-                ],
-            ).order_by("criada_em", "pk").first()
-
-            if not proxima:
-                return None
-
-            proxima.situacao = cls.Situacao.ATIVA
-            proxima.reserva_aguardada = None
-
-            proxima.save(
-                update_fields=[
-                    "situacao",
-                    "reserva_aguardada",
-                    "atualizada_em",
-                ]
+            proxima = (
+                cls.objects.filter(
+                    veiculo_id=veiculo_id, situacao=cls.Situacao.AGUARDANDO
+                )
+               .order_by("criada_em", "pk")
+                .first()
             )
-
-            return proxima
+            if proxima:
+                proxima.situacao = cls.Situacao.ATIVA
+                proxima.reserva_aguardada = None
+                proxima.save(
+                    update_fields=["situacao", "reserva_aguardada", "atualizada_em"]
+                )
     
     def cancelar(self):
         if self.situacao == self.Situacao.CANCELADA:
@@ -1166,8 +1218,7 @@ class Proposta(models.Model):
                 ]
             )
             
-            
-            if tipo in (Tipo.RECUSA, Tipo.APROVACAO):
+            if tipo == Tipo.RECUSA:
                 Proposta.ativar_aguardando(proposta.veiculo_id)
                 
             self.status_aprovacao = nova_aprovacao
@@ -1270,6 +1321,7 @@ class DecisaoProposta(models.Model):
         CONTRAPROPOSTA = "CONTRAPROPOSTA", "Contraproposta"
         ACEITE_CONTRAPROPOSTA = ("ACEITE_CONTRAPROPOSTA","Aceite da contraproposta",)
         RECUSA_CONTRAPROPOSTA = ("RECUSA_CONTRAPROPOSTA","Recusa da contraproposta",)
+        RECUSA_FILA = "RECUSA_FILA", "Recusa de proposta da fila"
         
 
     proposta = models.ForeignKey(

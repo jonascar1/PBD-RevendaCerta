@@ -289,3 +289,44 @@
     grid-column: span 1;
   }
 }
+
+.prop-form-confirmacao {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.prop-form-confirmacao .prop-dado {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.prop-form-confirmacao input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.prop-form-confirmacao input:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+
+.prop-form-confirmacao small {
+    color: #6b7280;
+}
+
+.prop-form-confirmacao button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+}

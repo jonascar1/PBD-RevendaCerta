@@ -1,6 +1,6 @@
 {% extends "core/vendedor_base.html" %}
 {% load static %}
-
+{% load formatadores %}
 {% block title %}Clientes | VENDACERTA{% endblock %}
 
 {% block extra_css %}
@@ -9,8 +9,6 @@
 {% endblock %}
 
 {% block content %}
-
-    
 
         <header class="clientes-cabecalho">
             <div>
@@ -115,15 +113,15 @@
 
                                 <td>
                                     {% if cliente.tipo == "PJ" %}
-                                        {{ cliente.cnpj|default:"—" }}
+                                        {{ cliente.cnpj|cnpj|default:"—" }}
                                     {% else %}
-                                        {{ cliente.cpf|default:"—" }}
+                                         {{ cliente.cpf|cpf|default:"—" }}
                                     {% endif %}
                                 </td>
 
                                 <td>
                                     {% for telefone in cliente.telefones.all %}
-                                        <div>{{ telefone.numero }}</div>
+                                          <div>{{ telefone.numero|telefone }}</div>
                                     {% empty %}
                                         —
                                     {% endfor %}

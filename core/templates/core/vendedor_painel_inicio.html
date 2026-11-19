@@ -1,15 +1,13 @@
-
 {% extends 'core/vendedor_base.html' %}
 {% load static %}
 {% load static l10n %}
 
-
-{% block content %}
-    <header class="topo">
-
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'core/css/vendedor_painel_inicio.css'%}">
 {% endblock %}
+
+{% block content %}
+    <header class="topo">
 
         <div>
             <h1>Painel do Vendedor</h1>
@@ -54,6 +52,35 @@
 
     </section>
 
+    {% if propostas_para_atender %}
+    <section class="avisos-propostas">
+        <h2>Propostas disponíveis para atendimento</h2>
+
+        <p>
+            Você possui negociações ativas que podem ser atendidas.
+        </p>
+
+        {% for proposta in propostas_para_atender %}
+            <div class="aviso-proposta">
+                <div>
+                    <strong>
+                        {{ proposta.veiculo.marca }}
+                        {{ proposta.veiculo.modelo }}
+                    </strong>
+
+                    <p>
+                        Cliente: {{ proposta.cliente.nome_exibicao }}
+                    </p>
+                </div>
+
+                <a href="{% url 'detalhes_proposta' proposta.pk %}">
+                    Ver proposta
+                </a>
+            </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
     <section class="atividade-section">
 
         <div class="titulo-secao">
@@ -61,7 +88,7 @@
             <p>Acompanhe suas propostas e o andamento das negociações.</p>
         </div>
 
-                <div class="propostas-card">
+        <div class="propostas-card">
 
             {% for p in propostas %}
                 <a href="{% url 'detalhes_proposta' p.pk %}" class="proposta">
@@ -148,32 +175,36 @@
         </div>
 
     </section>
-        <section class="dados-section">
 
-<div class="titulo-secao">
-    <h2>Veículos disponíveis</h2>
-    <p>Consulte o preço de venda e sua alçada de desconto.</p>
-</div>
+    <section class="dados-section">
 
-    <div class="veiculos-grid">
+        <div class="titulo-secao">
+            <h2>Veículos disponíveis</h2>
+            <p>Consulte o preço de venda e sua alçada de desconto.</p>
+        </div>
 
-    {% for veiculo in veiculos %}
+        <div class="veiculos-grid">
 
-        <div class="dado">
+            {% for veiculo in veiculos %}
 
-            {% with foto_principal=veiculo.fotos.all|first %}
-                    {% if foto_principal %}
-                        <img
-                            src="{{ foto_principal.imagem.url }}"
-                            alt="{{ veiculo.marca }} {{ veiculo.modelo }}"
-                        >
-                    {% else %}
-                        <img
-                            src="{% static 'core/img/sem-foto.webp' %}"
-                            alt="Veículo sem foto"
-                        >
-                    {% endif %}
-            {% endwith %}
+                <a
+                    class="dado"
+                    href="{% url 'detalhes_veiculo_vendedor' veiculo.id %}"
+                >
+
+                    {% with foto_principal=veiculo.fotos.all|first %}
+                            {% if foto_principal %}
+                                <img
+                                    src="{{ foto_principal.imagem.url }}"
+                                    alt="{{ veiculo.marca }} {{ veiculo.modelo }}"
+                                >
+                            {% else %}
+                                <img
+                                    src="{% static 'core/img/sem-foto.webp' %}"
+                                    alt="Veículo sem foto"
+                                >
+                            {% endif %}
+                    {% endwith %}
 
                     <span>
                         {{ veiculo.marca }} {{ veiculo.modelo }}
@@ -183,35 +214,36 @@
                         {{ veiculo.ano_fabricacao | unlocalize }} · {{ veiculo.get_situacao_display }}
                     </small>
 
-            <strong>
-                {% if veiculo.preco_venda %}
-                    R$ {{ veiculo.preco_venda|floatformat:2 }}
-                {% else %}
-                    Preço não definido
-                {% endif %}
-            </strong>
+                    <strong>
+                        {% if veiculo.preco_venda %}
+                            R$ {{ veiculo.preco_venda|floatformat:2 }}
+                        {% else %}
+                            Preço não definido
+                        {% endif %}
+                    </strong>
 
-            <small>
-                Sua alçada:
-                {% if dados.tipo_alcada == "PERCENTUAL" %}
-                    {{ dados.valor_alcada|floatformat:2 }}%
-                {% else %}
-                    R$ {{ dados.valor_alcada|floatformat:2 }}
-                {% endif %}
-            </small>
+                    <small>
+                        Sua alçada:
+                        {% if dados.tipo_alcada == "PERCENTUAL" %}
+                            {{ dados.valor_alcada|floatformat:2 }}%
+                        {% else %}
+                            R$ {{ dados.valor_alcada|floatformat:2 }}
+                        {% endif %}
+                    </small>
+
+                </a>
+
+            {% empty %}
+
+                <div class="aviso">
+                    <strong>Nenhum veículo cadastrado</strong>
+                    <p>Não há veículos para exibir no momento.</p>
+                </div>
+
+            {% endfor %}
 
         </div>
 
-    {% empty %}
-
-        <div class="aviso">
-            <strong>Nenhum veículo cadastrado</strong>
-            <p>Não há veículos para exibir no momento.</p>
-        </div>
-
-    {% endfor %}
-
-</div>
         <div class="titulo-secao">
 
             <h2>Meus dados</h2>
@@ -278,6 +310,3 @@
 
     </section>
 {% endblock %}
-
-
-

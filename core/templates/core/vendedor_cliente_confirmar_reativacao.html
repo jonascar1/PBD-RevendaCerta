@@ -1,0 +1,34 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Reativar cliente | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_confirmar.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo-form">
+    <div>
+        <h1>Reativar cliente</h1>
+        <p>{{ cliente.nome_exibicao }}</p>
+    </div>
+</header>
+
+<div class="confirmar-card">
+    <div class="confirmar-alerta confirmar-alerta-ok">
+        <strong>Reativar este cliente?</strong>
+        Ele voltará a aparecer ao criar novas propostas.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="confirmar-acoes">
+            <a href="{% url 'detalhes_cliente' cliente.pk %}" class="btn-voltar">Cancelar</a>
+            <button type="submit" class="btn-salvar">Confirmar reativação</button>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

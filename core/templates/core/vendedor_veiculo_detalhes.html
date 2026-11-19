@@ -1,0 +1,177 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+{% load l10n %}
+
+{% block title %}
+    {{ veiculo.marca }} {{ veiculo.modelo }} | VENDACERTA
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculo_detalhes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo-detalhes">
+    <div>
+        <h1>{{ veiculo.marca }} {{ veiculo.modelo }}</h1>
+        <p>{{ veiculo.ano_fabricacao|unlocalize }}/{{ veiculo.ano_modelo|unlocalize }} · {{ veiculo.placa }}</p>
+    </div>
+
+    <div class="topo-acoes">
+        <a href="{% url 'nova_proposta' %}?veiculo={{ veiculo.id }}" class="btn-editar">
+            <i data-lucide="plus"></i> Nova proposta
+        </a>
+    </div>
+</header>
+
+<section class="veiculo-container">
+
+    <!-- GALERIA -->
+    <div class="galeria">
+        <div class="foto-principal-container">
+            {% if fotos %}
+                <img id="foto-principal"
+                     src="{{ fotos.0.imagem.url }}"
+                     alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}">
+            {% else %}
+                <div class="sem-foto">
+                    <i data-lucide="image-off"></i>
+                    <p>Nenhuma foto cadastrada</p>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if fotos %}
+            <div class="miniaturas">
+                {% for foto in fotos %}
+                    <button type="button"
+                            class="miniatura {% if forloop.first %}ativa{% endif %}"
+                            onclick="trocarFoto('{{ foto.imagem.url|escapejs }}', this)">
+                        <img src="{{ foto.imagem.url }}" alt="Foto {{ forloop.counter }}">
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="informacoes">
+
+        <!-- SITUAÇÃO E PREÇO -->
+        <div class="card-info">
+            <div class="card-cabecalho">
+                <h3>Situação e preço</h3>
+                <span class="badge status-{{ veiculo.situacao|lower }}">
+                    {{ veiculo.get_situacao_display }}
+                </span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>Preço de tabela</span>
+                    <strong>
+                        {% if veiculo.preco_venda %}
+                            R$ {{ veiculo.preco_venda|floatformat:2 }}
+                        {% else %}
+                            Ainda não definido
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Sua alçada de desconto</span>
+                    <strong>
+                        {% if dados.tipo_alcada == "PERCENTUAL" %}
+                            {{ dados.valor_alcada|floatformat:2 }}%
+                        {% else %}
+                            R$ {{ dados.valor_alcada|floatformat:2 }}
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA DE PROPOSTAS -->
+        <div class="card-info">
+            <div class="card-cabecalho">
+                <h3>Fila de propostas</h3>
+            </div>
+
+            {% for proposta in fila %}
+                <div class="fila-item">
+                    <strong>{{ forloop.counter }}º na fila</strong>
+
+                    <div>
+                        <p>{{ proposta.cliente.nome_exibicao }}</p>
+
+                        <small>
+                            {% if proposta.vendedor_id == request.user.id %}
+                                Sua proposta
+                            {% else %}
+                                {{ proposta.vendedor.get_full_name|default:proposta.vendedor.username }}
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <span>
+                        {{ proposta.criada_em|date:"d/m/Y H:i" }}
+                    </span>
+                </div>
+            {% empty %}
+                <p class="sem-registros">
+                    Não há propostas aguardando.
+                </p>
+            {% endfor %}
+        </div>
+
+        <!-- DADOS DO VEÍCULO -->
+        <div class="card-info">
+            <div class="card-cabecalho">
+                <h3>Informações do veículo</h3>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item"><span>Placa</span><strong>{{ veiculo.placa }}</strong></div>
+                <div class="info-item"><span>Chassi</span><strong>{{ veiculo.chassi }}</strong></div>
+                <div class="info-item"><span>Renavam</span><strong>{{ veiculo.renavam }}</strong></div>
+                <div class="info-item"><span>Marca</span><strong>{{ veiculo.marca }}</strong></div>
+                <div class="info-item"><span>Modelo</span><strong>{{ veiculo.modelo }}</strong></div>
+                <div class="info-item"><span>Ano de fabricação</span><strong>{{ veiculo.ano_fabricacao|unlocalize }}</strong></div>
+                <div class="info-item"><span>Ano do modelo</span><strong>{{ veiculo.ano_modelo|unlocalize }}</strong></div>
+                <div class="info-item"><span>Cor</span><strong>{{ veiculo.cor }}</strong></div>
+                <div class="info-item"><span>Combustível</span><strong>{{ veiculo.combustivel }}</strong></div>
+                <div class="info-item"><span>Quilometragem</span><strong>{{ veiculo.quilometragem }} km</strong></div>
+            </div>
+        </div>
+
+        <!-- OPCIONAIS -->
+        <div class="card-info">
+            <div class="card-cabecalho">
+                <h3>Opcionais</h3>
+            </div>
+            {% if veiculo.opcionais %}
+                <p class="opcionais">{{ veiculo.opcionais|linebreaksbr }}</p>
+            {% else %}
+                <p class="sem-registros">Nenhum opcional informado.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+function trocarFoto(url, elemento) {
+    const fotoPrincipal = document.getElementById("foto-principal");
+    if (fotoPrincipal) {
+        fotoPrincipal.src = url;
+    }
+    document.querySelectorAll(".miniatura").forEach(function (m) {
+        m.classList.remove("ativa");
+    });
+    elemento.classList.add("ativa");
+}
+</script>
+{% endblock extra_js %}

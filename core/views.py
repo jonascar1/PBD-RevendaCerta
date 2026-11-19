@@ -12,6 +12,7 @@ from django.db.models import ProtectedError, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+
 # 3. Imports locais da aplicação (Local apps / Relative imports)
 from .decorators import perfil_requerido
 from .forms import (
@@ -29,7 +30,8 @@ from .forms import (
     TelefoneClienteFormSet,
     VeiculoForm,
     VendedorCadastroForm,
-    VendedorEdicaoForm,
+    VendedorEdicaoForm,    ConfirmarPropostaForm,
+    CancelarReservaForm,
 )
 from .models import (
     Cliente,
@@ -43,6 +45,7 @@ from .models import (
     TelefoneCliente,
     Usuario,
     Veiculo,
+    DecisaoProposta,
 )
 
 
@@ -406,7 +409,40 @@ def vendedores_view(request):
             "status_selecionado": status,
         },
     )
+    
+@perfil_requerido("VENDEDOR")
+def detalhes_veiculo_vendedor_view(request, veiculo_id):
+    expirar_reservas_vencidas()
 
+    veiculo = get_object_or_404(
+        Veiculo.objects.prefetch_related("fotos"), pk=veiculo_id
+    )
+    dados = get_object_or_404(PerfilVendedor, usuario=request.user)
+
+    return render(
+        request,
+        "core/vendedor_veiculo_detalhes.html",
+        {
+            "veiculo": veiculo,
+            "fotos": veiculo.fotos.all(),
+            "dados": dados,
+            "reserva": veiculo.reserva_ativa,
+            "fila": veiculo.propostas.filter(
+        situacao=Proposta.Situacao.AGUARDANDO
+    ).select_related("cliente", "vendedor").order_by("criada_em", "pk"),
+            "form_reserva": ReservaForm(),
+        "form_cancelamento": CancelarReservaForm(),
+        "form_preparacao": AlterarSituacaoForm(
+    initial={"situacao": Veiculo.Situacao.DISPONIVEL}
+),
+        "form_venda": AlterarSituacaoForm(
+    initial={"situacao": Veiculo.Situacao.VENDIDO}
+),
+        "form_entrega": AlterarSituacaoForm(
+    initial={"situacao": Veiculo.Situacao.ENTREGUE}
+),
+        },
+    )
 
 @perfil_requerido("GERENTE")
 def cadastrar_vendedor_view(request):
@@ -583,9 +619,18 @@ def detalhes_veiculo_view(request, veiculo_id):
     ultimo_lancamento = despesas.first()
 
     ultimo_historico_preco = (
-        veiculo.historico_precos.order_by("-alterado_em").first()
+    veiculo.historico_precos.order_by("-alterado_em").first()
+)
+    historico_reservas = (
+    ReservaVeiculo.objects.filter(veiculo=veiculo)
+    .select_related(
+        "cliente",
+        "vendedor",
+        "cancelada_por",
+        "proposta_origem",
     )
-
+    .order_by("-criada_em", "-pk")
+)
     return render(
         request,
         "core/gerente_detalhes_veiculo.html",
@@ -598,8 +643,37 @@ def detalhes_veiculo_view(request, veiculo_id):
             "ultimo_lancamento": ultimo_lancamento,
             "ultimo_historico_preco": ultimo_historico_preco,
             "reserva": reserva,
-        
-    "clientes_list": Cliente.objects.filter(ativo=True).order_by("nome", "razao_social"),}
+
+            "fila": veiculo.propostas.filter(
+                situacao=Proposta.Situacao.AGUARDANDO
+            ).select_related(
+                "cliente", "vendedor"
+            ).order_by("criada_em", "pk"),
+
+            "clientes_list": Cliente.objects.filter(
+                ativo=True
+            ).order_by("nome", "razao_social"),
+
+            # Formulários utilizados pelo template
+            "form_reserva": ReservaForm(),
+            "form_cancelamento": CancelarReservaForm(),
+
+            "form_venda": AlterarSituacaoForm(
+                initial={
+                    "situacao": Veiculo.Situacao.VENDIDO,
+                }
+            ),
+            "historico_reservas": historico_reservas,
+            "propostas_pendentes": veiculo.propostas.filter(
+    situacao__in=[
+        Proposta.Situacao.ATIVA,
+        Proposta.Situacao.AGUARDANDO,
+    ]
+).select_related(
+    "cliente",
+    "vendedor",
+).order_by("criada_em", "pk"),
+        },
     )
 
 
@@ -659,8 +733,6 @@ def alterar_preco_veiculo_view(request, veiculo_id):
         {"veiculo": veiculo, "custo_total": custo_total, "form": form},
     )
 
-
-
 @perfil_requerido("GERENTE")
 def reservar_veiculo_view(request, veiculo_id):
     if request.method != "POST":
@@ -691,10 +763,29 @@ def reservar_veiculo_view(request, veiculo_id):
 
             veiculo.refresh_from_db()
 
+            propostas_pendentes = Proposta.objects.filter(
+                veiculo=veiculo,
+                situacao__in=[
+                    Proposta.Situacao.ATIVA,
+                    Proposta.Situacao.AGUARDANDO,
+                ],
+            ).exists()
+
+            if propostas_pendentes:
+                messages.error(
+                    request,
+                    "Não é possível reservar este veículo manualmente "
+                    "enquanto existirem propostas pendentes. "
+                    "Resolva ou recuse as propostas antes de continuar.",
+                )
+                return redirect(
+                    "detalhes_veiculo",
+                    veiculo_id=veiculo.pk,
+                )
+
             # Verifica se ainda existe uma reserva válida.
             reserva_existente = veiculo.reservas.filter(
                 cancelada=False,
-                expira_em__gt=timezone.now(),
             ).exists()
 
             if (
@@ -703,7 +794,7 @@ def reservar_veiculo_view(request, veiculo_id):
             ):
                 messages.error(
                     request,
-                    "Apenas veículos disponíveis e sem reserva ativa podem ser reservados."
+                    "Apenas veículos disponíveis e sem reserva ativa podem ser reservados.",
                 )
                 return redirect(
                     "detalhes_veiculo",
@@ -722,9 +813,11 @@ def reservar_veiculo_view(request, veiculo_id):
 
             # Atualiza a situação operacional.
             situacao_anterior = veiculo.situacao
-            veiculo.situacao = Veiculo.Situacao.RESERVADO
-            veiculo.save(update_fields=["situacao"])
 
+            veiculo.situacao = Veiculo.Situacao.RESERVADO
+            veiculo.status = Veiculo.Status.RESERVADO
+
+            veiculo.save(update_fields=["situacao", "status"])
             # Registra a alteração no histórico.
             HistoricoSituacaoVeiculo.objects.create(
                 veiculo=veiculo,
@@ -740,7 +833,7 @@ def reservar_veiculo_view(request, veiculo_id):
     except IntegrityError:
         messages.error(
             request,
-            "Este veículo já possui uma reserva ativa."
+            "Este veículo já possui uma reserva ativa.",
         )
         return redirect(
             "detalhes_veiculo",
@@ -751,7 +844,104 @@ def reservar_veiculo_view(request, veiculo_id):
 
     return redirect("detalhes_veiculo", veiculo_id=veiculo_id)
 
+@perfil_requerido("GERENTE")
+def cancelar_reserva_view(request, reserva_id):
+    reserva_base = get_object_or_404(
+        ReservaVeiculo,
+        pk=reserva_id,
+    )
 
+    if request.method != "POST":
+        return redirect(
+            "detalhes_veiculo",
+            veiculo_id=reserva_base.veiculo_id,
+        )
+
+    form = CancelarReservaForm(request.POST)
+
+    if not form.is_valid():
+        erros_do_form_como_mensagens(request, form)
+        return redirect(
+            "detalhes_veiculo",
+            veiculo_id=reserva_base.veiculo_id,
+        )
+
+    try:
+        with transaction.atomic():
+            veiculo = Veiculo.objects.select_for_update().get(
+                pk=reserva_base.veiculo_id
+            )
+
+            reserva = ReservaVeiculo.objects.select_for_update().get(
+                pk=reserva_id
+            )
+
+            if reserva.cancelada:
+                raise ValidationError(
+                    "Esta reserva já foi encerrada."
+                )
+
+            if reserva.expira_em <= timezone.now():
+                raise ValidationError(
+                    "Esta reserva já venceu. "
+                    "Atualize a página para processar a expiração."
+                )
+
+            if veiculo.situacao != Veiculo.Situacao.RESERVADO:
+                raise ValidationError(
+                    "O veículo não está em situação de reserva."
+                )
+
+            agora = timezone.now()
+
+            reserva.cancelada = True
+            reserva.cancelada_em = agora
+            reserva.cancelada_por = request.user
+            reserva.motivo_cancelamento = form.cleaned_data["motivo"]
+
+            reserva.save(update_fields=[
+                "cancelada",
+                "cancelada_em",
+                "cancelada_por",
+                "motivo_cancelamento",
+            ])
+
+            if reserva.proposta_origem_id:
+                Proposta.objects.filter(
+                    pk=reserva.proposta_origem_id,
+                ).update(
+                    situacao=Proposta.Situacao.CANCELADA,
+                    atualizada_em=agora,
+                )
+
+            veiculo.situacao = Veiculo.Situacao.DISPONIVEL
+            veiculo.status = Veiculo.Status.DISPONIVEL
+            veiculo.save(update_fields=["situacao", "status"])
+
+            HistoricoSituacaoVeiculo.objects.create(
+                veiculo=veiculo,
+                situacao_anterior=Veiculo.Situacao.RESERVADO,
+                situacao_nova=Veiculo.Situacao.DISPONIVEL,
+                alterado_por=request.user,
+                motivo=form.cleaned_data["motivo"],
+            )
+
+            Proposta.ativar_aguardando(veiculo.pk)
+
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+
+    else:
+        messages.success(
+            request,
+            "Reserva cancelada e veículo liberado com sucesso.",
+        )
+
+    return redirect(
+        "detalhes_veiculo",
+        veiculo_id=reserva_base.veiculo_id,
+    )
+    
 @perfil_requerido("GERENTE", "ADMINISTRATIVO")
 def alterar_situacao_veiculo_view(request, veiculo_id):
     veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
@@ -771,11 +961,8 @@ def alterar_situacao_veiculo_view(request, veiculo_id):
 
     transicoes_permitidas = {
         Veiculo.Situacao.PREPARACAO: [Veiculo.Situacao.DISPONIVEL],
-        Veiculo.Situacao.DISPONIVEL: [Veiculo.Situacao.RESERVADO],
-        Veiculo.Situacao.RESERVADO: [
-            Veiculo.Situacao.DISPONIVEL,
-            Veiculo.Situacao.VENDIDO,
-        ],
+        Veiculo.Situacao.DISPONIVEL: [],  # só reserva pelo fluxo de reserva
+        Veiculo.Situacao.RESERVADO: [Veiculo.Situacao.VENDIDO],  # liberar = cancelar a reserva
         Veiculo.Situacao.VENDIDO: [Veiculo.Situacao.ENTREGUE],
         Veiculo.Situacao.ENTREGUE: [],
     }
@@ -830,6 +1017,8 @@ def alterar_situacao_veiculo_view(request, veiculo_id):
 
 
 def vitrine_view(request):
+    expirar_reservas_vencidas()
+    
     estoque = Veiculo.objects.filter(
         situacao=Veiculo.Situacao.DISPONIVEL,
         status=Veiculo.Status.DISPONIVEL,
@@ -1029,9 +1218,11 @@ def detalhes_cliente_view(request, cliente_id):
     ).prefetch_related("fotos").order_by("-criado_em")
 
     propostas = (
-        cliente.propostas.select_related("veiculo", "vendedor")
+        _propostas_visiveis(request.user)
+        .filter(cliente=cliente)
         .order_by("-criada_em")
     )
+
     return render(
     request,
     "core/vendedor_cliente_detalhes.html",
@@ -1087,14 +1278,27 @@ def desativar_cliente_view(request, cliente_id):
     if request.method == "POST":
         cliente.desativar()
         messages.success(request, "Cliente desativado com sucesso.")
-        return redirect("clientes")
+        return redirect("detalhes_cliente", cliente_id=cliente.pk)
 
     return render(
         request,
         "core/vendedor_cliente_confirmar_desativacao.html",
         {"cliente": cliente},
     )
+@login_required
+def reativar_cliente_view(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
 
+    if request.method == "POST":
+        cliente.reativar()
+        messages.success(request, "Cliente reativado com sucesso.")
+        return redirect("detalhes_cliente", cliente_id=cliente.pk)
+
+    return render(
+        request,
+        "core/vendedor_cliente_confirmar_reativacao.html",
+        {"cliente": cliente},
+    )
 
 @login_required
 def deletar_cliente_view(request, cliente_id):
@@ -1293,7 +1497,6 @@ def nova_proposta_view(request):
     expirar_reservas_vencidas()
     return _proposta_form_view(request, Proposta(), "Nova proposta")
  
- 
 @perfil_requerido("VENDEDOR")
 def editar_proposta_view(request, proposta_id):
     expirar_reservas_vencidas()
@@ -1301,6 +1504,10 @@ def editar_proposta_view(request, proposta_id):
  
     if proposta.situacao == Proposta.Situacao.CANCELADA:
         messages.error(request, "Proposta cancelada não pode ser editada.")
+        return redirect("detalhes_proposta", proposta_id=proposta.pk)
+
+    if proposta.status_aprovacao in ("PENDENTE", "CONTRAPROPOSTA"):
+        messages.error(request, "Esta proposta está em análise e não pode ser editada agora.")
         return redirect("detalhes_proposta", proposta_id=proposta.pk)
  
     if proposta.veiculo.situacao in (
@@ -1315,11 +1522,9 @@ def editar_proposta_view(request, proposta_id):
  
     return _proposta_form_view(request, proposta, "Editar proposta")
  
- 
 # ---------------------------------------------------------------------
 # Detalhes
 # ---------------------------------------------------------------------
- 
 @perfil_requerido("VENDEDOR")
 def detalhes_proposta_view(request, proposta_id):
     expirar_reservas_vencidas()
@@ -1331,15 +1536,32 @@ def detalhes_proposta_view(request, proposta_id):
         {
             "proposta": proposta,
             "composicao": proposta.composicao.all(),
+            "decisoes": proposta.decisoes.select_related("feito_por"),
             "historico": proposta.historico.select_related("alterado_por"),
             "reserva": (
                 proposta.reserva_aguardada
                 if proposta.situacao == Proposta.Situacao.AGUARDANDO
                 else None
             ),
+            "form_confirmacao": ConfirmarPropostaForm(),
+
+            "reserva_gerada": ReservaVeiculo.objects.filter(
+    proposta_origem=proposta,
+).first(),
+
+            "pode_confirmar": (
+                            proposta.situacao == Proposta.Situacao.ATIVA
+                            and proposta.status_aprovacao in (
+                                Proposta.StatusAprovacao.NAO_NECESSARIA,
+                                Proposta.StatusAprovacao.APROVADA,
+                            )
+                            and proposta.veiculo.situacao == Veiculo.Situacao.DISPONIVEL
+                            and not ReservaVeiculo.objects.filter(
+                                proposta_origem=proposta,
+                            ).exists()
+                        ),
         },
     )
- 
  
 # ---------------------------------------------------------------------
 # Painel inicial do vendedor: SUBSTITUA a painel_vendedor_view existente por esta
@@ -1352,12 +1574,25 @@ def painel_vendedor_view(request):
     dados = get_object_or_404(PerfilVendedor, usuario=request.user)
     veiculos = Veiculo.objects.all().order_by("-criado_em")
     propostas = _propostas_visiveis(request.user).order_by("-criada_em")[:5]
- 
-    return render(
-        request,
-        "core/vendedor_painel_inicio.html",
-        {"dados": dados, "veiculos": veiculos, "propostas": propostas},
+    propostas_para_atender = (
+    Proposta.objects.filter(
+        vendedor=request.user,
+        situacao=Proposta.Situacao.ATIVA,
+        veiculo__situacao=Veiculo.Situacao.DISPONIVEL,
     )
+    .select_related("cliente", "veiculo")
+    .order_by("criada_em", "pk")
+)
+    return render(
+    request,
+    "core/vendedor_painel_inicio.html",
+    {
+        "dados": dados,
+        "veiculos": veiculos,
+        "propostas": propostas,
+        "propostas_para_atender": propostas_para_atender,
+    },
+)
 # ---------------------------------------------------------------------
 # T09: aprovação de desconto pelo gerente
 # ---------------------------------------------------------------------
@@ -1365,18 +1600,20 @@ def painel_vendedor_view(request):
 @perfil_requerido("GERENTE")
 def aprovacoes_view(request):
     propostas = (
-        Proposta.objects.filter(
-            status_aprovacao=Proposta.StatusAprovacao.PENDENTE
+            Proposta.objects.filter(
+                status_aprovacao=Proposta.StatusAprovacao.PENDENTE
+            )
+            .exclude(
+                situacao=Proposta.Situacao.CANCELADA
+            )
+            .select_related(
+                "cliente",
+                "veiculo",
+                "vendedor",
+                "vendedor__dados_vendedor",
+            )
+            .order_by("criada_em")
         )
-        .select_related(
-            "cliente",
-            "veiculo",
-            "vendedor",
-            "vendedor__dados_vendedor",
-        )
-        .order_by("criada_em")
-    )
-
     return render(
         request,
         "core/gerente_painel_aprovacoes.html",
@@ -1403,30 +1640,18 @@ def decidir_proposta_view(request, proposta_id):
 
             try:
                 with transaction.atomic():
-                    # Busca novamente e bloqueia a proposta durante a decisão.
-                    proposta = (
-                        Proposta.objects
-                        .select_for_update()
-                        .get(pk=proposta_id)
-                    )
+                    veiculo_id = Proposta.objects.only(
+                    "veiculo_id"
+                ).get(pk=proposta_id).veiculo_id
 
-                    # Impede que uma proposta já decidida seja decidida novamente.
-                    if (
-                        proposta.status_aprovacao
-                        != Proposta.StatusAprovacao.PENDENTE
-                    ):
-                        messages.error(
-                            request,
-                            "Esta proposta já foi decidida.",
-                        )
-                        return redirect("negociacoes_gerente")
+                Veiculo.objects.select_for_update().get(
+                    pk=veiculo_id
+                )
 
-                    proposta.decidir(
-                        request.user,
-                        cd["acao"],
-                        parecer=cd["parecer"],
-                        novo_valor=cd["novo_valor"],
-                    )
+                proposta = Proposta.objects.select_for_update().get(
+                    pk=proposta_id,
+                    veiculo_id=veiculo_id,
+                )
 
                 messages.success(
                     request,
@@ -1467,6 +1692,92 @@ def decidir_proposta_view(request, proposta_id):
         },
     )
 
+
+@perfil_requerido("GERENTE")
+def recusar_proposta_fila_view(request, proposta_id):
+    if request.method != "POST":
+        return redirect("negociacoes_gerente")
+
+    motivo = request.POST.get("motivo", "").strip()
+
+    if not motivo:
+        messages.error(request, "Informe o motivo da recusa.")
+        return redirect("negociacoes_gerente")
+
+    proposta_base = get_object_or_404(
+        Proposta.objects.only("veiculo_id"),
+        pk=proposta_id,
+    )
+    veiculo_id = proposta_base.veiculo_id
+
+    try:
+        with transaction.atomic():
+            # Mantém a mesma ordem de bloqueio usada nas reservas.
+            veiculo = Veiculo.objects.select_for_update().get(
+                pk=veiculo_id
+            )
+
+            proposta = Proposta.objects.select_for_update().get(
+                pk=proposta_id,
+                veiculo=veiculo,
+            )
+
+            if proposta.situacao not in (
+                Proposta.Situacao.ATIVA,
+                Proposta.Situacao.AGUARDANDO,
+            ):
+                raise ValidationError(
+                    "Somente propostas ativas ou aguardando "
+                    "podem ser recusadas por este fluxo."
+                )
+
+            if ReservaVeiculo.objects.filter(
+                proposta_origem=proposta
+            ).exists():
+                raise ValidationError(
+                    "Esta proposta possui uma reserva vinculada. "
+                    "Utilize o cancelamento de reserva."
+                )
+
+            era_ativa = (
+                proposta.situacao == Proposta.Situacao.ATIVA
+            )
+
+            DecisaoProposta.objects.create(
+                proposta=proposta,
+                tipo=DecisaoProposta.Tipo.RECUSA_FILA,
+                valor_referencia=proposta.valor_oferecido,
+                desconto_percentual_no_momento=(
+                    proposta.desconto_percentual
+                ),
+                alcada_no_momento=proposta._alcada_texto(),
+                parecer=motivo,
+                feito_por=request.user,
+            )
+
+            proposta.situacao = Proposta.Situacao.CANCELADA
+            proposta.save(
+                update_fields=["situacao", "atualizada_em"]
+            )
+
+            if era_ativa:
+                Proposta.ativar_aguardando(veiculo.pk)
+
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+    else:
+        messages.success(
+            request,
+            "Proposta recusada com sucesso."
+        )
+
+    return redirect(
+        "detalhes_veiculo",
+        veiculo_id=veiculo_id,
+    )
+
+
+
 @perfil_requerido("GERENTE")
 def negociacoes_view(request):
     expirar_reservas_vencidas()
@@ -1491,20 +1802,20 @@ def negociacoes_view(request):
         propostas = propostas.filter(situacao=situacao)
     else:
         situacao = ""
-
+        
     indicadores = {
         "total": Proposta.objects.count(),
         "aguardando": Proposta.objects.filter(
-            situacao=Proposta.Situacao.AGUARDANDO_GERENTE
+            status_aprovacao=Proposta.StatusAprovacao.PENDENTE
         ).count(),
         "aprovadas": Proposta.objects.filter(
-            situacao=Proposta.Situacao.APROVADA
+            status_aprovacao=Proposta.StatusAprovacao.APROVADA
         ).count(),
         "recusadas": Proposta.objects.filter(
-            situacao=Proposta.Situacao.RECUSADA
+            status_aprovacao=Proposta.StatusAprovacao.RECUSADA
         ).count(),
         "contrapropostas": Proposta.objects.filter(
-            situacao=Proposta.Situacao.CONTRAPROPOSTA
+            status_aprovacao=Proposta.StatusAprovacao.CONTRAPROPOSTA
         ).count(),
     }
 
@@ -1518,13 +1829,14 @@ def negociacoes_view(request):
             "indicadores": indicadores,
         },
     )
+
 @perfil_requerido("VENDEDOR")
 def aceitar_contraproposta_view(request, proposta_id):
     if request.method != "POST":
         return redirect("propostas")
 
     proposta = get_object_or_404(
-        Proposta,
+        _propostas_visiveis(request.user),
         pk=proposta_id,
     )
 
@@ -1548,6 +1860,117 @@ def aceitar_contraproposta_view(request, proposta_id):
         proposta_id=proposta.pk,
     )
     
+@perfil_requerido("VENDEDOR")
+def confirmar_proposta_view(request, proposta_id):
+    if request.method != "POST":
+        return redirect(
+            "detalhes_proposta",
+            proposta_id=proposta_id,
+        )
+
+    form = ConfirmarPropostaForm(request.POST)
+
+    if not form.is_valid():
+        erros_do_form_como_mensagens(request, form)
+        return redirect(
+            "detalhes_proposta",
+            proposta_id=proposta_id,
+        )
+
+    try:
+        with transaction.atomic():
+            # Todos os fluxos de reserva devem bloquear primeiro
+            # o veículo e depois a proposta.
+            proposta_base = get_object_or_404(
+                Proposta.objects.only("veiculo_id"),
+                pk=proposta_id,
+                vendedor=request.user,
+            )
+
+            veiculo = Veiculo.objects.select_for_update().get(
+                pk=proposta_base.veiculo_id
+            )
+
+            proposta = Proposta.objects.select_for_update().get(
+                pk=proposta_id,
+                vendedor=request.user,
+            )
+
+            if proposta.situacao != Proposta.Situacao.ATIVA:
+                raise ValidationError(
+                    "Somente uma proposta ativa pode ser confirmada. "
+                    "Propostas em espera devem aguardar sua vez."
+                )
+
+            if proposta.status_aprovacao not in (
+                Proposta.StatusAprovacao.NAO_NECESSARIA,
+                Proposta.StatusAprovacao.APROVADA,
+            ):
+                raise ValidationError(
+                    "A proposta ainda não possui autorização para confirmação."
+                )
+
+            if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+                raise ValidationError(
+                    "O veículo não está disponível para reserva."
+                )
+
+            if veiculo.reservas.filter(cancelada=False).exists():
+                raise ValidationError(
+                    "Este veículo já possui uma reserva não encerrada."
+                )
+
+            if ReservaVeiculo.objects.filter(
+                proposta_origem=proposta
+            ).exists():
+                raise ValidationError(
+                    "Esta proposta já gerou uma reserva."
+                )
+
+            prazo = timezone.now() + timedelta(hours=24)
+
+            reserva = ReservaVeiculo.objects.create(
+                veiculo=veiculo,
+                cliente=proposta.cliente,
+                cliente_nome=proposta.cliente.nome_exibicao,
+                cliente_contato="Contato registrado no cadastro do cliente",
+                vendedor=request.user,
+                proposta_origem=proposta,
+                expira_em=prazo,
+            )
+
+            veiculo.situacao = Veiculo.Situacao.RESERVADO
+            veiculo.status = Veiculo.Status.RESERVADO
+            veiculo.save(update_fields=["situacao", "status"])
+
+            HistoricoSituacaoVeiculo.objects.create(
+                veiculo=veiculo,
+                situacao_anterior=Veiculo.Situacao.DISPONIVEL,
+                situacao_nova=Veiculo.Situacao.RESERVADO,
+                alterado_por=request.user,
+                motivo=f"Reserva gerada pela proposta #{proposta.pk}",
+            )
+
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+
+    except IntegrityError:
+        messages.error(
+            request,
+            "Não foi possível reservar: já existe uma reserva conflitante.",
+        )
+
+    else:
+        messages.success(
+            request,
+            f"Proposta confirmada. Reserva #{reserva.pk} criada "
+            f"até {timezone.localtime(reserva.expira_em):%d/%m/%Y %H:%M}.",
+        )
+
+    return redirect(
+        "detalhes_proposta",
+        proposta_id=proposta_id,
+    )
     
 @perfil_requerido("VENDEDOR")
 def recusar_contraproposta_view(request, proposta_id):

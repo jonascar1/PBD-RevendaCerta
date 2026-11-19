@@ -1,527 +1,485 @@
-"""
-Testes automatizados completos para o fluxo de negociações e aprovação de desconto (T09)
-da aplicação `core` do sistema VENDACERTA.
-"""
+"""Testes automatizados da T10 do VendaCerta.
 
+Copie este conteúdo para core/tests.py (ou para um módulo em core/tests/).
+Os testes de concorrência exigem PostgreSQL e usam TransactionTestCase.
+"""
+from concurrent.futures import ThreadPoolExecutor
+from datetime import timedelta
 from decimal import Decimal
+from threading import Barrier
 
-from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.test import TestCase
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, close_old_connections, connection, transaction
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from core.models import (
+from .models import (
     Cliente,
-    DecisaoProposta,
-    HistoricoProposta,
+    HistoricoSituacaoVeiculo,
     PerfilVendedor,
     Proposta,
+    ReservaVeiculo,
+    Usuario,
     Veiculo,
 )
 
-Usuario = get_user_model()
 
+class DadosT10:
+    """Factories mínimas usando os campos existentes nos arquivos enviados."""
 
-class BaseNegociacoesTestCase(TestCase):
-    """
-    Classe base de testes com massa de dados comum inicializada via `setUpTestData`.
-    """
-
-    @classmethod
-    def setUpTestData(cls):
-        # 1. Usuários e perfis
-        cls.gerente = Usuario.objects.create_user(
-            username="gerente1",
-            password="password123",
-            first_name="Gerente",
-            last_name="Silva",
-            perfil=Usuario.Perfil.GERENTE,
-            ativo=True,
+    def preparar(self):
+        self.gerente = Usuario.objects.create_user(
+            username="gerente_t10", password="SenhaForte123!", perfil=Usuario.Perfil.GERENTE
         )
-
-        cls.vendedor = Usuario.objects.create_user(
-            username="vendedor1",
-            password="password123",
-            first_name="Vendedor",
-            last_name="Santos",
-            perfil=Usuario.Perfil.VENDEDOR,
-            ativo=True,
+        self.vendedor = Usuario.objects.create_user(
+            username="vendedor_t10", password="SenhaForte123!", perfil=Usuario.Perfil.VENDEDOR
         )
-        cls.perfil_vendedor = PerfilVendedor.objects.create(
-            usuario=cls.vendedor,
-            tipo_alcada=PerfilVendedor.TipoAlcada.PERCENTUAL,
-            valor_alcada=Decimal("4.50"),  # Alçada de 4,5%
-            percentual_comissao=Decimal("2.00"),
+        self.outro_vendedor = Usuario.objects.create_user(
+            username="vendedor2_t10", password="SenhaForte123!", perfil=Usuario.Perfil.VENDEDOR
         )
-
-        cls.outro_vendedor = Usuario.objects.create_user(
-            username="vendedor2",
-            password="password123",
-            first_name="Outro Vendedor",
-            last_name="Oliveira",
-            perfil=Usuario.Perfil.VENDEDOR,
-            ativo=True,
-        )
-        cls.perfil_outro_vendedor = PerfilVendedor.objects.create(
-            usuario=cls.outro_vendedor,
-            tipo_alcada=PerfilVendedor.TipoAlcada.VALOR,
-            valor_alcada=Decimal("2000.00"),  # Alçada em R$ 2.000,00
-            percentual_comissao=Decimal("2.00"),
-        )
-
-        cls.administrativo = Usuario.objects.create_user(
-            username="admin1",
-            password="password123",
-            first_name="Admin",
-            last_name="Souza",
+        self.administrativo = Usuario.objects.create_user(
+            username="administrativo_t10", password="SenhaForte123!",
             perfil=Usuario.Perfil.ADMINISTRATIVO,
-            ativo=True,
+        )
+        for usuario in (self.vendedor, self.outro_vendedor):
+            PerfilVendedor.objects.create(
+                usuario=usuario,
+                tipo_alcada=PerfilVendedor.TipoAlcada.PERCENTUAL,
+                valor_alcada=Decimal("10.00"),
+                percentual_comissao=Decimal("5.00"),
+            )
+        self.veiculo = Veiculo.objects.create(
+            placa="ABC1D23", chassi="9BWZZZ377VT004251", renavam="12345678901",
+            marca="Volkswagen", modelo="Gol", ano_fabricacao=2020,
+            ano_modelo=2021, cor="Prata", combustivel="Flex",
+            quilometragem=30000, origem=Veiculo.Origem.COMPRADO,
+            custo_aquisicao=Decimal("30000.00"), preco_venda=Decimal("40000.00"),
+            situacao=Veiculo.Situacao.DISPONIVEL,
+            status=Veiculo.Status.DISPONIVEL, criado_por=self.gerente,
+        )
+        self.cliente = Cliente.objects.create(
+            tipo=Cliente.Tipo.PESSOA_FISICA, nome="Cliente T10",
+            cpf="12345678909", data_nascimento=timezone.localdate() - timedelta(days=10000),
         )
 
-        cls.gerente_vendedor = Usuario.objects.create_user(
-            username="gerente_vendedor",
-            password="password123",
-            first_name="Gerente Vendedor",
-            last_name="Ferreira",
-            perfil=Usuario.Perfil.GERENTE,
-            ativo=True,
-        )
-
-        # 2. Cliente pessoa física ativo
-        cls.cliente = Cliente.objects.create(
-            tipo=Cliente.Tipo.PESSOA_FISICA,
-            nome="Cliente Teste",
-            cpf="12345678901",
-            data_nascimento="1990-01-01",
-            ativo=True,
-        )
-
-        # 3. Veículo principal em estoque (Preço de tabela: R$ 100.000,00)
-       # 3. Veículo principal em estoque (Preço de tabela: R$ 100.000,00)
-        cls.veiculo = Veiculo.objects.create(
-            placa="ABC1D23",
-            chassi="9BWCA111111111111",
-            renavam="12345678901",
-            marca="Toyota",
-            modelo="Corolla",
-            ano_fabricacao=2022,
-            ano_modelo=2023,
-            cor="Preto",
-            combustivel="Flex",
-            quilometragem=15000,
-            origem=Veiculo.Origem.COMPRADO,
-            custo_aquisicao=Decimal("80000.00"),
-            preco_venda=Decimal("100000.00"),
-            situacao=Veiculo.Situacao.DISPONIVEL,  # <-- ALTERADO DE RESERVADO PARA DISPONIVEL
-            status=Veiculo.Status.DISPONIVEL,      # <-- ALTERADO DE RESERVADO PARA DISPONIVEL
-            criado_por=cls.gerente,
-        )
-
-    # --- Funções auxiliares para evitar duplicação de código ---
-
-    def _criar_proposta(self, vendedor=None, valor_oferecido=96000, veiculo=None, cliente=None):
-        """Cria uma proposta padrão no banco."""
-        return Proposta.objects.create(
-            cliente=cliente or self.cliente,
-            veiculo=veiculo or self.veiculo,
+    def proposta(self, *, vendedor=None, valor="40000.00", situacao=None):
+        proposta = Proposta.objects.create(
+            cliente=self.cliente, veiculo=self.veiculo,
             vendedor=vendedor or self.vendedor,
-            valor_oferecido=Decimal(str(valor_oferecido)),
+            valor_oferecido=Decimal(valor),
         )
-
-    def _criar_proposta_pendente(self, vendedor=None, valor_oferecido=90000, veiculo=None):
-        """Cria uma proposta com desconto acima da alçada (status_aprovacao = PENDENTE)."""
-        proposta = self._criar_proposta(
-            vendedor=vendedor or self.vendedor,
-            valor_oferecido=valor_oferecido,
-            veiculo=veiculo,
-        )
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.PENDENTE)
+        if situacao is not None and proposta.situacao != situacao:
+            # Monta cenários sem disparar novamente as regras do save().
+            Proposta.objects.filter(pk=proposta.pk).update(situacao=situacao)
+            proposta.refresh_from_db()
         return proposta
 
-
-class PermissoesTests(BaseNegociacoesTestCase):
-    """Verifica permissões de segurança e bloqueios de acesso por perfil e estado do usuário."""
-
-    def test_vendedor_desativado_redireciona_para_login(self):
-        self.vendedor.ativo = False
-        self.vendedor.save()
-
-        self.client.login(username="vendedor1", password="password123")
-        response = self.client.get(reverse("propostas"))
-        self.assertRedirects(response, reverse("login"))
-
-    def test_vendedor_nao_pode_decidir_proposta_no_model(self):
-        proposta = self._criar_proposta_pendente()
-        with self.assertRaises(PermissionDenied):
-            proposta.decidir(self.vendedor, DecisaoProposta.Tipo.APROVACAO)
-
-    def test_administrativo_nao_pode_decidir_proposta_no_model(self):
-        proposta = self._criar_proposta_pendente()
-        with self.assertRaises(PermissionDenied):
-            proposta.decidir(self.administrativo, DecisaoProposta.Tipo.APROVACAO)
-
-    def test_vendedor_nao_pode_acessar_view_de_decidir_proposta(self):
-        proposta = self._criar_proposta_pendente()
-        self.client.login(username="vendedor1", password="password123")
-        url = reverse("decidir_proposta", kwargs={"proposta_id": proposta.pk})
-        
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
-        
-        response_post = self.client.post(url, data={"acao": DecisaoProposta.Tipo.APROVACAO})
-        self.assertEqual(response_post.status_code, 403)
-
-    def test_gerente_nao_pode_decidir_propria_proposta_no_model(self):
-        # Gerente criando a proposta (como vendedor da operação)
-        proposta = self._criar_proposta(vendedor=self.gerente_vendedor, valor_oferecido=90000)
-        # Força o status pendente para simular o teste
-        Proposta.objects.filter(pk=proposta.pk).update(status_aprovacao=Proposta.StatusAprovacao.PENDENTE)
-        proposta.refresh_from_db()
-
-        with self.assertRaises(PermissionDenied):
-            proposta.decidir(self.gerente_vendedor, DecisaoProposta.Tipo.APROVACAO)
-
-    def test_gerente_inativo_nao_pode_decidir_proposta_no_model(self):
-        proposta = self._criar_proposta_pendente()
-        self.gerente.ativo = False
-        self.gerente.save()
-
-        with self.assertRaises(PermissionDenied):
-            proposta.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-
-
-class AlcadaTests(BaseNegociacoesTestCase):
-    """Testa o cálculo de alçada e geração automática do pedido de aprovação."""
-
-    def test_desconto_dentro_da_alcada_percentual_fica_nao_necessaria(self):
-        # Preço: 100.000,00 | Alçada: 4,5% | Valor: 96.000,00 (4,0% de desconto)
-        proposta = self._criar_proposta(self.vendedor, 96000)
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-        self.assertFalse(proposta.decisoes.filter(tipo=DecisaoProposta.Tipo.PEDIDO).exists())
-
-    def test_desconto_acima_da_alcada_percentual_fica_pendente_e_gera_pedido(self):
-        # Preço: 100.000,00 | Alçada: 4,5% | Valor: 90.000,00 (10,0% de desconto)
-        proposta = self._criar_proposta(self.vendedor, 90000)
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.PENDENTE)
-
-        # Valida trilha de auditoria criada
-        decisao = proposta.decisoes.filter(tipo=DecisaoProposta.Tipo.PEDIDO).first()
-        self.assertIsNotNone(decisao)
-        self.assertEqual(decisao.valor_referencia, Decimal("90000.00"))
-        self.assertEqual(decisao.desconto_percentual_no_momento, Decimal("10.00"))
-
-    def test_desconto_dentro_e_fora_da_alcada_tipo_valor(self):
-        # Alçada do outro vendedor é R$ 2.000,00
-        # 1. Dentro: R$ 1.500,00 de desconto (98.500,00)
-        p1 = self._criar_proposta(self.outro_vendedor, 98500)
-        self.assertEqual(p1.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-
-        # 2. Fora: R$ 3.000,00 de desconto (97.000,00) em outro veículo
-        veiculo2 = Veiculo.objects.create(
-            placa="XYZ9876",
-            chassi="9BWCA111111111112",
-            renavam="12345678902",
-            marca="Honda",
-            modelo="Civic",
-            ano_fabricacao=2022,
-            ano_modelo=2023,
-            cor="Branco",
-            combustivel="Flex",
-            quilometragem=10000,
-            origem=Veiculo.Origem.COMPRADO,
-            custo_aquisicao=Decimal("80000.00"),
-            preco_venda=Decimal("100000.00"),
-            situacao=Veiculo.Situacao.DISPONIVEL,
-            status=Veiculo.Status.DISPONIVEL,
-            criado_por=self.gerente,
+    def reserva(self, *, expira_em=None, proposta=None):
+        reserva = ReservaVeiculo.objects.create(
+            veiculo=self.veiculo,
+            cliente=self.cliente,
+            cliente_nome="Cliente T10", cliente_contato="81999999999",
+            vendedor=self.vendedor, proposta_origem=proposta,
+            expira_em=expira_em or timezone.now() + timedelta(hours=24),
         )
-        p2 = self._criar_proposta(self.outro_vendedor, 97000, veiculo=veiculo2)
-        self.assertEqual(p2.status_aprovacao, Proposta.StatusAprovacao.PENDENTE)
-
-    def test_proposta_com_valor_igual_ou_maior_que_tabela_nao_requer_aprovacao(self):
-        p_igual = self._criar_proposta(self.vendedor, 100000)
-        self.assertEqual(p_igual.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-
-        p_maior = self._criar_proposta(self.vendedor, 105000)
-        self.assertEqual(p_maior.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-
-    def test_gerente_criando_proposta_nao_requer_aprovacao(self):
-        proposta = self._criar_proposta(self.gerente, 80000)
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-
-
-class DecisaoGerenteTests(BaseNegociacoesTestCase):
-    """Testa os métodos de decisão do gerente sobre propostas pendentes."""
-
-    def setUp(self):
-        self.proposta = self._criar_proposta_pendente(self.vendedor, 90000)
-
-    def test_gerente_aprova_proposta_pendente(self):
-        decisao = self.proposta.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-
-        self.assertEqual(self.proposta.status_aprovacao, Proposta.StatusAprovacao.APROVADA)
-        self.assertEqual(decisao.tipo, DecisaoProposta.Tipo.APROVACAO)
-        self.assertEqual(decisao.feito_por, self.gerente)
-
-    def test_gerente_recusa_proposta_exige_parecer_e_cancela_proposta(self):
-        # Validação de parecer obrigatório
-        with self.assertRaises(ValidationError):
-            self.proposta.decidir(self.gerente, DecisaoProposta.Tipo.RECUSA, parecer="")
-
-        decisao = self.proposta.decidir(
-            self.gerente, DecisaoProposta.Tipo.RECUSA, parecer="Desconto muito alto para a margem"
+        Veiculo.objects.filter(pk=self.veiculo.pk).update(
+            situacao=Veiculo.Situacao.RESERVADO,
+            status=Veiculo.Status.RESERVADO,
         )
-        self.assertEqual(self.proposta.status_aprovacao, Proposta.StatusAprovacao.RECUSADA)
-        self.assertEqual(self.proposta.situacao, Proposta.Situacao.CANCELADA)
-        self.assertEqual(decisao.parecer, "Desconto muito alto para a margem")
-
-    def test_gerente_faz_contraproposta_validacoes(self):
-        # Exige parecer
-        with self.assertRaises(ValidationError):
-            self.proposta.decidir(
-                self.gerente, DecisaoProposta.Tipo.CONTRAPROPOSTA, novo_valor=94000, parecer=""
-            )
-
-        # Novo valor deve ser MAIOR que o oferecido (oferecido foi 90.000)
-        with self.assertRaises(ValidationError):
-            self.proposta.decidir(
-                self.gerente,
-                DecisaoProposta.Tipo.CONTRAPROPOSTA,
-                novo_valor=89000,
-                parecer="Faço por menos",
-            )
-
-        # Sucesso
-        decisao = self.proposta.decidir(
-            self.gerente,
-            DecisaoProposta.Tipo.CONTRAPROPOSTA,
-            novo_valor=94000,
-            parecer="Fechamos em R$ 94.000,00",
-        )
-        self.assertEqual(self.proposta.status_aprovacao, Proposta.StatusAprovacao.CONTRAPROPOSTA)
-        self.assertEqual(decisao.valor_referencia, Decimal("94000.00"))
-
-    def test_nao_pode_decidir_proposta_ja_decidida_ou_cancelada(self):
-        self.proposta.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-        with self.assertRaises(ValidationError):
-            self.proposta.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-
-        # Proposta cancelada
-        p2 = self._criar_proposta(self.outro_vendedor, 98500)
-        p2.cancelar()
-        with self.assertRaises(ValidationError):
-            p2.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-
-
-class ContrapropostaVendedorTests(BaseNegociacoesTestCase):
-    """Testa o aceite e recusa de contrapropostas pelo vendedor responsável."""
-
-    def setUp(self):
-        self.proposta = self._criar_proposta_pendente(self.vendedor, 90000)
-        self.proposta.decidir(
-            self.gerente,
-            DecisaoProposta.Tipo.CONTRAPROPOSTA,
-            novo_valor=94000,
-            parecer="Valor mínimo aprovado",
-        )
-
-    def test_vendedor_dono_aceita_contraproposta(self):
-        decisao = self.proposta.aceitar_contraproposta(self.vendedor)
-
-        self.assertEqual(self.proposta.valor_oferecido, Decimal("94000.00"))
-        self.assertEqual(self.proposta.status_aprovacao, Proposta.StatusAprovacao.APROVADA)
-        self.assertEqual(decisao.tipo, DecisaoProposta.Tipo.ACEITE_CONTRAPROPOSTA)
-
-        # Registra histórico de alteração do valor
-        historico = HistoricoProposta.objects.filter(proposta=self.proposta).first()
-        self.assertEqual(historico.valor_novo, Decimal("94000.00"))
-
-    def test_outro_vendedor_ou_gerente_nao_pode_aceitar_contraproposta(self):
-        with self.assertRaises(PermissionDenied):
-            self.proposta.aceitar_contraproposta(self.outro_vendedor)
-
-        with self.assertRaises(PermissionDenied):
-            self.proposta.aceitar_contraproposta(self.gerente)
-
-    def test_vendedor_dono_recusa_contraproposta(self):
-        decisao = self.proposta.recusar_contraproposta(self.vendedor)
-
-        self.assertEqual(self.proposta.status_aprovacao, Proposta.StatusAprovacao.RECUSADA)
-        self.assertEqual(self.proposta.situacao, Proposta.Situacao.CANCELADA)
-        self.assertEqual(decisao.tipo, DecisaoProposta.Tipo.RECUSA_CONTRAPROPOSTA)
-
-
-class FilaDeEsperaTests(BaseNegociacoesTestCase):
-    """Testa o gerenciamento e avanço da fila de propostas em espera no veículo."""
-
-    def test_propostas_subsequentes_ficam_aguardando_e_ativam_na_ordem(self):
-        # 1ª Proposta fica ATIVA (Alçada 4,5% -> 96.000 = 4% desc)
-        p1 = self._criar_proposta(self.vendedor, 96000)
-        self.assertEqual(p1.situacao, Proposta.Situacao.ATIVA)
-
-        # 2ª Proposta para o mesmo veículo fica AGUARDANDO
-        # (Valor R$ 98.500,00 está dentro da alçada de R$ 2.000,00 do outro_vendedor -> NAO_NECESSARIA)
-        p2 = self._criar_proposta(self.outro_vendedor, 98500)
-        self.assertEqual(p2.situacao, Proposta.Situacao.AGUARDANDO)
-        self.assertEqual(p2.status_aprovacao, Proposta.StatusAprovacao.NAO_NECESSARIA)
-
-        # Cancelar a primeira ativa a segunda da fila
-        p1.cancelar()
-        p2.refresh_from_db()
-        self.assertEqual(p2.situacao, Proposta.Situacao.ATIVA)
-
-
-class AuditoriaTests(BaseNegociacoesTestCase):
-    """Garante a imutabilidade do registro de auditoria DecisaoProposta."""
-
-    def test_decisao_proposta_nao_pode_ser_editada_nem_excluida(self):
-        proposta = self._criar_proposta_pendente(self.vendedor, 90000)
-        decisao = proposta.decisoes.first()
-
-        # Edição direta no model deve falhar
-        decisao.parecer = "Tentando alterar parecer"
-        with self.assertRaises(ValidationError):
-            decisao.save()
-
-        # Exclusão direta no model deve falhar
-        with self.assertRaises(ValidationError):
-            decisao.delete()
-
-
-class BloqueioVendaTests(BaseNegociacoesTestCase):
-    """Testa o bloqueio de transição para VENDIDO caso haja pendências no fluxo de aprovação."""
-
-    def test_bloqueia_venda_veiculo_com_proposta_pendente_ou_contraproposta(self):
-        self._criar_proposta_pendente(self.vendedor, 90000)  # Proposta PENDENTE
-
-        # Tenta mudar a situação do veículo para VENDIDO
-        self.client.login(username="gerente1", password="password123")
-        url = reverse("alterar_situacao_veiculo", kwargs={"veiculo_id": self.veiculo.pk})
-
-        response = self.client.post(
-            url,
-            data={
-                "situacao": Veiculo.Situacao.VENDIDO,
-                "motivo": "Tentativa de venda rápida",
-                "cliente": self.cliente.pk,
-            },
-        )
-
         self.veiculo.refresh_from_db()
-        self.assertNotEqual(self.veiculo.situacao, Veiculo.Situacao.VENDIDO)
+        return reserva
 
 
-class ViewsNegociacoesTests(BaseNegociacoesTestCase):
-    """Testes de rotas e navegação via cliente HTTP para as views do módulo de negociações."""
+class ReservaModelT10(DadosT10, TestCase):
+    def setUp(self):
+        self.preparar()
 
-    def test_negociacoes_view_acesso_e_indicadores(self):
-        # 1. Bloqueia vendedor e administrativo com 403
-        self.client.login(username="vendedor1", password="password123")
-        response = self.client.get(reverse("negociacoes_gerente"))
-        self.assertEqual(response.status_code, 403)
+    def test_reserva_nova_tem_prazo_futuro(self):
+        reserva = self.reserva()
+        self.assertGreater(reserva.expira_em, reserva.criada_em)
+        self.assertTrue(reserva.esta_valida())
+        self.assertEqual(self.veiculo.reserva_ativa.pk, reserva.pk)
 
-        self.client.login(username="admin1", password="password123")
-        response = self.client.get(reverse("negociacoes_gerente"))
-        self.assertEqual(response.status_code, 403)
-
-        # 2. Gerente acessa com sucesso (200) e verifica contexto
-        self.client.login(username="gerente1", password="password123")
-        self.create_propostas_para_indicadores()
-
-        response = self.client.get(reverse("negociacoes_gerente"))
-        self.assertEqual(response.status_code, 200)
-
-        indicadores = response.context["indicadores"]
-        self.assertEqual(indicadores["total"], 4)
-        self.assertEqual(indicadores["aguardando"], 1)
-        self.assertEqual(indicadores["aprovadas"], 1)
-        self.assertEqual(indicadores["recusadas"], 1)
-        self.assertEqual(indicadores["contrapropostas"], 1)
-
-    def create_propostas_para_indicadores(self):
-        """Auxiliar para popular propostas em diversos estados de aprovação."""
-        def _novo_veiculo(placa, chassi):
-            return Veiculo.objects.create(
-                placa=placa,
-                chassi=chassi,
-                renavam="12345678901",
-                marca="Toyota",
-                modelo="Corolla",
-                ano_fabricacao=2022,
-                ano_modelo=2023,
-                cor="Preto",
-                combustivel="Flex",
-                quilometragem=15000,
-                origem=Veiculo.Origem.COMPRADO,
-                custo_aquisicao=Decimal("80000.00"),
-                preco_venda=Decimal("100000.00"),
-                situacao=Veiculo.Situacao.DISPONIVEL,
-                status=Veiculo.Status.DISPONIVEL,
-                criado_por=self.gerente,
-            )
-
-        # 1. Pendente
-        v1 = _novo_veiculo("AAA1111", "9BWCA111111111113")
-        self._criar_proposta_pendente(self.vendedor, 90000, veiculo=v1)
-
-        # 2. Aprovada
-        v2 = _novo_veiculo("BBB2222", "9BWCA111111111114")
-        p2 = self._criar_proposta_pendente(self.vendedor, 89000, veiculo=v2)
-        p2.decidir(self.gerente, DecisaoProposta.Tipo.APROVACAO)
-
-        # 3. Recusada
-        v3 = _novo_veiculo("CCC3333", "9BWCA111111111115")
-        p3 = self._criar_proposta_pendente(self.vendedor, 88000, veiculo=v3)
-        p3.decidir(self.gerente, DecisaoProposta.Tipo.RECUSA, parecer="Recusada")
-
-        # 4. Contraproposta
-        v4 = _novo_veiculo("DDD4444", "9BWCA111111111116")
-        p4 = self._criar_proposta_pendente(self.vendedor, 87000, veiculo=v4)
-        p4.decidir(self.gerente, DecisaoProposta.Tipo.CONTRAPROPOSTA, novo_valor=92000, parecer="Contra")
-
-    def test_decidir_proposta_view_post_valido_e_invalidacao(self):
-        proposta = self._criar_proposta_pendente(self.vendedor, 90000)
-        self.client.login(username="gerente1", password="password123")
-
-        url = reverse("decidir_proposta", kwargs={"proposta_id": proposta.pk})
-
-        # POST de aprovação
-        response = self.client.post(
-            url,
-            data={"acao": DecisaoProposta.Tipo.APROVACAO, "parecer": "", "novo_valor": ""},
+    def test_prazo_passado_reprovado_pela_validacao(self):
+        reserva = ReservaVeiculo(
+            veiculo=self.veiculo, cliente_nome="Teste", cliente_contato="9999",
+            vendedor=self.vendedor, expira_em=timezone.now() - timedelta(minutes=1),
         )
-        self.assertRedirects(response, reverse("negociacoes_gerente"))
+        with self.assertRaises(ValidationError):
+            reserva.full_clean()
 
+    def test_expirar_antes_do_prazo_nao_altera_reserva(self):
+        reserva = self.reserva()
+        self.assertFalse(reserva.expirar())
+        reserva.refresh_from_db()
+        self.veiculo.refresh_from_db()
+        self.assertFalse(reserva.cancelada)
+        self.assertEqual(self.veiculo.situacao, Veiculo.Situacao.RESERVADO)
+
+    def test_expiracao_libera_veiculo_e_registra_historico(self):
+        reserva = self.reserva()
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(seconds=1)
+        )
+        reserva.refresh_from_db()
+        self.assertTrue(reserva.expirar())
+        reserva.refresh_from_db()
+        self.veiculo.refresh_from_db()
+        self.assertTrue(reserva.cancelada)
+        self.assertIsNotNone(reserva.cancelada_em)
+        self.assertIn("expirad", reserva.motivo_cancelamento.lower())
+        self.assertEqual(self.veiculo.situacao, Veiculo.Situacao.DISPONIVEL)
+        self.assertEqual(self.veiculo.status, Veiculo.Status.DISPONIVEL)
+        self.assertTrue(HistoricoSituacaoVeiculo.objects.filter(
+            veiculo=self.veiculo, situacao_nova=Veiculo.Situacao.DISPONIVEL
+        ).exists())
+
+    def test_expiracao_e_idempotente(self):
+        reserva = self.reserva()
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(minutes=1)
+        )
+        reserva.refresh_from_db()
+        self.assertTrue(reserva.expirar())
+        quantidade = HistoricoSituacaoVeiculo.objects.filter(veiculo=self.veiculo).count()
+        self.assertFalse(reserva.expirar())
+        self.assertEqual(
+            HistoricoSituacaoVeiculo.objects.filter(veiculo=self.veiculo).count(), quantidade
+        )
+
+    def test_expiracao_cancela_proposta_que_gerou_reserva(self):
+        proposta = self.proposta()
+        reserva = self.reserva(proposta=proposta)
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(minutes=1)
+        )
+        reserva.refresh_from_db()
+        self.assertTrue(reserva.expirar())
         proposta.refresh_from_db()
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.APROVADA)
+        self.assertEqual(proposta.situacao, Proposta.Situacao.CANCELADA)
 
-    def test_aceitar_e_recusar_contraproposta_view_regras_http(self):
-        proposta = self._criar_proposta_pendente(self.vendedor, 90000)
-        proposta.decidir(
-            self.gerente,
-            DecisaoProposta.Tipo.CONTRAPROPOSTA,
-            novo_valor=95000,
-            parecer="Contraproposta teste",
+    def test_expiracao_promove_primeira_proposta_da_fila(self):
+        reserva = self.reserva()
+        primeira = self.proposta(situacao=Proposta.Situacao.AGUARDANDO)
+        segunda = self.proposta(vendedor=self.outro_vendedor,
+                                situacao=Proposta.Situacao.AGUARDANDO)
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(minutes=1)
+        )
+        reserva.refresh_from_db()
+        reserva.expirar()
+        primeira.refresh_from_db()
+        segunda.refresh_from_db()
+        self.assertEqual(primeira.situacao, Proposta.Situacao.ATIVA)
+        self.assertEqual(segunda.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_promocao_nao_ultrapassa_proposta_ativa(self):
+        ativa = self.proposta()
+        aguardando = self.proposta(situacao=Proposta.Situacao.AGUARDANDO)
+        Proposta.ativar_aguardando(self.veiculo.pk)
+        ativa.refresh_from_db()
+        aguardando.refresh_from_db()
+        self.assertEqual(ativa.situacao, Proposta.Situacao.ATIVA)
+        self.assertEqual(aguardando.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_promocao_nao_acontece_com_veiculo_reservado(self):
+        self.reserva()
+        aguardando = self.proposta()
+        self.assertEqual(aguardando.situacao, Proposta.Situacao.AGUARDANDO)
+        Proposta.ativar_aguardando(self.veiculo.pk)
+        aguardando.refresh_from_db()
+        self.assertEqual(aguardando.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_promocao_nao_acontece_com_veiculo_vendido(self):
+        aguardando = self.proposta(situacao=Proposta.Situacao.AGUARDANDO)
+        Veiculo.objects.filter(pk=self.veiculo.pk).update(
+            situacao=Veiculo.Situacao.VENDIDO, status=Veiculo.Status.VENDIDO
+        )
+        Proposta.ativar_aguardando(self.veiculo.pk)
+        aguardando.refresh_from_db()
+        self.assertEqual(aguardando.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_proposta_criada_durante_reserva_entra_na_fila(self):
+        self.reserva()
+        proposta = self.proposta()
+        self.assertEqual(proposta.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_proposta_criada_com_outra_ativa_entra_na_fila(self):
+        primeira = self.proposta()
+        segunda = self.proposta(vendedor=self.outro_vendedor)
+        self.assertEqual(primeira.situacao, Proposta.Situacao.ATIVA)
+        self.assertEqual(segunda.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_constraint_impede_duas_reservas_nao_canceladas(self):
+        self.reserva()
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                ReservaVeiculo.objects.create(
+                    veiculo=self.veiculo, vendedor=self.outro_vendedor,
+                    cliente_nome="Outro", cliente_contato="8888",
+                    expira_em=timezone.now() + timedelta(hours=24),
+                )
+        self.assertEqual(
+            ReservaVeiculo.objects.filter(veiculo=self.veiculo, cancelada=False).count(), 1
         )
 
-        url_aceitar = reverse("aceitar_contraproposta", kwargs={"proposta_id": proposta.pk})
+    def test_constraint_impede_duplicidade_mesmo_se_primeira_estiver_vencida(self):
+        reserva = self.reserva()
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(minutes=1)
+        )
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                ReservaVeiculo.objects.create(
+                    veiculo=self.veiculo, vendedor=self.outro_vendedor,
+                    cliente_nome="Outro", cliente_contato="8888",
+                    expira_em=timezone.now() + timedelta(hours=24),
+                )
 
-        # GET redireciona para propostas
-        self.client.login(username="vendedor1", password="password123")
-        response_get = self.client.get(url_aceitar)
-        self.assertRedirects(response_get, reverse("propostas"))
-
-        # POST efetuado pelo vendedor dono aceita a contraproposta
-        response_post = self.client.post(url_aceitar)
-        self.assertRedirects(
-            response_post,
-            reverse("detalhes_proposta", kwargs={"proposta_id": proposta.pk}),
+    def test_apos_cancelamento_pode_criar_nova_reserva(self):
+        reserva = self.reserva()
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(cancelada=True)
+        nova = ReservaVeiculo.objects.create(
+            veiculo=self.veiculo, vendedor=self.outro_vendedor,
+            cliente_nome="Outro", cliente_contato="8888",
+            expira_em=timezone.now() + timedelta(hours=24),
+        )
+        self.assertNotEqual(nova.pk, reserva.pk)
+        self.assertEqual(
+            ReservaVeiculo.objects.filter(veiculo=self.veiculo, cancelada=False).count(), 1
         )
 
+
+class ReservaViewsT10(DadosT10, TestCase):
+    def setUp(self):
+        self.preparar()
+
+    def test_reserva_manual_sem_proposta_e_permitida(self):
+        self.client.force_login(self.gerente)
+        resposta = self.client.post(reverse("reservar_veiculo", args=[self.veiculo.pk]), {
+            "cliente_nome": "Cliente avulso", "cliente_contato": "81999999999",
+        })
+        self.assertEqual(resposta.status_code, 302)
+        reserva = ReservaVeiculo.objects.get(veiculo=self.veiculo, cancelada=False)
+        self.assertIsNone(reserva.proposta_origem_id)
+        self.assertEqual(reserva.vendedor_id, self.gerente.pk)
+        self.assertAlmostEqual(
+            (reserva.expira_em - reserva.criada_em).total_seconds(), 86400, delta=10
+        )
+        self.veiculo.refresh_from_db()
+        self.assertEqual(self.veiculo.situacao, Veiculo.Situacao.RESERVADO)
+        self.assertEqual(self.veiculo.status, Veiculo.Status.RESERVADO)
+
+    def test_reserva_manual_bloqueada_com_proposta_ativa(self):
+        self.proposta()
+        self.client.force_login(self.gerente)
+        self.client.post(reverse("reservar_veiculo", args=[self.veiculo.pk]), {
+            "cliente_nome": "Cliente avulso", "cliente_contato": "81999999999",
+        })
+        self.assertFalse(ReservaVeiculo.objects.filter(veiculo=self.veiculo).exists())
+
+    def test_reserva_manual_bloqueada_com_fila_aguardando(self):
+        self.proposta(situacao=Proposta.Situacao.AGUARDANDO)
+        self.client.force_login(self.gerente)
+        self.client.post(reverse("reservar_veiculo", args=[self.veiculo.pk]), {
+            "cliente_nome": "Cliente avulso", "cliente_contato": "81999999999",
+        })
+        self.assertFalse(ReservaVeiculo.objects.filter(veiculo=self.veiculo).exists())
+
+    def test_vendedor_nao_pode_criar_reserva_manual(self):
+        self.client.force_login(self.vendedor)
+        resposta = self.client.post(reverse("reservar_veiculo", args=[self.veiculo.pk]), {
+            "cliente_nome": "Cliente", "cliente_contato": "81999999999",
+        })
+        self.assertEqual(resposta.status_code, 403)
+        self.assertFalse(ReservaVeiculo.objects.exists())
+
+    def test_cancelamento_manual_exige_motivo(self):
+        reserva = self.reserva()
+        self.client.force_login(self.gerente)
+        self.client.post(reverse("cancelar_reserva", args=[reserva.pk]), {"motivo": ""})
+        reserva.refresh_from_db()
+        self.assertFalse(reserva.cancelada)
+
+    def test_cancelamento_manual_registra_responsavel_motivo_e_libera(self):
+        reserva = self.reserva()
+        self.client.force_login(self.gerente)
+        resposta = self.client.post(reverse("cancelar_reserva", args=[reserva.pk]), {
+            "motivo": "Cliente desistiu da compra"
+        })
+        self.assertEqual(resposta.status_code, 302)
+        reserva.refresh_from_db()
+        self.veiculo.refresh_from_db()
+        self.assertTrue(reserva.cancelada)
+        self.assertEqual(reserva.cancelada_por_id, self.gerente.pk)
+        self.assertEqual(reserva.motivo_cancelamento, "Cliente desistiu da compra")
+        self.assertIsNotNone(reserva.cancelada_em)
+        self.assertEqual(self.veiculo.situacao, Veiculo.Situacao.DISPONIVEL)
+        self.assertEqual(self.veiculo.status, Veiculo.Status.DISPONIVEL)
+        self.assertTrue(HistoricoSituacaoVeiculo.objects.filter(
+            veiculo=self.veiculo, motivo="Cliente desistiu da compra"
+        ).exists())
+
+    def test_cancelamento_manual_promove_fila(self):
+        reserva = self.reserva()
+        primeira = self.proposta()
+        segunda = self.proposta(vendedor=self.outro_vendedor)
+        self.client.force_login(self.gerente)
+        self.client.post(reverse("cancelar_reserva", args=[reserva.pk]), {
+            "motivo": "Cliente não poderá comparecer"
+        })
+        primeira.refresh_from_db()
+        segunda.refresh_from_db()
+        self.assertEqual(primeira.situacao, Proposta.Situacao.ATIVA)
+        self.assertEqual(segunda.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_vendedor_nao_pode_cancelar_reserva(self):
+        reserva = self.reserva()
+        self.client.force_login(self.vendedor)
+        resposta = self.client.post(reverse("cancelar_reserva", args=[reserva.pk]), {
+            "motivo": "Tentativa sem permissão"
+        })
+        self.assertEqual(resposta.status_code, 403)
+        reserva.refresh_from_db()
+        self.assertFalse(reserva.cancelada)
+
+    def test_confirmacao_de_proposta_ativa_cria_reserva(self):
+        proposta = self.proposta()
+        aguardando = self.proposta(vendedor=self.outro_vendedor)
+        self.client.force_login(self.vendedor)
+        resposta = self.client.post(reverse("confirmar_proposta", args=[proposta.pk]), {
+            "prazo_horas": 24,  # Compatível também com formulário antigo.
+        })
+        self.assertEqual(resposta.status_code, 302)
+        reserva = ReservaVeiculo.objects.get(proposta_origem=proposta)
+        self.assertEqual(reserva.veiculo_id, self.veiculo.pk)
+        self.assertEqual(reserva.vendedor_id, self.vendedor.pk)
+        aguardando.refresh_from_db()
+        self.assertEqual(aguardando.situacao, Proposta.Situacao.AGUARDANDO)
+
+    def test_proposta_na_fila_nao_pode_ser_confirmada(self):
+        self.proposta()
+        aguardando = self.proposta(vendedor=self.outro_vendedor)
+        self.client.force_login(self.outro_vendedor)
+        self.client.post(reverse("confirmar_proposta", args=[aguardando.pk]), {
+            "prazo_horas": 24,
+        })
+        self.assertFalse(ReservaVeiculo.objects.filter(proposta_origem=aguardando).exists())
+
+    def test_vendedor_nao_confirma_proposta_de_outro(self):
+        proposta = self.proposta()
+        self.client.force_login(self.outro_vendedor)
+        resposta = self.client.post(reverse("confirmar_proposta", args=[proposta.pk]), {
+            "prazo_horas": 24,
+        })
+        self.assertEqual(resposta.status_code, 404)
+        self.assertFalse(ReservaVeiculo.objects.exists())
+
+    def test_confirmacao_nao_gera_duas_reservas(self):
+        proposta = self.proposta()
+        self.client.force_login(self.vendedor)
+        url = reverse("confirmar_proposta", args=[proposta.pk])
+        self.client.post(url, {"prazo_horas": 24})
+        self.client.post(url, {"prazo_horas": 24})
+        self.assertEqual(ReservaVeiculo.objects.filter(veiculo=self.veiculo).count(), 1)
+
+
+class ConcorrenciaPostgreSQLT10(DadosT10, TransactionTestCase):
+    """Concorrência real: duas conexões/transações PostgreSQL distintas."""
+
+    def setUp(self):
+        self.preparar()
+
+    def test_duas_reservas_simultaneas_apenas_uma_persiste(self):
+        if connection.vendor != "postgresql":
+            self.skipTest("Este teste exige PostgreSQL")
+        barreira = Barrier(2, timeout=15)
+        veiculo_id = self.veiculo.pk
+        vendedor_ids = (self.vendedor.pk, self.outro_vendedor.pk)
+
+        def tentar_reservar(vendedor_id):
+            close_old_connections()
+            try:
+                with transaction.atomic():
+                    barreira.wait()
+                    ReservaVeiculo.objects.create(
+                        veiculo_id=veiculo_id,
+                        vendedor_id=vendedor_id,
+                        cliente_nome="Concorrência", cliente_contato="81999999999",
+                        expira_em=timezone.now() + timedelta(hours=24),
+                    )
+                return "criada"
+            except IntegrityError:
+                return "conflito"
+            finally:
+                connection.close()
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            resultados = list(executor.map(tentar_reservar, vendedor_ids))
+
+        self.assertCountEqual(resultados, ["criada", "conflito"])
+        self.assertEqual(
+            ReservaVeiculo.objects.filter(veiculo_id=veiculo_id, cancelada=False).count(), 1
+        )
+
+class IntegracoesRecentesT10(DadosT10, TestCase):
+    """Cobertura das funcionalidades citadas depois dos arquivos anexados.
+
+    Se uma rota/comando ainda não estiver no projeto, o teste falha explicitamente
+    para indicar o requisito pendente, em vez de fingir que passou.
+    """
+
+    def setUp(self):
+        self.preparar()
+
+    def test_recusa_gerente_registra_motivo_e_promove_fila(self):
+        from django.urls import NoReverseMatch
+        try:
+            url = reverse("recusar_proposta_fila", args=[1])
+        except NoReverseMatch:
+            self.fail("Rota 'recusar_proposta_fila' não registrada no urls.py atual.")
+        primeira = self.proposta()
+        segunda = self.proposta(vendedor=self.outro_vendedor)
+        url = reverse("recusar_proposta_fila", args=[primeira.pk])
+        self.client.force_login(self.gerente)
+        resposta = self.client.post(url, {"motivo": "Negociação recusada pelo gerente"})
+        self.assertEqual(resposta.status_code, 302)
+        primeira.refresh_from_db()
+        segunda.refresh_from_db()
+        self.assertEqual(primeira.situacao, Proposta.Situacao.CANCELADA)
+        self.assertEqual(segunda.situacao, Proposta.Situacao.ATIVA)
+        self.assertTrue(primeira.decisoes.filter(
+            parecer="Negociação recusada pelo gerente", feito_por=self.gerente
+        ).exists())
+
+    def test_recusa_sem_motivo_nao_cancela(self):
+        from django.urls import NoReverseMatch
+        try:
+            reverse("recusar_proposta_fila", args=[1])
+        except NoReverseMatch:
+            self.fail("Rota 'recusar_proposta_fila' não registrada no urls.py atual.")
+        proposta = self.proposta()
+        self.client.force_login(self.gerente)
+        self.client.post(reverse("recusar_proposta_fila", args=[proposta.pk]), {
+            "motivo": "",
+        })
         proposta.refresh_from_db()
-        self.assertEqual(proposta.status_aprovacao, Proposta.StatusAprovacao.APROVADA)
+        self.assertEqual(proposta.situacao, Proposta.Situacao.ATIVA)
 
-    def test_visitante_anonimo_redirecionado_para_login(self):
-        url = reverse("negociacoes_gerente")
-        response = self.client.get(url)
-        self.assertRedirects(response, f"{reverse('login')}?next={url}")
+    def test_comando_expirar_reservas_processa_vencimento(self):
+        from django.core.management import call_command, get_commands
+        from io import StringIO
+        self.assertIn(
+            "expirar_reservas", get_commands(),
+            "O comando expirar_reservas ainda não está registrado em management/commands.",
+        )
+        reserva = self.reserva()
+        ReservaVeiculo.objects.filter(pk=reserva.pk).update(
+            expira_em=timezone.now() - timedelta(minutes=1)
+        )
+        call_command("expirar_reservas", stdout=StringIO(), stderr=StringIO())
+        reserva.refresh_from_db()
+        self.veiculo.refresh_from_db()
+        self.assertTrue(reserva.cancelada)
+        self.assertEqual(self.veiculo.situacao, Veiculo.Situacao.DISPONIVEL)

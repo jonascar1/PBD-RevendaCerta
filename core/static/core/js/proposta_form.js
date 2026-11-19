@@ -40,32 +40,32 @@
     }
 
     function centavos(valor) {
-    if (valor === null || valor === undefined || valor === "") {
-        return 0;
-    }
+        if (valor === null || valor === undefined || valor === "") {
+            return 0;
+        }
 
-    if (typeof valor === "number") {
-        return Number.isFinite(valor)
-            ? Math.round(valor * 100)
+        if (typeof valor === "number") {
+            return Number.isFinite(valor)
+                ? Math.round(valor * 100)
+                : 0;
+        }
+
+        var texto = String(valor)
+            .trim()
+            .replace(/[^\d,.-]/g, "");
+
+        if (texto.includes(",")) {
+            texto = texto.replace(/\./g, "").replace(",", ".");
+        } else if ((texto.match(/\./g) || []).length > 1) {
+            texto = texto.replace(/\./g, "");
+        }
+
+        var numero = Number(texto);
+
+        return Number.isFinite(numero)
+            ? Math.round(numero * 100)
             : 0;
     }
-
-    var texto = String(valor)
-        .trim()
-        .replace(/[^\d,.-]/g, "");
-
-    if (texto.includes(",")) {
-        texto = texto.replace(/\./g, "").replace(",", ".");
-    } else if ((texto.match(/\./g) || []).length > 1) {
-        texto = texto.replace(/\./g, "");
-    }
-
-    var numero = Number(texto);
-
-    return Number.isFinite(numero)
-        ? Math.round(numero * 100)
-        : 0;
-}
 
     function brl(c) {
         return (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -85,6 +85,13 @@
     function linhasAtivas() {
         return $$("[data-form-row], .composicao-linha", container).filter(function (l) {
             return !linhaExcluida(l);
+        });
+    }
+
+    function renumerarLinhas() {
+        linhasAtivas().forEach(function (linha, i) {
+            var n = $("[data-row-number]", linha);
+            if (n) n.textContent = i + 1;
         });
     }
 
@@ -165,7 +172,7 @@
             soma += valor ? centavos(valor.value) : 0;
         });
 
-        var diferenca = soma - oferecido;
+        var diferenca = oferecido - soma;
 
         // Atualização de Preço de Tabela e Desconto
         definirTexto("resumo-preco-tabela", tabela !== null ? brl(tabela) : "R$ 0,00");
@@ -200,9 +207,9 @@
             } else {
                 aviso.hidden = false;
                 aviso.style.display = "flex";
-                var mensagem = diferenca > 0
-                    ? "A soma das formas de pagamento excede o valor oferecido em " + brl(diferenca) + "."
-                    : "Faltam " + brl(Math.abs(diferenca)) + " na composição para atingir o valor oferecido.";
+                var mensagem = diferenca < 0
+                    ? "A soma das formas de pagamento excede o valor oferecido em " + brl(Math.abs(diferenca)) + "."
+                    : "Faltam " + brl(diferenca) + " na composição para atingir o valor oferecido.";
                 
                 if (textoAviso) {
                     textoAviso.textContent = mensagem;
@@ -220,6 +227,8 @@
             avisoReserva.hidden = !reservado;
             definirTexto("aviso-reserva-prazo", reservado ? (veiculo.reserva_prazo || veiculo.reserva_expira || "") : "");
         }
+
+        renumerarLinhas();
     }
 
     // ---------- Eventos ----------

@@ -167,22 +167,30 @@
                     >
                         {% csrf_token %}
 
-                        <div class="form-linha">
-                            <input
-                                type="text"
-                                name="cliente_nome"
-                                placeholder="Nome do cliente"
-                            >
+                        <div class="campo-form">
+                            {{ form_reserva.cliente.label_tag }}
+                            {{ form_reserva.cliente }}
+                        </div>
 
-                            <input
-                                type="text"
-                                name="cliente_contato"
-                                placeholder="Contato do cliente"
-                            >
+                        <p class="separador-reserva">
+                            ou informe um cliente não cadastrado
+                        </p>
+
+                        <div class="form-linha">
+                            <div class="campo-form">
+                                {{ form_reserva.cliente_nome.label_tag }}
+                                {{ form_reserva.cliente_nome }}
+                            </div>
+
+                            <div class="campo-form">
+                                {{ form_reserva.cliente_contato.label_tag }}
+                                {{ form_reserva.cliente_contato }}
+                            </div>
                         </div>
 
                         <button type="submit" class="btn-situacao btn-reservar">
-                            <i data-lucide="pin"></i> Reservar veículo
+                            <i data-lucide="pin"></i>
+                            Reservar veículo
                         </button>
                     </form>
 
@@ -216,61 +224,54 @@
                     <div class="acoes-situacao">
 
                         <form
-                            method="post" novalidate
+                            method="post"
                             action="{% url 'alterar_situacao_veiculo' veiculo.id %}"
                             class="form-situacao acao-venda"
                         >
                             {% csrf_token %}
 
-                            <input
-                                type="hidden"
-                                name="situacao"
-                                value="VENDIDO"
-                            >
+                            {{ form_venda.situacao.as_hidden }}
 
-                            <select name="cliente" class="select-cliente">
-                                    <option value="" selected>Selecione o cliente comprador...</option>
-                                    {% for c in clientes_list %}
-                                        <option value="{{ c.id }}">{{ c.nome_exibicao }}</option>
-                                    {% endfor %}
-                            </select>
-                     
+                            <h4>Registrar venda</h4>
 
-                            <input
-                                type="text"
-                                name="motivo"
-                                placeholder="Motivo da venda"
-                            >
+                            <div class="campo-form">
+                                {{ form_venda.cliente.label_tag }}
+                                {{ form_venda.cliente }}
+                            </div>
+
+                            <div class="campo-form">
+                                {{ form_venda.motivo.label_tag }}
+                                {{ form_venda.motivo }}
+                            </div>
 
                             <button type="submit" class="btn-situacao btn-vendido">
-                                <i data-lucide="dollar-sign"></i> Registrar venda
+                                <i data-lucide="dollar-sign"></i>
+                                Registrar venda
                             </button>
                         </form>
 
 
+                        {% if reserva %}
                         <form
-                            method="post" novalidate
-                            action="{% url 'alterar_situacao_veiculo' veiculo.id %}"
+                            method="post"
+                            action="{% url 'cancelar_reserva' reserva.id %}"
                             class="form-situacao"
                         >
                             {% csrf_token %}
 
-                            <input
-                                type="hidden"
-                                name="situacao"
-                                value="DISPONIVEL"
-                            >
+                            <h4>Cancelar reserva</h4>
 
-                            <input
-                                type="text"
-                                name="motivo"
-                                placeholder="Motivo da liberação"
-                            >
+                            <div class="campo-form">
+                                {{ form_cancelamento.motivo.label_tag }}
+                                {{ form_cancelamento.motivo }}
+                            </div>
 
                             <button type="submit" class="btn-situacao btn-liberar">
-                                ↩ Liberar reserva
+                                <i data-lucide="x-circle"></i>
+                                Cancelar reserva
                             </button>
                         </form>
+                        {% endif %}
 
                     </div>
 
@@ -591,6 +592,148 @@
 
     </div>
 
+</section>
+
+<section class="historico-reservas">
+
+    <div class="historico-reservas__cabecalho">
+        <h2>Histórico de reservas</h2>
+        <p>Consulte as reservas realizadas para este veículo.</p>
+    </div>
+
+    {% if historico_reservas %}
+
+        <div class="historico-reservas__lista">
+
+            {% for item in historico_reservas %}
+
+                <article class="historico-reservas__item">
+
+                    <div class="historico-reservas__topo">
+
+                        <strong>Reserva #{{ item.pk }}</strong>
+
+                        {% if item.cancelada %}
+
+                            {% if item.motivo_cancelamento == "Reserva expirada automaticamente" %}
+                                <span class="historico-reservas__status expirado">
+                                    Expirada
+                                </span>
+                            {% else %}
+                                <span class="historico-reservas__status cancelado">
+                                    Cancelada
+                                </span>
+                            {% endif %}
+
+                        {% elif item.expira_em <= agora %}
+                            <span class="historico-reservas__status expirado">
+                                Vencida
+                            </span>
+
+                        {% else %}
+                            <span class="historico-reservas__status ativa">
+                                Ativa
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="historico-reservas__dados">
+
+                        <p><strong>Cliente:</strong> {{ item.cliente_nome }}</p>
+
+                        <p><strong>Vendedor:</strong> {{ item.vendedor.get_full_name|default:item.vendedor.username }}</p>
+
+                        <p><strong>Criada em:</strong> {{ item.criada_em|date:"d/m/Y H:i" }}</p>
+
+                        <p><strong>Prazo:</strong> {{ item.expira_em|date:"d/m/Y H:i" }}</p>
+
+                        {% if item.proposta_origem %}
+                            <p>
+                                <strong>Proposta:</strong>
+                                #{{ item.proposta_origem.pk }}
+                            </p>
+                        {% endif %}
+
+                        {% if item.cancelada %}
+
+                            <p>
+                                <strong>Encerrada em:</strong>
+                                {{ item.cancelada_em|date:"d/m/Y H:i" }}
+                            </p>
+
+                            <p>
+                                <strong>Encerrada por:</strong>
+                                {% if item.cancelada_por %}
+                                    {{ item.cancelada_por.get_full_name|default:item.cancelada_por.username }}
+                                {% else %}
+                                    Sistema (expiração automática)
+                                {% endif %}
+                            </p>
+
+                            <p class="historico-reservas__motivo">
+                                <strong>Motivo:</strong>
+                                {{ item.motivo_cancelamento|default:"Não informado" }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p class="historico-reservas__vazio">
+            Nenhuma reserva registrada para este veículo.
+        </p>
+
+    {% endif %}
+
+</section>
+
+<section class="historico-reservas">
+    <h2>Propostas pendentes</h2>
+
+    {% for proposta in propostas_pendentes %}
+        <div class="historico-reservas__item">
+            <p>
+                <strong>Proposta #{{ proposta.pk }}</strong>
+                — {{ proposta.get_situacao_display }}
+            </p>
+
+            <p>Cliente: {{ proposta.cliente }}</p>
+            <p>Vendedor: {{ proposta.vendedor }}</p>
+
+            <form
+                method="post"
+                action="{% url 'recusar_proposta_fila' proposta.pk %}"
+            >
+                {% csrf_token %}
+
+                <label for="motivo-{{ proposta.pk }}">
+                    Motivo da recusa
+                </label>
+
+                <textarea
+                    id="motivo-{{ proposta.pk }}"
+                    name="motivo"
+                    required
+                    maxlength="1000"
+                ></textarea>
+
+                <button type="submit">
+                    Recusar proposta
+                </button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Não existem propostas pendentes.</p>
+    {% endfor %}
 </section>
 
 {% endblock content %}

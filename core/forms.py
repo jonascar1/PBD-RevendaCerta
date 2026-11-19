@@ -435,25 +435,57 @@ class VeiculoForm(BaseForm, forms.ModelForm):
 # ======================================================================
 # AÇÕES NA TELA DE DETALHES DO VEÍCULO
 # ======================================================================
+
 class ReservaForm(BaseForm, forms.Form):
-    cliente_nome = forms.CharField(
-        label="Nome do cliente",
-        max_length=120,
-        error_messages={"required": "Informe o nome do cliente."},
-    )
-    cliente_contato = forms.CharField(
-        label="Contato do cliente",
-        max_length=60,
-        error_messages={"required": "Informe o contato do cliente."},
-    )
-    
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.filter(ativo=True),
         required=False,
         label="Cliente cadastrado",
         empty_label="Selecione um cliente...",
-        error_messages={"invalid_choice": "Selecione um cliente válido."},
     )
+
+    cliente_nome = forms.CharField(
+        label="Nome do cliente não cadastrado",
+        max_length=120,
+        required=False,
+    )
+
+    cliente_contato = forms.CharField(
+        label="Contato do cliente não cadastrado",
+        max_length=60,
+        required=False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        cliente = cleaned_data.get("cliente")
+        nome = (cleaned_data.get("cliente_nome") or "").strip()
+        contato = (cleaned_data.get("cliente_contato") or "").strip()
+
+        if cliente:
+            cleaned_data["cliente_nome"] = cliente.nome_exibicao
+
+            telefone = cliente.telefones.first()
+
+            cleaned_data["cliente_contato"] = (
+                telefone.numero if telefone else cliente.email
+            ) or "Contato não informado"
+
+        else:
+            if not nome:
+                self.add_error(
+                    "cliente_nome",
+                    "Informe o nome do cliente não cadastrado."
+                )
+
+            if not contato:
+                self.add_error(
+                    "cliente_contato",
+                    "Informe o contato do cliente não cadastrado."
+                )
+
+        return cleaned_data
 
 class AlterarSituacaoForm(BaseForm, forms.Form):
     situacao = forms.ChoiceField(
@@ -543,8 +575,13 @@ class ClienteForm(BaseForm, forms.ModelForm):
                 format="%Y-%m-%d",
                 attrs={"type": "date"},
             ),
+            "email": forms.EmailInput(
+                attrs={"placeholder": "cliente@email.com"}
+            ),
         }
-
+        error_messages = {
+            "email": {"invalid": "Informe um e-mail válido."},
+        }
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("auto_id", "id_%s")
         super().__init__(*args, **kwargs)
@@ -564,15 +601,21 @@ class ClienteForm(BaseForm, forms.ModelForm):
             "",
             self.cleaned_data.get(nome) or "",
         )
-
     def clean_cpf(self):
         cpf = self._somente_numeros("cpf")
         tipo = self.cleaned_data.get("tipo")
 
         if tipo == Cliente.Tipo.PESSOA_FISICA:
             if not validar_cpf(cpf):
+                raise forms.ValidationError("Informe um CPF válido.")
+
+            if (
+                Cliente.objects.filter(cpf=cpf)
+                .exclude(pk=self.instance.pk)
+                .exists()
+            ):
                 raise forms.ValidationError(
-                    "Informe um CPF válido."
+                    "Já existe um cliente cadastrado com este CPF."
                 )
 
         return cpf
@@ -583,8 +626,15 @@ class ClienteForm(BaseForm, forms.ModelForm):
 
         if tipo == Cliente.Tipo.PESSOA_JURIDICA:
             if not validar_cnpj(cnpj):
+                raise forms.ValidationError("Informe um CNPJ válido.")
+
+            if (
+                Cliente.objects.filter(cnpj=cnpj)
+                .exclude(pk=self.instance.pk)
+                .exists()
+            ):
                 raise forms.ValidationError(
-                    "Informe um CNPJ válido."
+                    "Já existe um cliente cadastrado com este CNPJ."
                 )
 
         return cnpj
@@ -632,8 +682,37 @@ class ClienteForm(BaseForm, forms.ModelForm):
             cleaned["data_nascimento"] = None
 
         return cleaned
+    def clean_email(self):
+        return (self.cleaned_data.get("email") or "").strip().lower()
 
+class BaseTelefoneFormSet(BaseInlineFormSet):
+    """Valida o conjunto de telefones: no máximo um principal."""
 
+    def clean(self):
+        super().clean()
+
+        # Linhas com erro de campo aparecem primeiro.
+        if any(self.errors):
+            return
+
+        ativos = [
+            f for f in self.forms
+            if getattr(f, "cleaned_data", None)
+            and not f.cleaned_data.get("DELETE")
+            and f.cleaned_data.get("numero")
+        ]
+
+        principais = [f for f in ativos if f.cleaned_data.get("principal")]
+
+        if len(principais) > 1:
+            raise forms.ValidationError(
+                "Marque apenas um telefone como principal."
+            )
+
+        # Nenhum marcado: o primeiro vira o principal.
+        if ativos and not principais:
+            ativos[0].cleaned_data["principal"] = True
+            ativos[0].instance.principal = True
 class TelefoneClienteForm(BaseForm, forms.ModelForm):
     class Meta:
         model = TelefoneCliente
@@ -657,11 +736,11 @@ class TelefoneClienteForm(BaseForm, forms.ModelForm):
 
         return numero
 
-
 TelefoneClienteFormSet = inlineformset_factory(
     Cliente,
     TelefoneCliente,
     form=TelefoneClienteForm,
+    formset=BaseTelefoneFormSet,
     extra=1,
     min_num=1,
     validate_min=True,
@@ -963,3 +1042,30 @@ class DecisaoPropostaForm(BaseForm, forms.Form):
         required=False,
         min_value=Decimal("0.01"),
     )
+class ConfirmarPropostaForm(BaseForm, forms.Form):
+    pass
+
+
+class CancelarReservaForm(BaseForm, forms.Form):
+    motivo = forms.CharField(
+        label="Motivo do cancelamento",
+        min_length=5,
+        max_length=1000,
+        widget=forms.Textarea(attrs={
+            "rows": 3,
+            "placeholder": "Explique por que a reserva será cancelada...",
+        }),
+        error_messages={
+            "required": "Informe o motivo do cancelamento.",
+        },
+    )
+
+    def clean_motivo(self):
+        motivo = self.cleaned_data["motivo"].strip()
+
+        if len(motivo) < 5:
+            raise forms.ValidationError(
+                "O motivo precisa ter pelo menos 5 caracteres."
+            )
+
+        return motivo
