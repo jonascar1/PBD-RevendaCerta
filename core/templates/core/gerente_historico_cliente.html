@@ -27,6 +27,7 @@
         </a>
     </div>
 </header>
+
 <!-- RESUMO -->
 <section class="hist-resumo">
     <div class="card-info">
@@ -64,9 +65,14 @@
                 <span>Contatos realizados</span>
                 <strong>{{ resumo.contatos|length }}</strong>
             </div>
+            <div class="info-item">
+                <span>Procuras registradas</span>
+                <strong>{{ resumo.procuras|length }}</strong>
+            </div>
         </div>
     </div>
 </section>
+
 <!-- COMPRAS -->
 <section class="hist-secao">
     <h2>Compras</h2>
@@ -99,6 +105,7 @@
         </table>
     </div>
 </section>
+
 <!-- TROCAS -->
 <section class="hist-secao">
     <h2>Veículos entregues na troca</h2>
@@ -133,6 +140,7 @@
         </table>
     </div>
 </section>
+
 <!-- PROPOSTAS QUE NÃO FECHARAM -->
 <section class="hist-secao">
     <h2>Propostas que não fecharam</h2>
@@ -192,6 +200,7 @@
     </div>
 </section>
 {% endif %}
+
 <!-- CONTATOS DA CARTEIRA -->
 <section class="hist-secao">
     <h2>Contatos realizados</h2>
@@ -227,6 +236,48 @@
                 </tr>
                 {% empty %}
                 <tr><td colspan="5" class="hist-vazio">Nenhum contato registrado na carteira.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+<!-- PROCURAS -->
+<section class="hist-secao">
+    <h2>Procuras registradas</h2>
+
+    <div class="hist-tabela-wrap">
+        <table class="hist-tabela">
+            <thead>
+                <tr>
+                    <th>Registrada em</th>
+                    <th>O que procura</th>
+                    <th>Vendedor</th>
+                    <th>Válida até</th>
+                    <th>Situação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for procura in resumo.procuras %}
+                <tr>
+                    <td>{{ procura.criada_em|date:"d/m/Y" }}</td>
+                    <td class="hist-motivo">{{ procura.resumo }}</td>
+                    <td>{{ procura.vendedor.get_full_name|default:procura.vendedor.username }}</td>
+                    <td>{{ procura.valido_ate|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if procura.esta_aberta and procura.valido_ate < hoje %}
+                            Vencida
+                        {% else %}
+                            {{ procura.get_situacao_display }}
+                        {% endif %}
+                        {% if procura.venda_atendida_id %}
+                            <small>
+                                <a href="{% url 'detalhes_venda' procura.venda_atendida_id %}">venda #{{ procura.venda_atendida_id }}</a>
+                            </small>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="hist-vazio">Este cliente não tem procuras registradas.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

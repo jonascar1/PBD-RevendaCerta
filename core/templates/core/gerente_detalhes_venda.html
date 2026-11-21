@@ -176,8 +176,7 @@
             <form
                 method="post"
                 action="{% url 'cancelar_venda' venda.pk %}"
-                class="form-situacao"
-                onsubmit="return confirm('Cancelar esta venda e devolver o veículo ao estoque?');"
+                class="form-situacao" data-confirmacao="Cancelar esta venda e devolver o veículo ao estoque?"
             >
                 {% csrf_token %}
 
@@ -197,3 +196,6 @@
 </section>
 
 {% endblock content %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
+{% endblock %}

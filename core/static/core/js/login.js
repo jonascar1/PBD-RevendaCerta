@@ -1,18 +1,19 @@
-const passwordInput = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
+/**
+ * Alterna a visibilidade do campo de senha na tela de autenticação.
+ */
+(function () {
+    "use strict";
 
-togglePassword.addEventListener("click", function () {
+    const passwordInput = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
 
-    if (passwordInput.type === "password") {
+    if (!passwordInput || !togglePassword) return;
 
-        passwordInput.type = "text";
+    togglePassword.addEventListener("click", function () {
+        const oculto = passwordInput.type === "password";
 
-        togglePassword.textContent = "Ocultar";
-
-    } else {
-
-        passwordInput.type = "password";
-
-        togglePassword.textContent = "Mostrar";
-    }
-});
+        passwordInput.type = oculto ? "text" : "password";
+        togglePassword.textContent = oculto ? "Ocultar" : "Mostrar";
+        togglePassword.setAttribute("aria-pressed", String(oculto));
+    });
+})();

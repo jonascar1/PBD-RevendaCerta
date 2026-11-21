@@ -1,28 +1,22 @@
-"""
-T16 - Cálculo automático da carteira de clientes.
-"""
+"""Cálculo automático e priorização da carteira de clientes elegíveis para recompra."""
 
 from calendar import monthrange
 from datetime import date
 
 from django.utils import timezone
 
-from .models import (
-    Cliente,
-    ConfiguracaoCarteira,
-    ContatoCarteira,
-    Venda,
-)
+from .models import Cliente, ConfiguracaoCarteira, ContatoCarteira, Venda
 
 
 def data_limite_carteira(hoje, anos):
-    """Subtrai anos civis, incluindo o caso de 29/02."""
+    """Subtrai anos civis de uma data, tratando o caso bissexto (29/02)."""
     ano = hoje.year - anos
     dia = min(hoje.day, monthrange(ano, hoje.month)[1])
     return date(ano, hoje.month, dia)
 
 
 def obter_configuracao_carteira():
+    """Retorna a configuração global da carteira, criando o registro padrão se não existir."""
     configuracao, _ = ConfiguracaoCarteira.objects.get_or_create(
         pk=1,
         defaults={"anos_sem_comprar": 3},
@@ -32,19 +26,17 @@ def obter_configuracao_carteira():
 
 def calcular_carteira(vendedor=None, hoje=None):
     """
-    Calcula a carteira a partir das vendas FECHADAS.
+    Calcula a carteira de clientes elegíveis a partir das vendas fechadas.
 
-    - A última compra do cliente é global.
-    - O cliente pode pertencer a vários vendedores.
-    - Cada vendedor aparece uma única vez por cliente.
-    - Uma nova compra reinicia o prazo para todos.
-    - Clientes inativos não entram.
+    Regras de negócio:
+    - Considera a última venda fechada global de cada cliente ativo.
+    - Um cliente pode integrar a carteira de múltiplos vendedores (sem duplicidade).
+    - Qualquer nova compra reinicia o prazo de elegibilidade para todos os vendedores.
+    - Clientes contatados no mês saem da fila diária, exceto quando a data de retorno vence.
     """
     hoje = hoje or timezone.localdate()
     configuracao = obter_configuracao_carteira()
-    limite = data_limite_carteira(
-        hoje, configuracao.anos_sem_comprar
-    )
+    limite = data_limite_carteira(hoje, configuracao.anos_sem_comprar)
 
     vendas = (
         Venda.objects.filter(
@@ -56,10 +48,8 @@ def calcular_carteira(vendedor=None, hoje=None):
         .order_by("cliente_id", "-data", "-pk")
     )
 
-    # Uma entrada por cliente, com sua última venda válida
-    # e todos os vendedores que já venderam para ele.
+    # Agrupa por cliente mantendo sua última venda válida e o conjunto de vendedores.
     clientes = {}
-
     for venda in vendas:
         dados = clientes.setdefault(
             venda.cliente_id,
@@ -73,8 +63,7 @@ def calcular_carteira(vendedor=None, hoje=None):
         if venda.vendedor.is_vendedor():
             dados["vendedores"].add(venda.vendedor_id)
             dados["vendedores_nomes"][venda.vendedor_id] = (
-                venda.vendedor.get_full_name()
-                or venda.vendedor.username
+                venda.vendedor.get_full_name() or venda.vendedor.username
             )
 
     elegiveis = {
@@ -84,17 +73,13 @@ def calcular_carteira(vendedor=None, hoje=None):
         and (vendedor is None or vendedor.pk in dados["vendedores"])
     }
 
-    telefones = {}
-    for cliente in (
-        Cliente.objects.filter(pk__in=elegiveis)
-        .prefetch_related("telefones")
-    ):
-        telefones[cliente.pk] = next(
-            (telefone.numero for telefone in cliente.telefones.all()),
-            "",
+    telefones = {
+        cliente.pk: next((t.numero for t in cliente.telefones.all()), "")
+        for cliente in Cliente.objects.filter(pk__in=elegiveis).prefetch_related(
+            "telefones"
         )
+    }
 
-    # Limites do mês corrente.
     inicio_mes = date(hoje.year, hoje.month, 1)
     if hoje.month == 12:
         proximo_mes = date(hoje.year + 1, 1, 1)
@@ -108,11 +93,8 @@ def calcular_carteira(vendedor=None, hoje=None):
     if vendedor is not None:
         contatos = contatos.filter(vendedor=vendedor)
 
-    # Uma única passada pelos contatos (do mais novo para o mais antigo):
-    # - ultimo_contato: o contato mais recente de cada cliente;
-    # - ids_contatados: quem foi contatado neste mês (o gerente conta
-    #   o cliente uma vez, mesmo que dois vendedores tenham ligado);
-    # - contatos_por_vendedor: quais vendedores ligaram neste mês.
+    # Em passagem única (mais recente -> mais antigo), extrai o último contato,
+    # os clientes atendidos no mês corrente e os vendedores que realizaram contato.
     ultimo_contato = {}
     ids_contatados = set()
     contatos_por_vendedor = {}
@@ -123,9 +105,9 @@ def calcular_carteira(vendedor=None, hoje=None):
         data_contato = timezone.localtime(contato.realizado_em).date()
         if inicio_mes <= data_contato < proximo_mes:
             ids_contatados.add(contato.cliente_id)
-            contatos_por_vendedor.setdefault(
-                contato.cliente_id, set()
-            ).add(contato.vendedor_id)
+            contatos_por_vendedor.setdefault(contato.cliente_id, set()).add(
+                contato.vendedor_id
+            )
 
     linhas = []
     for cliente_id, dados in elegiveis.items():
@@ -137,38 +119,32 @@ def calcular_carteira(vendedor=None, hoje=None):
         retorno_chegou = retorno is not None and retorno <= hoje
         contatado_mes = cliente_id in ids_contatados
 
-        linhas.append({
-            "cliente": dados["cliente"],
-            "telefone": telefones.get(cliente_id, ""),
-            "veiculo": venda.veiculo,
-            "data_compra": venda.data,
-            "dias_decorridos": dias,
-            "anos_decorridos": dias // 365,
-            "ultima_venda": venda,
-            "vendedores_ids": dados["vendedores"],
-            "vendedores_nomes": list(
-                dados["vendedores_nomes"].values()
-            ),
-            "contatado_mes": contatado_mes,
-            "contatos_vendedores_ids": contatos_por_vendedor.get(
-                cliente_id, set()
-            ),
-            # T17
-            "ultimo_contato": ultimo,
-            "retorno": retorno,
-            "retorno_chegou": retorno_chegou,
-            "para_ligar_hoje": (not contatado_mes) or retorno_chegou,
-        })
-
-    # Fila geral: compra mais antiga primeiro (usada pelo gerente).
-    linhas.sort(
-        key=lambda item: (
-            item["data_compra"],
-            item["cliente"].pk,
+        linhas.append(
+            {
+                "cliente": dados["cliente"],
+                "telefone": telefones.get(cliente_id, ""),
+                "veiculo": venda.veiculo,
+                "data_compra": venda.data,
+                "dias_decorridos": dias,
+                "anos_decorridos": dias // 365,
+                "ultima_venda": venda,
+                "vendedores_ids": dados["vendedores"],
+                "vendedores_nomes": list(dados["vendedores_nomes"].values()),
+                "contatado_mes": contatado_mes,
+                "contatos_vendedores_ids": contatos_por_vendedor.get(
+                    cliente_id, set()
+                ),
+                "ultimo_contato": ultimo,
+                "retorno": retorno,
+                "retorno_chegou": retorno_chegou,
+                "para_ligar_hoje": (not contatado_mes) or retorno_chegou,
+            }
         )
-    )
 
-    # T17: retornos que chegaram vão para o topo da fila do dia.
+    # Fila geral ordenada pela compra mais antiga (visão gerencial).
+    linhas.sort(key=lambda item: (item["data_compra"], item["cliente"].pk))
+
+    # Fila do dia prioriza retornos agendados vencidos no topo.
     linhas_hoje = sorted(
         (item for item in linhas if item["para_ligar_hoje"]),
         key=lambda item: (
@@ -177,9 +153,7 @@ def calcular_carteira(vendedor=None, hoje=None):
             item["cliente"].pk,
         ),
     )
-    linhas_contatadas = [
-        item for item in linhas if not item["para_ligar_hoje"]
-    ]
+    linhas_contatadas = [item for item in linhas if not item["para_ligar_hoje"]]
 
     return {
         "linhas": linhas,
@@ -187,9 +161,7 @@ def calcular_carteira(vendedor=None, hoje=None):
         "linhas_contatadas": linhas_contatadas,
         "total_clientes": len(linhas),
         "total_hoje": len(linhas_hoje),
-        "retornos_hoje": sum(
-            1 for item in linhas_hoje if item["retorno_chegou"]
-        ),
+        "retornos_hoje": sum(1 for item in linhas_hoje if item["retorno_chegou"]),
         "contatados_mes": len(ids_contatados),
         "anos_configurados": configuracao.anos_sem_comprar,
         "data_limite": limite,

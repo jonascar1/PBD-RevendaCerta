@@ -60,8 +60,7 @@
                                 <td>{{ procura.valido_ate|date:"d/m/Y" }}</td>
                                 <td>
                                     <form method="post"
-                                          action="{% url 'encerrar_procura' procura.pk %}"
-                                          onsubmit="return confirm('Encerrar esta procura?');">
+                                          action="{% url 'encerrar_procura' procura.pk %}" data-confirmacao="Encerrar esta procura?">
                                         {% csrf_token %}
                                         <button type="submit" class="cart-botao cart-botao-secundario">
                                             Encerrar
@@ -119,4 +118,7 @@
     {% endif %}
 
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
 {% endblock %}

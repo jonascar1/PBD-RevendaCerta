@@ -1,0 +1,113 @@
+{% extends "core/gerente_base.html" %}
+{% load static %}
+
+{% block title %}Procuras | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_carteira.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_procuras.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Relacionamento comercial</span>
+            <h1>Procuras registradas</h1>
+            <p>O que os clientes procuram e ainda não temos no pátio.</p>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="cart-mensagens">
+            {% for message in messages %}
+                <p class="cart-mensagem">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="cart-indicadores">
+        <div class="cart-indicador">
+            <span>Procuras abertas</span>
+            <strong>{{ total_abertas }}</strong>
+        </div>
+    </div>
+
+    <section class="cart-painel">
+        <div class="cart-secao-topo">
+            <h2>Todas as procuras</h2>
+
+            <form method="get" class="proc-filtro">
+                <select name="situacao" data-auto-submit="true" aria-label="Filtrar por situação">
+                    <option value="">Todas as situações</option>
+                    {% for valor, rotulo in situacoes %}
+                        <option value="{{ valor }}" {% if situacao_selecionada == valor %}selected{% endif %}>
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+
+        {% if procuras %}
+            <div class="cart-tabela-wrap">
+                <table class="cart-tabela proc-tabela">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>O que procura</th>
+                            <th>Vendedor</th>
+                            <th>Válida até</th>
+                            <th>Situação</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for procura in procuras %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'historico_cliente' procura.cliente_id %}" class="cart-link">
+                                        {{ procura.cliente }}
+                                    </a>
+                                </td>
+                                <td>{{ procura.resumo }}</td>
+                                <td>{{ procura.vendedor.get_full_name|default:procura.vendedor.username }}</td>
+                                <td>{{ procura.valido_ate|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="cart-status proc-status-{{ procura.situacao|lower }}">
+                                        {{ procura.get_situacao_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if procura.esta_aberta %}
+                                        <form method="post"
+                                              action="{% url 'encerrar_procura' procura.pk %}" data-confirmacao="Encerrar esta procura?">
+                                            {% csrf_token %}
+                                            <button type="submit" class="cart-botao cart-botao-secundario">
+                                                Encerrar
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="cart-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="cart-vazio">
+                <i data-lucide="search-x"></i>
+                <h3>Nenhuma procura encontrada</h3>
+                <p>Não há procuras para esse filtro.</p>
+            </div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
+{% endblock %}

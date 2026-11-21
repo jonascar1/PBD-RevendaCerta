@@ -46,8 +46,7 @@
             <div class="miniaturas">
                 {% for foto in fotos %}
                     <button type="button"
-                            class="miniatura {% if forloop.first %}ativa{% endif %}"
-                            onclick="trocarFoto('{{ foto.imagem.url|escapejs }}', this)">
+                            class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url|escape }}">
                         <img src="{{ foto.imagem.url }}" alt="Foto {{ forloop.counter }}">
                     </button>
                 {% endfor %}
@@ -123,7 +122,22 @@
                 </p>
             {% endfor %}
         </div>
+        <div class="card-info">
+            <div class="card-cabecalho">
+                <h3>Suas procuras compatíveis</h3>
+            </div>
 
+            {% for procura in procuras_compativeis %}
+                <div class="fila-item">
+                    <div>
+                        <p>{{ procura.cliente.nome_exibicao }}</p>
+                        <small>{{ procura.resumo }}</small>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="sem-registros">Nenhuma procura sua combina com este veículo.</p>
+            {% endfor %}
+        </div>
         <!-- DADOS DO VEÍCULO -->
         <div class="card-info">
             <div class="card-cabecalho">
@@ -171,16 +185,5 @@
 {% endblock content %}
 
 {% block extra_js %}
-<script>
-function trocarFoto(url, elemento) {
-    const fotoPrincipal = document.getElementById("foto-principal");
-    if (fotoPrincipal) {
-        fotoPrincipal.src = url;
-    }
-    document.querySelectorAll(".miniatura").forEach(function (m) {
-        m.classList.remove("ativa");
-    });
-    elemento.classList.add("ativa");
-}
-</script>
+<script src="{% static 'core/js/vendedor_veiculo_detalhes.js' %}"></script>
 {% endblock extra_js %}

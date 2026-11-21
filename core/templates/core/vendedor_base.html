@@ -63,9 +63,15 @@
             </a>
 
             <a href="{% url 'carteira_vendedor' %}" class="menu-item
-                {% if request.resolver_match.url_name == 'carteira_vendedor' or request.resolver_match.url_name == 'registrar_contato_carteira' or request.resolver_match.url_name == 'configurar_carteira' %}active{% endif %}">
+                {% if request.resolver_match.url_name == 'carteira_vendedor' or request.resolver_match.url_name == 'registrar_contato_carteira' %}active{% endif %}">
                 <span><i data-lucide="phone-call"></i></span>
                 Carteira de clientes
+            </a>
+
+            <a href="{% url 'procuras_vendedor' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'procuras_vendedor' or request.resolver_match.url_name == 'nova_procura' %}active{% endif %}">
+                <span><i data-lucide="search"></i></span>
+                Procuras
             </a>
 
             <a href="{% url 'minhas_comissoes' %}" class="menu-item
@@ -104,9 +110,7 @@
     </main>
 
     <!-- JAVASCRIPT ESPECÍFICO DA PÁGINA E ÍCONES -->
-    <script>
-        lucide.createIcons();
-    </script>
+    <script src="{% static 'core/js/vendedor_base.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}

@@ -138,8 +138,7 @@
 
                     <button
                         type="submit"
-                        class="prop-btn prop-btn-primario"
-                        onclick="return confirm('Confirmar a negociação e reservar este veículo?');"
+                        class="prop-btn prop-btn-primario" data-confirmacao-clique="Confirmar a negociação e reservar este veículo?"
                     >
                         <i data-lucide="check-circle"></i>
                         Confirmar proposta e reservar veículo
@@ -187,8 +186,7 @@
 
                 <form
                     method="post"
-                    action="{% url 'fechar_venda' proposta.pk %}"
-                    onsubmit="return confirm('Fechar a venda? O veículo passará a vendido.');"
+                    action="{% url 'fechar_venda' proposta.pk %}" data-confirmacao="Fechar a venda? O veículo passará a vendido."
                 >
                     {% csrf_token %}
 
@@ -251,8 +249,7 @@
                             </form>
 
                             <form method="post"
-                                  action="{% url 'recusar_contraproposta' proposta.pk %}"
-                                  onsubmit="return confirm('Recusar a contraproposta cancela esta proposta. Continuar?');">
+                                  action="{% url 'recusar_contraproposta' proposta.pk %}" data-confirmacao="Recusar a contraproposta cancela esta proposta. Continuar?">
                                 {% csrf_token %}
                                 <button type="submit" class="prop-btn prop-btn-perigo">
                                     Recusar contraproposta
@@ -355,4 +352,7 @@
         </section>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
 {% endblock %}

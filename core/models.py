@@ -1,53 +1,37 @@
 """
-T01 - Perfis, vendedores e o painel de cada um
-T02 - O veículo: ficha, fotos, custo de aquisição e origem
+Modelos de domínio do sistema VENDACERTA.
 
-Cobre os critérios de aceite:
-- Login com usuário/senha (senha cifrada via AbstractUser do Django)
-- Três perfis: gerente, vendedor, administrativo
-- Vendedor tem alçada de desconto e percentual de comissão
-- Só gerente edita alçada/comissão (regra fica no lado de permissões/views, aqui
-  deixamos o campo protegido por um método de validação)
-- Vendedor desativado não entra, mas vendas dele continuam no sistema
-  (usamos soft delete: campo `ativo`, nunca deletamos o registro)
-- Unicidade do veículo (placa/chassi) no estoque ativo
-- Reserva exclusiva com prazo, com expiração automática
-- Histórico de situação e de preço do veículo
-- Margem derivada dos lançamentos financeiros (nunca um campo digitado)
-- Auditoria simples de edição/exclusão de lançamentos financeiros
+Regras centrais implementadas nesta camada:
+- Controle de acesso por perfil (gerente, vendedor, administrativo) e soft delete.
+- Unicidade de placa e chassi no estoque ativo e exclusividade de reserva/venda.
+- Trilhas de auditoria imutáveis para decisões de proposta, preços e situações.
+- Margem calculada dinamicamente a partir dos lançamentos financeiros ativos.
 """
 
-# --- stdlib ---
 import re
-from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
-# --- django ---
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.db.models.aggregates import Sum
 from django.utils import timezone
-from decimal import Decimal, InvalidOperation
-from django.core.exceptions import PermissionDenied, ValidationError
-
-# ============================================================
-# Constantes / regex
-# ============================================================
-
-PLACA_REGEX = re.compile(r"^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$")  # antiga e Mercosul
-CHASSI_REGEX = re.compile(r"^[A-HJ-NPR-Z0-9]{17}$")  # 17 chars, sem I/O/Q (padrão VIN)
 
 
-# ============================================================
-# Usuários e perfis
-# ============================================================
+# ==============================================================================
+# Constantes e Expressões Regulares
+# ==============================================================================
+
+PLACA_REGEX = re.compile(r"^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$")  # Antiga e Mercosul
+CHASSI_REGEX = re.compile(r"^[A-HJ-NPR-Z0-9]{17}$")  # Padrão VIN (17 chars, sem I, O ou Q)
+
+
+# ==============================================================================
+# Usuários e Perfis
+# ==============================================================================
 
 class Usuario(AbstractUser):
-    """
-    Usuário base do sistema. A senha já vem cifrada automaticamente pelo
-    Django (AbstractUser usa PBKDF2 por padrão) — não reinventar isso.
-    """
+    """Usuário do sistema com controle de perfil e desativação lógica (soft delete)."""
 
     class Perfil(models.TextChoices):
         GERENTE = "GERENTE", "Gerente"
@@ -55,8 +39,6 @@ class Usuario(AbstractUser):
         ADMINISTRATIVO = "ADMINISTRATIVO", "Administrativo"
 
     perfil = models.CharField(max_length=20, choices=Perfil.choices)
-
-    # Soft delete: nunca apagar o usuário, só desativar.
     ativo = models.BooleanField(default=True)
 
     def is_gerente(self):
@@ -73,9 +55,7 @@ class Usuario(AbstractUser):
 
 
 class PerfilVendedor(models.Model):
-    """
-    Dados extras de quem é vendedor: alçada de desconto e comissão.
-    """
+    """Parâmetros comerciais do vendedor (alçada de desconto e percentual de comissão)."""
 
     class TipoAlcada(models.TextChoices):
         PERCENTUAL = "PERCENTUAL", "Percentual (%)"
@@ -87,27 +67,23 @@ class PerfilVendedor(models.Model):
         related_name="dados_vendedor",
         limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
     )
-
     tipo_alcada = models.CharField(
         max_length=20,
         choices=TipoAlcada.choices,
         default=TipoAlcada.PERCENTUAL,
     )
-
     valor_alcada = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
         help_text="Limite máximo de desconto permitido ao vendedor.",
     )
-
     percentual_comissao = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         default=0,
         help_text="Percentual de comissão do vendedor sobre a margem da venda.",
     )
-
     editado_por = models.ForeignKey(
         Usuario,
         on_delete=models.SET_NULL,
@@ -131,10 +107,13 @@ class PerfilVendedor(models.Model):
         )
 
 
-# ============================================================
-# Veículos
-# ============================================================
+# ==============================================================================
+# Veículos, Estoque e Reservas
+# ==============================================================================
+
 class Veiculo(models.Model):
+    """Unidade física do estoque, identificada univocamente por placa e chassi enquanto ativa."""
+
     class Origem(models.TextChoices):
         COMPRADO = "COMPRADO", "Comprado de terceiro"
         TROCA = "TROCA", "Recebido em troca"
@@ -175,12 +154,17 @@ class Veiculo(models.Model):
     cor = models.CharField(max_length=30)
     combustivel = models.CharField(max_length=30)
     tipo = models.CharField(
-        max_length=12, choices=Tipo.choices, blank=True, default=""
+        max_length=12,
+        choices=Tipo.choices,
+        blank=True,
+        default="",
     )
     cambio = models.CharField(
-        max_length=12, choices=Cambio.choices, blank=True, default=""
+        max_length=12,
+        choices=Cambio.choices,
+        blank=True,
+        default="",
     )
-
     quilometragem = models.PositiveIntegerField()
     opcionais = models.TextField(blank=True)
 
@@ -189,12 +173,22 @@ class Veiculo(models.Model):
         choices=Situacao.choices,
         default=Situacao.PREPARACAO,
     )
-
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.DISPONIVEL,
+    )
     origem = models.CharField(max_length=20, choices=Origem.choices)
 
-    custo_aquisicao = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    preco_venda = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    valor_repasse = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    custo_aquisicao = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    preco_venda = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    valor_repasse = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
 
     venda_fechada = models.BooleanField(default=False)
     cliente_comprador = models.ForeignKey(
@@ -204,7 +198,6 @@ class Veiculo(models.Model):
         null=True,
         blank=True,
     )
-
     avaliacao_origem = models.OneToOneField(
         "AvaliacaoTroca",
         on_delete=models.PROTECT,
@@ -213,10 +206,10 @@ class Veiculo(models.Model):
         related_name="veiculo_estoque",
     )
 
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DISPONIVEL)
-
     criado_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="veiculos_cadastrados"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="veiculos_cadastrados",
     )
     criado_em = models.DateTimeField(auto_now_add=True)
 
@@ -234,12 +227,22 @@ class Veiculo(models.Model):
             ),
         ]
 
+    @property
+    def reserva_ativa(self):
+        """Retorna a reserva vigente (não cancelada e não vencida), ou None."""
+        return self.reservas.filter(
+            cancelada=False,
+            expira_em__gt=timezone.now(),
+        ).first()
+
     def clean(self):
         erros = {}
 
         placa_normalizada = self.placa.upper().replace(" ", "")
         if not PLACA_REGEX.match(placa_normalizada):
-            erros["placa"] = "Placa inválida. Use o formato antigo (ABC1234) ou Mercosul (ABC1D23)."
+            erros["placa"] = (
+                "Placa inválida. Use o formato antigo (ABC1234) ou Mercosul (ABC1D23)."
+            )
         self.placa = placa_normalizada
 
         chassi_normalizado = self.chassi.upper().replace(" ", "")
@@ -257,8 +260,14 @@ class Veiculo(models.Model):
 
         if self.pk:
             original = Veiculo.objects.filter(pk=self.pk).first()
-            if original and original.venda_fechada and original.custo_aquisicao != self.custo_aquisicao:
-                erros["custo_aquisicao"] = "Não é possível alterar o custo após o fechamento da venda."
+            if (
+                original
+                and original.venda_fechada
+                and original.custo_aquisicao != self.custo_aquisicao
+            ):
+                erros["custo_aquisicao"] = (
+                    "Não é possível alterar o custo após o fechamento da venda."
+                )
 
         if erros:
             raise ValidationError(erros)
@@ -266,25 +275,23 @@ class Veiculo(models.Model):
     def __str__(self):
         return f"{self.marca} {self.modelo} — {self.placa}"
 
-    @property
-    def reserva_ativa(self):
-        """Reserva vigente (não cancelada e não vencida), ou None."""
-        return self.reservas.filter(
-            cancelada=False, expira_em__gt=timezone.now()
-        ).first()
-class HistoricoSituacaoVeiculo(models.Model):
-    veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="historico_situacoes"
-    )
 
+class HistoricoSituacaoVeiculo(models.Model):
+    """Linha do tempo de transições de situação de cada veículo."""
+
+    veiculo = models.ForeignKey(
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="historico_situacoes",
+    )
     situacao_anterior = models.CharField(max_length=20, blank=True, null=True)
     situacao_nova = models.CharField(max_length=20)
-
     alterado_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="alteracoes_situacao_veiculo"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="alteracoes_situacao_veiculo",
     )
     alterado_em = models.DateTimeField(auto_now_add=True)
-
     motivo = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -292,7 +299,13 @@ class HistoricoSituacaoVeiculo(models.Model):
 
 
 class FotoVeiculo(models.Model):
-    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, related_name="fotos")
+    """Galeria de fotos do veículo; garante apenas uma foto marcada como principal."""
+
+    veiculo = models.ForeignKey(
+        Veiculo,
+        on_delete=models.CASCADE,
+        related_name="fotos",
+    )
     imagem = models.ImageField(upload_to="veiculos/%Y/%m/")
     ordem = models.PositiveSmallIntegerField(default=0)
     principal = models.BooleanField(default=False)
@@ -309,6 +322,8 @@ class FotoVeiculo(models.Model):
 
 
 class ReservaVeiculo(models.Model):
+    """Reserva exclusiva com prazo de expiração e promoção automática da fila."""
+
     veiculo = models.ForeignKey(
         Veiculo,
         on_delete=models.PROTECT,
@@ -325,13 +340,10 @@ class ReservaVeiculo(models.Model):
     cliente_nome = models.CharField(max_length=120)
     cliente_contato = models.CharField(max_length=60)
     vendedor = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="reservas_feitas"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="reservas_feitas",
     )
-
-    criada_em = models.DateTimeField(auto_now_add=True)
-    expira_em = models.DateTimeField()
-
-    cancelada = models.BooleanField(default=False)
     proposta_origem = models.OneToOneField(
         "Proposta",
         on_delete=models.PROTECT,
@@ -340,12 +352,11 @@ class ReservaVeiculo(models.Model):
         related_name="reserva_gerada",
     )
 
-    cancelada_em = models.DateTimeField(
-        null=True,
-        blank=True,
-        editable=False,
-    )
+    criada_em = models.DateTimeField(auto_now_add=True)
+    expira_em = models.DateTimeField()
 
+    cancelada = models.BooleanField(default=False)
+    cancelada_em = models.DateTimeField(null=True, blank=True, editable=False)
     cancelada_por = models.ForeignKey(
         Usuario,
         on_delete=models.PROTECT,
@@ -354,82 +365,7 @@ class ReservaVeiculo(models.Model):
         related_name="reservas_canceladas",
         editable=False,
     )
-
-    motivo_cancelamento = models.TextField(
-        blank=True,
-        editable=False,
-    )
-    def esta_valida(self):
-        return not self.cancelada and timezone.now() < self.expira_em
-    
-    def expirar(self):
-        with transaction.atomic():
-
-            veiculo = Veiculo.objects.select_for_update().get(
-                pk=self.veiculo_id
-            )
-
-            reserva = ReservaVeiculo.objects.select_for_update().get(
-                pk=self.pk
-            )
-
-            agora = timezone.now()
-
-            if reserva.cancelada or reserva.expira_em > agora:
-                return False
-
-            reserva.cancelada = True
-            reserva.cancelada_em = agora
-            reserva.motivo_cancelamento = "Reserva expirada automaticamente"
-
-            reserva.save(
-                update_fields=[
-                    "cancelada",
-                    "cancelada_em",
-                    "motivo_cancelamento",
-                ]
-            )
-
-            if reserva.proposta_origem_id:
-                Proposta.objects.filter(
-                    pk=reserva.proposta_origem_id,
-                ).exclude(
-                    situacao=Proposta.Situacao.CANCELADA,
-                ).update(
-                    situacao=Proposta.Situacao.CANCELADA,
-                    atualizada_em=agora,
-                )
-
-            if veiculo.situacao == Veiculo.Situacao.RESERVADO:
-                veiculo.situacao = Veiculo.Situacao.DISPONIVEL
-                veiculo.status = Veiculo.Status.DISPONIVEL
-
-                veiculo.save(
-                    update_fields=["situacao", "status"]
-                )
-
-                HistoricoSituacaoVeiculo.objects.create(
-                    veiculo=veiculo,
-                    situacao_anterior=Veiculo.Situacao.RESERVADO,
-                    situacao_nova=Veiculo.Situacao.DISPONIVEL,
-                    alterado_por=reserva.vendedor,
-                    motivo="Reserva expirada automaticamente",
-                )
-
-            Proposta.ativar_aguardando(veiculo.pk)
-
-            self.refresh_from_db()
-
-            return True
-
-    def clean(self):
-        if self.expira_em and self.expira_em <= timezone.now():
-            raise ValidationError({"expira_em": "O prazo da reserva deve ser no futuro."})
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.esta_valida():
-            Veiculo.objects.filter(pk=self.veiculo_id).update(status=Veiculo.Status.RESERVADO)
+    motivo_cancelamento = models.TextField(blank=True, editable=False)
 
     class Meta:
         constraints = [
@@ -440,12 +376,70 @@ class ReservaVeiculo(models.Model):
             )
         ]
 
+    def esta_valida(self):
+        return not self.cancelada and timezone.now() < self.expira_em
 
-# ============================================================
-# Financeiro
-# ============================================================
+    def expirar(self):
+        """Encerra a reserva vencida, libera o veículo e ativa a próxima proposta da fila."""
+        with transaction.atomic():
+            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
+            reserva = ReservaVeiculo.objects.select_for_update().get(pk=self.pk)
+            agora = timezone.now()
+
+            if reserva.cancelada or reserva.expira_em > agora:
+                return False
+
+            reserva.cancelada = True
+            reserva.cancelada_em = agora
+            reserva.motivo_cancelamento = "Reserva expirada automaticamente"
+            reserva.save(
+                update_fields=["cancelada", "cancelada_em", "motivo_cancelamento"]
+            )
+
+            if reserva.proposta_origem_id:
+                Proposta.objects.filter(pk=reserva.proposta_origem_id).exclude(
+                    situacao=Proposta.Situacao.CANCELADA
+                ).update(
+                    situacao=Proposta.Situacao.CANCELADA,
+                    atualizada_em=agora,
+                )
+
+            if veiculo.situacao == Veiculo.Situacao.RESERVADO:
+                veiculo.situacao = Veiculo.Situacao.DISPONIVEL
+                veiculo.status = Veiculo.Status.DISPONIVEL
+                veiculo.save(update_fields=["situacao", "status"])
+
+                HistoricoSituacaoVeiculo.objects.create(
+                    veiculo=veiculo,
+                    situacao_anterior=Veiculo.Situacao.RESERVADO,
+                    situacao_nova=Veiculo.Situacao.DISPONIVEL,
+                    alterado_por=reserva.vendedor,
+                    motivo="Reserva expirada automaticamente",
+                )
+
+            Proposta.ativar_aguardando(veiculo.pk)
+            self.refresh_from_db()
+            return True
+
+    def clean(self):
+        if self.expira_em and self.expira_em <= timezone.now():
+            raise ValidationError({"expira_em": "O prazo da reserva deve ser no futuro."})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.esta_valida():
+            Veiculo.objects.filter(pk=self.veiculo_id).update(
+                status=Veiculo.Status.RESERVADO
+            )
+
+
+# ==============================================================================
+# Financeiro e Histórico de Preços
+# ==============================================================================
 
 class LancamentoFinanceiro(models.Model):
+    """Movimentações financeiras vinculadas ao veículo (custo, despesas, venda e comissão)."""
+
     class Tipo(models.TextChoices):
         CUSTO_AQUISICAO = "CUSTO_AQUISICAO", "Custo de aquisição"
         DESPESA = "DESPESA", "Despesa (preparo, documentação, etc.)"
@@ -453,9 +447,10 @@ class LancamentoFinanceiro(models.Model):
         COMISSAO = "COMISSAO", "Comissão paga"
 
     veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="lancamentos"
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="lancamentos",
     )
-        # T14: liga a comissão à venda que a gerou (vazio nos demais lançamentos).
     venda = models.ForeignKey(
         "Venda",
         on_delete=models.PROTECT,
@@ -466,9 +461,10 @@ class LancamentoFinanceiro(models.Model):
     tipo = models.CharField(max_length=30, choices=Tipo.choices)
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     descricao = models.CharField(max_length=200, blank=True)
+    data_lancamento = models.DateField(default=timezone.now)
+
     registrado_por = models.ForeignKey(Usuario, on_delete=models.PROTECT)
     criado_em = models.DateTimeField(auto_now_add=True)
-    data_lancamento = models.DateField(default=timezone.now)
 
     editado_por = models.ForeignKey(
         Usuario,
@@ -478,6 +474,7 @@ class LancamentoFinanceiro(models.Model):
         related_name="despesas_editadas",
     )
     editado_em = models.DateTimeField(null=True, blank=True)
+
     excluido = models.BooleanField(default=False)
     excluido_por = models.ForeignKey(
         Usuario,
@@ -493,6 +490,7 @@ class LancamentoFinanceiro(models.Model):
 
 
 def calcular_margem(veiculo: Veiculo) -> Decimal:
+    """Calcula a margem líquida do veículo somando os lançamentos não excluídos."""
     lancamentos = veiculo.lancamentos.filter(excluido=False)
 
     entradas = sum(
@@ -511,18 +509,23 @@ def calcular_margem(veiculo: Veiculo) -> Decimal:
 
 
 class HistoricoPrecoVeiculo(models.Model):
-    veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="historico_precos"
-    )
+    """Registro de alterações no preço de tabela e alerta de venda abaixo do custo."""
 
+    veiculo = models.ForeignKey(
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="historico_precos",
+    )
     valor_anterior = models.DecimalField(max_digits=12, decimal_places=2)
     valor_novo = models.DecimalField(max_digits=12, decimal_places=2)
-
-    custo_total_no_momento = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    custo_total_no_momento = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0
+    )
     abaixo_do_custo = models.BooleanField(default=False)
-
     alterado_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="alteracoes_preco_veiculo"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="alteracoes_preco_veiculo",
     )
     alterado_em = models.DateTimeField(auto_now_add=True)
 
@@ -530,30 +533,32 @@ class HistoricoPrecoVeiculo(models.Model):
         return f"{self.veiculo} — R$ {self.valor_anterior} → R$ {self.valor_novo}"
 
 
-
-# ============================================================
+# ==============================================================================
 # Clientes
-# ============================================================
+# ==============================================================================
 
 class Cliente(models.Model):
+    """Cadastro unificado de Pessoa Física (PF) e Pessoa Jurídica (PJ)."""
+
     class Tipo(models.TextChoices):
         PESSOA_FISICA = "PF", "Pessoa Física"
         PESSOA_JURIDICA = "PJ", "Pessoa Jurídica"
 
-    tipo = models.CharField(
-        max_length=2,
-        choices=Tipo.choices,
-    )
+    tipo = models.CharField(max_length=2, choices=Tipo.choices)
 
+    # Pessoa Física
     nome = models.CharField(max_length=150, blank=True)
     cpf = models.CharField(max_length=11, blank=True)
     data_nascimento = models.DateField(null=True, blank=True)
 
+    # Pessoa Jurídica
     cnpj = models.CharField(max_length=14, blank=True)
     razao_social = models.CharField(max_length=180, blank=True)
     nome_fantasia = models.CharField(max_length=150, blank=True)
     responsavel = models.CharField(max_length=150, blank=True)
 
+    # Contato e Endereço
+    email = models.EmailField(blank=True)
     cep = models.CharField(max_length=8, blank=True)
     logradouro = models.CharField(max_length=180, blank=True)
     numero = models.CharField(max_length=20, blank=True)
@@ -565,8 +570,7 @@ class Cliente(models.Model):
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
-    responsavel = models.CharField(max_length=150, blank=True)
-    email = models.EmailField(blank=True)
+
     class Meta:
         ordering = ["nome", "razao_social"]
         constraints = [
@@ -581,6 +585,12 @@ class Cliente(models.Model):
                 name="cliente_cnpj_unico",
             ),
         ]
+
+    @property
+    def nome_exibicao(self):
+        if self.tipo == self.Tipo.PESSOA_FISICA:
+            return self.nome
+        return self.nome_fantasia or self.razao_social
 
     def clean(self):
         super().clean()
@@ -619,16 +629,6 @@ class Cliente(models.Model):
         if erros:
             raise ValidationError(erros)
 
-    @property
-    def nome_exibicao(self):
-        if self.tipo == self.Tipo.PESSOA_FISICA:
-            return self.nome
-        return self.nome_fantasia or self.razao_social
-
-    def desativar(self):
-        self.ativo = False
-        self.save(update_fields=["ativo", "atualizado_em"])
-
     def desativar(self):
         self.ativo = False
         self.save(update_fields=["ativo", "atualizado_em"])
@@ -636,11 +636,14 @@ class Cliente(models.Model):
     def reativar(self):
         self.ativo = True
         self.save(update_fields=["ativo", "atualizado_em"])
-        
+
     def __str__(self):
         return self.nome_exibicao
 
+
 class TelefoneCliente(models.Model):
+    """Telefones vinculados a um cliente."""
+
     class Tipo(models.TextChoices):
         CELULAR = "CELULAR", "Celular"
         FIXO = "FIXO", "Fixo"
@@ -666,26 +669,32 @@ class TelefoneCliente(models.Model):
     def clean(self):
         super().clean()
         self.numero = re.sub(r"\D", "", self.numero or "")
-
         if len(self.numero) not in (10, 11):
             raise ValidationError({
                 "numero": "Informe um telefone com DDD e 10 ou 11 dígitos."
             })
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.numero
 
 
+# ==============================================================================
+# Negociações e Propostas
+# ==============================================================================
+
 class Proposta(models.Model):
+    """
+    Proposta de compra de um veículo. Gerencia fila de espera por veículo,
+    verificação de alçada de desconto e fluxo de aprovação/contraproposta.
+    """
+
     class StatusAprovacao(models.TextChoices):
         NAO_NECESSARIA = "NAO_NECESSARIA", "Não necessária"
         PENDENTE = "PENDENTE", "Pendente"
         APROVADA = "APROVADA", "Aprovada"
         RECUSADA = "RECUSADA", "Recusada"
         CONTRAPROPOSTA = "CONTRAPROPOSTA", "Contraproposta"
+
     class Situacao(models.TextChoices):
         AGUARDANDO = "AGUARDANDO", "Aguardando"
         ATIVA = "ATIVA", "Ativa"
@@ -696,10 +705,14 @@ class Proposta(models.Model):
         CONTRAPROPOSTA = "CONTRAPROPOSTA", "Contraproposta"
 
     cliente = models.ForeignKey(
-        Cliente, on_delete=models.PROTECT, related_name="propostas"
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name="propostas",
     )
     veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="propostas"
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="propostas",
     )
     vendedor = models.ForeignKey(
         Usuario,
@@ -712,9 +725,12 @@ class Proposta(models.Model):
 
     data = models.DateField(default=timezone.localdate)
     valor_oferecido = models.DecimalField(max_digits=12, decimal_places=2)
-
     preco_tabela = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True, editable=False
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
     )
 
     situacao = models.CharField(
@@ -742,7 +758,7 @@ class Proposta(models.Model):
     atualizada_em = models.DateTimeField(auto_now=True)
 
     _valor_original = None
-    
+
     class Meta:
         ordering = ["-criada_em"]
         constraints = [
@@ -752,7 +768,6 @@ class Proposta(models.Model):
                 name="uma_proposta_ativa_por_veiculo",
             )
         ]
-    
 
     @classmethod
     def from_db(cls, db, field_names, values):
@@ -789,14 +804,12 @@ class Proposta(models.Model):
 
     @property
     def alcada_vendedor(self):
-        """Perfil comercial do vendedor da proposta (ou None, ex.: gerente)."""
+        """Perfil comercial do vendedor da proposta (ou None para gerentes)."""
         return getattr(self.vendedor, "dados_vendedor", None)
+
     @property
     def fora_da_alcada(self):
-        """
-        Verifica se o desconto ultrapassa a alçada do vendedor.
-        Gerentes não precisam de aprovação.
-        """
+        """Indica se o desconto solicitado excede o limite configurado para o vendedor."""
         perfil = self.alcada_vendedor
 
         if perfil is None:
@@ -814,22 +827,24 @@ class Proposta(models.Model):
             return self.desconto_percentual > perfil.valor_alcada
 
         return self.desconto_embutido > perfil.valor_alcada
-    
+
     def _desconto_percentual_de(self, valor):
-            """Desconto sobre o preço de tabela se a venda fosse por `valor`."""
-            if not self.preco_tabela:
-                return Decimal("0.00")
-            return ((self.preco_tabela - valor) / self.preco_tabela * 100).quantize(Decimal("0.01"))
+        """Calcula o percentual de desconto sobre o preço de tabela para um dado valor."""
+        if not self.preco_tabela:
+            return Decimal("0.00")
+        return ((self.preco_tabela - valor) / self.preco_tabela * 100).quantize(
+            Decimal("0.01")
+        )
 
     def _alcada_texto(self):
-        """Foto da alçada em texto legível, para a trilha de auditoria."""
+        """Formata a alçada vigente do vendedor para registro na auditoria."""
         perfil = self.alcada_vendedor
         if perfil is None:
             return ""
         if perfil.tipo_alcada == PerfilVendedor.TipoAlcada.PERCENTUAL:
             return f"{perfil.valor_alcada}%"
         return f"R$ {perfil.valor_alcada}"
-    
+
     def clean(self):
         erros = {}
 
@@ -860,30 +875,23 @@ class Proposta(models.Model):
         criando = self.pk is None
 
         with transaction.atomic():
-            veiculo = Veiculo.objects.select_for_update().get(
-                pk=self.veiculo_id
-            )
+            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
 
             if self.situacao != self.Situacao.CANCELADA and veiculo.preco_venda:
                 self.preco_tabela = veiculo.preco_venda
 
-            valor_mudou = (
-                criando or self.valor_oferecido != self._valor_original
-            )
-
+            valor_mudou = criando or self.valor_oferecido != self._valor_original
             precisa_aprovacao = (
                 valor_mudou
                 and self.situacao != self.Situacao.CANCELADA
                 and self.fora_da_alcada
             )
 
-            # Situação inicial: respeita a reserva e a proposta ativa.
             if criando:
                 reserva = veiculo.reservas.filter(
                     cancelada=False,
                     expira_em__gt=timezone.now(),
                 ).exists()
-
                 proposta_ativa = Proposta.objects.filter(
                     veiculo_id=self.veiculo_id,
                     situacao=self.Situacao.ATIVA,
@@ -896,23 +904,19 @@ class Proposta(models.Model):
                     self.situacao = self.Situacao.ATIVA
                     self.reserva_aguardada = None
 
-            # Aprovação é independente da situação do veículo.
             if valor_mudou:
-                if precisa_aprovacao:
-                    self.status_aprovacao = self.StatusAprovacao.PENDENTE
-                else:
-                    self.status_aprovacao = (
-                        self.StatusAprovacao.NAO_NECESSARIA
-                    )
+                self.status_aprovacao = (
+                    self.StatusAprovacao.PENDENTE
+                    if precisa_aprovacao
+                    else self.StatusAprovacao.NAO_NECESSARIA
+                )
 
             super().save(*args, **kwargs)
 
             if valor_mudou:
                 HistoricoProposta.objects.create(
                     proposta=self,
-                    valor_anterior=(
-                        None if criando else self._valor_original
-                    ),
+                    valor_anterior=None if criando else self._valor_original,
                     valor_novo=self.valor_oferecido,
                     alterado_por=usuario or self.vendedor,
                 )
@@ -921,12 +925,100 @@ class Proposta(models.Model):
                 self.registrar_pedido(usuario or self.vendedor)
 
             self._valor_original = self.valor_oferecido
-            
+
+    def registrar_pedido(self, usuario):
+        """Registra na trilha de auditoria a solicitação de aprovação de desconto."""
+        return DecisaoProposta.objects.create(
+            proposta=self,
+            tipo=DecisaoProposta.Tipo.PEDIDO,
+            valor_referencia=self.valor_oferecido,
+            desconto_percentual_no_momento=self.desconto_percentual,
+            alcada_no_momento=self._alcada_texto(),
+            feito_por=usuario,
+        )
+
+    def decidir(self, usuario, tipo, parecer="", novo_valor=None):
+        """Processa a decisão do gerente (aprovação, recusa ou contraproposta)."""
+        if not (
+            getattr(usuario, "is_authenticated", False)
+            and usuario.ativo
+            and usuario.is_gerente()
+        ):
+            raise PermissionDenied(
+                "Somente um gerente ativo pode decidir sobre propostas."
+            )
+
+        Tipo = DecisaoProposta.Tipo
+        if tipo not in (Tipo.APROVACAO, Tipo.RECUSA, Tipo.CONTRAPROPOSTA):
+            raise ValidationError("Tipo de decisão inválido.")
+
+        parecer = (parecer or "").strip()
+
+        with transaction.atomic():
+            proposta = Proposta.objects.select_for_update().get(pk=self.pk)
+
+            if proposta.situacao == self.Situacao.CANCELADA:
+                raise ValidationError("Esta proposta foi cancelada.")
+            if proposta.vendedor_id == usuario.pk:
+                raise PermissionDenied("Ninguém pode decidir sobre a própria proposta.")
+            if proposta.status_aprovacao != self.StatusAprovacao.PENDENTE:
+                raise ValidationError(
+                    "Esta proposta não está aguardando decisão do gerente."
+                )
+
+            if tipo == Tipo.APROVACAO:
+                nova_aprovacao = self.StatusAprovacao.APROVADA
+                valor_ref = proposta.valor_oferecido
+
+            elif tipo == Tipo.RECUSA:
+                if not parecer:
+                    raise ValidationError("Informe o parecer da recusa.")
+                nova_aprovacao = self.StatusAprovacao.RECUSADA
+                valor_ref = proposta.valor_oferecido
+
+            else:
+                if not parecer:
+                    raise ValidationError("Informe o parecer da contraproposta.")
+                if novo_valor is None:
+                    raise ValidationError("Informe o valor da contraproposta.")
+                try:
+                    novo_valor = Decimal(novo_valor)
+                except (InvalidOperation, TypeError, ValueError):
+                    raise ValidationError("Valor da contraproposta inválido.")
+                if novo_valor <= proposta.valor_oferecido:
+                    raise ValidationError(
+                        "A contraproposta deve ser maior que o valor oferecido."
+                    )
+                nova_aprovacao = self.StatusAprovacao.CONTRAPROPOSTA
+                valor_ref = novo_valor.quantize(Decimal("0.01"))
+
+            decisao = DecisaoProposta.objects.create(
+                proposta=proposta,
+                tipo=tipo,
+                valor_referencia=valor_ref,
+                desconto_percentual_no_momento=proposta._desconto_percentual_de(valor_ref),
+                alcada_no_momento=proposta._alcada_texto(),
+                parecer=parecer,
+                feito_por=usuario,
+            )
+
+            proposta.status_aprovacao = nova_aprovacao
+            if tipo == Tipo.RECUSA:
+                proposta.situacao = self.Situacao.CANCELADA
+
+            proposta.save(
+                update_fields=["status_aprovacao", "situacao", "atualizada_em"]
+            )
+
+            if tipo == Tipo.RECUSA:
+                Proposta.ativar_aguardando(proposta.veiculo_id)
+
+            self.status_aprovacao = nova_aprovacao
+            self.situacao = proposta.situacao
+            return decisao
+
     def aceitar_contraproposta(self, usuario):
-        """
-        Permite que o vendedor responsável aceite a contraproposta
-        registrada pelo gerente.
-        """
+        """Aceita a contraproposta do gerente, atualiza o valor e aprova a proposta."""
         if not (
             getattr(usuario, "is_authenticated", False)
             and usuario.ativo
@@ -937,58 +1029,34 @@ class Proposta(models.Model):
             )
 
         with transaction.atomic():
-            # Bloqueia o veículo para evitar conflitos com outras propostas.
-            veiculo_id = Proposta.objects.only("veiculo_id").get(
-                pk=self.pk
-            ).veiculo_id
-
-            veiculo = Veiculo.objects.select_for_update().get(
-                pk=veiculo_id
-            )
-
-            proposta = Proposta.objects.select_for_update().get(
-                pk=self.pk
-            )
+            # Ordem de bloqueio: veículo primeiro, depois proposta.
+            veiculo_id = Proposta.objects.only("veiculo_id").get(pk=self.pk).veiculo_id
+            Veiculo.objects.select_for_update().get(pk=veiculo_id)
+            proposta = Proposta.objects.select_for_update().get(pk=self.pk)
 
             if proposta.vendedor_id != usuario.pk:
                 raise PermissionDenied(
                     "Você não pode aceitar a contraproposta de outro vendedor."
                 )
-
             if proposta.situacao == self.Situacao.CANCELADA:
-                raise ValidationError(
-                    "Uma proposta cancelada não pode ser aceita."
-                )
-
+                raise ValidationError("Uma proposta cancelada não pode ser aceita.")
             if proposta.status_aprovacao != self.StatusAprovacao.CONTRAPROPOSTA:
                 raise ValidationError(
                     "Esta proposta não possui uma contraproposta pendente de aceite."
                 )
 
-            # Recupera a contraproposta mais recente do gerente.
             decisao = (
-                proposta.decisoes.filter(
-                    tipo=DecisaoProposta.Tipo.CONTRAPROPOSTA
-                )
+                proposta.decisoes.filter(tipo=DecisaoProposta.Tipo.CONTRAPROPOSTA)
                 .order_by("-feito_em", "-id")
                 .first()
             )
-
             if not decisao:
-                raise ValidationError(
-                    "Não foi encontrada uma contraproposta registrada."
-                )
+                raise ValidationError("Não foi encontrada uma contraproposta registrada.")
 
             valor_anterior = proposta.valor_oferecido
             novo_valor = decisao.valor_referencia
 
-
-            # Registra o novo valor e a aprovação.
-            proposta.valor_oferecido = novo_valor
-            proposta.status_aprovacao = self.StatusAprovacao.APROVADA
-
-            # Atualiza diretamente para não executar novamente
-            # a regra de alçada do método save().
+            # Atualiza via QuerySet para não reexecutar a validação de alçada do save().
             Proposta.objects.filter(pk=proposta.pk).update(
                 valor_oferecido=novo_valor,
                 status_aprovacao=self.StatusAprovacao.APROVADA,
@@ -997,7 +1065,6 @@ class Proposta(models.Model):
                 atualizada_em=timezone.now(),
             )
 
-            # Registra a alteração do valor.
             HistoricoProposta.objects.create(
                 proposta=proposta,
                 valor_anterior=valor_anterior,
@@ -1005,28 +1072,21 @@ class Proposta(models.Model):
                 alterado_por=usuario,
             )
 
-            # Registra o aceite na trilha de auditoria.
             aceite = DecisaoProposta.objects.create(
                 proposta=proposta,
                 tipo=DecisaoProposta.Tipo.ACEITE_CONTRAPROPOSTA,
                 valor_referencia=novo_valor,
-                desconto_percentual_no_momento=(
-                    proposta._desconto_percentual_de(novo_valor)
-                ),
+                desconto_percentual_no_momento=proposta._desconto_percentual_de(novo_valor),
                 alcada_no_momento=proposta._alcada_texto(),
                 parecer="Contraproposta aceita pelo vendedor.",
                 feito_por=usuario,
             )
 
             self.refresh_from_db()
+            return aceite
 
-        return aceite
-    
     def recusar_contraproposta(self, usuario):
-        """
-        O vendedor responsável recusa a contraproposta do gerente.
-        A proposta fica RECUSADA + CANCELADA e a fila do veículo anda.
-        """
+        """Recusa a contraproposta do gerente, cancela a proposta e avança a fila."""
         if not (
             getattr(usuario, "is_authenticated", False)
             and usuario.ativo
@@ -1037,14 +1097,8 @@ class Proposta(models.Model):
             )
 
         with transaction.atomic():
-            veiculo_id = Proposta.objects.only(
-                "veiculo_id"
-            ).get(pk=self.pk).veiculo_id
-
-            Veiculo.objects.select_for_update().get(
-                pk=veiculo_id
-            )
-
+            veiculo_id = Proposta.objects.only("veiculo_id").get(pk=self.pk).veiculo_id
+            Veiculo.objects.select_for_update().get(pk=veiculo_id)
             proposta = Proposta.objects.select_for_update().get(
                 pk=self.pk,
                 veiculo_id=veiculo_id,
@@ -1054,10 +1108,8 @@ class Proposta(models.Model):
                 raise PermissionDenied(
                     "Você não pode recusar a contraproposta de outro vendedor."
                 )
-
             if proposta.situacao == self.Situacao.CANCELADA:
                 raise ValidationError("Uma proposta cancelada não pode ser recusada.")
-
             if proposta.status_aprovacao != self.StatusAprovacao.CONTRAPROPOSTA:
                 raise ValidationError(
                     "Esta proposta não possui uma contraproposta pendente."
@@ -1066,18 +1118,15 @@ class Proposta(models.Model):
             decisao_gerente = proposta.decisoes.filter(
                 tipo=DecisaoProposta.Tipo.CONTRAPROPOSTA
             ).first()
-
             if not decisao_gerente:
-                raise ValidationError(
-                    "Não foi encontrada uma contraproposta registrada."
-                )
+                raise ValidationError("Não foi encontrada uma contraproposta registrada.")
 
             recusa = DecisaoProposta.objects.create(
                 proposta=proposta,
                 tipo=DecisaoProposta.Tipo.RECUSA_CONTRAPROPOSTA,
                 valor_referencia=decisao_gerente.valor_referencia,
-                desconto_percentual_no_momento=(
-                    proposta._desconto_percentual_de(decisao_gerente.valor_referencia)
+                desconto_percentual_no_momento=proposta._desconto_percentual_de(
+                    decisao_gerente.valor_referencia
                 ),
                 alcada_no_momento=proposta._alcada_texto(),
                 parecer="Contraproposta recusada pelo vendedor.",
@@ -1091,40 +1140,9 @@ class Proposta(models.Model):
             )
 
             Proposta.ativar_aguardando(proposta.veiculo_id)
-
             self.refresh_from_db()
+            return recusa
 
-        return recusa
-    
-    @classmethod
-    def ativar_aguardando(cls, veiculo_id):
-        """Promove a proposta aguardando mais antiga, se o veículo estiver livre."""
-        with transaction.atomic():
-            veiculo = Veiculo.objects.select_for_update().get(pk=veiculo_id)
-            if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
-                return
-            if veiculo.reserva_ativa:
-                return
-            
-            if cls.objects.filter(
-                veiculo_id=veiculo_id, situacao=cls.Situacao.ATIVA
-            ).exists():
-                return
-
-            proxima = (
-                cls.objects.filter(
-                    veiculo_id=veiculo_id, situacao=cls.Situacao.AGUARDANDO
-                )
-               .order_by("criada_em", "pk")
-                .first()
-            )
-            if proxima:
-                proxima.situacao = cls.Situacao.ATIVA
-                proxima.reserva_aguardada = None
-                proxima.save(
-                    update_fields=["situacao", "reserva_aguardada", "atualizada_em"]
-                )
-    
     def cancelar(self):
         if self.situacao == self.Situacao.CANCELADA:
             return
@@ -1133,144 +1151,53 @@ class Proposta(models.Model):
             self.situacao = self.Situacao.CANCELADA
             self.save(update_fields=["situacao", "atualizada_em"])
             Proposta.ativar_aguardando(self.veiculo_id)
-            
-        
-    def registrar_pedido(self, usuario):
-            """Grava na trilha o pedido de aprovação (a situação já foi ajustada no save)."""
-            return DecisaoProposta.objects.create(
-            proposta=self,
-            tipo=DecisaoProposta.Tipo.PEDIDO,
-            valor_referencia=self.valor_oferecido,
-            desconto_percentual_no_momento=self.desconto_percentual,
-            alcada_no_momento=self._alcada_texto(),
-            feito_por=usuario,
-            )
 
-    def decidir(self, usuario, tipo, parecer="", novo_valor=None):
-        if not (
-            getattr(usuario, "is_authenticated", False)
-            and usuario.ativo
-            and usuario.is_gerente()
-        ):
-            raise PermissionDenied(
-                "Somente um gerente ativo pode decidir sobre propostas."
-            )
-
-        Tipo = DecisaoProposta.Tipo
-
-        if tipo not in (
-            Tipo.APROVACAO,
-            Tipo.RECUSA,
-            Tipo.CONTRAPROPOSTA,
-        ):
-            raise ValidationError("Tipo de decisão inválido.")
-
-        parecer = (parecer or "").strip()
-
+    @classmethod
+    def ativar_aguardando(cls, veiculo_id):
+        """Promove a proposta em espera mais antiga caso o veículo esteja livre."""
         with transaction.atomic():
-            proposta = Proposta.objects.select_for_update().get(
-                pk=self.pk
-            )
-            if proposta.situacao == self.Situacao.CANCELADA:
-                raise ValidationError("Esta proposta foi cancelada.")
+            veiculo = Veiculo.objects.select_for_update().get(pk=veiculo_id)
+            if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+                return
+            if veiculo.reserva_ativa:
+                return
+            if cls.objects.filter(
+                veiculo_id=veiculo_id,
+                situacao=cls.Situacao.ATIVA,
+            ).exists():
+                return
 
-            if proposta.vendedor_id == usuario.pk:
-                raise PermissionDenied(
-                    "Ninguém pode decidir sobre a própria proposta."
+            proxima = (
+                cls.objects.filter(
+                    veiculo_id=veiculo_id,
+                    situacao=cls.Situacao.AGUARDANDO,
+                )
+                .order_by("criada_em", "pk")
+                .first()
+            )
+            if proxima:
+                proxima.situacao = cls.Situacao.ATIVA
+                proxima.reserva_aguardada = None
+                proxima.save(
+                    update_fields=["situacao", "reserva_aguardada", "atualizada_em"]
                 )
 
-            if (
-                proposta.status_aprovacao
-                != self.StatusAprovacao.PENDENTE
-            ):
-                raise ValidationError(
-                    "Esta proposta não está aguardando decisão do gerente."
-                )
-
-            if tipo == Tipo.APROVACAO:
-                nova_aprovacao = self.StatusAprovacao.APROVADA
-                valor_ref = proposta.valor_oferecido
-
-            elif tipo == Tipo.RECUSA:
-                if not parecer:
-                    raise ValidationError(
-                        "Informe o parecer da recusa."
-                    )
-
-                nova_aprovacao = self.StatusAprovacao.RECUSADA
-                valor_ref = proposta.valor_oferecido
-
-            else:
-                if not parecer:
-                    raise ValidationError(
-                        "Informe o parecer da contraproposta."
-                    )
-
-                if novo_valor is None:
-                    raise ValidationError(
-                        "Informe o valor da contraproposta."
-                    )
-
-                try:
-                    novo_valor = Decimal(novo_valor)
-                except (InvalidOperation, TypeError, ValueError):
-                    raise ValidationError(
-                        "Valor da contraproposta inválido."
-                    )
-
-                if novo_valor <= proposta.valor_oferecido:
-                    raise ValidationError(
-                        "A contraproposta deve ser maior que o valor oferecido."
-                    )
-
-                nova_aprovacao = self.StatusAprovacao.CONTRAPROPOSTA
-                valor_ref = novo_valor.quantize(Decimal("0.01"))
-
-            decisao = DecisaoProposta.objects.create(
-                proposta=proposta,
-                tipo=tipo,
-                valor_referencia=valor_ref,
-                desconto_percentual_no_momento=(
-                    proposta._desconto_percentual_de(valor_ref)
-                ),
-                alcada_no_momento=proposta._alcada_texto(),
-                parecer=parecer,
-                feito_por=usuario,
-            )
-
-            proposta.status_aprovacao = nova_aprovacao
-
-            if tipo == Tipo.RECUSA:
-                proposta.situacao = self.Situacao.CANCELADA
-
-            proposta.save(
-                update_fields=[
-                    "status_aprovacao",
-                    "situacao",
-                    "atualizada_em",
-                ]
-            )
-            
-            if tipo == Tipo.RECUSA:
-                Proposta.ativar_aguardando(proposta.veiculo_id)
-                
-            self.status_aprovacao = nova_aprovacao
-            self.situacao = proposta.situacao
-
-            return decisao
-    
     def __str__(self):
         return f"Proposta #{self.pk} — {self.cliente} — {self.veiculo}"
 
 
 class ComposicaoPagamento(models.Model):
+    """Parcelas e formas de pagamento que compõem o valor total de uma proposta."""
+
     class Tipo(models.TextChoices):
         ENTRADA = "ENTRADA", "Entrada em dinheiro"
         TROCA = "TROCA", "Veículo na troca"
         FINANCIAMENTO = "FINANCIAMENTO", "Saldo financiado"
 
     proposta = models.ForeignKey(
-        Proposta, on_delete=models.CASCADE, related_name="composicao"
+        Proposta,
+        on_delete=models.CASCADE,
+        related_name="composicao",
     )
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     valor = models.DecimalField(max_digits=12, decimal_places=2)
@@ -1308,19 +1235,17 @@ class ComposicaoPagamento(models.Model):
         if self.tipo == self.Tipo.TROCA:
             if self.avaliacao_troca_id:
                 avaliacao = self.avaliacao_troca
-
                 self.troca_descricao = (
                     f"{avaliacao.marca} {avaliacao.modelo} "
                     f"{avaliacao.ano_modelo} - {avaliacao.placa}"
                 )
-
                 if self.valor != avaliacao.valor_avaliado:
                     erros["valor"] = (
                         "O valor da troca deve ser igual ao valor avaliado pelo gerente."
                     )
-
             elif not self.troca_descricao.strip():
                 erros["troca_descricao"] = "Descreva o veículo recebido na troca."
+
             self.financ_banco = ""
             self.financ_parcelas = None
             self.financ_valor_parcela = None
@@ -1348,15 +1273,21 @@ class ComposicaoPagamento(models.Model):
 
 
 class HistoricoProposta(models.Model):
+    """Registro cronológico das alterações de valor em uma proposta."""
+
     proposta = models.ForeignKey(
-        Proposta, on_delete=models.PROTECT, related_name="historico"
+        Proposta,
+        on_delete=models.PROTECT,
+        related_name="historico",
     )
     valor_anterior = models.DecimalField(
         max_digits=12, decimal_places=2, null=True, blank=True
     )
     valor_novo = models.DecimalField(max_digits=12, decimal_places=2)
     alterado_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="alteracoes_proposta"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="alteracoes_proposta",
     )
     alterado_em = models.DateTimeField(auto_now_add=True)
 
@@ -1366,11 +1297,12 @@ class HistoricoProposta(models.Model):
     def __str__(self):
         anterior = "—" if self.valor_anterior is None else f"R$ {self.valor_anterior}"
         return f"{self.proposta} — {anterior} → R$ {self.valor_novo}"
-    
+
+
 class DecisaoProposta(models.Model):
     """
-    Trilha de auditoria da T09: um registro por evento (pedido de aprovação,
-    aprovação, recusa, contraproposta). Nunca é editado nem apagado.
+    Trilha de auditoria imutável de pedidos, aprovações, recusas e contrapropostas.
+    Registros gravados aqui não podem ser editados nem excluídos.
     """
 
     class Tipo(models.TextChoices):
@@ -1378,42 +1310,33 @@ class DecisaoProposta(models.Model):
         APROVACAO = "APROVACAO", "Aprovação"
         RECUSA = "RECUSA", "Recusa"
         CONTRAPROPOSTA = "CONTRAPROPOSTA", "Contraproposta"
-        ACEITE_CONTRAPROPOSTA = ("ACEITE_CONTRAPROPOSTA","Aceite da contraproposta",)
-        RECUSA_CONTRAPROPOSTA = ("RECUSA_CONTRAPROPOSTA","Recusa da contraproposta",)
+        ACEITE_CONTRAPROPOSTA = "ACEITE_CONTRAPROPOSTA", "Aceite da contraproposta"
+        RECUSA_CONTRAPROPOSTA = "RECUSA_CONTRAPROPOSTA", "Recusa da contraproposta"
         RECUSA_FILA = "RECUSA_FILA", "Recusa de proposta da fila"
-        
 
     proposta = models.ForeignKey(
-        Proposta, on_delete=models.PROTECT, related_name="decisoes"
+        Proposta,
+        on_delete=models.PROTECT,
+        related_name="decisoes",
     )
-    tipo = models.CharField(
-    max_length=30,
-    choices=Tipo.choices,
-)
-
-    # Pedido: valor que o vendedor ofereceu. Contraproposta: novo valor do gerente.
+    tipo = models.CharField(max_length=30, choices=Tipo.choices)
     valor_referencia = models.DecimalField(max_digits=12, decimal_places=2)
-
-    # Fotos do momento (o preço e a alçada podem mudar depois).
     desconto_percentual_no_momento = models.DecimalField(
         max_digits=7, decimal_places=2, default=0
     )
     alcada_no_momento = models.CharField(max_length=40, blank=True)
-
     parecer = models.TextField(blank=True)
-
     feito_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="decisoes_proposta"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="decisoes_proposta",
     )
     feito_em = models.DateTimeField(auto_now_add=True)
-    
-    
 
     class Meta:
         ordering = ["-feito_em", "-id"]
 
     def save(self, *args, **kwargs):
-        # Trilha de auditoria: só se cria, nunca se edita.
         if self.pk:
             raise ValidationError("Registros de decisão não podem ser alterados.")
         super().save(*args, **kwargs)
@@ -1425,11 +1348,12 @@ class DecisaoProposta(models.Model):
         return f"{self.proposta} — {self.get_tipo_display()} — R$ {self.valor_referencia}"
 
 
-# ============================================================
-# T11 - Avaliação de troca
-# ============================================================
+# ==============================================================================
+# Avaliação de Troca
+# ==============================================================================
 
 class AvaliacaoTroca(models.Model):
+    """Laudo técnico e financeiro de veículo oferecido como parte do pagamento."""
 
     class EstadoGeral(models.TextChoices):
         EXCELENTE = "EXCELENTE", "Excelente"
@@ -1437,52 +1361,32 @@ class AvaliacaoTroca(models.Model):
         REGULAR = "REGULAR", "Regular"
         RUIM = "RUIM", "Ruim"
 
-    # Identificação do veículo oferecido na troca
     placa = models.CharField(max_length=8)
     chassi = models.CharField(max_length=17)
     renavam = models.CharField(max_length=11, blank=True, default="")
     marca = models.CharField(max_length=60)
     modelo = models.CharField(max_length=60)
-
     ano_fabricacao = models.PositiveSmallIntegerField()
     ano_modelo = models.PositiveSmallIntegerField()
     cor = models.CharField(max_length=30)
     combustivel = models.CharField(max_length=30)
     quilometragem = models.PositiveIntegerField()
-    opcionais = models.TextField(
-        blank=True,
-        default="",
-        verbose_name="Opcionais"
-    )
+    opcionais = models.TextField(blank=True, default="", verbose_name="Opcionais")
 
-    # Avaliação realizada pelo gerente
-    estado_geral = models.CharField(
-        max_length=15,
-        choices=EstadoGeral.choices,
-    )
-
+    estado_geral = models.CharField(max_length=15, choices=EstadoGeral.choices)
     possui_debitos = models.BooleanField(default=False)
     descricao_debitos = models.TextField(blank=True)
-
-    possui_pendencias_documentacao = models.BooleanField(
-        default=False
-    )
+    possui_pendencias_documentacao = models.BooleanField(default=False)
     descricao_pendencias = models.TextField(blank=True)
 
-    valor_avaliado = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-    )
-
+    valor_avaliado = models.DecimalField(max_digits=12, decimal_places=2)
     observacoes = models.TextField(blank=True)
 
-    # Responsável pela avaliação
     avaliado_por = models.ForeignKey(
-        "Usuario",
+        Usuario,
         on_delete=models.PROTECT,
         related_name="avaliacoes_troca",
     )
-
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -1490,27 +1394,19 @@ class AvaliacaoTroca(models.Model):
         erros = {}
 
         if self.valor_avaliado is not None and self.valor_avaliado <= 0:
-            erros["valor_avaliado"] = (
-                "O valor avaliado deve ser maior que zero."
-            )
+            erros["valor_avaliado"] = "O valor avaliado deve ser maior que zero."
 
         if self.possui_debitos and not self.descricao_debitos.strip():
-            erros["descricao_debitos"] = (
-                "Descreva os débitos existentes."
-            )
+            erros["descricao_debitos"] = "Descreva os débitos existentes."
 
         if (
             self.possui_pendencias_documentacao
             and not self.descricao_pendencias.strip()
         ):
-            erros["descricao_pendencias"] = (
-                "Descreva as pendências de documentação."
-            )
+            erros["descricao_pendencias"] = "Descreva as pendências de documentação."
 
         if self.avaliado_por_id and not self.avaliado_por.is_gerente():
-            erros["avaliado_por"] = (
-                "Somente um gerente pode realizar avaliações."
-            )
+            erros["avaliado_por"] = "Somente um gerente pode realizar avaliações."
 
         if erros:
             raise ValidationError(erros)
@@ -1523,27 +1419,18 @@ class AvaliacaoTroca(models.Model):
 
 
 class FotoAvaliacaoTroca(models.Model):
+    """Fotos anexadas à avaliação de um veículo de troca."""
+
     avaliacao = models.ForeignKey(
-        "AvaliacaoTroca",
+        AvaliacaoTroca,
         on_delete=models.CASCADE,
-        related_name="fotos"
+        related_name="fotos",
     )
-
-    imagem = models.ImageField(
-        upload_to="avaliacoes_troca/%Y/%m/"
-    )
-
-    descricao = models.CharField(
-        max_length=255,
-        blank=True
-    )
-
+    imagem = models.ImageField(upload_to="avaliacoes_troca/%Y/%m/")
+    descricao = models.CharField(max_length=255, blank=True)
     ordem = models.PositiveIntegerField(default=0)
+    criada_em = models.DateTimeField(auto_now_add=True)
 
-    criada_em = models.DateTimeField(
-        auto_now_add=True
-    )
-    
     class Meta:
         ordering = ["ordem", "id"]
 
@@ -1551,15 +1438,14 @@ class FotoAvaliacaoTroca(models.Model):
         return f"Foto da avaliação #{self.avaliacao_id}"
 
 
-# ============================================================
-# T12 - Fechamento, contrato e pagamento
-# ============================================================
+# ==============================================================================
+# Vendas, Pagamentos, Documentação e Entrega
+# ==============================================================================
 
 class Venda(models.Model):
     """
-    Registro formal da venda. Nasce no fechamento (Venda.fechar) e guarda
-    uma "foto" do negócio: valores, vendedor e cliente no momento da venda.
-    Venda cancelada nunca é apagada: fica com motivo e responsável.
+    Registro formal do fechamento da venda. Consolida valores, pagamentos,
+    entrada de troca no estoque, comissão, etapas documentais e entrega.
     """
 
     class Situacao(models.TextChoices):
@@ -1567,16 +1453,24 @@ class Venda(models.Model):
         CANCELADA = "CANCELADA", "Cancelada"
 
     proposta = models.ForeignKey(
-        Proposta, on_delete=models.PROTECT, related_name="vendas"
+        Proposta,
+        on_delete=models.PROTECT,
+        related_name="vendas",
     )
     veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="vendas"
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="vendas",
     )
     cliente = models.ForeignKey(
-        Cliente, on_delete=models.PROTECT, related_name="vendas"
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name="vendas",
     )
     vendedor = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="vendas_realizadas"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="vendas_realizadas",
     )
 
     data = models.DateField(default=timezone.localdate)
@@ -1591,7 +1485,9 @@ class Venda(models.Model):
     )
 
     fechada_por = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="vendas_fechadas"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="vendas_fechadas",
     )
     criada_em = models.DateTimeField(auto_now_add=True)
 
@@ -1609,13 +1505,11 @@ class Venda(models.Model):
     class Meta:
         ordering = ["-criada_em", "-id"]
         constraints = [
-            # Um veículo só pode ter uma venda fechada por vez.
             models.UniqueConstraint(
                 fields=["veiculo"],
                 condition=models.Q(situacao="FECHADA"),
                 name="uma_venda_fechada_por_veiculo",
             ),
-            # Uma proposta só pode gerar uma venda fechada por vez.
             models.UniqueConstraint(
                 fields=["proposta"],
                 condition=models.Q(situacao="FECHADA"),
@@ -1633,401 +1527,23 @@ class Venda(models.Model):
 
     @property
     def entrada(self):
-        """Pagamento de entrada desta venda, ou None."""
-        return self.pagamentos.filter(
-            tipo=PagamentoVenda.Tipo.ENTRADA
-        ).first()
+        return self.pagamentos.filter(tipo=PagamentoVenda.Tipo.ENTRADA).first()
 
     @property
     def financiamento(self):
-        """Dados do financiamento desta venda, ou None."""
-        return self.pagamentos.filter(
-            tipo=PagamentoVenda.Tipo.FINANCIAMENTO
-        ).first()
+        return self.pagamentos.filter(tipo=PagamentoVenda.Tipo.FINANCIAMENTO).first()
 
     @property
     def soma_pagamentos(self):
         total = self.pagamentos.aggregate(total=Sum("valor"))["total"]
         return total or Decimal("0.00")
-    # ------------------------------------------------------------------
-    # Fechamento (T12)
-    # ------------------------------------------------------------------
-    @classmethod
-    def fechar(cls, veiculo_id, proposta_id, cliente_id, usuario, motivo=""):
-        """
-        Fecha a venda: valida a proposta, grava a Venda e os pagamentos,
-        cria o veículo recebido na troca (T11) e leva o veículo a VENDIDO.
-        Tudo ou nada: qualquer erro desfaz a operação inteira.
-        """
-        if not (
-            getattr(usuario, "is_authenticated", False)
-            and usuario.ativo
-            and (
-                usuario.is_gerente()
-                or usuario.is_administrativo()
-                or usuario.is_vendedor()
-            )
-        ):
-            raise PermissionDenied(
-                "Somente gerente, administrativo ou o vendedor da proposta "
-                "podem fechar uma venda."
-            )
 
-        with transaction.atomic():
-            # Ordem de bloqueio da T10: veículo primeiro, depois a proposta.
-            veiculo = Veiculo.objects.select_for_update().get(pk=veiculo_id)
-            proposta = Proposta.objects.select_for_update().get(pk=proposta_id)
-            cliente = Cliente.objects.get(pk=cliente_id)
-            
-            if usuario.is_vendedor() and proposta.vendedor_id != usuario.pk:
-                raise PermissionDenied(
-                    "Você só pode fechar a venda das suas próprias propostas."
-                )
-                
-            if veiculo.situacao != Veiculo.Situacao.RESERVADO:
-                raise ValidationError(
-                    "Somente um veículo reservado pode ter a venda fechada."
-                )
-
-            if proposta.veiculo_id != veiculo.pk or proposta.cliente_id != cliente.pk:
-                raise ValidationError(
-                    "A proposta não corresponde ao veículo e ao cliente informados."
-                )
-
-            if proposta.situacao != Proposta.Situacao.ATIVA:
-                raise ValidationError("Somente uma proposta ativa pode ser fechada.")
-
-            # Critério 1: só fecha com proposta aprovada (ou dentro da alçada).
-            if proposta.status_aprovacao not in (
-                Proposta.StatusAprovacao.NAO_NECESSARIA,
-                Proposta.StatusAprovacao.APROVADA,
-            ):
-                raise ValidationError(
-                    "A venda só pode ser fechada com proposta aprovada "
-                    "ou dentro da alçada do vendedor."
-                )
-
-            if veiculo.propostas.filter(
-                status_aprovacao__in=[
-                    Proposta.StatusAprovacao.PENDENTE,
-                    Proposta.StatusAprovacao.CONTRAPROPOSTA,
-                ]
-            ).exclude(situacao=Proposta.Situacao.CANCELADA).exists():
-                raise ValidationError(
-                    "Há proposta aguardando decisão do gerente ou resposta do "
-                    "vendedor. Resolva antes de registrar a venda."
-                )
-
-            itens = list(proposta.composicao.select_related("avaliacao_troca"))
-
-            if not itens or not proposta.composicao_fecha:
-                raise ValidationError(
-                    "A composição do pagamento deve fechar exatamente o valor da proposta."
-                )
-
-            # Troca: avaliação válida, valor igual e ainda não recebida no estoque.
-            for item in itens:
-                if item.tipo != ComposicaoPagamento.Tipo.TROCA:
-                    continue
-
-                avaliacao = item.avaliacao_troca
-                if avaliacao is None:
-                    raise ValidationError(
-                        "Existe uma troca sem avaliação vinculada."
-                    )
-                if item.valor != avaliacao.valor_avaliado:
-                    raise ValidationError(
-                        "O valor de uma troca está diferente do valor da avaliação. "
-                        "Revise a composição antes de fechar a venda."
-                    )
-                if Veiculo.objects.filter(avaliacao_origem=avaliacao).exists():
-                    raise ValidationError(
-                        f"A avaliação #{avaliacao.pk} já gerou um veículo no estoque."
-                    )
-
-            hoje = timezone.localdate()
-
-            venda = cls.objects.create(
-                proposta=proposta,
-                veiculo=veiculo,
-                cliente=cliente,
-                vendedor=proposta.vendedor,
-                data=hoje,
-                preco_tabela=proposta.preco_tabela or veiculo.preco_venda or 0,
-                valor_venda=proposta.valor_oferecido,
-                fechada_por=usuario,
-            )
-
-            # Critérios 3 e 4: entrada e financiamento ficam gravados na venda.
-            for item in itens:
-                PagamentoVenda.objects.create(
-                    venda=venda,
-                    tipo=item.tipo,
-                    valor=item.valor,
-                    data_pagamento=(
-                        hoje if item.tipo == ComposicaoPagamento.Tipo.ENTRADA else None
-                    ),
-                    troca_descricao=item.troca_descricao,
-                    avaliacao_troca=item.avaliacao_troca,
-                    financ_banco=item.financ_banco,
-                    financ_parcelas=item.financ_parcelas,
-                    financ_valor_parcela=item.financ_valor_parcela,
-                )
-
-                # T11: o veículo da troca entra no estoque em preparação.
-                if item.tipo == ComposicaoPagamento.Tipo.TROCA:
-                    a = item.avaliacao_troca
-                    recebido = Veiculo(
-                        placa=a.placa, chassi=a.chassi, renavam=a.renavam,
-                        marca=a.marca, modelo=a.modelo,
-                        ano_fabricacao=a.ano_fabricacao, ano_modelo=a.ano_modelo,
-                        cor=a.cor, combustivel=a.combustivel,
-                        quilometragem=a.quilometragem, opcionais=a.opcionais,
-                        origem=Veiculo.Origem.TROCA,
-                        custo_aquisicao=a.valor_avaliado,
-                        situacao=Veiculo.Situacao.PREPARACAO,
-                        status=Veiculo.Status.DISPONIVEL,
-                        avaliacao_origem=a,
-                        criado_por=usuario,
-                    )
-                    recebido.full_clean()
-                    recebido.save()
-                    
-            # A reserva cumpriu o papel: encerra sem cancelar a proposta.
-            agora = timezone.now()
-            for reserva in veiculo.reservas.filter(cancelada=False):
-                reserva.cancelada = True
-                reserva.cancelada_em = agora
-                reserva.cancelada_por = usuario
-                reserva.motivo_cancelamento = f"Encerrada pela venda #{venda.pk}"
-                reserva.save(
-                    update_fields=[
-                        "cancelada",
-                        "cancelada_em",
-                        "cancelada_por",
-                        "motivo_cancelamento",
-                    ]
-                )
-            # Critério 5: o veículo passa a vendido.
-            veiculo.situacao = Veiculo.Situacao.VENDIDO
-            veiculo.status = Veiculo.Status.VENDIDO
-            veiculo.venda_fechada = True
-            veiculo.cliente_comprador = cliente
-            veiculo.save(
-                update_fields=["situacao", "status", "venda_fechada", "cliente_comprador"]
-            )
-
-            HistoricoSituacaoVeiculo.objects.create(
-                veiculo=veiculo,
-                situacao_anterior=Veiculo.Situacao.RESERVADO,
-                situacao_nova=Veiculo.Situacao.VENDIDO,
-                alterado_por=usuario,
-                motivo=(motivo or f"Venda #{venda.pk}")[:255],
-            )
-            # T13: nasce a lista de etapas da documentação, todas pendentes.
-            for tipo, _rotulo in EtapaDocumentacao.Tipo.choices:
-                EtapaDocumentacao.objects.create(
-                    venda=venda, tipo=tipo, atualizada_por=usuario
-                )
-                
-            # T14: a comissão é lançada como despesa do veículo, e por isso
-            # entra na conta da margem.
-            valor_comissao = venda.calcular_comissao()
-            if valor_comissao > 0:
-                perfil = venda.vendedor.dados_vendedor
-                LancamentoFinanceiro.objects.create(
-                    veiculo=veiculo,
-                    venda=venda,
-                    tipo=LancamentoFinanceiro.Tipo.COMISSAO,
-                    valor=valor_comissao,
-                    descricao=(
-                        f"Comissão da venda #{venda.pk} "
-                        f"({perfil.percentual_comissao}%)"
-                    )[:200],
-                    registrado_por=usuario,
-                    data_lancamento=hoje,
-                )
-                
-            return venda
-
-    # ------------------------------------------------------------------
-    # Cancelamento (T12)
-    # ------------------------------------------------------------------
-    def cancelar(self, usuario, motivo):
-        """
-        Cancela a venda e devolve o veículo ao estoque (disponível).
-        Exige motivo. O veículo recebido na troca NÃO é removido do estoque.
-        """
-        if not (
-            getattr(usuario, "is_authenticated", False)
-            and usuario.ativo
-            and usuario.is_gerente()
-        ):
-            raise PermissionDenied("Somente um gerente ativo pode cancelar uma venda.")
-
-        motivo = (motivo or "").strip()
-        if len(motivo) < 5:
-            raise ValidationError("Informe o motivo do cancelamento (mínimo de 5 caracteres).")
-
-        with transaction.atomic():
-            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
-            venda = Venda.objects.select_for_update().get(pk=self.pk)
-
-            if venda.situacao != self.Situacao.FECHADA:
-                raise ValidationError("Esta venda já foi cancelada.")
-
-            if veiculo.situacao != Veiculo.Situacao.VENDIDO:
-                raise ValidationError(
-                    "Só é possível cancelar a venda de um veículo que ainda não foi entregue."
-                )
-
-            agora = timezone.now()
-            venda.situacao = self.Situacao.CANCELADA
-            venda.cancelada_em = agora
-            venda.cancelada_por = usuario
-            venda.motivo_cancelamento = motivo
-            venda.save(
-                update_fields=["situacao", "cancelada_em", "cancelada_por", "motivo_cancelamento"]
-            )
-
-            veiculo.situacao = Veiculo.Situacao.DISPONIVEL
-            veiculo.status = Veiculo.Status.DISPONIVEL
-            veiculo.venda_fechada = False
-            veiculo.cliente_comprador = None
-            veiculo.save(
-                update_fields=["situacao", "status", "venda_fechada", "cliente_comprador"]
-            )
-            
-            # Reserva que ficou aberta (vendas feitas antes desta regra).
-            veiculo.reservas.filter(cancelada=False).update(
-                cancelada=True,
-                cancelada_em=agora,
-                cancelada_por=usuario,
-                motivo_cancelamento=f"Venda #{venda.pk} cancelada",
-            )
-
-            # A proposta que gerou a venda também é cancelada,
-            # como no cancelamento de reserva da T10.
-            Proposta.objects.filter(pk=venda.proposta_id).update(
-                situacao=Proposta.Situacao.CANCELADA,
-                atualizada_em=agora,
-            )
-            # T14: a comissão de uma venda cancelada deixa de entrar nas contas.
-            LancamentoFinanceiro.objects.filter(
-                venda=venda,
-                tipo=LancamentoFinanceiro.Tipo.COMISSAO,
-                excluido=False,
-            ).update(excluido=True, excluido_por=usuario, excluido_em=agora)
-            
-            HistoricoSituacaoVeiculo.objects.create(
-                veiculo=veiculo,
-                situacao_anterior=Veiculo.Situacao.VENDIDO,
-                situacao_nova=Veiculo.Situacao.DISPONIVEL,
-                alterado_por=usuario,
-                motivo=f"Venda #{venda.pk} cancelada: {motivo}"[:255],
-            )
-            # Promove a próxima proposta da fila, se houver.
-            Proposta.ativar_aguardando(veiculo.pk)
-            self.refresh_from_db()
-
-        return self
-    # ------------------------------------------------------------------
-    # Entrega (T13)
-    # ------------------------------------------------------------------
-    def registrar_entrega(self, usuario, data_entrega=None, checklist=None, observacoes=""):
-        """
-        Registra a entrega: exige venda fechada, as 3 etapas da documentação
-        concluídas e o checklist completo. Leva o veículo a ENTREGUE.
-        `checklist` é um dict {campo: bool} com os itens de EntregaVeiculo.ITENS_CHECKLIST.
-        """
-        if not (
-            getattr(usuario, "is_authenticated", False)
-            and usuario.ativo
-            and (usuario.is_gerente() or usuario.is_administrativo())
-        ):
-            raise PermissionDenied(
-                "Somente gerente ou administrativo ativo pode registrar a entrega."
-            )
-
-        checklist = checklist or {}
-
-        with transaction.atomic():
-            # Ordem de bloqueio: veículo primeiro, depois a venda.
-            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
-            venda = Venda.objects.select_for_update().get(pk=self.pk)
-
-            if venda.situacao != self.Situacao.FECHADA:
-                raise ValidationError(
-                    "Não é possível registrar a entrega: a venda não está fechada."
-                )
-
-            if EntregaVeiculo.objects.filter(venda=venda).exists():
-                raise ValidationError("A entrega desta venda já foi registrada.")
-
-            if veiculo.situacao != Veiculo.Situacao.VENDIDO:
-                raise ValidationError(
-                    "Somente um veículo vendido pode ser entregue."
-                )
-
-            # Todas as etapas precisam estar concluídas.
-            concluidas = set(
-                venda.etapas_documentacao.filter(
-                    situacao=EtapaDocumentacao.Situacao.CONCLUIDA
-                ).values_list("tipo", flat=True)
-            )
-            faltando = [
-                rotulo
-                for valor, rotulo in EtapaDocumentacao.Tipo.choices
-                if valor not in concluidas
-            ]
-            if faltando:
-                raise ValidationError(
-                    "Conclua toda a documentação antes de entregar. Pendente: "
-                    + ", ".join(faltando)
-                    + "."
-                )
-
-            entrega = EntregaVeiculo(
-                venda=venda,
-                data_entrega=data_entrega or timezone.localdate(),
-                responsavel=usuario,
-                observacoes=(observacoes or "").strip(),
-                **{
-                    campo: bool(checklist.get(campo))
-                    for campo, _rotulo in EntregaVeiculo.ITENS_CHECKLIST
-                },
-            )
-            entrega.full_clean()  # exige o checklist completo e data válida
-            entrega.save()
-
-            veiculo.situacao = Veiculo.Situacao.ENTREGUE
-            veiculo.status = Veiculo.Status.VENDIDO
-            veiculo.save(update_fields=["situacao", "status"])
-
-            HistoricoSituacaoVeiculo.objects.create(
-                veiculo=veiculo,
-                situacao_anterior=Veiculo.Situacao.VENDIDO,
-                situacao_nova=Veiculo.Situacao.ENTREGUE,
-                alterado_por=usuario,
-                motivo=f"Entrega da venda #{venda.pk}",
-            )
-
-            return entrega
-
-    # ------------------------------------------------------------------
-    # Margem e comissão (T14)
-    # ------------------------------------------------------------------
-    def _soma_lancamentos(self, filtro):
-        total = filtro.aggregate(total=Sum("valor"))["total"]
+    def _soma_lancamentos(self, queryset):
+        total = queryset.aggregate(total=Sum("valor"))["total"]
         return total or Decimal("0.00")
 
     def calcular_comissao(self):
-        """
-        Comissão = percentual do vendedor sobre a margem da venda ANTES da
-        comissão (preço vendido - custo - despesas lançadas até agora).
-        Margem zero ou negativa não gera comissão. Quem não tem perfil de
-        vendedor (ex.: gerente) não recebe comissão.
-        """
+        """Calcula a comissão do vendedor sobre a margem pré-comissão."""
         perfil = getattr(self.vendedor, "dados_vendedor", None)
         if perfil is None:
             return Decimal("0.00")
@@ -2050,11 +1566,7 @@ class Venda(models.Model):
         )
 
     def calcular_margem(self):
-        """
-        Margem REAL, calculada na hora a partir dos lançamentos. Nunca é
-        guardada: despesas novas mudam o resultado, por isso o retorno
-        traz o momento exato do cálculo (`calculada_em`).
-        """
+        """Recalcula a margem real em tempo de consulta considerando despesas pós-venda."""
         calculada_em = timezone.now()
 
         ativos = LancamentoFinanceiro.objects.filter(excluido=False)
@@ -2092,17 +1604,364 @@ class Venda(models.Model):
             "negativa": margem < 0,
             "calculada_em": calculada_em,
         }
-        
+
+    @classmethod
+    def fechar(cls, veiculo_id, proposta_id, cliente_id, usuario, motivo=""):
+        """
+        Executa atomicamente o fechamento da venda:
+        valida proposta/composição, cria pagamentos, cadastra veículo de troca,
+        baixa reserva, gera etapas documentais, lança comissão e encerra procuras.
+        """
+        if not (
+            getattr(usuario, "is_authenticated", False)
+            and usuario.ativo
+            and (
+                usuario.is_gerente()
+                or usuario.is_administrativo()
+                or usuario.is_vendedor()
+            )
+        ):
+            raise PermissionDenied(
+                "Somente gerente, administrativo ou o vendedor da proposta "
+                "podem fechar uma venda."
+            )
+
+        with transaction.atomic():
+            # Ordem de bloqueio: veículo primeiro, depois proposta.
+            veiculo = Veiculo.objects.select_for_update().get(pk=veiculo_id)
+            proposta = Proposta.objects.select_for_update().get(pk=proposta_id)
+            cliente = Cliente.objects.get(pk=cliente_id)
+
+            if usuario.is_vendedor() and proposta.vendedor_id != usuario.pk:
+                raise PermissionDenied(
+                    "Você só pode fechar a venda das suas próprias propostas."
+                )
+            if veiculo.situacao != Veiculo.Situacao.RESERVADO:
+                raise ValidationError(
+                    "Somente um veículo reservado pode ter a venda fechada."
+                )
+            if proposta.veiculo_id != veiculo.pk or proposta.cliente_id != cliente.pk:
+                raise ValidationError(
+                    "A proposta não corresponde ao veículo e ao cliente informados."
+                )
+            if proposta.situacao != Proposta.Situacao.ATIVA:
+                raise ValidationError("Somente uma proposta ativa pode ser fechada.")
+            if proposta.status_aprovacao not in (
+                Proposta.StatusAprovacao.NAO_NECESSARIA,
+                Proposta.StatusAprovacao.APROVADA,
+            ):
+                raise ValidationError(
+                    "A venda só pode ser fechada com proposta aprovada "
+                    "ou dentro da alçada do vendedor."
+                )
+
+            if veiculo.propostas.filter(
+                status_aprovacao__in=[
+                    Proposta.StatusAprovacao.PENDENTE,
+                    Proposta.StatusAprovacao.CONTRAPROPOSTA,
+                ]
+            ).exclude(situacao=Proposta.Situacao.CANCELADA).exists():
+                raise ValidationError(
+                    "Há proposta aguardando decisão do gerente ou resposta do "
+                    "vendedor. Resolva antes de registrar a venda."
+                )
+
+            itens = list(proposta.composicao.select_related("avaliacao_troca"))
+            if not itens or not proposta.composicao_fecha:
+                raise ValidationError(
+                    "A composição do pagamento deve fechar exatamente o valor da proposta."
+                )
+
+            for item in itens:
+                if item.tipo != ComposicaoPagamento.Tipo.TROCA:
+                    continue
+                avaliacao = item.avaliacao_troca
+                if avaliacao is None:
+                    raise ValidationError("Existe uma troca sem avaliação vinculada.")
+                if item.valor != avaliacao.valor_avaliado:
+                    raise ValidationError(
+                        "O valor de uma troca está diferente do valor da avaliação. "
+                        "Revise a composição antes de fechar a venda."
+                    )
+                if Veiculo.objects.filter(avaliacao_origem=avaliacao).exists():
+                    raise ValidationError(
+                        f"A avaliação #{avaliacao.pk} já gerou um veículo no estoque."
+                    )
+
+            hoje = timezone.localdate()
+
+            venda = cls.objects.create(
+                proposta=proposta,
+                veiculo=veiculo,
+                cliente=cliente,
+                vendedor=proposta.vendedor,
+                data=hoje,
+                preco_tabela=proposta.preco_tabela or veiculo.preco_venda or 0,
+                valor_venda=proposta.valor_oferecido,
+                fechada_por=usuario,
+            )
+
+            for item in itens:
+                PagamentoVenda.objects.create(
+                    venda=venda,
+                    tipo=item.tipo,
+                    valor=item.valor,
+                    data_pagamento=(
+                        hoje if item.tipo == ComposicaoPagamento.Tipo.ENTRADA else None
+                    ),
+                    troca_descricao=item.troca_descricao,
+                    avaliacao_troca=item.avaliacao_troca,
+                    financ_banco=item.financ_banco,
+                    financ_parcelas=item.financ_parcelas,
+                    financ_valor_parcela=item.financ_valor_parcela,
+                )
+
+                if item.tipo == ComposicaoPagamento.Tipo.TROCA:
+                    a = item.avaliacao_troca
+                    recebido = Veiculo(
+                        placa=a.placa,
+                        chassi=a.chassi,
+                        renavam=a.renavam,
+                        marca=a.marca,
+                        modelo=a.modelo,
+                        ano_fabricacao=a.ano_fabricacao,
+                        ano_modelo=a.ano_modelo,
+                        cor=a.cor,
+                        combustivel=a.combustivel,
+                        quilometragem=a.quilometragem,
+                        opcionais=a.opcionais,
+                        origem=Veiculo.Origem.TROCA,
+                        custo_aquisicao=a.valor_avaliado,
+                        situacao=Veiculo.Situacao.PREPARACAO,
+                        status=Veiculo.Status.DISPONIVEL,
+                        avaliacao_origem=a,
+                        criado_por=usuario,
+                    )
+                    recebido.full_clean()
+                    recebido.save()
+
+            agora = timezone.now()
+            for reserva in veiculo.reservas.filter(cancelada=False):
+                reserva.cancelada = True
+                reserva.cancelada_em = agora
+                reserva.cancelada_por = usuario
+                reserva.motivo_cancelamento = f"Encerrada pela venda #{venda.pk}"
+                reserva.save(
+                    update_fields=[
+                        "cancelada",
+                        "cancelada_em",
+                        "cancelada_por",
+                        "motivo_cancelamento",
+                    ]
+                )
+
+            veiculo.situacao = Veiculo.Situacao.VENDIDO
+            veiculo.status = Veiculo.Status.VENDIDO
+            veiculo.venda_fechada = True
+            veiculo.cliente_comprador = cliente
+            veiculo.save(
+                update_fields=["situacao", "status", "venda_fechada", "cliente_comprador"]
+            )
+
+            HistoricoSituacaoVeiculo.objects.create(
+                veiculo=veiculo,
+                situacao_anterior=Veiculo.Situacao.RESERVADO,
+                situacao_nova=Veiculo.Situacao.VENDIDO,
+                alterado_por=usuario,
+                motivo=(motivo or f"Venda #{venda.pk}")[:255],
+            )
+
+            for tipo, _rotulo in EtapaDocumentacao.Tipo.choices:
+                EtapaDocumentacao.objects.create(
+                    venda=venda,
+                    tipo=tipo,
+                    atualizada_por=usuario,
+                )
+
+            valor_comissao = venda.calcular_comissao()
+            if valor_comissao > 0:
+                perfil = venda.vendedor.dados_vendedor
+                LancamentoFinanceiro.objects.create(
+                    veiculo=veiculo,
+                    venda=venda,
+                    tipo=LancamentoFinanceiro.Tipo.COMISSAO,
+                    valor=valor_comissao,
+                    descricao=(
+                        f"Comissão da venda #{venda.pk} ({perfil.percentual_comissao}%)"
+                    )[:200],
+                    registrado_por=usuario,
+                    data_lancamento=hoje,
+                )
+
+            for procura in Procura.objects.select_for_update().filter(
+                cliente=cliente,
+                situacao=Procura.Situacao.ABERTA,
+            ):
+                if procura.combina_com(veiculo):
+                    procura.situacao = Procura.Situacao.ATENDIDA
+                    procura.encerrada_em = agora
+                    procura.venda_atendida = venda
+                    procura.save(
+                        update_fields=["situacao", "encerrada_em", "venda_atendida"]
+                    )
+
+            return venda
+
+    def cancelar(self, usuario, motivo):
+        """Cancela a venda antes da entrega, estorna a comissão e devolve o carro ao estoque."""
+        if not (
+            getattr(usuario, "is_authenticated", False)
+            and usuario.ativo
+            and usuario.is_gerente()
+        ):
+            raise PermissionDenied("Somente um gerente ativo pode cancelar uma venda.")
+
+        motivo = (motivo or "").strip()
+        if len(motivo) < 5:
+            raise ValidationError(
+                "Informe o motivo do cancelamento (mínimo de 5 caracteres)."
+            )
+
+        with transaction.atomic():
+            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
+            venda = Venda.objects.select_for_update().get(pk=self.pk)
+
+            if venda.situacao != self.Situacao.FECHADA:
+                raise ValidationError("Esta venda já foi cancelada.")
+            if veiculo.situacao != Veiculo.Situacao.VENDIDO:
+                raise ValidationError(
+                    "Só é possível cancelar a venda de um veículo que ainda não foi entregue."
+                )
+
+            agora = timezone.now()
+            venda.situacao = self.Situacao.CANCELADA
+            venda.cancelada_em = agora
+            venda.cancelada_por = usuario
+            venda.motivo_cancelamento = motivo
+            venda.save(
+                update_fields=[
+                    "situacao",
+                    "cancelada_em",
+                    "cancelada_por",
+                    "motivo_cancelamento",
+                ]
+            )
+
+            veiculo.situacao = Veiculo.Situacao.DISPONIVEL
+            veiculo.status = Veiculo.Status.DISPONIVEL
+            veiculo.venda_fechada = False
+            veiculo.cliente_comprador = None
+            veiculo.save(
+                update_fields=["situacao", "status", "venda_fechada", "cliente_comprador"]
+            )
+
+            veiculo.reservas.filter(cancelada=False).update(
+                cancelada=True,
+                cancelada_em=agora,
+                cancelada_por=usuario,
+                motivo_cancelamento=f"Venda #{venda.pk} cancelada",
+            )
+
+            Proposta.objects.filter(pk=venda.proposta_id).update(
+                situacao=Proposta.Situacao.CANCELADA,
+                atualizada_em=agora,
+            )
+
+            LancamentoFinanceiro.objects.filter(
+                venda=venda,
+                tipo=LancamentoFinanceiro.Tipo.COMISSAO,
+                excluido=False,
+            ).update(excluido=True, excluido_por=usuario, excluido_em=agora)
+
+            HistoricoSituacaoVeiculo.objects.create(
+                veiculo=veiculo,
+                situacao_anterior=Veiculo.Situacao.VENDIDO,
+                situacao_nova=Veiculo.Situacao.DISPONIVEL,
+                alterado_por=usuario,
+                motivo=f"Venda #{venda.pk} cancelada: {motivo}"[:255],
+            )
+
+            Proposta.ativar_aguardando(veiculo.pk)
+            self.refresh_from_db()
+
+        return self
+
+    def registrar_entrega(self, usuario, data_entrega=None, checklist=None, observacoes=""):
+        """Conclui a entrega após validar toda a documentação e o checklist físico."""
+        if not (
+            getattr(usuario, "is_authenticated", False)
+            and usuario.ativo
+            and (usuario.is_gerente() or usuario.is_administrativo())
+        ):
+            raise PermissionDenied(
+                "Somente gerente ou administrativo ativo pode registrar a entrega."
+            )
+
+        checklist = checklist or {}
+
+        with transaction.atomic():
+            veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
+            venda = Venda.objects.select_for_update().get(pk=self.pk)
+
+            if venda.situacao != self.Situacao.FECHADA:
+                raise ValidationError(
+                    "Não é possível registrar a entrega: a venda não está fechada."
+                )
+            if EntregaVeiculo.objects.filter(venda=venda).exists():
+                raise ValidationError("A entrega desta venda já foi registrada.")
+            if veiculo.situacao != Veiculo.Situacao.VENDIDO:
+                raise ValidationError("Somente um veículo vendido pode ser entregue.")
+
+            concluidas = set(
+                venda.etapas_documentacao.filter(
+                    situacao=EtapaDocumentacao.Situacao.CONCLUIDA
+                ).values_list("tipo", flat=True)
+            )
+            faltando = [
+                rotulo
+                for valor, rotulo in EtapaDocumentacao.Tipo.choices
+                if valor not in concluidas
+            ]
+            if faltando:
+                raise ValidationError(
+                    "Conclua toda a documentação antes de entregar. Pendente: "
+                    + ", ".join(faltando)
+                    + "."
+                )
+
+            entrega = EntregaVeiculo(
+                venda=venda,
+                data_entrega=data_entrega or timezone.localdate(),
+                responsavel=usuario,
+                observacoes=(observacoes or "").strip(),
+                **{
+                    campo: bool(checklist.get(campo))
+                    for campo, _rotulo in EntregaVeiculo.ITENS_CHECKLIST
+                },
+            )
+            entrega.full_clean()
+            entrega.save()
+
+            veiculo.situacao = Veiculo.Situacao.ENTREGUE
+            veiculo.status = Veiculo.Status.VENDIDO
+            veiculo.save(update_fields=["situacao", "status"])
+
+            HistoricoSituacaoVeiculo.objects.create(
+                veiculo=veiculo,
+                situacao_anterior=Veiculo.Situacao.VENDIDO,
+                situacao_nova=Veiculo.Situacao.ENTREGUE,
+                alterado_por=usuario,
+                motivo=f"Entrega da venda #{venda.pk}",
+            )
+
+            return entrega
+
     def __str__(self):
         return f"Venda #{self.pk} — {self.cliente} — {self.veiculo}"
 
 
 class PagamentoVenda(models.Model):
-    """
-    Forma de pagamento da venda, copiada da composição da proposta no
-    momento do fechamento. Assim, editar a proposta depois não altera
-    o que foi efetivamente vendido.
-    """
+    """Snapshot imutável das condições de pagamento consolidadas no fechamento da venda."""
 
     class Tipo(models.TextChoices):
         ENTRADA = "ENTRADA", "Entrada em dinheiro"
@@ -2110,15 +1969,14 @@ class PagamentoVenda(models.Model):
         FINANCIAMENTO = "FINANCIAMENTO", "Saldo financiado"
 
     venda = models.ForeignKey(
-        Venda, on_delete=models.CASCADE, related_name="pagamentos"
+        Venda,
+        on_delete=models.CASCADE,
+        related_name="pagamentos",
     )
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     valor = models.DecimalField(max_digits=12, decimal_places=2)
-
-    # Entrada: data em que o pagamento foi registrado.
     data_pagamento = models.DateField(null=True, blank=True)
 
-    # Troca (T11)
     troca_descricao = models.CharField(max_length=150, blank=True)
     avaliacao_troca = models.ForeignKey(
         AvaliacaoTroca,
@@ -2128,7 +1986,6 @@ class PagamentoVenda(models.Model):
         related_name="pagamentos_venda",
     )
 
-    # Financiamento
     financ_banco = models.CharField(max_length=100, blank=True)
     financ_parcelas = models.PositiveSmallIntegerField(null=True, blank=True)
     financ_valor_parcela = models.DecimalField(
@@ -2157,17 +2014,10 @@ class PagamentoVenda(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()}: R$ {self.valor}"
-    
 
-# ============================================================
-# T13 - Documentação e entrega
-# ============================================================
 
 class EtapaDocumentacao(models.Model):
-    """
-    Uma etapa do trabalho entre "vendido" e "entregue". É criada junto com a
-    venda (Venda.fechar), sempre como PENDENTE, e acompanhada pelo administrativo.
-    """
+    """Etapas obrigatórias de documentação pós-venda antes da entrega do veículo."""
 
     class Tipo(models.TextChoices):
         TRANSFERENCIA = "TRANSFERENCIA", "Transferência"
@@ -2180,14 +2030,16 @@ class EtapaDocumentacao(models.Model):
         CONCLUIDA = "CONCLUIDA", "Concluída"
 
     venda = models.ForeignKey(
-        Venda, on_delete=models.PROTECT, related_name="etapas_documentacao"
+        Venda,
+        on_delete=models.PROTECT,
+        related_name="etapas_documentacao",
     )
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     situacao = models.CharField(
-        max_length=20, choices=Situacao.choices, default=Situacao.PENDENTE
+        max_length=20,
+        choices=Situacao.choices,
+        default=Situacao.PENDENTE,
     )
-
-    # Data da situação atual (muda sempre que a situação muda).
     data = models.DateField(default=timezone.localdate)
     observacao = models.CharField(max_length=255, blank=True)
 
@@ -2215,7 +2067,6 @@ class EtapaDocumentacao(models.Model):
         return self.situacao == self.Situacao.CONCLUIDA
 
     def atualizar(self, usuario, situacao, data=None, observacao=""):
-        """Muda a situação da etapa. Só gerente ou administrativo ativo."""
         if not (
             getattr(usuario, "is_authenticated", False)
             and usuario.ativo
@@ -2234,7 +2085,6 @@ class EtapaDocumentacao(models.Model):
 
         with transaction.atomic():
             venda = Venda.objects.select_for_update().get(pk=self.venda_id)
-
             if venda.situacao != Venda.Situacao.FECHADA:
                 raise ValidationError(
                     "Não é possível alterar a documentação de uma venda cancelada."
@@ -2253,28 +2103,7 @@ class EtapaDocumentacao(models.Model):
 
 
 class EntregaVeiculo(models.Model):
-    """
-    Entrega do veículo ao cliente. Registra data, responsável e o checklist
-    assinado. Só existe uma entrega por venda.
-    """
-
-    venda = models.OneToOneField(
-        Venda, on_delete=models.PROTECT, related_name="entrega"
-    )
-    data_entrega = models.DateField(default=timezone.localdate)
-    responsavel = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="entregas_realizadas"
-    )
-
-    # Checklist da entrega (lista fixa).
-    documentos_entregues = models.BooleanField(default=False)
-    chaves_entregues = models.BooleanField(default=False)
-    manual_entregue = models.BooleanField(default=False)
-    veiculo_conferido = models.BooleanField(default=False)
-    checklist_assinado = models.BooleanField(default=False)
-
-    observacoes = models.TextField(blank=True)
-    criada_em = models.DateTimeField(auto_now_add=True)
+    """Registro único da entrega física do veículo e validação do checklist."""
 
     ITENS_CHECKLIST = (
         ("documentos_entregues", "Documentos do veículo entregues"),
@@ -2283,6 +2112,27 @@ class EntregaVeiculo(models.Model):
         ("veiculo_conferido", "Veículo conferido pelo cliente"),
         ("checklist_assinado", "Checklist assinado pelo cliente"),
     )
+
+    venda = models.OneToOneField(
+        Venda,
+        on_delete=models.PROTECT,
+        related_name="entrega",
+    )
+    data_entrega = models.DateField(default=timezone.localdate)
+    responsavel = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="entregas_realizadas",
+    )
+
+    documentos_entregues = models.BooleanField(default=False)
+    chaves_entregues = models.BooleanField(default=False)
+    manual_entregue = models.BooleanField(default=False)
+    veiculo_conferido = models.BooleanField(default=False)
+    checklist_assinado = models.BooleanField(default=False)
+
+    observacoes = models.TextField(blank=True)
+    criada_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-data_entrega", "-id"]
@@ -2296,23 +2146,19 @@ class EntregaVeiculo(models.Model):
             raise ValidationError(
                 "Todos os itens do checklist precisam estar marcados e assinados."
             )
-
         if self.data_entrega and self.data_entrega > timezone.localdate():
             raise ValidationError({"data_entrega": "A data da entrega não pode ser futura."})
 
     def __str__(self):
         return f"Entrega da venda #{self.venda_id} em {self.data_entrega:%d/%m/%Y}"
-    
-    
-    
 
 
-# ============================================================
-# T16 - Carteira de clientes
-# ============================================================
+# ==============================================================================
+# Carteira de Clientes e Relacionamento
+# ==============================================================================
 
 class ConfiguracaoCarteira(models.Model):
-    """Configuração única do prazo de retorno à carteira."""
+    """Registro singleton com o prazo de recompra para acionamento da carteira."""
 
     anos_sem_comprar = models.PositiveSmallIntegerField(
         default=3,
@@ -2339,7 +2185,6 @@ class ConfiguracaoCarteira(models.Model):
             })
 
     def save(self, *args, **kwargs):
-        # Existe apenas uma configuração para toda a loja.
         self.pk = 1
         self.full_clean()
         super().save(*args, **kwargs)
@@ -2349,7 +2194,12 @@ class ConfiguracaoCarteira(models.Model):
 
 
 class ContatoCarteira(models.Model):
-    """Histórico de contatos, sem armazenar a fila calculada."""
+    """Histórico de contatos realizados pelos vendedores com clientes da carteira."""
+
+    class Canal(models.TextChoices):
+        TELEFONE = "TELEFONE", "Telefone"
+        WHATSAPP = "WHATSAPP", "WhatsApp"
+        PRESENCIAL = "PRESENCIAL", "Presencial"
 
     cliente = models.ForeignKey(
         Cliente,
@@ -2362,23 +2212,19 @@ class ContatoCarteira(models.Model):
         related_name="contatos_carteira_realizados",
         limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
     )
-    realizado_em = models.DateTimeField(default=timezone.now)
-    observacao = models.TextField(blank=True)
-    class Canal(models.TextChoices):
-        TELEFONE = "TELEFONE", "Telefone"
-        WHATSAPP = "WHATSAPP", "WhatsApp"
-        PRESENCIAL = "PRESENCIAL", "Presencial"
-
     canal = models.CharField(
         max_length=12,
         choices=Canal.choices,
         default=Canal.TELEFONE,
     )
+    realizado_em = models.DateTimeField(default=timezone.now)
+    observacao = models.TextField(blank=True)
     data_retorno = models.DateField(
         null=True,
         blank=True,
         help_text="Quando voltar a falar com o cliente (opcional).",
     )
+
     class Meta:
         ordering = ["-realizado_em", "-pk"]
         indexes = [
@@ -2401,18 +2247,19 @@ class ContatoCarteira(models.Model):
                 raise ValidationError({
                     "data_retorno": "A data de retorno não pode ser anterior ao contato."
                 })
+
     def __str__(self):
         return f"{self.cliente} - {self.vendedor} - {self.realizado_em:%d/%m/%Y}"
 
 
-# ============================================================
-# T18 - Procura registrada
-# ============================================================
+# ==============================================================================
+# Procuras de Veículos e Avisos
+# ==============================================================================
 
 class Procura(models.Model):
     """
-    O carro que o cliente procura e ainda não temos no pátio.
-    Nos campos de critério, vazio significa "tanto faz".
+    Registro de interesse de compra para veículos indisponíveis no estoque.
+    Campos de critério em branco atuam como curingas (aceitam qualquer valor).
     """
 
     class Situacao(models.TextChoices):
@@ -2422,7 +2269,9 @@ class Procura(models.Model):
         ENCERRADA = "ENCERRADA", "Encerrada pelo vendedor"
 
     cliente = models.ForeignKey(
-        Cliente, on_delete=models.PROTECT, related_name="procuras"
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name="procuras",
     )
     vendedor = models.ForeignKey(
         Usuario,
@@ -2431,9 +2280,11 @@ class Procura(models.Model):
         limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
     )
 
-    # Critérios (todos opcionais: vazio = tanto faz)
     tipo = models.CharField(
-        max_length=12, choices=Veiculo.Tipo.choices, blank=True, default=""
+        max_length=12,
+        choices=Veiculo.Tipo.choices,
+        blank=True,
+        default="",
     )
     marca_modelo = models.CharField(max_length=120, blank=True)
     preco_minimo = models.DecimalField(
@@ -2444,7 +2295,10 @@ class Procura(models.Model):
     )
     ano_minimo = models.PositiveSmallIntegerField(null=True, blank=True)
     cambio = models.CharField(
-        max_length=12, choices=Veiculo.Cambio.choices, blank=True, default=""
+        max_length=12,
+        choices=Veiculo.Cambio.choices,
+        blank=True,
+        default="",
     )
     combustivel = models.CharField(max_length=30, blank=True)
 
@@ -2466,14 +2320,13 @@ class Procura(models.Model):
         editable=False,
     )
     venda_atendida = models.ForeignKey(
-        "Venda",
+        Venda,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="procuras_atendidas",
         editable=False,
     )
-
     criada_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -2485,42 +2338,33 @@ class Procura(models.Model):
             ),
         ]
 
+    @property
+    def esta_aberta(self):
+        return self.situacao == self.Situacao.ABERTA
+
     def clean(self):
         erros = {}
 
         if self.vendedor_id and not self.vendedor.is_vendedor():
             erros["vendedor"] = "A procura deve pertencer a um vendedor."
-
         if self.cliente_id and not self.pk and not self.cliente.ativo:
             erros["cliente"] = "Cliente desativado não pode ter procura."
-
         if (
             self.preco_minimo is not None
             and self.preco_maximo is not None
             and self.preco_minimo > self.preco_maximo
         ):
-            erros["preco_maximo"] = (
-                "O preço máximo não pode ser menor que o mínimo."
-            )
-
+            erros["preco_maximo"] = "O preço máximo não pode ser menor que o mínimo."
         if self.ano_minimo is not None and not 1900 <= self.ano_minimo <= 2100:
             erros["ano_minimo"] = "Informe um ano entre 1900 e 2100."
-
         if self.valido_ate and not self.pk and self.valido_ate < timezone.localdate():
             erros["valido_ate"] = "A validade não pode estar no passado."
 
         if erros:
             raise ValidationError(erros)
 
-    # ------------------------------------------------------------------
-    # Consultas e regras
-    # ------------------------------------------------------------------
-    @property
-    def esta_aberta(self):
-        return self.situacao == self.Situacao.ABERTA
-
     def resumo(self):
-        """Texto curto com os critérios preenchidos, para telas e avisos."""
+        """Retorna uma descrição resumida dos filtros preenchidos na procura."""
         partes = []
         if self.tipo:
             partes.append(self.get_tipo_display())
@@ -2533,9 +2377,7 @@ class Procura(models.Model):
         if self.ano_minimo:
             partes.append(f"a partir de {self.ano_minimo}")
         if self.preco_minimo is not None and self.preco_maximo is not None:
-            partes.append(
-                f"R$ {self.preco_minimo:,.2f} a R$ {self.preco_maximo:,.2f}"
-            )
+            partes.append(f"R$ {self.preco_minimo:,.2f} a R$ {self.preco_maximo:,.2f}")
         elif self.preco_maximo is not None:
             partes.append(f"até R$ {self.preco_maximo:,.2f}")
         elif self.preco_minimo is not None:
@@ -2543,7 +2385,7 @@ class Procura(models.Model):
         return " · ".join(partes) or "Qualquer veículo"
 
     def combina_com(self, veiculo):
-        """True se o veículo bate com todos os critérios preenchidos."""
+        """Verifica se o veículo atende a todos os critérios definidos na procura."""
         if self.tipo and veiculo.tipo != self.tipo:
             return False
         if self.cambio and veiculo.cambio != self.cambio:
@@ -2573,7 +2415,7 @@ class Procura(models.Model):
         return True
 
     def encerrar(self, usuario):
-        """O vendedor dono (ou o gerente) encerra a procura."""
+        """Encerra manualmente uma procura aberta (permitido ao vendedor dono ou gerente)."""
         if not (
             getattr(usuario, "is_authenticated", False)
             and usuario.ativo
@@ -2588,7 +2430,6 @@ class Procura(models.Model):
 
         with transaction.atomic():
             procura = Procura.objects.select_for_update().get(pk=self.pk)
-
             if procura.situacao != self.Situacao.ABERTA:
                 raise ValidationError("Esta procura já foi encerrada.")
 
@@ -2604,11 +2445,7 @@ class Procura(models.Model):
 
     @classmethod
     def encerrar_vencidas(cls, hoje=None):
-        """
-        Não há agendador (como nas reservas): o encerramento automático
-        acontece quando alguém abre uma tela que lista procuras.
-        A procura vale até o fim do dia de `valido_ate`.
-        """
+        """Atualiza para VENCIDA todas as procuras abertas cuja validade já passou."""
         hoje = hoje or timezone.localdate()
         return cls.objects.filter(
             situacao=cls.Situacao.ABERTA,
@@ -2618,24 +2455,63 @@ class Procura(models.Model):
             encerrada_em=timezone.now(),
         )
 
+    @classmethod
+    def cruzar_com_veiculo(cls, veiculo):
+        """Gera avisos para vendedores cujas procuras abertas combinam com o veículo."""
+        cls.encerrar_vencidas()
+
+        criados = 0
+        abertas = cls.objects.filter(
+            situacao=cls.Situacao.ABERTA,
+            vendedor__ativo=True,
+        ).select_related("cliente", "vendedor")
+
+        for procura in abertas:
+            if not procura.combina_com(veiculo):
+                continue
+
+            _, criou = AvisoProcura.objects.get_or_create(
+                procura=procura,
+                veiculo=veiculo,
+                defaults={"vendedor": procura.vendedor},
+            )
+            if criou:
+                criados += 1
+
+        return criados
+
+    @classmethod
+    def abertas_compativeis(cls, veiculo):
+        """Lista as procuras abertas compatíveis para exibição na ficha do veículo."""
+        return [
+            procura
+            for procura in cls.objects.filter(
+                situacao=cls.Situacao.ABERTA
+            ).select_related("cliente", "vendedor")
+            if procura.combina_com(veiculo)
+        ]
+
     def __str__(self):
         return f"Procura #{self.pk} — {self.cliente} — {self.resumo()}"
-    
+
 
 class AvisoProcura(models.Model):
-    """
-    Aviso ao vendedor: um veículo que acabou de ficar disponível
-    bate com uma procura aberta do cliente dele.
-    """
+    """Notificação enviada ao vendedor quando um veículo compatível fica disponível."""
 
     procura = models.ForeignKey(
-        Procura, on_delete=models.PROTECT, related_name="avisos"
+        Procura,
+        on_delete=models.PROTECT,
+        related_name="avisos",
     )
     veiculo = models.ForeignKey(
-        Veiculo, on_delete=models.PROTECT, related_name="avisos_procura"
+        Veiculo,
+        on_delete=models.PROTECT,
+        related_name="avisos_procura",
     )
     vendedor = models.ForeignKey(
-        Usuario, on_delete=models.PROTECT, related_name="avisos_procura"
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="avisos_procura",
     )
 
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -2645,8 +2521,6 @@ class AvisoProcura(models.Model):
     class Meta:
         ordering = ["lido", "-criado_em", "-pk"]
         constraints = [
-            # Um aviso por par procura/veículo, mesmo que o carro
-            # volte a ficar disponível mais de uma vez.
             models.UniqueConstraint(
                 fields=["procura", "veiculo"],
                 name="um_aviso_por_procura_e_veiculo",
@@ -2661,9 +2535,7 @@ class AvisoProcura(models.Model):
 
     def marcar_como_lido(self, usuario):
         if self.vendedor_id != usuario.pk:
-            raise PermissionDenied(
-                "Você não pode alterar o aviso de outro vendedor."
-            )
+            raise PermissionDenied("Você não pode alterar o aviso de outro vendedor.")
         if not self.lido:
             self.lido = True
             self.lido_em = timezone.now()

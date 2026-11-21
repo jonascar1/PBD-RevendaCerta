@@ -72,13 +72,17 @@
     <section class="cart-painel cart-formulario">
         <h2>Próximo passo</h2>
         <p>
-            Se o cliente demonstrou interesse em um carro, abra uma proposta
-            já com os dados dele preenchidos.
+            Se o cliente demonrou interesse em um carro, abra uma proposta
+            ou registre uma procura já com os dados dele preenchidos.
         </p>
         <div class="cart-acoes">
             <a class="cart-botao cart-botao-secundario"
                href="{% url 'nova_proposta' %}?cliente={{ cliente.pk }}">
                 <i data-lucide="circle-dollar-sign"></i> Abrir proposta
+            </a>
+            <a class="cart-botao cart-botao-secundario"
+               href="{% url 'nova_procura' %}?cliente={{ cliente.pk }}">
+                <i data-lucide="search"></i> Registrar procura
             </a>
         </div>
     </section>

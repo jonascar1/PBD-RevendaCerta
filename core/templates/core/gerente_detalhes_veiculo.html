@@ -91,8 +91,7 @@
             {% for foto in fotos %}
                 <button
                     type="button"
-                    class="miniatura {% if forloop.first %}ativa{% endif %}"
-                    onclick="trocarFoto('{{ foto.imagem.url }}', this)"
+                    class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}"
                 >
                     <img
                         src="{{ foto.imagem.url }}"
@@ -746,29 +745,27 @@
         <p>Não existem propostas pendentes.</p>
     {% endfor %}
 </section>
+<section class="historico-reservas">
+    <h2>Procuras que combinam com este veículo</h2>
 
+    {% for procura in procuras_compativeis %}
+        <div class="historico-reservas__item">
+            <p>
+                <strong>{{ procura.cliente }}</strong>
+                — vendedor {{ procura.vendedor.get_full_name|default:procura.vendedor.username }}
+            </p>
+            <p>Procura: {{ procura.resumo }}</p>
+            <p>Válida até {{ procura.valido_ate|date:"d/m/Y" }}</p>
+        </div>
+    {% empty %}
+        <p>Nenhuma procura aberta combina com este veículo.</p>
+    {% endfor %}
+</section>
 {% endblock content %}
 
 
 {% block extra_js %}
 
-<script>
-
-function trocarFoto(url, elemento) {
-
-    const fotoPrincipal = document.getElementById("foto-principal");
-
-    if (fotoPrincipal) {
-        fotoPrincipal.src = url;
-    }
-
-    document.querySelectorAll(".miniatura").forEach(function(miniatura) {
-        miniatura.classList.remove("ativa");
-    });
-
-    elemento.classList.add("ativa");
-}
-
-</script>
+<script src="{% static 'core/js/gerente_detalhes_veiculo.js' %}"></script>
 
 {% endblock extra_js %}

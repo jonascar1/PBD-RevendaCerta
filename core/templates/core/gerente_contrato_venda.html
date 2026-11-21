@@ -1,3 +1,4 @@
+{% load static %}
 {% load formatadores %}
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -26,7 +27,7 @@
 <body>
 
     <div class="acoes">
-        <button type="button" onclick="window.print()">Imprimir / salvar em PDF</button>
+        <button type="button" data-imprimir="true">Imprimir / salvar em PDF</button>
     </div>
 
     {% if not venda.esta_fechada %}
@@ -99,5 +100,6 @@
         <div class="assinatura">{{ cliente.nome_exibicao }}<br>Comprador</div>
     </div>
 
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
 </body>
 </html>

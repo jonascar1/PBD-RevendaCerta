@@ -1,16 +1,11 @@
-"""
-Todas as validações dos formulários ficam aqui (e nos models), nunca no HTML.
-"""
-
-from decimal import Decimal, InvalidOperation
 import re
 from datetime import date, timedelta
+from decimal import Decimal, InvalidOperation
 
 from django import forms
 from django.core.validators import MaxLengthValidator
 from django.forms import BaseInlineFormSet, inlineformset_factory
 from django.utils import timezone
-from django.core.exceptions import PermissionDenied, ValidationError
 
 from .models import (
     AvaliacaoTroca,
@@ -31,18 +26,86 @@ from .models import (
 )
 
 
-# ======================================================================
-# BASE: vale para todos os formulários
-# ======================================================================
+COMBUSTIVEIS = [
+    ("", "Selecione"),
+    ("Gasolina", "Gasolina"),
+    ("Etanol", "Etanol"),
+    ("Flex", "Flex"),
+    ("Diesel", "Diesel"),
+    ("Elétrico", "Elétrico"),
+    ("Híbrido", "Híbrido"),
+]
+
+
+# ==============================================================================
+# Funções Auxiliares de Validação e Formatação
+# ==============================================================================
+
+def _brl(valor):
+    """Formata um Decimal no padrão monetário brasileiro (ex.: 'R$ 1.234,56')."""
+    texto = f"{valor:,.2f}"
+    return "R$ " + texto.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def validar_cpf(valor):
+    """Valida dígitos verificadores de um CPF (com ou sem máscara)."""
+    cpf = re.sub(r"\D", "", valor or "")
+
+    if len(cpf) != 11 or len(set(cpf)) == 1:
+        return False
+
+    numeros = [int(d) for d in cpf]
+
+    soma = sum(numeros[i] * (10 - i) for i in range(9))
+    resto = (soma * 10) % 11
+    primeiro = 0 if resto == 10 else resto
+
+    if numeros[9] != primeiro:
+        return False
+
+    soma = sum(numeros[i] * (11 - i) for i in range(10))
+    resto = (soma * 10) % 11
+    segundo = 0 if resto == 10 else resto
+
+    return numeros[10] == segundo
+
+
+def validar_cnpj(valor):
+    """Valida dígitos verificadores de um CNPJ (com ou sem máscara)."""
+    cnpj = re.sub(r"\D", "", valor or "")
+
+    if len(cnpj) != 14 or len(set(cnpj)) == 1:
+        return False
+
+    numeros = [int(d) for d in cnpj]
+
+    pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    soma = sum(n * p for n, p in zip(numeros[:12], pesos1))
+    resto = soma % 11
+    primeiro = 0 if resto < 2 else 11 - resto
+
+    if numeros[12] != primeiro:
+        return False
+
+    pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    soma = sum(n * p for n, p in zip(numeros[:13], pesos2))
+    resto = soma % 11
+    segundo = 0 if resto < 2 else 11 - resto
+
+    return numeros[13] == segundo
+
+
+# ==============================================================================
+# Base e Campos Reutilizáveis
+# ==============================================================================
+
 class BaseForm:
     """
-    Herde sempre desta classe ANTES de forms.Form / forms.ModelForm.
+    Mixin base para todos os formulários do sistema.
 
-    - Tira o `required` do HTML.
-    - Tira `maxlength`, `minlength`, `min` e `max` dos widgets (o Django
-      continua validando tudo no servidor).
-    - Usa o NOME do campo como id (id="valor" em vez de id="id_valor"),
-      assim o seu CSS e seus scripts continuam funcionando.
+    Remove restrições nativas de validação HTML5 (mantendo a validação no servidor),
+    padroniza o `id` dos inputs pelo nome do campo e aplica a classe `input-erro`
+    nos widgets com falhas de validação.
     """
 
     use_required_attribute = False
@@ -56,7 +119,6 @@ class BaseForm:
                 campo.widget.attrs.pop(atributo, None)
 
     def add_error(self, field, error):
-        """Marca com a classe `input-erro` todo campo que tiver erro (borda vermelha)."""
         super().add_error(field, error)
         for nome in self._errors:
             if nome in self.fields:
@@ -66,10 +128,66 @@ class BaseForm:
                     widget.attrs["class"] = " ".join(classes + ["input-erro"])
 
 
-# ======================================================================
-# LOGIN
-# ======================================================================
+class CampoMonetarioBR(forms.DecimalField):
+    """Campo decimal que aceita entrada formatada em Real (ex.: 'R$ 18.500,00')."""
+
+    widget = forms.TextInput
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault(
+            "widget",
+            forms.TextInput(attrs={"inputmode": "decimal"}),
+        )
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+
+        if isinstance(value, str):
+            valor = value.strip().replace("R$", "").replace(" ", "")
+
+            if "," in valor:
+                valor = valor.replace(".", "").replace(",", ".")
+            elif valor.count(".") > 1:
+                valor = valor.replace(".", "")
+
+            value = valor
+
+        try:
+            return super().to_python(value)
+        except (InvalidOperation, ValueError):
+            raise forms.ValidationError(
+                "Informe um valor monetário válido.",
+                code="invalid",
+            )
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleImageField(forms.ImageField):
+    """Campo de upload múltiplo de imagens."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        limpar = super().clean
+        if isinstance(data, (list, tuple)):
+            return [limpar(arquivo, initial) for arquivo in data if arquivo]
+        return [limpar(data, initial)] if data else []
+
+
+# ==============================================================================
+# Autenticação
+# ==============================================================================
+
 class LoginForm(BaseForm, forms.Form):
+    """Formulário de autenticação de usuários."""
+
     username = forms.CharField(
         label="Usuário",
         error_messages={"required": "Informe o usuário."},
@@ -79,7 +197,7 @@ class LoginForm(BaseForm, forms.Form):
     )
     password = forms.CharField(
         label="Senha",
-        strip=False,  # a senha não pode ter espaços cortados
+        strip=False,  # Preserva espaços intencionais na senha.
         error_messages={"required": "Informe a senha."},
         widget=forms.PasswordInput(
             attrs={"placeholder": "Digite sua senha", "autocomplete": "current-password"}
@@ -87,90 +205,12 @@ class LoginForm(BaseForm, forms.Form):
     )
 
 
-# ======================================================================
-# DESPESAS (LancamentoFinanceiro)
-# ======================================================================
-class DespesaForm(BaseForm, forms.ModelForm):
-    class Meta:
-        model = LancamentoFinanceiro
-        fields = ["valor", "data_lancamento", "descricao"]
-        labels = {
-            "valor": "Valor",
-            "data_lancamento": "Data do lançamento",
-            "descricao": "Descrição",
-        }
-        widgets = {
-            "valor": forms.NumberInput(attrs={"step": "0.01"}),
-            "data_lancamento": forms.DateInput(
-                format="%Y-%m-%d", attrs={"type": "date"}
-            ),
-            "descricao": forms.Textarea(
-                attrs={
-                    "rows": 4,
-                    "placeholder": "Ex.: Funilaria, documentação, limpeza...",
-                }
-            ),
-        }
-        error_messages = {
-            "valor": {
-                "required": "Informe o valor.",
-                "invalid": "Informe um valor válido.",
-            },
-            "data_lancamento": {
-                "required": "Informe a data do lançamento.",
-                "invalid": "Data inválida.",
-            },
-        }
+# ==============================================================================
+# Vendedores
+# ==============================================================================
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Data de hoje já preenchida ao abrir o formulário vazio.
-        self.fields["data_lancamento"].initial = timezone.localdate
-
-    def clean_valor(self):
-        valor = self.cleaned_data["valor"]
-        if valor <= 0:
-            raise forms.ValidationError("O valor deve ser maior que zero.")
-        return valor
-
-
-class DespesaEditarForm(DespesaForm):
-    """Mesma regra, mas a descrição é um campo de uma linha (como na tela atual)."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["descricao"].widget = forms.TextInput()
-
-
-# ======================================================================
-# PREÇO DE VENDA
-# ======================================================================
-class PrecoVendaForm(BaseForm, forms.Form):
-    preco_venda = forms.DecimalField(
-        label="Novo preço de venda",
-        max_digits=12,
-        decimal_places=2,
-        min_value=0,
-        error_messages={
-            "required": "Informe o preço de venda.",
-            "invalid": "Informe um valor válido.",
-            "min_value": "O preço não pode ser negativo.",
-        },
-        widget=forms.NumberInput(attrs={"step": "0.01"}),
-    )
-
-    def clean_preco_venda(self):
-        preco = self.cleaned_data["preco_venda"]
-        if preco <= 0:
-            raise forms.ValidationError("O preço deve ser maior que zero.")
-        return preco
-
-
-# ======================================================================
-# VENDEDORES
-# ======================================================================
 class _VendedorComercialMixin(forms.Form):
-    """Campos comerciais compartilhados entre cadastro e edição."""
+    """Campos comerciais compartilhados entre cadastro e edição de vendedor."""
 
     tipo_alcada = forms.ChoiceField(
         label="Tipo de alçada",
@@ -206,7 +246,7 @@ class _VendedorComercialMixin(forms.Form):
             "required": "Informe o percentual de comissão.",
             "invalid": "Informe um valor válido.",
             "min_value": "A comissão não pode ser negativa.",
-            "max_value": "A comissão não pode passar de 100%%.",  # %% = % literal (o Django formata a mensagem)
+            "max_value": "A comissão não pode passar de 100%%.",  # %% escapa o % na formatação do Django.
         },
         widget=forms.NumberInput(attrs={"step": "0.01"}),
     )
@@ -227,6 +267,8 @@ class _VendedorComercialMixin(forms.Form):
 
 
 class VendedorCadastroForm(BaseForm, _VendedorComercialMixin):
+    """Cadastro de usuário vendedor e respectivo perfil comercial."""
+
     nome = forms.CharField(
         label="Nome completo",
         max_length=150,
@@ -247,20 +289,22 @@ class VendedorCadastroForm(BaseForm, _VendedorComercialMixin):
     )
     senha = forms.CharField(
         label="Senha",
-        strip=False,  # a senha não pode ter espaços cortados
+        strip=False,  # Preserva espaços intencionais na senha.
         error_messages={"required": "Informe a senha."},
         widget=forms.PasswordInput(attrs={"placeholder": "Digite a senha"}),
     )
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()
-        Usuario.username_validator(username)  # caracteres permitidos
+        Usuario.username_validator(username)
         if Usuario.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError("Já existe um usuário com este nome.")
         return username
 
 
 class VendedorEdicaoForm(BaseForm, _VendedorComercialMixin):
+    """Edição de dados cadastrais, status e parâmetros comerciais do vendedor."""
+
     nome = forms.CharField(
         label="Nome",
         max_length=150,
@@ -281,39 +325,13 @@ class VendedorEdicaoForm(BaseForm, _VendedorComercialMixin):
     )
 
 
-# ======================================================================
-# VEÍCULOS
-# ======================================================================
-COMBUSTIVEIS = [
-    ("", "Selecione"),
-    ("Gasolina", "Gasolina"),
-    ("Etanol", "Etanol"),
-    ("Flex", "Flex"),
-    ("Diesel", "Diesel"),
-    ("Elétrico", "Elétrico"),
-    ("Híbrido", "Híbrido"),
-]
-
-
-class MultipleFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
-
-
-class MultipleImageField(forms.ImageField):
-    """Campo que aceita várias imagens de uma vez (name="fotos")."""
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("widget", MultipleFileInput())
-        super().__init__(*args, **kwargs)
-
-    def clean(self, data, initial=None):
-        limpar = super().clean
-        if isinstance(data, (list, tuple)):
-            return [limpar(arquivo, initial) for arquivo in data if arquivo]
-        return [limpar(data, initial)] if data else []
-
+# ==============================================================================
+# Veículos e Preço
+# ==============================================================================
 
 class VeiculoForm(BaseForm, forms.ModelForm):
+    """Cadastro de veículo no estoque com suporte a múltiplas fotos."""
+
     combustivel = forms.ChoiceField(
         label="Combustível",
         choices=COMBUSTIVEIS,
@@ -331,11 +349,23 @@ class VeiculoForm(BaseForm, forms.ModelForm):
     class Meta:
         model = Veiculo
         fields = [
-            "placa", "chassi", "renavam", "marca", "modelo",
-            "ano_fabricacao", "ano_modelo", "cor", "combustivel",
-            "quilometragem", "opcionais",
-            "origem", "custo_aquisicao", "preco_venda", "valor_repasse",
-            "ano_fabricacao", "ano_modelo", "cor", "tipo", "cambio", "combustivel",
+            "placa",
+            "chassi",
+            "renavam",
+            "marca",
+            "modelo",
+            "ano_fabricacao",
+            "ano_modelo",
+            "cor",
+            "tipo",
+            "cambio",
+            "combustivel",
+            "quilometragem",
+            "opcionais",
+            "origem",
+            "custo_aquisicao",
+            "preco_venda",
+            "valor_repasse",
         ]
         labels = {
             "placa": "Placa",
@@ -346,14 +376,14 @@ class VeiculoForm(BaseForm, forms.ModelForm):
             "ano_fabricacao": "Ano de fabricação",
             "ano_modelo": "Ano do modelo",
             "cor": "Cor",
+            "tipo": "Tipo",
+            "cambio": "Câmbio",
             "quilometragem": "Quilometragem",
             "opcionais": "Opcionais",
             "origem": "Origem do veículo",
             "custo_aquisicao": "Custo de aquisição",
             "preco_venda": "Preço de venda",
             "valor_repasse": "Valor de repasse",
-            "tipo": "Tipo",
-            "cambio": "Câmbio",
         }
         widgets = {
             "placa": forms.TextInput(attrs={"placeholder": "ABC1D23 ou ABC1234"}),
@@ -414,7 +444,6 @@ class VeiculoForm(BaseForm, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["origem"].initial = Veiculo.Origem.COMPRADO
 
-    # --- validações campo a campo ---------------------------------------
     def clean_renavam(self):
         renavam = re.sub(r"\s", "", self.cleaned_data["renavam"])
         if not renavam.isdigit():
@@ -428,8 +457,9 @@ class VeiculoForm(BaseForm, forms.ModelForm):
             raise forms.ValidationError(f"Informe um ano entre 1900 e {limite}.")
         return ano
 
-    # --- validações entre campos ----------------------------------------
     def clean(self):
+        # Validações de placa, chassi, custo/repasse por origem e unicidade no estoque
+        # são complementadas em Veiculo.clean().
         cleaned = super().clean()
         fabricacao = cleaned.get("ano_fabricacao")
         modelo = cleaned.get("ano_modelo")
@@ -439,30 +469,26 @@ class VeiculoForm(BaseForm, forms.ModelForm):
                 "O ano do modelo deve ser igual ao de fabricação ou o ano seguinte.",
             )
         return cleaned
-    # Obs.: placa, chassi, custo (comprado/troca), repasse (consignado) e
-    # unicidade no estoque já são validados pelo Veiculo.clean() do model.
 
 
 class EditarVeiculoForm(VeiculoForm):
+    """Edição de veículo existente bloqueando mudança de origem e de custo pós-venda."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         if self.instance.pk:
             self.fields["origem"].initial = self.instance.origem
 
     def clean_origem(self):
         origem = self.cleaned_data["origem"]
-
         if self.instance.pk and origem != self.instance.origem:
             raise forms.ValidationError(
                 "A origem de um veículo já cadastrado não pode ser alterada."
             )
-
         return origem
 
     def clean_custo_aquisicao(self):
         custo = self.cleaned_data["custo_aquisicao"]
-
         if (
             self.instance.pk
             and self.instance.venda_fechada
@@ -471,28 +497,584 @@ class EditarVeiculoForm(VeiculoForm):
             raise forms.ValidationError(
                 "O custo de aquisição não pode ser alterado após o fechamento da venda."
             )
-
         return custo
 
 
-# ======================================================================
-# AÇÕES NA TELA DE DETALHES DO VEÍCULO
-# ======================================================================
+class PrecoVendaForm(BaseForm, forms.Form):
+    """Atualização do preço de venda do veículo."""
+
+    preco_venda = forms.DecimalField(
+        label="Novo preço de venda",
+        max_digits=12,
+        decimal_places=2,
+        min_value=0,
+        error_messages={
+            "required": "Informe o preço de venda.",
+            "invalid": "Informe um valor válido.",
+            "min_value": "O preço não pode ser negativo.",
+        },
+        widget=forms.NumberInput(attrs={"step": "0.01"}),
+    )
+
+    def clean_preco_venda(self):
+        preco = self.cleaned_data["preco_venda"]
+        if preco <= 0:
+            raise forms.ValidationError("O preço deve ser maior que zero.")
+        return preco
+
+
+# ==============================================================================
+# Clientes
+# ==============================================================================
+
+class ClienteForm(BaseForm, forms.ModelForm):
+    """Cadastro e edição de clientes PF e PJ com sanitização de campos por tipo."""
+
+    class Meta:
+        model = Cliente
+        exclude = ["ativo", "criado_em", "atualizado_em"]
+        widgets = {
+            "data_nascimento": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={"type": "date"},
+            ),
+            "email": forms.EmailInput(
+                attrs={"placeholder": "cliente@email.com"}
+            ),
+        }
+        error_messages = {
+            "email": {"invalid": "Informe um e-mail válido."},
+        }
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("auto_id", "id_%s")
+        super().__init__(*args, **kwargs)
+
+        # Permite envio com máscara (pontos, traços e barras) antes da limpeza.
+        for nome in ("cpf", "cnpj", "cep"):
+            campo = self.fields[nome]
+            campo.max_length = None
+            campo.validators = [
+                v for v in campo.validators if not isinstance(v, MaxLengthValidator)
+            ]
+
+    def _somente_numeros(self, nome):
+        return re.sub(r"\D", "", self.cleaned_data.get(nome) or "")
+
+    def clean_cpf(self):
+        cpf = self._somente_numeros("cpf")
+        tipo = self.cleaned_data.get("tipo")
+
+        if tipo == Cliente.Tipo.PESSOA_FISICA:
+            if not validar_cpf(cpf):
+                raise forms.ValidationError("Informe um CPF válido.")
+
+            if Cliente.objects.filter(cpf=cpf).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError(
+                    "Já existe um cliente cadastrado com este CPF."
+                )
+
+        return cpf
+
+    def clean_cnpj(self):
+        cnpj = self._somente_numeros("cnpj")
+        tipo = self.cleaned_data.get("tipo")
+
+        if tipo == Cliente.Tipo.PESSOA_JURIDICA:
+            if not validar_cnpj(cnpj):
+                raise forms.ValidationError("Informe um CNPJ válido.")
+
+            if Cliente.objects.filter(cnpj=cnpj).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError(
+                    "Já existe um cliente cadastrado com este CNPJ."
+                )
+
+        return cnpj
+
+    def clean_cep(self):
+        cep = self._somente_numeros("cep")
+        if cep and len(cep) != 8:
+            raise forms.ValidationError("O CEP deve conter 8 dígitos.")
+        return cep
+
+    def clean_data_nascimento(self):
+        nascimento = self.cleaned_data.get("data_nascimento")
+        tipo = self.cleaned_data.get("tipo")
+
+        if (
+            tipo == Cliente.Tipo.PESSOA_FISICA
+            and nascimento
+            and nascimento > timezone.localdate()
+        ):
+            raise forms.ValidationError(
+                "A data de nascimento não pode ser futura."
+            )
+
+        return nascimento
+
+    def clean_email(self):
+        return (self.cleaned_data.get("email") or "").strip().lower()
+
+    def clean(self):
+        cleaned = super().clean()
+        tipo = cleaned.get("tipo")
+
+        # Zera atributos exclusivos do tipo oposto para manter integridade cadastral.
+        if tipo == Cliente.Tipo.PESSOA_FISICA:
+            cleaned["cnpj"] = ""
+            cleaned["razao_social"] = ""
+            cleaned["nome_fantasia"] = ""
+            cleaned["responsavel"] = ""
+        elif tipo == Cliente.Tipo.PESSOA_JURIDICA:
+            cleaned["cpf"] = ""
+            cleaned["nome"] = ""
+            cleaned["data_nascimento"] = None
+
+        return cleaned
+
+
+class BaseTelefoneFormSet(BaseInlineFormSet):
+    """Garante unicidade do telefone principal ou promove o primeiro ativo automaticamente."""
+
+    def clean(self):
+        super().clean()
+
+        if any(self.errors):
+            return
+
+        ativos = [
+            f
+            for f in self.forms
+            if getattr(f, "cleaned_data", None)
+            and not f.cleaned_data.get("DELETE")
+            and f.cleaned_data.get("numero")
+        ]
+
+        principais = [f for f in ativos if f.cleaned_data.get("principal")]
+
+        if len(principais) > 1:
+            raise forms.ValidationError(
+                "Marque apenas um telefone como principal."
+            )
+
+        if ativos and not principais:
+            ativos[0].cleaned_data["principal"] = True
+            ativos[0].instance.principal = True
+
+
+class TelefoneClienteForm(BaseForm, forms.ModelForm):
+    class Meta:
+        model = TelefoneCliente
+        fields = ["numero", "tipo", "principal"]
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("auto_id", "%s")
+        super().__init__(*args, **kwargs)
+
+    def clean_numero(self):
+        numero = re.sub(r"\D", "", self.cleaned_data.get("numero") or "")
+        if len(numero) not in (10, 11):
+            raise forms.ValidationError(
+                "Informe um telefone com DDD e 10 ou 11 dígitos."
+            )
+        return numero
+
+
+TelefoneClienteFormSet = inlineformset_factory(
+    Cliente,
+    TelefoneCliente,
+    form=TelefoneClienteForm,
+    formset=BaseTelefoneFormSet,
+    extra=1,
+    min_num=1,
+    validate_min=True,
+    can_delete=True,
+)
+
+
+# ==============================================================================
+# Propostas e Composição de Pagamento
+# ==============================================================================
+
+class PropostaForm(BaseForm, forms.ModelForm):
+    """
+    Registro e edição de proposta comercial.
+
+    Na edição, cliente e veículo são bloqueados para preservar a integridade
+    da fila de espera do veículo.
+    """
+
+    valor_oferecido = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        min_value=Decimal("0.01"),
+    )
+
+    class Meta:
+        model = Proposta
+        fields = ["cliente", "veiculo", "valor_oferecido", "data"]
+        widgets = {
+            "data": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+            "valor_oferecido": forms.TextInput(
+                attrs={
+                    "inputmode": "decimal",
+                    "placeholder": "Ex.: 18.500,00",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        editando = bool(self.instance.pk)
+
+        cliente = self.fields["cliente"]
+        veiculo = self.fields["veiculo"]
+
+        cliente.queryset = Cliente.objects.filter(ativo=True).order_by(
+            "nome", "razao_social"
+        )
+        veiculo.queryset = Veiculo.objects.filter(
+            situacao__in=[Veiculo.Situacao.DISPONIVEL, Veiculo.Situacao.RESERVADO],
+            preco_venda__gt=0,
+        ).order_by("marca", "modelo")
+
+        cliente.empty_label = "Selecione o cliente..."
+        veiculo.empty_label = "Selecione o veículo..."
+
+        cliente.label_from_instance = lambda c: (
+            f"{c.nome_exibicao} — {c.cpf or c.cnpj}"
+        )
+        veiculo.label_from_instance = lambda v: (
+            f"{v.marca} {v.modelo} {v.ano_modelo} — {v.placa}"
+            f"{' (reservado)' if v.situacao == Veiculo.Situacao.RESERVADO else ''}"
+        )
+
+        cliente.error_messages["required"] = "Selecione o cliente."
+        cliente.error_messages["invalid_choice"] = "Selecione um cliente válido."
+        veiculo.error_messages["required"] = "Selecione o veículo."
+        veiculo.error_messages["invalid_choice"] = (
+            "Esse veículo não está disponível para proposta."
+        )
+        self.fields["valor_oferecido"].error_messages["required"] = (
+            "Informe o valor oferecido."
+        )
+        self.fields["valor_oferecido"].error_messages["invalid"] = (
+            "Informe um valor válido."
+        )
+        self.fields["data"].error_messages["required"] = "Informe a data da proposta."
+
+        if editando:
+            cliente.queryset = Cliente.objects.filter(pk=self.instance.cliente_id)
+            veiculo.queryset = Veiculo.objects.filter(pk=self.instance.veiculo_id)
+            cliente.disabled = True
+            veiculo.disabled = True
+
+
+class PropostaFiltroForm(BaseForm, forms.Form):
+    """Filtros de pesquisa para a listagem de propostas."""
+
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all().order_by("id"),
+        required=False,
+        empty_label="Todos os clientes",
+    )
+    veiculo = forms.ModelChoiceField(
+        queryset=Veiculo.objects.all().order_by("marca", "modelo"),
+        required=False,
+        empty_label="Todos os veículos",
+    )
+    situacao = forms.ChoiceField(
+        choices=[("", "Todas as situações")] + list(Proposta.Situacao.choices),
+        required=False,
+    )
+    vendedor = forms.ModelChoiceField(
+        queryset=Usuario.objects.filter(
+            perfil__in=[
+                Usuario.Perfil.VENDEDOR,
+                Usuario.Perfil.GERENTE,
+            ]
+        ).order_by("username"),
+        required=False,
+        empty_label="Todos os vendedores",
+    )
+
+
+class ComposicaoPagamentoForm(BaseForm, forms.ModelForm):
+    """Parcela individual da composição de pagamento de uma proposta."""
+
+    valor = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        min_value=Decimal("0.01"),
+    )
+    financ_valor_parcela = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        required=False,
+        min_value=Decimal("0.01"),
+    )
+
+    class Meta:
+        model = ComposicaoPagamento
+        fields = [
+            "tipo",
+            "valor",
+            "troca_descricao",
+            "avaliacao_troca",
+            "financ_banco",
+            "financ_parcelas",
+            "financ_valor_parcela",
+        ]
+        widgets = {
+            "valor": forms.NumberInput(attrs={"step": "0.01", "inputmode": "decimal"}),
+            "financ_valor_parcela": forms.NumberInput(
+                attrs={"step": "0.01", "inputmode": "decimal"}
+            ),
+            "financ_parcelas": forms.NumberInput(attrs={"step": "1"}),
+            "troca_descricao": forms.TextInput(
+                attrs={"placeholder": "Ex.: Fiat Uno 2012, placa ABC1D23"}
+            ),
+            "financ_banco": forms.TextInput(attrs={"placeholder": "Banco"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tipo"].choices = [("", "Selecione...")] + list(
+            ComposicaoPagamento.Tipo.choices
+        )
+        self.fields["tipo"].error_messages["required"] = "Selecione o tipo."
+        self.fields["tipo"].error_messages["invalid_choice"] = "Tipo inválido."
+        self.fields["valor"].error_messages["required"] = "Informe o valor."
+        self.fields["valor"].error_messages["invalid"] = "Informe um valor válido."
+
+        avaliacoes = self.fields["avaliacao_troca"]
+        avaliacoes.queryset = AvaliacaoTroca.objects.all().order_by("-criado_em")
+        avaliacoes.empty_label = "Selecione a avaliação..."
+        avaliacoes.label_from_instance = lambda avaliacao: (
+            f"{avaliacao.marca} {avaliacao.modelo} "
+            f"{avaliacao.ano_modelo} - {avaliacao.placa} "
+            f"(R$ {avaliacao.valor_avaliado:,.2f})"
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        tipo = cleaned_data.get("tipo")
+        avaliacao = cleaned_data.get("avaliacao_troca")
+        valor = cleaned_data.get("valor")
+
+        if tipo == ComposicaoPagamento.Tipo.TROCA:
+            if not avaliacao:
+                self.add_error(
+                    "avaliacao_troca",
+                    "Selecione uma avaliação de troca realizada pelo gerente.",
+                )
+            elif Veiculo.objects.filter(avaliacao_origem=avaliacao).exists():
+                self.add_error(
+                    "avaliacao_troca",
+                    "Esta avaliação já foi utilizada em uma venda e o veículo já entrou no estoque.",
+                )
+            elif valor is not None and valor != avaliacao.valor_avaliado:
+                self.add_error(
+                    "valor",
+                    "O valor da troca deve ser igual ao valor avaliado pelo gerente.",
+                )
+
+        return cleaned_data
+
+
+class BaseComposicaoFormSet(BaseInlineFormSet):
+    """
+    Valida a soma das parcelas contra `valor_oferecido` e impede duplicidade de troca.
+
+    A view deve atribuir `formset.valor_oferecido` antes de invocar `is_valid()`.
+    """
+
+    valor_oferecido = None
+    soma_composicao = Decimal("0.00")
+
+    def clean(self):
+        super().clean()
+
+        if any(self.errors):
+            return
+
+        total = Decimal("0.00")
+        linhas = 0
+        avaliacoes_utilizadas = set()
+
+        for form in self.forms:
+            dados = getattr(form, "cleaned_data", None)
+            if not dados or dados.get("DELETE"):
+                continue
+
+            avaliacao = dados.get("avaliacao_troca")
+            if avaliacao:
+                if avaliacao.pk in avaliacoes_utilizadas:
+                    form.add_error(
+                        "avaliacao_troca",
+                        "Esta avaliação já foi selecionada em outra linha da proposta.",
+                    )
+                else:
+                    avaliacoes_utilizadas.add(avaliacao.pk)
+
+            valor = dados.get("valor")
+            if valor is None:
+                continue
+            total += valor
+            linhas += 1
+
+        self.soma_composicao = total
+
+        if linhas == 0:
+            raise forms.ValidationError(
+                "Informe ao menos uma forma de pagamento."
+            )
+
+        if self.valor_oferecido is not None and total != self.valor_oferecido:
+            diferenca = self.valor_oferecido - total
+            situacao = "faltam" if diferenca > 0 else "sobram"
+            raise forms.ValidationError(
+                f"A composição não fecha com o valor oferecido: "
+                f"{situacao} {_brl(abs(diferenca))}."
+            )
+
+
+ComposicaoFormSet = inlineformset_factory(
+    Proposta,
+    ComposicaoPagamento,
+    form=ComposicaoPagamentoForm,
+    formset=BaseComposicaoFormSet,
+    extra=1,
+    can_delete=True,
+)
+
+
+class DecisaoPropostaForm(BaseForm, forms.Form):
+    """Coleta a decisão do gerente sobre propostas fora da alçada do vendedor."""
+
+    acao = forms.ChoiceField(
+        choices=[
+            (DecisaoProposta.Tipo.APROVACAO, "Aprovar"),
+            (DecisaoProposta.Tipo.RECUSA, "Recusar"),
+            (DecisaoProposta.Tipo.CONTRAPROPOSTA, "Contraproposta"),
+        ],
+        error_messages={
+            "required": "Escolha uma decisão.",
+            "invalid_choice": "Decisão inválida.",
+        },
+    )
+    parecer = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={"rows": 4, "placeholder": "Explique o motivo da sua decisão..."}
+        ),
+    )
+    novo_valor = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        required=False,
+        min_value=Decimal("0.01"),
+    )
+
+
+class ConfirmarPropostaForm(BaseForm, forms.Form):
+    """Formulário vazio para proteção CSRF na confirmação de proposta."""
+
+
+# ==============================================================================
+# Avaliações de Troca
+# ==============================================================================
+
+class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
+    """Laudo técnico e financeiro de veículo ofertado como parte de pagamento."""
+
+    fotos = MultipleImageField(required=False)
+
+    class Meta:
+        model = AvaliacaoTroca
+        fields = [
+            "placa",
+            "chassi",
+            "renavam",
+            "marca",
+            "modelo",
+            "ano_fabricacao",
+            "ano_modelo",
+            "cor",
+            "combustivel",
+            "quilometragem",
+            "opcionais",
+            "estado_geral",
+            "possui_debitos",
+            "descricao_debitos",
+            "possui_pendencias_documentacao",
+            "descricao_pendencias",
+            "valor_avaliado",
+            "observacoes",
+        ]
+        widgets = {
+            "descricao_debitos": forms.Textarea(attrs={"rows": 3}),
+            "descricao_pendencias": forms.Textarea(attrs={"rows": 3}),
+            "observacoes": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["renavam"].required = True
+
+    def clean_renavam(self):
+        renavam = self.cleaned_data.get("renavam", "").strip()
+        if len(renavam) != 11 or not renavam.isascii() or not renavam.isdigit():
+            raise forms.ValidationError(
+                "O Renavam deve conter exatamente 11 dígitos numéricos."
+            )
+        return renavam
+
+    def clean_fotos(self):
+        fotos = self.cleaned_data.get("fotos") or []
+        formatos_permitidos = {"JPEG", "PNG", "WEBP"}
+        tamanho_maximo = 5 * 1024 * 1024  # 5 MB
+
+        for foto in fotos:
+            if foto.size > tamanho_maximo:
+                raise forms.ValidationError(
+                    f'A foto "{foto.name}" ultrapassa o limite de 5 MB.'
+                )
+
+            if foto.image.format not in formatos_permitidos:
+                raise forms.ValidationError(
+                    f'A foto "{foto.name}" possui um formato não permitido. '
+                    "Envie apenas JPG, PNG ou WEBP."
+                )
+
+        return fotos
+
+
+class FotoAvaliacaoTrocaForm(BaseForm, forms.ModelForm):
+    class Meta:
+        model = FotoAvaliacaoTroca
+        fields = ["imagem", "descricao"]
+
+
+# ==============================================================================
+# Operações de Reserva, Venda, Entrega e Documentação
+# ==============================================================================
 
 class ReservaForm(BaseForm, forms.Form):
+    """Reserva manual de veículo para cliente cadastrado ou avulso."""
+
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.filter(ativo=True),
         required=False,
         label="Cliente cadastrado",
         empty_label="Selecione um cliente...",
     )
-
     cliente_nome = forms.CharField(
         label="Nome do cliente não cadastrado",
         max_length=120,
         required=False,
     )
-
     cliente_contato = forms.CharField(
         label="Contato do cliente não cadastrado",
         max_length=60,
@@ -508,29 +1090,55 @@ class ReservaForm(BaseForm, forms.Form):
 
         if cliente:
             cleaned_data["cliente_nome"] = cliente.nome_exibicao
-
             telefone = cliente.telefones.first()
-
             cleaned_data["cliente_contato"] = (
                 telefone.numero if telefone else cliente.email
             ) or "Contato não informado"
-
         else:
             if not nome:
                 self.add_error(
                     "cliente_nome",
-                    "Informe o nome do cliente não cadastrado."
+                    "Informe o nome do cliente não cadastrado.",
                 )
-
             if not contato:
                 self.add_error(
                     "cliente_contato",
-                    "Informe o contato do cliente não cadastrado."
+                    "Informe o contato do cliente não cadastrado.",
                 )
 
         return cleaned_data
 
+
+class CancelarReservaForm(BaseForm, forms.Form):
+    """Cancelamento de reserva ativa com justificativa obrigatória."""
+
+    motivo = forms.CharField(
+        label="Motivo do cancelamento",
+        min_length=5,
+        max_length=1000,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": "Explique por que a reserva será cancelada...",
+            }
+        ),
+        error_messages={
+            "required": "Informe o motivo do cancelamento.",
+        },
+    )
+
+    def clean_motivo(self):
+        motivo = self.cleaned_data["motivo"].strip()
+        if len(motivo) < 5:
+            raise forms.ValidationError(
+                "O motivo precisa ter pelo menos 5 caracteres."
+            )
+        return motivo
+
+
 class AlterarSituacaoForm(BaseForm, forms.Form):
+    """Transição de situação do veículo e vinculação de proposta no fechamento de venda."""
+
     situacao = forms.ChoiceField(
         choices=Veiculo.Situacao.choices,
         error_messages={"invalid_choice": "Situação inválida."},
@@ -546,8 +1154,6 @@ class AlterarSituacaoForm(BaseForm, forms.Form):
         empty_label="Selecione um cliente...",
         error_messages={"invalid_choice": "Selecione um cliente válido."},
     )
-
-    # T11: a venda parte de uma proposta, é dela que vêm as trocas avaliadas.
     proposta = forms.ModelChoiceField(
         queryset=Proposta.objects.none(),
         required=False,
@@ -606,710 +1212,20 @@ class AlterarSituacaoForm(BaseForm, forms.Form):
 
         return cleaned_data
 
-# ======================================================================
-# CLIENTES
-# ======================================================================
 
-def validar_cpf(valor):
-    cpf = re.sub(r"\D", "", valor or "")
-
-    if len(cpf) != 11 or len(set(cpf)) == 1:
-        return False
-
-    numeros = [int(d) for d in cpf]
-
-    soma = sum(numeros[i] * (10 - i) for i in range(9))
-    resto = (soma * 10) % 11
-    primeiro = 0 if resto == 10 else resto
-
-    if numeros[9] != primeiro:
-        return False
-
-    soma = sum(numeros[i] * (11 - i) for i in range(10))
-    resto = (soma * 10) % 11
-    segundo = 0 if resto == 10 else resto
-
-    return numeros[10] == segundo
-
-
-def validar_cnpj(valor):
-    cnpj = re.sub(r"\D", "", valor or "")
-
-    if len(cnpj) != 14 or len(set(cnpj)) == 1:
-        return False
-
-    numeros = [int(d) for d in cnpj]
-
-    pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
-    soma = sum(n * p for n, p in zip(numeros[:12], pesos1))
-    resto = soma % 11
-    primeiro = 0 if resto < 2 else 11 - resto
-
-    if numeros[12] != primeiro:
-        return False
-
-    pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
-    soma = sum(n * p for n, p in zip(numeros[:13], pesos2))
-    resto = soma % 11
-    segundo = 0 if resto < 2 else 11 - resto
-
-    return numeros[13] == segundo
-
-
-class ClienteForm(BaseForm, forms.ModelForm):
-    class Meta:
-        model = Cliente
-        exclude = ["ativo", "criado_em", "atualizado_em"]
-
-        widgets = {
-            "data_nascimento": forms.DateInput(
-                format="%Y-%m-%d",
-                attrs={"type": "date"},
-            ),
-            "email": forms.EmailInput(
-                attrs={"placeholder": "cliente@email.com"}
-            ),
-        }
-        error_messages = {
-            "email": {"invalid": "Informe um e-mail válido."},
-        }
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("auto_id", "id_%s")
-        super().__init__(*args, **kwargs)
-
-        # Aceita documentos e CEP com ou sem máscara.
-        for nome in ("cpf", "cnpj", "cep"):
-            campo = self.fields[nome]
-            campo.max_length = None
-            campo.validators = [
-                v for v in campo.validators
-                if not isinstance(v, MaxLengthValidator)
-            ]
-
-    def _somente_numeros(self, nome):
-        return re.sub(
-            r"\D",
-            "",
-            self.cleaned_data.get(nome) or "",
-        )
-    def clean_cpf(self):
-        cpf = self._somente_numeros("cpf")
-        tipo = self.cleaned_data.get("tipo")
-
-        if tipo == Cliente.Tipo.PESSOA_FISICA:
-            if not validar_cpf(cpf):
-                raise forms.ValidationError("Informe um CPF válido.")
-
-            if (
-                Cliente.objects.filter(cpf=cpf)
-                .exclude(pk=self.instance.pk)
-                .exists()
-            ):
-                raise forms.ValidationError(
-                    "Já existe um cliente cadastrado com este CPF."
-                )
-
-        return cpf
-
-    def clean_cnpj(self):
-        cnpj = self._somente_numeros("cnpj")
-        tipo = self.cleaned_data.get("tipo")
-
-        if tipo == Cliente.Tipo.PESSOA_JURIDICA:
-            if not validar_cnpj(cnpj):
-                raise forms.ValidationError("Informe um CNPJ válido.")
-
-            if (
-                Cliente.objects.filter(cnpj=cnpj)
-                .exclude(pk=self.instance.pk)
-                .exists()
-            ):
-                raise forms.ValidationError(
-                    "Já existe um cliente cadastrado com este CNPJ."
-                )
-
-        return cnpj
-
-    def clean_cep(self):
-        cep = self._somente_numeros("cep")
-
-        if cep and len(cep) != 8:
-            raise forms.ValidationError(
-                "O CEP deve conter 8 dígitos."
-            )
-
-        return cep
-
-    def clean_data_nascimento(self):
-        nascimento = self.cleaned_data.get("data_nascimento")
-        tipo = self.cleaned_data.get("tipo")
-
-        if (
-            tipo == Cliente.Tipo.PESSOA_FISICA
-            and nascimento
-            and nascimento > timezone.localdate()
-        ):
-            raise forms.ValidationError(
-                "A data de nascimento não pode ser futura."
-            )
-
-        return nascimento
-
-    def clean(self):
-        cleaned = super().clean()
-        tipo = cleaned.get("tipo")
-
-        # Limpa os campos que não pertencem ao tipo selecionado.
-        # Isso evita gravar dados de PF em PJ e vice-versa.
-        if tipo == Cliente.Tipo.PESSOA_FISICA:
-            cleaned["cnpj"] = ""
-            cleaned["razao_social"] = ""
-            cleaned["nome_fantasia"] = ""
-            cleaned["responsavel"] = ""
-
-        elif tipo == Cliente.Tipo.PESSOA_JURIDICA:
-            cleaned["cpf"] = ""
-            cleaned["nome"] = ""
-            cleaned["data_nascimento"] = None
-
-        return cleaned
-    def clean_email(self):
-        return (self.cleaned_data.get("email") or "").strip().lower()
-
-class BaseTelefoneFormSet(BaseInlineFormSet):
-    """Valida o conjunto de telefones: no máximo um principal."""
-
-    def clean(self):
-        super().clean()
-
-        # Linhas com erro de campo aparecem primeiro.
-        if any(self.errors):
-            return
-
-        ativos = [
-            f for f in self.forms
-            if getattr(f, "cleaned_data", None)
-            and not f.cleaned_data.get("DELETE")
-            and f.cleaned_data.get("numero")
-        ]
-
-        principais = [f for f in ativos if f.cleaned_data.get("principal")]
-
-        if len(principais) > 1:
-            raise forms.ValidationError(
-                "Marque apenas um telefone como principal."
-            )
-
-        # Nenhum marcado: o primeiro vira o principal.
-        if ativos and not principais:
-            ativos[0].cleaned_data["principal"] = True
-            ativos[0].instance.principal = True
-class TelefoneClienteForm(BaseForm, forms.ModelForm):
-    class Meta:
-        model = TelefoneCliente
-        fields = ["numero", "tipo", "principal"]
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("auto_id", "%s")
-        super().__init__(*args, **kwargs)
-
-    def clean_numero(self):
-        numero = re.sub(
-            r"\D",
-            "",
-            self.cleaned_data.get("numero") or "",
-        )
-
-        if len(numero) not in (10, 11):
-            raise forms.ValidationError(
-                "Informe um telefone com DDD e 10 ou 11 dígitos."
-            )
-
-        return numero
-
-TelefoneClienteFormSet = inlineformset_factory(
-    Cliente,
-    TelefoneCliente,
-    form=TelefoneClienteForm,
-    formset=BaseTelefoneFormSet,
-    extra=1,
-    min_num=1,
-    validate_min=True,
-    can_delete=True,
-)
-
-def _brl(valor):
-    """Decimal -> 'R$ 1.234,56'."""
-    texto = f"{valor:,.2f}"
-    return "R$ " + texto.replace(",", "X").replace(".", ",").replace("X", ".")
- 
-
-class CampoMonetarioBR(forms.DecimalField):
-    widget = forms.TextInput
-
-    def to_python(self, value):
-        if value in self.empty_values:
-            return None
-
-        if isinstance(value, str):
-            valor = value.strip()
-            valor = valor.replace("R$", "").replace(" ", "")
-
-            if "," in valor:
-                valor = valor.replace(".", "").replace(",", ".")
-            elif valor.count(".") > 1:
-                valor = valor.replace(".", "")
-
-            value = valor
-
-        try:
-            return super().to_python(value)
-        except (InvalidOperation, ValueError):
-            raise forms.ValidationError(
-                "Informe um valor monetário válido.",
-                code="invalid",
-            )
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault(
-            "widget",
-            forms.TextInput(attrs={"inputmode": "decimal"})
-        )
-        super().__init__(*args, **kwargs)
-class PropostaForm(BaseForm, forms.ModelForm):
-    """
-    Dados da proposta. O vendedor NÃO é campo: a view grava request.user.
- 
-    Ao EDITAR, cliente e veículo ficam travados (disabled): trocar o veículo
-    mudaria a regra do "aguardando", então, se errou, cancela e faz outra.
-    """
-    valor_oferecido = CampoMonetarioBR(
-    max_digits=12,
-    decimal_places=2,
-    min_value=Decimal("0.01"),
-)
-    class Meta:
-        model = Proposta
-        fields = ["cliente", "veiculo", "valor_oferecido", "data"]
-        widgets = {
-            "data": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
-            "valor_oferecido": forms.TextInput(
-    attrs={
-        "inputmode": "decimal",
-        "placeholder": "Ex.: 18.500,00",
-    }
-),
-        }
- 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        editando = bool(self.instance.pk)
- 
-        cliente = self.fields["cliente"]
-        veiculo = self.fields["veiculo"]
- 
-        cliente.queryset = Cliente.objects.filter(ativo=True).order_by(
-            "nome", "razao_social"
-        )
-        veiculo.queryset = Veiculo.objects.filter(
-            situacao__in=[Veiculo.Situacao.DISPONIVEL, Veiculo.Situacao.RESERVADO],
-            preco_venda__gt=0,
-        ).order_by("marca", "modelo")
- 
-        cliente.empty_label = "Selecione o cliente..."
-        veiculo.empty_label = "Selecione o veículo..."
- 
-        cliente.label_from_instance = lambda c: (
-            f"{c.nome_exibicao} — {c.cpf or c.cnpj}"
-        )
-        veiculo.label_from_instance = lambda v: (
-            f"{v.marca} {v.modelo} {v.ano_modelo} — {v.placa}"
-            f"{' (reservado)' if v.situacao == Veiculo.Situacao.RESERVADO else ''}"
-        )
- 
-        cliente.error_messages["required"] = "Selecione o cliente."
-        cliente.error_messages["invalid_choice"] = "Selecione um cliente válido."
-        veiculo.error_messages["required"] = "Selecione o veículo."
-        veiculo.error_messages["invalid_choice"] = (
-            "Esse veículo não está disponível para proposta."
-        )
-        self.fields["valor_oferecido"].error_messages["required"] = (
-            "Informe o valor oferecido."
-        )
-        self.fields["valor_oferecido"].error_messages["invalid"] = (
-            "Informe um valor válido."
-        )
-        self.fields["data"].error_messages["required"] = "Informe a data da proposta."
- 
-        if editando:
-            # Mantém só o registro atual (mesmo que o cliente tenha sido
-            # desativado ou o veículo mudado de situação depois).
-            cliente.queryset = Cliente.objects.filter(pk=self.instance.cliente_id)
-            veiculo.queryset = Veiculo.objects.filter(pk=self.instance.veiculo_id)
-            cliente.disabled = True
-            veiculo.disabled = True
- 
-class PropostaFiltroForm(BaseForm, forms.Form):
-    """Filtros da listagem de propostas."""
-
-    cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.all().order_by("id"),
-        required=False,
-        empty_label="Todos os clientes",
-    )
-
-    veiculo = forms.ModelChoiceField(
-        queryset=Veiculo.objects.all().order_by("marca", "modelo"),
-        required=False,
-        empty_label="Todos os veículos",
-    )
-
-    situacao = forms.ChoiceField(
-        choices=[("", "Todas as situações")] + list(Proposta.Situacao.choices),
-        required=False,
-    )
-
-    vendedor = forms.ModelChoiceField(
-        queryset=Usuario.objects.filter(
-            perfil__in=[
-                Usuario.Perfil.VENDEDOR,
-                Usuario.Perfil.GERENTE,
-            ]
-        ).order_by("username"),
-        required=False,
-        empty_label="Todos os vendedores",
-    )
-class ComposicaoPagamentoForm(BaseForm, forms.ModelForm):
-    """Uma linha da composição. As regras por tipo estão no clean() do model."""
-    valor = CampoMonetarioBR(
-    max_digits=12,
-    decimal_places=2,
-    min_value=Decimal("0.01"),
-)
-
-    financ_valor_parcela = CampoMonetarioBR(
-    max_digits=12,
-    decimal_places=2,
-    required=False,
-    min_value=Decimal("0.01"),
-)
-    class Meta:
-        model = ComposicaoPagamento
-        fields = [
-            "tipo",
-            "valor",
-            "troca_descricao",
-            "avaliacao_troca",
-            "financ_banco",
-            "financ_parcelas",
-            "financ_valor_parcela",
-        ]
-        widgets = {
-            "valor": forms.NumberInput(attrs={"step": "0.01", "inputmode": "decimal"}),
-            "financ_valor_parcela": forms.NumberInput(
-                attrs={"step": "0.01", "inputmode": "decimal"}
-            ),
-            "financ_parcelas": forms.NumberInput(attrs={"step": "1"}),
-            "troca_descricao": forms.TextInput(
-                attrs={"placeholder": "Ex.: Fiat Uno 2012, placa ABC1D23"}
-            ),
-            "financ_banco": forms.TextInput(attrs={"placeholder": "Banco"}),
-        }
-    class Meta:
-        model = ComposicaoPagamento
-        fields = [
-            "tipo",
-            "valor",
-            "troca_descricao",
-            "avaliacao_troca",
-            "financ_banco",
-            "financ_parcelas",
-            "financ_valor_parcela",
-        ]
-        widgets = {
-            "valor": forms.NumberInput(attrs={"step": "0.01", "inputmode": "decimal"}),
-            "troca_descricao": forms.TextInput(
-                attrs={"placeholder": "Ex.: Fiat Uno 2012, placa ABC1D23"}
-            ),
-            "financ_banco": forms.TextInput(attrs={"placeholder": "Banco"}),
-        }
- 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["tipo"].choices = [("", "Selecione...")] + list(
-            ComposicaoPagamento.Tipo.choices
-        )
-        self.fields["tipo"].error_messages["required"] = "Selecione o tipo."
-        self.fields["tipo"].error_messages["invalid_choice"] = "Tipo inválido."
-        self.fields["valor"].error_messages["required"] = "Informe o valor."
-        self.fields["valor"].error_messages["invalid"] = "Informe um valor válido."
-
-        avaliacoes = self.fields["avaliacao_troca"]
-        avaliacoes.queryset = AvaliacaoTroca.objects.all().order_by("-criado_em")
-        avaliacoes.empty_label = "Selecione a avaliação..."
-        avaliacoes.label_from_instance = lambda avaliacao: (
-            f"{avaliacao.marca} {avaliacao.modelo} "
-            f"{avaliacao.ano_modelo} - {avaliacao.placa} "
-            f"(R$ {avaliacao.valor_avaliado:,.2f})"
-        )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        tipo = cleaned_data.get("tipo")
-        avaliacao = cleaned_data.get("avaliacao_troca")
-        valor = cleaned_data.get("valor")
-
-        if tipo == ComposicaoPagamento.Tipo.TROCA:
-            if not avaliacao:
-                self.add_error(
-                    "avaliacao_troca",
-                    "Selecione uma avaliação de troca realizada pelo gerente.",
-                )
-            elif Veiculo.objects.filter(avaliacao_origem=avaliacao).exists():
-                self.add_error(
-                    "avaliacao_troca",
-                    "Esta avaliação já foi utilizada em uma venda e o veículo já entrou no estoque.",
-                )
-            elif valor is not None and valor != avaliacao.valor_avaliado:
-                self.add_error(
-                    "valor",
-                    "O valor da troca deve ser igual ao valor avaliado pelo gerente.",
-                )
-
-        return cleaned_data
-
-
-class BaseComposicaoFormSet(BaseInlineFormSet):
-    """
-    Valida a composição como um todo: precisa ter ao menos uma linha e a
-    soma TEM de fechar com o valor oferecido.
- 
-    A view precisa preencher `formset.valor_oferecido` ANTES de chamar
-    `formset.is_valid()` (ver _proposta_form_view em t08_views_novas.py).
-    """
- 
-    valor_oferecido = None
-    soma_composicao = Decimal("0.00")
- 
-    def clean(self):
-        super().clean()
- 
-        # Se alguma linha já tem erro de campo, deixa esses erros aparecerem primeiro.
-        if any(self.errors):
-            return
- 
-        total = Decimal("0.00")
-        linhas = 0
-        avaliacoes_utilizadas = set()
- 
-        for form in self.forms:
-            dados = getattr(form, "cleaned_data", None)
-            if not dados or dados.get("DELETE"):
-                continue
-
-            avaliacao = dados.get("avaliacao_troca")
-            if avaliacao:
-                if avaliacao.pk in avaliacoes_utilizadas:
-                    form.add_error(
-                        "avaliacao_troca",
-                        "Esta avaliação já foi selecionada em outra linha da proposta.",
-                    )
-                else:
-                    avaliacoes_utilizadas.add(avaliacao.pk)
-
-            valor = dados.get("valor")
-            if valor is None:
-                continue
-            total += valor
-            linhas += 1
- 
-        self.soma_composicao = total
- 
-        if linhas == 0:
-            raise forms.ValidationError(
-                "Informe ao menos uma forma de pagamento."
-            )
- 
-        if self.valor_oferecido is not None and total != self.valor_oferecido:
-            diferenca = self.valor_oferecido - total
-            situacao = "faltam" if diferenca > 0 else "sobram"
-            raise forms.ValidationError(
-                f"A composição não fecha com o valor oferecido: "
-                f"{situacao} {_brl(abs(diferenca))}."
-            )
- 
- 
-ComposicaoFormSet = inlineformset_factory(
-    Proposta,
-    ComposicaoPagamento,
-    form=ComposicaoPagamentoForm,
-    formset=BaseComposicaoFormSet,
-    extra=1,
-    can_delete=True,
-)
-
-# ======================================================================
-# DECISÃO DO GERENTE (T09)
-# ======================================================================
-class DecisaoPropostaForm(BaseForm, forms.Form):
-    """
-    Só coleta e limpa os dados. As regras de negócio (parecer obrigatório,
-    contraproposta maior que o oferecido, quem pode decidir) ficam em
-    Proposta.decidir(), no model.
-    """
-
-    acao = forms.ChoiceField(
-        choices=[
-            (DecisaoProposta.Tipo.APROVACAO, "Aprovar"),
-            (DecisaoProposta.Tipo.RECUSA, "Recusar"),
-            (DecisaoProposta.Tipo.CONTRAPROPOSTA, "Contraproposta"),
-        ],
-        error_messages={
-            "required": "Escolha uma decisão.",
-            "invalid_choice": "Decisão inválida.",
-        },
-    )
-    parecer = forms.CharField(
-        required=False,
-        widget=forms.Textarea(
-            attrs={"rows": 4, "placeholder": "Explique o motivo da sua decisão..."}
-        ),
-    )
-    novo_valor = CampoMonetarioBR(
-        max_digits=12,
-        decimal_places=2,
-        required=False,
-        min_value=Decimal("0.01"),
-    )
-class ConfirmarPropostaForm(BaseForm, forms.Form):
-    pass
-
-
-class CancelarReservaForm(BaseForm, forms.Form):
-    motivo = forms.CharField(
-        label="Motivo do cancelamento",
-        min_length=5,
-        max_length=1000,
-        widget=forms.Textarea(attrs={
-            "rows": 3,
-            "placeholder": "Explique por que a reserva será cancelada...",
-        }),
-        error_messages={
-            "required": "Informe o motivo do cancelamento.",
-        },
-    )
-
-    def clean_motivo(self):
-        motivo = self.cleaned_data["motivo"].strip()
-
-        if len(motivo) < 5:
-            raise forms.ValidationError(
-                "O motivo precisa ter pelo menos 5 caracteres."
-            )
-
-        return motivo
-
-
-# ======================================================================
-# AVALIAÇÃO DE TROCA (T11)
-# ======================================================================
-class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
-
-    fotos = MultipleImageField(required=False)
-    class Meta:
-        model = AvaliacaoTroca
-
-        fields = [
-            "placa",
-            "chassi",
-            "renavam",
-            "marca",
-            "modelo",
-            "ano_fabricacao",
-            "ano_modelo",
-            "cor",
-            "combustivel",
-            "quilometragem",
-            "opcionais",
-            "estado_geral",
-            "possui_debitos",
-            "descricao_debitos",
-            "possui_pendencias_documentacao",
-            "descricao_pendencias",
-            "valor_avaliado",
-            "observacoes",
-        ]
-
-        widgets = {
-            "descricao_debitos": forms.Textarea(attrs={"rows": 3}),
-            "descricao_pendencias": forms.Textarea(attrs={"rows": 3}),
-            "observacoes": forms.Textarea(attrs={"rows": 4}),
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["renavam"].required = True
-
-    def clean_renavam(self):
-        renavam = self.cleaned_data.get("renavam", "").strip()
-
-        if len(renavam) != 11 or not renavam.isascii() or not renavam.isdigit():
-            raise forms.ValidationError(
-                "O Renavam deve conter exatamente 11 dígitos numéricos."
-            )
-
-        return renavam
-    
-
-    def clean_fotos(self):
-        fotos = self.cleaned_data.get("fotos") or []
-
-        formatos_permitidos = {
-            "JPEG",
-            "PNG",
-            "WEBP",
-        }
-
-        tamanho_maximo = 5 * 1024 * 1024  # 5 MB
-
-        for foto in fotos:
-            if foto.size > tamanho_maximo:
-                raise forms.ValidationError(
-                    f'A foto "{foto.name}" ultrapassa o limite de 5 MB.'
-                )
-
-            if foto.image.format not in formatos_permitidos:
-                raise forms.ValidationError(
-                    f'A foto "{foto.name}" possui um formato não permitido. '
-                    "Envie apenas JPG, PNG ou WEBP."
-                )
-
-        return fotos
-
-
-class FotoAvaliacaoTrocaForm(BaseForm, forms.ModelForm):    
-    class Meta:
-        model = FotoAvaliacaoTroca
-
-        fields = [
-            "imagem",
-            "descricao",
-        ]
-        
-        
-# ======================================================================
-# CANCELAMENTO DE VENDA (T12)
-# ======================================================================
 class CancelarVendaForm(BaseForm, forms.Form):
+    """Cancelamento de venda fechada com motivo obrigatório."""
+
     motivo = forms.CharField(
         label="Motivo do cancelamento",
         min_length=5,
         max_length=1000,
-        widget=forms.Textarea(attrs={
-            "rows": 3,
-            "placeholder": "Explique por que a venda será cancelada...",
-        }),
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": "Explique por que a venda será cancelada...",
+            }
+        ),
         error_messages={
             "required": "Informe o motivo do cancelamento.",
             "min_length": "O motivo precisa ter pelo menos 5 caracteres.",
@@ -1319,10 +1235,10 @@ class CancelarVendaForm(BaseForm, forms.Form):
     def clean_motivo(self):
         return self.cleaned_data["motivo"].strip()
 
-# ======================================================================
-# ENTREGA DO VEÍCULO (T13)
-# ======================================================================
+
 class EntregaVeiculoForm(BaseForm, forms.Form):
+    """Checklist de entrega física do veículo vendido ao comprador."""
+
     data_entrega = forms.DateField(
         label="Data da entrega",
         error_messages={
@@ -1331,7 +1247,6 @@ class EntregaVeiculoForm(BaseForm, forms.Form):
         },
         widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
     )
-
     documentos_entregues = forms.BooleanField(
         required=False, label="Documentos do veículo entregues"
     )
@@ -1347,7 +1262,6 @@ class EntregaVeiculoForm(BaseForm, forms.Form):
     checklist_assinado = forms.BooleanField(
         required=False, label="Checklist assinado pelo cliente"
     )
-
     observacoes = forms.CharField(
         label="Observações",
         required=False,
@@ -1365,7 +1279,7 @@ class EntregaVeiculoForm(BaseForm, forms.Form):
         return data
 
     def checklist(self):
-        """Dict {campo: bool} no formato que Venda.registrar_entrega espera."""
+        """Retorna o dicionário de itens conferidos no formato esperado por Venda.registrar_entrega()."""
         return {
             campo: self.cleaned_data.get(campo, False)
             for campo in (
@@ -1376,11 +1290,11 @@ class EntregaVeiculoForm(BaseForm, forms.Form):
                 "checklist_assinado",
             )
         }
-        
-# ======================================================================
-# DOCUMENTAÇÃO DA VENDA (T13)
-# ======================================================================
+
+
 class EtapaDocumentacaoForm(BaseForm, forms.Form):
+    """Atualização de etapa documental pós-venda."""
+
     situacao = forms.ChoiceField(
         choices=EtapaDocumentacao.Situacao.choices,
         error_messages={
@@ -1400,15 +1314,72 @@ class EtapaDocumentacaoForm(BaseForm, forms.Form):
         if data and data > timezone.localdate():
             raise forms.ValidationError("A data da etapa não pode ser futura.")
         return data
-    
-    
 
 
-# ============================================================
-# T16 - Carteira de clientes
-# ============================================================
+# ==============================================================================
+# Despesas Operacionais
+# ==============================================================================
+
+class DespesaForm(BaseForm, forms.ModelForm):
+    """Lançamento de despesa vinculada a um veículo."""
+
+    class Meta:
+        model = LancamentoFinanceiro
+        fields = ["valor", "data_lancamento", "descricao"]
+        labels = {
+            "valor": "Valor",
+            "data_lancamento": "Data do lançamento",
+            "descricao": "Descrição",
+        }
+        widgets = {
+            "valor": forms.NumberInput(attrs={"step": "0.01"}),
+            "data_lancamento": forms.DateInput(
+                format="%Y-%m-%d", attrs={"type": "date"}
+            ),
+            "descricao": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "placeholder": "Ex.: Funilaria, documentação, limpeza...",
+                }
+            ),
+        }
+        error_messages = {
+            "valor": {
+                "required": "Informe o valor.",
+                "invalid": "Informe um valor válido.",
+            },
+            "data_lancamento": {
+                "required": "Informe a data do lançamento.",
+                "invalid": "Data inválida.",
+            },
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["data_lancamento"].initial = timezone.localdate
+
+    def clean_valor(self):
+        valor = self.cleaned_data["valor"]
+        if valor <= 0:
+            raise forms.ValidationError("O valor deve ser maior que zero.")
+        return valor
+
+
+class DespesaEditarForm(DespesaForm):
+    """Edição de despesa utilizando input de linha única para descrição."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["descricao"].widget = forms.TextInput()
+
+
+# ==============================================================================
+# Carteira de Clientes e Procuras
+# ==============================================================================
 
 class ConfiguracaoCarteiraForm(BaseForm, forms.ModelForm):
+    """Configuração do prazo de inatividade para elegibilidade de recompra."""
+
     class Meta:
         model = ConfiguracaoCarteira
         fields = ["anos_sem_comprar"]
@@ -1423,16 +1394,14 @@ class ConfiguracaoCarteiraForm(BaseForm, forms.ModelForm):
 
     def clean_anos_sem_comprar(self):
         anos = self.cleaned_data["anos_sem_comprar"]
-
         if not 1 <= anos <= 50:
-            raise forms.ValidationError(
-                "Informe um prazo entre 1 e 50 anos."
-            )
-
+            raise forms.ValidationError("Informe um prazo entre 1 e 50 anos.")
         return anos
 
 
 class ContatoCarteiraForm(BaseForm, forms.ModelForm):
+    """Registro de abordagem comercial com cliente da carteira."""
+
     class Meta:
         model = ContatoCarteira
         fields = ["canal", "observacao", "data_retorno"]
@@ -1458,8 +1427,7 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
         }
 
     def clean_observacao(self):
-        # Obrigatório aqui (e não no model) porque os contatos
-        # antigos da T16 têm este campo vazio.
+        # Mantido obrigatório apenas no form para preservar compatibilidade com registros legados sem observação.
         texto = (self.cleaned_data.get("observacao") or "").strip()
         if not texto:
             raise forms.ValidationError("Resuma o que foi conversado.")
@@ -1472,15 +1440,11 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
                 "A data de retorno não pode estar no passado."
             )
         return retorno
-    
 
-
-
-# ============================================================
-# T18 - Procura registrada
-# ============================================================
 
 class ProcuraForm(BaseForm, forms.ModelForm):
+    """Cadastro de interesse de compra de cliente para cruzamento automático com estoque."""
+
     preco_minimo = CampoMonetarioBR(
         max_digits=12,
         decimal_places=2,
@@ -1559,7 +1523,6 @@ class ProcuraForm(BaseForm, forms.ModelForm):
             f"{c.nome_exibicao} — {c.cpf or c.cnpj}"
         )
 
-        # Validade padrão: 30 dias a partir de hoje.
         self.fields["valido_ate"].initial = (
             lambda: timezone.localdate() + timedelta(days=30)
         )

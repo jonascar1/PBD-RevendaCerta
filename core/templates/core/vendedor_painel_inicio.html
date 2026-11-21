@@ -51,7 +51,41 @@
         </div>
 
     </section>
+    {% if avisos_procura %}
+    <section class="avisos-propostas">
+        <h2>Veículos compatíveis com procuras</h2>
 
+        <p>Chegou um carro que bate com o que seu cliente procura.</p>
+
+        {% for aviso in avisos_procura %}
+            <div class="aviso-proposta">
+                <div>
+                    <strong>
+                        {{ aviso.veiculo.marca }} {{ aviso.veiculo.modelo }}
+                        {{ aviso.veiculo.ano_modelo|unlocalize }}
+                    </strong>
+
+                    <p>
+                        Cliente: {{ aviso.procura.cliente.nome_exibicao }}
+                        · Procurava: {{ aviso.procura.resumo }}
+                    </p>
+                </div>
+
+                <div class="aviso-acoes">
+                    <a href="{% url 'nova_proposta' %}?cliente={{ aviso.procura.cliente_id }}&veiculo={{ aviso.veiculo_id }}">
+                        Fazer proposta
+                    </a>
+
+                    <form method="post" action="{% url 'marcar_aviso_procura_lido' aviso.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="aviso-lido">Marcar como lido</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+    
     {% if propostas_para_atender %}
     <section class="avisos-propostas">
         <h2>Propostas disponíveis para atendimento</h2>

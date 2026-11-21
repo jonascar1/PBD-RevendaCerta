@@ -98,8 +98,7 @@
         <form method="get" class="neg-filter">
             <label for="filtro-situacao">Situação</label>
 
-            <select name="situacao" id="filtro-situacao"
-                    onchange="this.form.submit()">
+            <select name="situacao" id="filtro-situacao" data-auto-submit="true">
                 <option value="">Todas as situações</option>
 
                 {% for valor, rotulo in situacoes %}
@@ -132,13 +131,11 @@
                     <td>
                         <strong>#{{ proposta.pk }}</strong>
                         <small>{{ proposta.criada_em|date:"d/m/Y" }}</small>
-                    </td>
-
-                <strong>
+                                       <td>
+                        <strong>
                             <a href="{% url 'historico_cliente' proposta.cliente_id %}">{{ proposta.cliente }}</a>
                         </strong>
-
-                    <td>
+                    </td>
                         <strong>
                             {{ proposta.veiculo.marca }}
                             {{ proposta.veiculo.modelo }}
@@ -194,3 +191,6 @@
 </section>
 
 {% endblock content %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
+{% endblock %}

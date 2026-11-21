@@ -65,8 +65,7 @@
                 {% for foto in fotos %}
                     <button
                         type="button"
-                        class="miniatura {% if forloop.first %}ativa{% endif %}"
-                        onclick="trocarFoto('{{ foto.imagem.url|escapejs }}', this)"
+                        class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url|escape }}"
                         aria-label="Ver foto {{ forloop.counter }}"
                         aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                     >
@@ -175,23 +174,4 @@
 </body>
 </html>
 
-<script>
-
-function trocarFoto(url, elemento) {
-
-    const fotoPrincipal = document.getElementById("foto-principal");
-
-    if (fotoPrincipal) {
-        fotoPrincipal.src = url;
-    }
-
-    document.querySelectorAll(".miniatura").forEach(function(miniatura) {
-        miniatura.classList.remove("ativa");
-    });
-
-    elemento.classList.add("ativa");
-}
-
-lucide.createIcons();
-
-</script>
+<script src="{% static 'core/js/vitrine_veiculo_detalhe.js' %}"></script>

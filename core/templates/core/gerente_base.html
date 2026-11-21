@@ -95,7 +95,11 @@
                     <span><i data-lucide="phone-call"></i></span>
                     Carteira de clientes
                 </a>
-
+                <a href="{% url 'procuras_gerente' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'procuras_gerente' %}active{% endif %}">
+                    <span><i data-lucide="search"></i></span>
+                    Procuras
+                </a>
                 <a href="{% url 'vendedores' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'vendedores' or request.resolver_match.url_name == 'cadastrar_vendedor' or request.resolver_match.url_name == 'editar_vendedor' %}active{% endif %}">
                     <span><i data-lucide="users"></i></span>
@@ -142,9 +146,7 @@
     <!-- JAVASCRIPT ESPECÍFICO DA PÁGINA -->
 
 
-    <script>
-        lucide.createIcons();
-    </script>
+    <script src="{% static 'core/js/gerente_base.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}
