@@ -1,38 +1,36 @@
-{% extends "core/vendedor_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Minha carteira | VENDACERTA{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
-{% endblock %}
+{% block title %}Minha Carteira · VendaCerta{% endblock %}
 
 {% block content %}
 <div class="cart-pagina">
-
-    <header class="cart-topo">
+    <header class="cart-cabecalho">
         <div>
-            <span class="cart-sobretitulo">Relacionamento com clientes</span>
-            <h1>Minha carteira</h1>
-            <p>
-                Clientes que já compraram com você e estão há pelo menos
-                {{ carteira.anos_configurados }} ano(s) sem comprar na loja.
-            </p>
+            <h1>Minha Carteira</h1>
+            <p>Clientes elegíveis para contato e retorno de troca</p>
         </div>
     </header>
 
     {% if messages %}
         <div class="cart-mensagens">
             {% for message in messages %}
-                <p class="cart-mensagem">{{ message }}</p>
+                <div class="cart-alerta cart-alerta-{{ message.tags }}">
+                    {{ message }}
+                </div>
             {% endfor %}
         </div>
     {% endif %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">
-            <span>Clientes na carteira</span>
-            <strong>{{ carteira.total_clientes }}</strong>
+            <span>Para ligar hoje</span>
+            <strong>{{ carteira.total_hoje }}</strong>
+        </div>
+
+        <div class="cart-indicador">
+            <span>Retornos marcados</span>
+            <strong>{{ carteira.retornos_hoje }}</strong>
         </div>
 
         <div class="cart-indicador">
@@ -43,11 +41,11 @@
 
     <section class="cart-painel">
         <div class="cart-secao-topo">
-            <h2>Quem ligar hoje</h2>
-            <span>Mais antigos primeiro</span>
+            <h2>Para ligar hoje</h2>
+            <span>Retornos primeiro, depois os mais antigos</span>
         </div>
 
-        {% if carteira.linhas %}
+        {% if carteira.linhas_hoje %}
             <div class="cart-tabela-wrap">
                 <table class="cart-tabela">
                     <thead>
@@ -57,13 +55,13 @@
                             <th>Último veículo comprado</th>
                             <th>Data da compra</th>
                             <th>Tempo decorrido</th>
-                            <th>Contato no mês</th>
+                            <th>Retorno</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in carteira.linhas %}
-                            <tr>
+                        {% for item in carteira.linhas_hoje %}
+                            <tr {% if item.retorno_chegou %}class="cart-linha-retorno"{% endif %}>
                                 <td>
                                     <a href="{% url 'detalhes_cliente' item.cliente.pk %}" class="cart-link">
                                         {{ item.cliente }}
@@ -85,19 +83,19 @@
                                     <span class="cart-muted">(aprox. {{ item.anos_decorridos }} anos)</span>
                                 </td>
                                 <td>
-                                    {% if item.contatado_mes %}
-                                        <span class="cart-status cart-status-ok">Contatado</span>
+                                    {% if item.retorno_chegou %}
+                                        <span class="cart-status cart-status-retorno">
+                                            Retorno {{ item.retorno|date:"d/m/Y" }}
+                                        </span>
                                     {% else %}
-                                        <span class="cart-status cart-status-pendente">Pendente</span>
+                                        <span class="cart-muted">—</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <form method="post" action="{% url 'registrar_contato_carteira' item.cliente.pk %}">
-                                        {% csrf_token %}
-                                        <button class="cart-botao" type="submit">
-                                            Registrar contato
-                                        </button>
-                                    </form>
+                                    <a class="cart-botao"
+                                       href="{% url 'registrar_contato_carteira' item.cliente.pk %}">
+                                        Registrar contato
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -107,14 +105,55 @@
         {% else %}
             <div class="cart-vazio">
                 <i data-lucide="phone-off"></i>
-                <h3>Nenhum cliente para contatar</h3>
+                <h3>Ninguém para ligar hoje</h3>
                 <p>
                     Quando clientes das suas vendas atingirem o prazo configurado,
-                    aparecerão automaticamente aqui.
+                    ou um retorno marcado chegar, aparecerão aqui.
                 </p>
             </div>
         {% endif %}
     </section>
 
+    {% if carteira.linhas_contatadas %}
+    <section class="cart-painel cart-secao-espaco">
+        <div class="cart-secao-topo">
+            <h2>Já contatados neste mês</h2>
+            <span>Voltam à fila no próximo mês ou na data de retorno</span>
+        </div>
+
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Último contato</th>
+                        <th>Canal</th>
+                        <th>Voltar a falar em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carteira.linhas_contatadas %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'detalhes_cliente' item.cliente.pk %}" class="cart-link">
+                                    {{ item.cliente }}
+                                </a>
+                            </td>
+                            <td>{{ item.ultimo_contato.realizado_em|date:"d/m/Y" }}</td>
+                            <td>{{ item.ultimo_contato.get_canal_display }}</td>
+                            <td>
+                                {% if item.retorno %}
+                                    {{ item.retorno|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="cart-muted">Próximo mês</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}

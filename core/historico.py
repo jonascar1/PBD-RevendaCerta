@@ -11,10 +11,12 @@ from decimal import Decimal
 from django.utils import timezone
 
 from .models import (
+    ContatoCarteira,
     DecisaoProposta,
     EntregaVeiculo,
     EtapaDocumentacao,
     HistoricoProposta,
+    PagamentoVenda,
     Proposta,
     ReservaVeiculo,
     Venda,
@@ -346,7 +348,22 @@ def resumo_cliente(cliente):
     ).order_by("-criada_em")
 
     total_comprado = sum((v.valor_venda for v in compras), Decimal("0.00"))
-
+    # T17: todos os contatos registrados na carteira, do mais novo ao mais antigo.
+    contatos = list(
+        ContatoCarteira.objects.filter(cliente=cliente)
+        .select_related("vendedor")
+        .order_by("-realizado_em", "-pk")
+    )
+    # T15: veículos que o cliente entregou na troca (venda fechada).
+    trocas = list(
+        PagamentoVenda.objects.filter(
+            venda__cliente=cliente,
+            venda__situacao=Venda.Situacao.FECHADA,
+            tipo=PagamentoVenda.Tipo.TROCA,
+        )
+        .select_related("venda", "avaliacao_troca")
+        .order_by("-venda__data", "-pk")
+    )
     return {
         "compras": compras,
         "total_comprado": total_comprado,
@@ -354,4 +371,6 @@ def resumo_cliente(cliente):
         "dias_desde_ultima_compra": dias_desde_ultima_compra,
         "nao_fechadas": nao_fechadas,
         "em_andamento": em_andamento,
+        "contatos": contatos,
+        "trocas": trocas,
     }

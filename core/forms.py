@@ -17,6 +17,7 @@ from .models import (
     Cliente,
     ComposicaoPagamento,
     ConfiguracaoCarteira,
+    ContatoCarteira,
     DecisaoProposta,
     EtapaDocumentacao,
     FotoAvaliacaoTroca,
@@ -1423,3 +1424,45 @@ class ConfiguracaoCarteiraForm(BaseForm, forms.ModelForm):
             )
 
         return anos
+
+
+class ContatoCarteiraForm(BaseForm, forms.ModelForm):
+    class Meta:
+        model = ContatoCarteira
+        fields = ["canal", "observacao", "data_retorno"]
+        labels = {
+            "canal": "Canal",
+            "observacao": "O que foi conversado",
+            "data_retorno": "Voltar a falar em",
+        }
+        widgets = {
+            "observacao": forms.Textarea(
+                attrs={"rows": 3, "placeholder": "Resumo da conversa..."}
+            ),
+            "data_retorno": forms.DateInput(
+                format="%Y-%m-%d", attrs={"type": "date"}
+            ),
+        }
+        error_messages = {
+            "canal": {
+                "required": "Selecione o canal do contato.",
+                "invalid_choice": "Canal inválido.",
+            },
+            "data_retorno": {"invalid": "Data inválida."},
+        }
+
+    def clean_observacao(self):
+        # Obrigatório aqui (e não no model) porque os contatos
+        # antigos da T16 têm este campo vazio.
+        texto = (self.cleaned_data.get("observacao") or "").strip()
+        if not texto:
+            raise forms.ValidationError("Resuma o que foi conversado.")
+        return texto
+
+    def clean_data_retorno(self):
+        retorno = self.cleaned_data.get("data_retorno")
+        if retorno and retorno < timezone.localdate():
+            raise forms.ValidationError(
+                "A data de retorno não pode estar no passado."
+            )
+        return retorno

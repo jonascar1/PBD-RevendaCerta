@@ -80,36 +80,53 @@
         {% endfor %}
     </section>
     {% endif %}
-
     <section class="atividade-section">
 
         <div class="titulo-secao">
-            <h2>Minhas propostas</h2>
-            <p>Acompanhe suas propostas e o andamento das negociações.</p>
+            <h2>Fila de hoje</h2>
+            <p>Clientes da sua carteira que precisam de contato hoje.</p>
         </div>
 
-        <div class="propostas-card">
+        <div class="fila-card">
 
-            {% for p in propostas %}
-                <a href="{% url 'detalhes_proposta' p.pk %}" class="proposta">
+            {% for item in fila_hoje %}
+                <div class="fila-item">
 
-                    <div class="proposta-info">
-                        <strong>{{ p.cliente.nome_exibicao }}</strong>
-                        <span>{{ p.veiculo.marca }} {{ p.veiculo.modelo }} {{ p.veiculo.ano_modelo|unlocalize }}</span>
+                    <div class="fila-info">
+                        <strong>{{ item.cliente.nome_exibicao }}</strong>
+                        <span>
+                            {% if item.retorno_chegou %}
+                                Retorno marcado para {{ item.retorno|date:"d/m/Y" }}
+                            {% else %}
+                                Última compra em {{ item.data_compra|date:"d/m/Y" }} · {{ item.veiculo }}
+                            {% endif %}
+                        </span>
                     </div>
 
-                    <div class="proposta-valor">
-                        <strong>R$ {{ p.valor_oferecido|floatformat:"2g" }}</strong>
-                        <span class="status {{ p.situacao|lower }}">{{ p.get_situacao_display }}</span>
-                    </div>
+                    <span class="fila-status">
+                        {% if item.retorno_chegou %}Retorno{% else %}Prazo da carteira{% endif %}
+                    </span>
 
-                </a>
+                    <a href="{% url 'registrar_contato_carteira' item.cliente.pk %}" class="fila-acao">
+                        Registrar contato
+                    </a>
+
+                </div>
             {% empty %}
                 <div class="aviso">
-                    <strong>Nenhuma proposta ainda</strong>
-                    <p>Use "Nova negociação" para registrar a primeira.</p>
+                    <strong>Ninguém para ligar hoje</strong>
+                    <p>Quando um cliente atingir o prazo ou um retorno chegar, ele aparece aqui.</p>
                 </div>
             {% endfor %}
+
+            {% if carteira.total_hoje > 5 %}
+                <div class="fila-item">
+                    <div class="fila-info">
+                        <span>Mostrando 5 de {{ carteira.total_hoje }} clientes.</span>
+                    </div>
+                    <a href="{% url 'carteira_vendedor' %}" class="fila-acao">Ver carteira completa</a>
+                </div>
+            {% endif %}
 
         </div>
 

@@ -27,6 +27,7 @@ from .forms import (
     ClienteForm,
     ComposicaoFormSet,
     ConfiguracaoCarteiraForm,
+    ContatoCarteiraForm,
     DecisaoPropostaForm,
     DespesaEditarForm,
     DespesaForm,
@@ -693,6 +694,7 @@ def detalhes_veiculo_view(request, veiculo_id):
     "cliente",
     "vendedor",
 ).order_by("criada_em", "pk"),
+"agora": timezone.now(),
         },
         
     )
@@ -1638,6 +1640,7 @@ def painel_vendedor_view(request):
     .select_related("cliente", "veiculo")
     .order_by("criada_em", "pk")
 )
+    carteira = calcular_carteira(vendedor=request.user)
     return render(
     request,
     "core/vendedor_painel_inicio.html",
@@ -1646,6 +1649,8 @@ def painel_vendedor_view(request):
         "veiculos": veiculos,
         "propostas": propostas,
         "propostas_para_atender": propostas_para_atender,
+        "carteira": carteira,
+        "fila_hoje": carteira["linhas_hoje"][:5],
     },
 )
 # ---------------------------------------------------------------------
@@ -2825,34 +2830,59 @@ def configurar_carteira_view(request):
 
 
 @perfil_requerido("VENDEDOR")
-@require_POST
 def registrar_contato_carteira_view(request, cliente_id):
     cliente = get_object_or_404(
-        Cliente,
+        Cliente.objects.prefetch_related("telefones"),
         pk=cliente_id,
         ativo=True,
     )
 
     carteira = calcular_carteira(vendedor=request.user)
 
-    clientes_elegiveis = {
-        linha["cliente"].pk
-        for linha in carteira["linhas"]
-    }
+    linha = next(
+        (
+            item
+            for item in carteira["linhas"]
+            if item["cliente"].pk == cliente.pk
+        ),
+        None,
+    )
 
-    if cliente.pk not in clientes_elegiveis:
+    # A checagem fica no servidor (T01): o cliente precisa estar
+    # na carteira atual deste vendedor.
+    if linha is None:
         raise PermissionDenied(
             "Este cliente não pertence à sua carteira atual."
         )
 
-    ContatoCarteira.objects.create(
-        cliente=cliente,
-        vendedor=request.user,
-        observacao=request.POST.get("observacao", "").strip(),
-    )
+    if request.method == "POST":
+        form = ContatoCarteiraForm(request.POST)
 
-    messages.success(
+        if form.is_valid():
+            contato = form.save(commit=False)
+            contato.cliente = cliente
+            contato.vendedor = request.user
+
+            try:
+                contato.full_clean()
+                contato.save()
+            except ValidationError as erro:
+                adicionar_erros_de_validacao(form, erro)
+            else:
+                messages.success(
+                    request,
+                    "Contato registrado com sucesso.",
+                )
+                return redirect("carteira_vendedor")
+    else:
+        form = ContatoCarteiraForm()
+
+    return render(
         request,
-        "Contato registrado com sucesso.",
+        "core/vendedor_carteira_contato.html",
+        {
+            "form": form,
+            "cliente": cliente,
+            "linha": linha,
+        },
     )
-    return redirect("carteira_vendedor")

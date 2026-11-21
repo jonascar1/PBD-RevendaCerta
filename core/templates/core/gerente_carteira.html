@@ -68,6 +68,8 @@
                             <th>Tempo decorrido</th>
                             <th>Contatado no mês</th>
                             <th>Vendedores associados</th>
+                            <th>Último contato</th>
+                            <th>Retorno</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,6 +96,24 @@
                                         <span class="cart-status cart-status-ok">Sim</span>
                                     {% else %}
                                         <span class="cart-status cart-status-pendente">Não</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.ultimo_contato %}
+                                        {{ item.ultimo_contato.realizado_em|date:"d/m/Y" }}
+                                        <span class="cart-muted">
+                                            ({{ item.ultimo_contato.get_canal_display }} ·
+                                            {{ item.ultimo_contato.vendedor.get_full_name|default:item.ultimo_contato.vendedor.username }})
+                                        </span>
+                                    {% else %}
+                                        <span class="cart-muted">Nunca</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.retorno %}
+                                        {{ item.retorno|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="cart-muted">—</span>
                                     {% endif %}
                                 </td>
                                 <td>

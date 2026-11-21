@@ -533,3 +533,17 @@ a.proposta,
         flex-direction: column;
     }
 }
+
+/* T17 — fila real */
+.fila-acao {
+    padding: 8px 12px;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.fila-acao:hover { background: #1d4ed8; }

@@ -1,0 +1,87 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Registrar contato | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira_contato.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Carteira de clientes</span>
+            <h1>Registrar contato</h1>
+            <p>
+                {{ cliente.nome_exibicao }}
+                {% if linha.telefone %}
+                    · <a href="tel:{{ linha.telefone }}" class="cart-link">{{ linha.telefone }}</a>
+                {% endif %}
+            </p>
+        </div>
+
+        <a class="cart-botao cart-botao-secundario" href="{% url 'carteira_vendedor' %}">
+            <i data-lucide="arrow-left"></i> Voltar à carteira
+        </a>
+    </header>
+
+    <section class="cart-painel cart-formulario">
+        <h2>Último veículo comprado</h2>
+        <p>
+            {{ linha.veiculo }} · comprado em {{ linha.data_compra|date:"d/m/Y" }}
+            ({{ linha.dias_decorridos }} dias).
+        </p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="cart-campo">
+                <label for="{{ form.canal.id_for_label }}">{{ form.canal.label }}</label>
+                {{ form.canal }}
+                {{ form.canal.errors }}
+            </div>
+
+            <div class="cart-campo">
+                <label for="{{ form.observacao.id_for_label }}">{{ form.observacao.label }}</label>
+                {{ form.observacao }}
+                {{ form.observacao.errors }}
+            </div>
+
+            <div class="cart-campo">
+                <label for="{{ form.data_retorno.id_for_label }}">{{ form.data_retorno.label }}</label>
+                {{ form.data_retorno }}
+                {{ form.data_retorno.errors }}
+                <small>Opcional. O cliente volta ao topo da fila nesse dia.</small>
+            </div>
+
+            <div class="cart-acoes">
+                <button type="submit" class="cart-botao">Salvar contato</button>
+                <a class="cart-botao cart-botao-secundario" href="{% url 'carteira_vendedor' %}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+    <section class="cart-painel cart-formulario">
+        <h2>Próximo passo</h2>
+        <p>
+            Se o cliente demonstrou interesse em um carro, abra uma proposta
+            já com os dados dele preenchidos.
+        </p>
+        <div class="cart-acoes">
+            <a class="cart-botao cart-botao-secundario"
+               href="{% url 'nova_proposta' %}?cliente={{ cliente.pk }}">
+                <i data-lucide="circle-dollar-sign"></i> Abrir proposta
+            </a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

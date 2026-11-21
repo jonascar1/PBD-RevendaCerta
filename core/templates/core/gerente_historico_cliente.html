@@ -27,7 +27,6 @@
         </a>
     </div>
 </header>
-
 <!-- RESUMO -->
 <section class="hist-resumo">
     <div class="card-info">
@@ -61,10 +60,13 @@
                 <span>Propostas que não fecharam</span>
                 <strong>{{ resumo.nao_fechadas|length }}</strong>
             </div>
+            <div class="info-item">
+                <span>Contatos realizados</span>
+                <strong>{{ resumo.contatos|length }}</strong>
+            </div>
         </div>
     </div>
 </section>
-
 <!-- COMPRAS -->
 <section class="hist-secao">
     <h2>Compras</h2>
@@ -97,7 +99,40 @@
         </table>
     </div>
 </section>
+<!-- TROCAS -->
+<section class="hist-secao">
+    <h2>Veículos entregues na troca</h2>
 
+    <div class="hist-tabela-wrap">
+        <table class="hist-tabela">
+            <thead>
+                <tr>
+                    <th>Veículo recebido</th>
+                    <th>Valor avaliado</th>
+                    <th>Data</th>
+                    <th>Venda</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for troca in resumo.trocas %}
+                <tr>
+                    <td>
+                        <strong>{{ troca.troca_descricao|default:"—" }}</strong>
+                        {% if troca.avaliacao_troca %}
+                            <small>Avaliação #{{ troca.avaliacao_troca.pk }}</small>
+                        {% endif %}
+                    </td>
+                    <td>R$ {{ troca.valor|floatformat:2 }}</td>
+                    <td>{{ troca.venda.data|date:"d/m/Y" }}</td>
+                    <td><a href="{% url 'detalhes_venda' troca.venda_id %}">#{{ troca.venda_id }}</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="hist-vazio">Este cliente nunca entregou um veículo na troca.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 <!-- PROPOSTAS QUE NÃO FECHARAM -->
 <section class="hist-secao">
     <h2>Propostas que não fecharam</h2>
@@ -157,5 +192,44 @@
     </div>
 </section>
 {% endif %}
+<!-- CONTATOS DA CARTEIRA -->
+<section class="hist-secao">
+    <h2>Contatos realizados</h2>
 
+    <div class="hist-tabela-wrap">
+        <table class="hist-tabela">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Canal</th>
+                    <th>Vendedor</th>
+                    <th>O que foi conversado</th>
+                    <th>Retorno</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contato in resumo.contatos %}
+                <tr>
+                    <td>
+                        <strong>{{ contato.realizado_em|date:"d/m/Y" }}</strong>
+                        <small>{{ contato.realizado_em|date:"H:i" }}</small>
+                    </td>
+                    <td>{{ contato.get_canal_display }}</td>
+                    <td>{{ contato.vendedor.get_full_name|default:contato.vendedor.username }}</td>
+                    <td class="hist-motivo">{{ contato.observacao|default:"—" }}</td>
+                    <td>
+                        {% if contato.data_retorno %}
+                            {{ contato.data_retorno|date:"d/m/Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="hist-vazio">Nenhum contato registrado na carteira.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 {% endblock content %}
