@@ -1,17 +1,8 @@
-/* ==============================
-   CONTEÚDO
-============================== */
-
 .content {
     margin-left: 250px;
     width: calc(100% - 250px);
     padding: 35px 45px;
 }
-
-
-/* ==============================
-   TOPO
-============================== */
 
 .topo {
     display: flex;
@@ -30,10 +21,6 @@
     font-size: 14px;
 }
 
-/* ==============================
-   CARD
-============================== */
-
 .card {
     background: white;
     border: 1px solid #e5e7eb;
@@ -41,11 +28,6 @@
     padding: 25px;
     max-width: 850px;
 }
-
-
-/* ==============================
-   INFORMAÇÕES DO VENDEDOR
-============================== */
 
 .vendedor-info {
     display: flex;
@@ -79,11 +61,6 @@
     margin-top: 3px;
 }
 
-
-/* ==============================
-   CAMPOS
-============================== */
-
 .campo {
     margin-bottom: 22px;
 }
@@ -101,11 +78,6 @@
     font-size: 12px;
     margin-bottom: 9px;
 }
-
-
-/* ==============================
-   INPUTS COM SUFIXO (% / R$)
-============================== */
 
 .input-percentual {
     display: flex;
@@ -144,11 +116,6 @@
     margin-left: 6px;
 }
 
-
-/* ==============================
-   RÁDIOS - TIPO DE ALÇADA
-============================== */
-
 .radio-alcada {
     display: flex;
     align-items: center;
@@ -172,11 +139,6 @@
     cursor: pointer;
 }
 
-
-/* ==============================
-   AVISO
-============================== */
-
 .aviso {
     background: #eff6ff;
     border: 1px solid #dbeafe;
@@ -193,11 +155,6 @@
     margin-left: 8px;
 }
 
-
-/* ==============================
-   BOTÕES
-============================== */
-
 .acoes {
     display: flex;
     justify-content: flex-end;
@@ -206,9 +163,6 @@
     padding-top: 20px;
     border-top: 1px solid #e5e7eb;
 }
-
-
-/* CANCELAR */
 
 .btn-voltar {
     display: inline-block;
@@ -228,9 +182,6 @@
     transition: 0.3s;
 }
 
-
-/* SALVAR */
-
 .btn-salvar {
     padding: 9px 15px;
     border: none;
@@ -246,11 +197,6 @@
 .btn-salvar:hover {
     background: #1d4ed8;
 }
-
-
-/* ==============================
-   STATUS DO VENDEDOR
-============================== */
 
 .status {
     margin-left: auto;
@@ -270,11 +216,6 @@
     background: #fee2e2;
     color: #dc2626;
 }
-
-
-/* ==============================
-   SEÇÕES
-============================== */
 
 .secao {
     margin-bottom: 28px;
@@ -297,21 +238,11 @@
     color: #6b7280;
 }
 
-
-/* ==============================
-   GRID DOS CAMPOS
-============================== */
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
 }
-
-
-/* ==============================
-   INPUTS GERAIS
-============================== */
 
 .campo input:not([type="radio"]),
 .campo select {
@@ -335,21 +266,11 @@
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
 }
 
-
-/* ==============================
-   USUÁRIO - CAMPO DESABILITADO
-============================== */
-
 .campo input:disabled {
     background: #f3f4f6;
     color: #6b7280;
     cursor: not-allowed;
 }
-
-
-/* ==============================
-   SENHA
-============================== */
 
 .senha-info {
     display: flex;
@@ -374,9 +295,6 @@
     font-size: 12px;
 }
 
-
-/* BOTÃO ALTERAR SENHA */
-
 .btn-alterar-senha {
     padding: 8px 13px;
     border: 1px solid #d1d5db;
@@ -395,13 +313,7 @@
     border-color: #9ca3af;
 }
 
-
-/* ==============================
-   RESPONSIVIDADE DOS CAMPOS
-============================== */
-
 @media (max-width: 650px) {
-
     .form-grid {
         grid-template-columns: 1fr;
     }
@@ -420,13 +332,7 @@
     }
 }
 
-
-/* ==============================
-   RESPONSIVIDADE
-============================== */
-
 @media (max-width: 900px) {
-
     .sidebar {
         width: 210px;
     }
@@ -438,9 +344,7 @@
     }
 }
 
-
 @media (max-width: 650px) {
-
     .sidebar {
         position: static;
         width: 100%;

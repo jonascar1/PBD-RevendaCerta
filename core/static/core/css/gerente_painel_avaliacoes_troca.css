@@ -1,13 +1,6 @@
-
-/* ==============================
-   AVALIAÇÕES DE TROCA
-============================== */
-
 .section {
     margin-bottom: 35px;
 }
-
-/* CABEÇALHO */
 
 .topbar {
     display: flex;
@@ -54,8 +47,6 @@
     height: 17px;
 }
 
-/* CARD */
-
 .avaliacoes-card {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -79,8 +70,6 @@
     font-size: 12px;
     font-weight: 600;
 }
-
-/* PESQUISA */
 
 .barra-pesquisa-avaliacoes {
     display: flex;
@@ -149,8 +138,6 @@
     color: #374151;
 }
 
-/* TABELA */
-
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -191,8 +178,6 @@
 .avaliacoes-tabela tbody tr:hover {
     background: #fafcff;
 }
-
-/* VEÍCULO */
 
 .veiculo-info {
     display: flex;
@@ -250,8 +235,6 @@
     color: #374151;
 }
 
-/* BOTÃO EDITAR */
-
 .edit-button {
     display: inline-block;
     padding: 7px 13px;
@@ -268,8 +251,6 @@
 .edit-button:hover {
     border-color: #2563eb;
 }
-
-/* MENSAGENS */
 
 .messages {
     margin-bottom: 18px;
@@ -292,8 +273,6 @@
     border: 1px solid #fecaca;
     color: #dc2626;
 }
-
-/* SEM RESULTADOS */
 
 .empty {
     text-align: center;
@@ -321,11 +300,6 @@
     gap: 2px;
     margin-left: 10px;
 }
-
-
-
-
-/* RESPONSIVIDADE */
 
 @media (max-width: 900px) {
     .topbar {

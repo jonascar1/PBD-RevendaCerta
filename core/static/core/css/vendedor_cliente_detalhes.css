@@ -53,7 +53,6 @@
     background-color: #1d4ed8;
 }
 
-/* CARDS DE INFORMAÇÕES */
 .cliente-container {
     display: flex;
     flex-direction: column;
@@ -110,7 +109,6 @@
     color: #1e293b;
 }
 
-/* TABELAS */
 .tabela-responsive {
     overflow-x: auto;
 }
@@ -142,7 +140,6 @@
     color: #64748b;
 }
 
-/* BADGES E STATUS */
 .badge {
     display: inline-block;
     padding: 4px 8px;
@@ -194,7 +191,7 @@
     font-style: italic;
     margin: 8px 0;
 }
-/* Badges de status para propostas e reservas */
+
 .badge.status-aguardando {
     background-color: var(--warning-bg, #fffbe6);
     color: var(--warning-color, #d46b08);
@@ -213,12 +210,6 @@
     border: 1px solid var(--danger-border, #ffa39e);
 }
 
-
-
-/* ==============================
-   INFORMAÇÕES E DOCUMENTAÇÃO
-============================== */
-
 .cliente-container,
 .cliente-container .card-info {
     min-width: 0;
@@ -232,10 +223,6 @@
 .sub-info {
     overflow-wrap: anywhere;
 }
-
-/* ==============================
-   RESPONSIVIDADE
-============================== */
 
 @media (max-width: 700px) {
     .topo-detalhes {

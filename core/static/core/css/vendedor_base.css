@@ -10,9 +10,6 @@ body {
     color: #1f2937;
 }
 
-
-/* SIDEBAR */
-
 .sidebar {
     width: 250px;
     background: #111827;
@@ -26,9 +23,6 @@ body {
     left: 0;
 }
 
-
-/* LOGO */
-
 .logo {
     font-size: 22px;
     font-weight: 800;
@@ -41,9 +35,6 @@ body {
 .logo span {
     color: #2864e8;
 }
-
-
-/* PERFIL */
 
 .perfil {
     display: flex;
@@ -76,9 +67,6 @@ body {
     font-size: 12px;
 }
 
-
-/* MENU */
-
 .menu {
     display: flex;
     flex-direction: column;
@@ -88,20 +76,13 @@ body {
 .menu a,
 .menu-inferior a {
     text-decoration: none;
-
     color: #d1d5db;
-
     padding: 12px;
-
     border-radius: 8px;
-
     font-size: 14px;
-
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     transition: 0.2s;
 }
 
@@ -132,9 +113,6 @@ body {
     color: white;
 }
 
-
-/* MENU INFERIOR */
-
 .menu-inferior {
     margin-top: auto;
     display: flex;
@@ -163,37 +141,28 @@ body {
     color: white;
 }
 
-
-/* CONTEÚDO */
-
 .conteudo {
     margin-left: 250px;
     width: calc(100% - 250px);
     padding: 35px 45px;
 }
 
-/* RESPONSIVO */
-
 @media (max-width: 900px) {
-
     .sidebar {
         width: 210px;
     }
 
     .conteudo {
         margin-left: 210px;
-
         padding: 25px;
     }
 
     .dados-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
 @media (max-width: 650px) {
-
     .sidebar {
         display: none;
     }
@@ -205,14 +174,9 @@ body {
     }
 }
 
-/* Evita que conteúdos internos forcem a largura da página. */
-.conteudo { min-width: 0; }
-
-
-
-/* ==============================
-   SIDEBAR - TELAS BAIXAS
-============================== */
+.conteudo {
+    min-width: 0;
+}
 
 .sidebar {
     overflow-y: auto;

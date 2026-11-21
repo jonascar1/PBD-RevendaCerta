@@ -1,43 +1,193 @@
-/* Complemento a gerente_detalhes_veiculo.css */
-.hist-resumo, .hist-secao { min-width: 0; max-width: 100%; }
-.hist-resumo { margin-bottom: 24px; }
-.hist-resumo .card-info { box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-.hist-resumo .info-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
-.hist-resumo .info-item strong { overflow-wrap: anywhere; }
-.hist-secao { margin-bottom: 24px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px; }
-.hist-secao > h2 { margin: 0 0 22px; font-size: 18px; line-height: 1.4; color: #1f2937; }
-.hist-vazio { color: #6b7280; font-size: 14px; line-height: 1.6; }
-.topo { gap: 16px; min-width: 0; }
-.topo > div:first-child { min-width: 0; }
-.topo p { overflow-wrap: anywhere; }
-.topo-acoes .btn-voltar { min-height: 44px; display: inline-flex; justify-content: center; gap: 6px; text-align: center; }
-@media (max-width: 900px) {
-  .hist-resumo .info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
-}
-@media (max-width: 600px) {
-  .topo { flex-direction: column; align-items: stretch; }
-  .topo-acoes { justify-content: flex-start; flex-wrap: wrap; }
-  .hist-secao { padding: 16px; }
-  .hist-resumo .card-info { padding: 16px; }
-}
-@media (max-width: 400px) {
-  .hist-resumo .info-grid { grid-template-columns: minmax(0,1fr); }
+.hist-resumo, .hist-secao {
+    min-width: 0;
+    max-width: 100%;
 }
 
-/* Tabelas do histórico do cliente */
-.hist-tabela-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border: 1px solid #e5e7eb; border-radius: 8px; }
-.hist-tabela { width: 100%; min-width: 640px; border-collapse: collapse; text-align: left; font-size: 13px; color: #374151; }
-.hist-tabela th { padding: 13px 16px; background: #f9fafb; color: #6b7280; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; white-space: nowrap; border-bottom: 1px solid #e5e7eb; }
-.hist-tabela td { padding: 13px 16px; border-bottom: 1px solid #f0f1f3; vertical-align: top; }
-.hist-tabela tbody tr:last-child td { border-bottom: 0; }
-.hist-tabela tbody tr:hover { background: #f9fafb; }
-.hist-tabela td strong { display: block; color: #1f2937; overflow-wrap: anywhere; }
-.hist-tabela td small { display: block; margin-top: 4px; color: #6b7280; }
-.hist-tabela td a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: #2563eb; text-decoration: none; font-weight: 600; }
-.hist-tabela td a:hover { text-decoration: underline; }
-.hist-tabela td a:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; border-radius: 4px; }
-.hist-tabela .hist-motivo { min-width: 200px; max-width: 360px; white-space: normal; overflow-wrap: anywhere; word-break: normal; line-height: 1.6; }
-.hist-tabela td.hist-vazio { padding: 24px 16px; text-align: center; white-space: normal; }
+.hist-resumo {
+    margin-bottom: 24px;
+}
+
+.hist-resumo .card-info {
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+
+.hist-resumo .info-grid {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+}
+
+.hist-resumo .info-item strong {
+    overflow-wrap: anywhere;
+}
+
+.hist-secao {
+    margin-bottom: 24px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.hist-secao > h2 {
+    margin: 0 0 22px;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #1f2937;
+}
+
+.hist-vazio {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.topo {
+    gap: 16px;
+    min-width: 0;
+}
+
+.topo > div:first-child {
+    min-width: 0;
+}
+
+.topo p {
+    overflow-wrap: anywhere;
+}
+
+.topo-acoes .btn-voltar {
+    min-height: 44px;
+    display: inline-flex;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .hist-resumo .info-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .topo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .topo-acoes {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .hist-secao {
+        padding: 16px;
+    }
+
+    .hist-resumo .card-info {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    .hist-resumo .info-grid {
+        grid-template-columns: minmax(0,1fr);
+    }
+}
+
+.hist-tabela-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.hist-tabela {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+    color: #374151;
+}
+
+.hist-tabela th {
+    padding: 13px 16px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.hist-tabela td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #f0f1f3;
+    vertical-align: top;
+}
+
+.hist-tabela tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.hist-tabela tbody tr:hover {
+    background: #f9fafb;
+}
+
+.hist-tabela td strong {
+    display: block;
+    color: #1f2937;
+    overflow-wrap: anywhere;
+}
+
+.hist-tabela td small {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+}
+
+.hist-tabela td a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.hist-tabela td a:hover {
+    text-decoration: underline;
+}
+
+.hist-tabela td a:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.hist-tabela .hist-motivo {
+    min-width: 200px;
+    max-width: 360px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.6;
+}
+
+.hist-tabela td.hist-vazio {
+    padding: 24px 16px;
+    text-align: center;
+    white-space: normal;
+}
+
 @media (max-width: 768px) {
-  .hist-tabela { min-width: 620px; }
+    .hist-tabela {
+        min-width: 620px;
+    }
 }

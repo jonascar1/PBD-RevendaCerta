@@ -1,9 +1,3 @@
-/* ==================================================
-   VENDACERTA — VITRINE DE VEÍCULOS
-================================================== */
-
-/* ---------- Variáveis e reset ---------- */
-
 :root {
     --azul-escuro: #071b3b;
     --azul-profundo: #041329;
@@ -38,8 +32,14 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-a { color: inherit; }
-img { display: block; max-width: 100%; }
+a {
+    color: inherit;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
 
 button,
 input,
@@ -53,12 +53,9 @@ select {
     margin-inline: auto;
 }
 
-.secao { padding: 82px 0; }
-
-
-/* ==================================================
-   CABEÇALHO
-================================================== */
+.secao {
+    padding: 82px 0;
+}
 
 .cabecalho {
     position: sticky;
@@ -106,9 +103,9 @@ select {
     border-radius: 8px;
 }
 
-.logo-destaque { color: var(--azul-escuro); }
-
-/* Menu desktop */
+.logo-destaque {
+    color: var(--azul-escuro);
+}
 
 .menu {
     display: flex;
@@ -140,8 +137,13 @@ select {
     transition: transform 0.2s ease;
 }
 
-.menu a:hover { color: var(--azul); }
-.menu a:hover::after { transform: scaleX(1); }
+.menu a:hover {
+    color: var(--azul);
+}
+
+.menu a:hover::after {
+    transform: scaleX(1);
+}
 
 .botao-whatsapp {
     display: inline-flex;
@@ -170,8 +172,6 @@ select {
     color: var(--azul);
 }
 
-/* Botão do menu mobile (escondido no desktop) */
-
 .botao-menu-mobile {
     display: none;
     flex-direction: column;
@@ -193,8 +193,6 @@ select {
     border-radius: 2px;
     background: #10213d;
 }
-
-/* Drawer (menu lateral mobile) */
 
 .drawer-overlay {
     position: fixed;
@@ -265,7 +263,9 @@ select {
     text-decoration: none;
 }
 
-.drawer-links a:hover { background: #f1f5f9; }
+.drawer-links a:hover {
+    background: #f1f5f9;
+}
 
 .drawer-links .drawer-whatsapp {
     margin-top: 12px;
@@ -274,9 +274,9 @@ select {
     text-align: center;
 }
 
-/* Estado aberto (JS adiciona .menu-aberto no body) */
-
-body.menu-aberto { overflow: hidden; }
+body.menu-aberto {
+    overflow: hidden;
+}
 
 body.menu-aberto .drawer-overlay {
     opacity: 1;
@@ -287,11 +287,6 @@ body.menu-aberto .drawer-menu {
     transform: translateX(0);
     visibility: visible;
 }
-
-
-/* ==================================================
-   BANNER PRINCIPAL
-================================================== */
 
 .banner {
     position: relative;
@@ -308,12 +303,7 @@ body.menu-aberto .drawer-menu {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background-image:
-        linear-gradient(90deg,
-            rgba(4, 19, 45, 0.96) 0%,
-            rgba(4, 19, 45, 0.82) 42%,
-            rgba(4, 19, 45, 0.35) 100%),
-        url("/static/core/img/pneu-azul.png");
+    background-image: linear-gradient(90deg, rgba(4, 19, 45, 0.96) 0%, rgba(4, 19, 45, 0.82) 42%, rgba(4, 19, 45, 0.35) 100%), url("/static/core/img/pneu-azul.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -416,12 +406,9 @@ body.menu-aberto .drawer-menu {
     box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
 }
 
-
-/* ==================================================
-   ESTOQUE — TÍTULO
-================================================== */
-
-.estoque { background: var(--fundo); }
+.estoque {
+    background: var(--fundo);
+}
 
 .estoque-cabecalho {
     display: flex;
@@ -470,11 +457,6 @@ body.menu-aberto .drawer-menu {
     font-weight: 800;
     white-space: nowrap;
 }
-
-
-/* ==================================================
-   FILTROS
-================================================== */
 
 form.filtros {
     display: block;
@@ -534,7 +516,9 @@ form.filtros {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.filtros .filtro-campo input::placeholder { color: #94a3b8; }
+.filtros .filtro-campo input::placeholder {
+    color: #94a3b8;
+}
 
 .filtros .filtro-campo input:focus,
 .filtros .filtro-campo select:focus {
@@ -565,7 +549,9 @@ form.filtros {
     transition: background 0.2s ease;
 }
 
-.filtros .botao-filtrar:hover { background: var(--azul-hover); }
+.filtros .botao-filtrar:hover {
+    background: var(--azul-hover);
+}
 
 .filtros .botao-limpar {
     display: inline-flex;
@@ -587,13 +573,6 @@ form.filtros {
     color: var(--azul-hover);
     border-color: var(--azul-hover);
 }
-
-
-/* ==================================================
-   CARROSSEL DE VEÍCULOS
-   Desktop: 5 cards | Tablet: 4 cards | Celular: 2 cards
-   (o JS precisa usar esses mesmos números ao deslizar)
-================================================== */
 
 .carrossel-veiculos {
     display: flex;
@@ -619,11 +598,9 @@ form.filtros {
 }
 
 .trilho-veiculos .card-veiculo {
-    flex: 0 0 calc((100% - 64px) / 5);   /* 5 cards, 4 espaços de 16px */
+    flex: 0 0 calc((100% - 64px) / 5);
     min-width: 0;
 }
-
-/* Setas */
 
 .seta-carrossel {
     display: flex;
@@ -651,12 +628,6 @@ form.filtros {
     opacity: 0.35;
     cursor: not-allowed;
 }
-
-
-/* ==================================================
-   CARD DE VEÍCULO (base)
-   Se você já tem esses estilos em outro lugar, apague esta seção.
-================================================== */
 
 .card-veiculo {
     display: flex;
@@ -774,14 +745,11 @@ form.filtros {
     background: var(--azul-hover);
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
- }
+}
 
-
-/* ==================================================
-   COMO COMPRAR
-================================================== */
-
-.como-comprar { background: var(--branco); }
+.como-comprar {
+    background: var(--branco);
+}
 
 .titulo-centralizado {
     max-width: 720px;
@@ -789,9 +757,13 @@ form.filtros {
     text-align: center;
 }
 
-.titulo-centralizado .subtitulo { margin-bottom: 12px; }
+.titulo-centralizado .subtitulo {
+    margin-bottom: 12px;
+}
 
-.titulo-centralizado h2 { font-size: clamp(28px, 3.5vw, 39px); }
+.titulo-centralizado h2 {
+    font-size: clamp(28px, 3.5vw, 39px);
+}
 
 .titulo-centralizado p {
     max-width: 570px;
@@ -846,18 +818,11 @@ form.filtros {
     line-height: 1.9;
 }
 
-
-/* ==================================================
-   CONTATO
-================================================== */
-
 .contato {
     position: relative;
     overflow: hidden;
     padding: 65px 0;
-    background:
-        radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.24), transparent 35%),
-        var(--azul-escuro);
+    background: radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.24), transparent 35%), var(--azul-escuro);
     color: var(--branco);
 }
 
@@ -868,7 +833,9 @@ form.filtros {
     gap: 35px;
 }
 
-.contato .subtitulo { color: #93c5fd; }
+.contato .subtitulo {
+    color: #93c5fd;
+}
 
 .contato h2 {
     max-width: 650px;
@@ -910,24 +877,16 @@ form.filtros {
     background: #dbeafe;
 }
 
-
-/* ==================================================
-   RODAPÉ
-================================================== */
-
 .rodape {
     padding: 25px 0;
     background: var(--azul-profundo);
     color: #cbd5e1;
-    
 }
 
 .rodape-conteudo {
     display: flex;
     gap: 20px;
-    
 }
-
 
 .rodape p {
     color: #94a3b8;
@@ -935,35 +894,35 @@ form.filtros {
     text-align: right;
 }
 
-
-/* ==================================================
-   RESPONSIVO — TABLET (até 1100px)
-================================================== */
-
 @media (max-width: 1100px) {
-    .container { width: calc(100% - 40px); }
+    .container {
+        width: calc(100% - 40px);
+    }
 
-    .cabecalho-conteudo { gap: 18px; }
-    .menu { gap: 20px; }
+    .cabecalho-conteudo {
+        gap: 18px;
+    }
+
+    .menu {
+        gap: 20px;
+    }
 
     .filtros .filtros-campos {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .filtros .filtros-acoes { grid-column: 1 / -1; }
+    .filtros .filtros-acoes {
+        grid-column: 1 / -1;
+    }
 
-    /* Carrossel: 4 cards, 3 espaços de 12px */
-    .trilho-veiculos { gap: 12px; }
+    .trilho-veiculos {
+        gap: 12px;
+    }
 
     .trilho-veiculos .card-veiculo {
         flex-basis: calc((100% - 36px) / 4);
     }
 }
-
-
-/* ==================================================
-   RESPONSIVO — MENU MOBILE (até 768px)
-================================================== */
 
 @media (max-width: 768px) {
     .cabecalho-conteudo {
@@ -972,7 +931,9 @@ form.filtros {
     }
 
     .menu,
-    .botao-whatsapp { display: none; }
+    .botao-whatsapp {
+        display: none;
+    }
 
     .botao-menu-mobile {
         display: flex;
@@ -980,26 +941,31 @@ form.filtros {
     }
 }
 
-
-/* ==================================================
-   RESPONSIVO — CELULAR (até 680px)
-================================================== */
-
 @media (max-width: 680px) {
-    .container { width: calc(100% - 32px); }
+    .container {
+        width: calc(100% - 32px);
+    }
 
-    .secao { padding: 55px 0; }
+    .secao {
+        padding: 55px 0;
+    }
 
-    .logo { font-size: 16px; gap: 8px; }
-    .logo-icone { width: 38px; height: 38px; }
+    .logo {
+        font-size: 16px;
+        gap: 8px;
+    }
 
-    /* Banner */
-    .banner { min-height: 430px; }
+    .logo-icone {
+        width: 38px;
+        height: 38px;
+    }
+
+    .banner {
+        min-height: 430px;
+    }
 
     .banner-fundo {
-        background-image:
-            linear-gradient(90deg, rgba(4, 19, 45, 0.94), rgba(4, 19, 45, 0.7)),
-            url("/static/core/img/pneu-azul.png");
+        background-image: linear-gradient(90deg, rgba(4, 19, 45, 0.94), rgba(4, 19, 45, 0.7)), url("/static/core/img/pneu-azul.png");
         background-position: 58% center;
     }
 
@@ -1040,7 +1006,6 @@ form.filtros {
         font-size: 10px;
     }
 
-    /* Estoque */
     .estoque-cabecalho {
         align-items: flex-start;
         flex-direction: column;
@@ -1049,15 +1014,22 @@ form.filtros {
     }
 
     .estoque-cabecalho h2,
-    .titulo-centralizado h2 { font-size: 29px; }
+    .titulo-centralizado h2 {
+        font-size: 29px;
+    }
 
     .estoque-cabecalho p,
-    .titulo-centralizado p { font-size: 13px; }
+    .titulo-centralizado p {
+        font-size: 13px;
+    }
 
-    .total-veiculos { padding: 7px 10px; }
+    .total-veiculos {
+        padding: 7px 10px;
+    }
 
-    /* Filtros */
-    .filtros { padding: 16px; }
+    .filtros {
+        padding: 16px;
+    }
 
     .filtros .filtros-campos {
         grid-template-columns: minmax(0, 1fr);
@@ -1069,10 +1041,13 @@ form.filtros {
         width: 100%;
     }
 
-    .filtros .botao-filtrar { flex: 1; }
+    .filtros .botao-filtrar {
+        flex: 1;
+    }
 
-    /* Carrossel: 2 cards, 1 espaço de 10px */
-    .carrossel-veiculos { gap: 6px; }
+    .carrossel-veiculos {
+        gap: 6px;
+    }
 
     .seta-carrossel {
         flex-basis: 28px;
@@ -1081,13 +1056,17 @@ form.filtros {
         font-size: 12px;
     }
 
-    .trilho-veiculos { gap: 10px; }
+    .trilho-veiculos {
+        gap: 10px;
+    }
 
     .trilho-veiculos .card-veiculo {
         flex-basis: calc((100% - 10px) / 2);
     }
 
-    .card-conteudo { padding: 9px; }
+    .card-conteudo {
+        padding: 9px;
+    }
 
     .card-marca {
         font-size: 9px;
@@ -1136,15 +1115,18 @@ form.filtros {
         font-size: 8px;
     }
 
-    /* Como comprar */
-    .titulo-centralizado { margin-bottom: 28px; }
+    .titulo-centralizado {
+        margin-bottom: 28px;
+    }
 
     .etapas {
         grid-template-columns: minmax(0, 1fr);
         gap: 15px;
     }
 
-    .etapa { padding: 23px; }
+    .etapa {
+        padding: 23px;
+    }
 
     .etapa-numero {
         width: 43px;
@@ -1152,8 +1134,9 @@ form.filtros {
         margin-bottom: 16px;
     }
 
-    /* Contato */
-    .contato { padding: 48px 0; }
+    .contato {
+        padding: 48px 0;
+    }
 
     .contato-conteudo {
         align-items: flex-start;
@@ -1161,10 +1144,14 @@ form.filtros {
         gap: 23px;
     }
 
-    .contato h2 { font-size: 29px; }
-    .contato p { font-size: 13px; }
+    .contato h2 {
+        font-size: 29px;
+    }
 
-    /* Rodapé */
+    .contato p {
+        font-size: 13px;
+    }
+
     .rodape-conteudo {
         align-items: flex-start;
         flex-direction: column;
@@ -1177,22 +1164,31 @@ form.filtros {
     }
 }
 
-
-/* ==================================================
-   RESPONSIVO — CELULAR PEQUENO (até 380px)
-================================================== */
-
 @media (max-width: 380px) {
-    .container { width: calc(100% - 24px); }
+    .container {
+        width: calc(100% - 24px);
+    }
 
-    .cabecalho-conteudo { gap: 10px; }
+    .cabecalho-conteudo {
+        gap: 10px;
+    }
 
-    .logo { font-size: 14px; }
-    .logo-icone { width: 34px; height: 34px; }
+    .logo {
+        font-size: 14px;
+    }
 
-    .banner h1 { font-size: 33px; }
+    .logo-icone {
+        width: 34px;
+        height: 34px;
+    }
 
-    .carrossel-veiculos { gap: 4px; }
+    .banner h1 {
+        font-size: 33px;
+    }
+
+    .carrossel-veiculos {
+        gap: 4px;
+    }
 
     .seta-carrossel {
         flex-basis: 24px;
@@ -1200,17 +1196,19 @@ form.filtros {
         height: 24px;
     }
 
-    .card-conteudo { padding: 7px; }
-    .card-preco { font-size: 14px; }
+    .card-conteudo {
+        padding: 7px;
+    }
+
+    .card-preco {
+        font-size: 14px;
+    }
 }
-
-
-/* ==================================================
-   ACESSIBILIDADE — MENOS ANIMAÇÃO
-================================================== */
 
 @media (prefers-reduced-motion: reduce) {
     .trilho-veiculos,
     .drawer-menu,
-    .drawer-overlay { transition: none; }
+    .drawer-overlay {
+        transition: none;
+    }
 }

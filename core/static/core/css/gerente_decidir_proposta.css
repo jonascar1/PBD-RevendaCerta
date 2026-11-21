@@ -6,8 +6,17 @@
     margin-bottom: 24px;
 }
 
-.topo h1 { margin: 0 0 4px; font-size: 26px; color: #0f172a; }
-.topo p  { margin: 0; color: #64748b; font-size: 14px; }
+.topo h1 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    color: #0f172a;
+}
+
+.topo p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
 
 .btn-voltar {
     display: inline-flex;
@@ -23,7 +32,9 @@
     text-decoration: none;
 }
 
-.btn-voltar:hover { background: #f1f5f9; }
+.btn-voltar:hover {
+    background: #f1f5f9;
+}
 
 .decisao-grid {
     display: grid;
@@ -46,7 +57,9 @@
     margin-bottom: 20px;
 }
 
-.decisao-coluna .card { margin-bottom: 0; }
+.decisao-coluna .card {
+    margin-bottom: 0;
+}
 
 .card-titulo {
     margin: 0 0 16px;
@@ -75,14 +88,21 @@
     margin-bottom: 2px;
 }
 
-.info-item strong { font-size: 15px; color: #0f172a; }
+.info-item strong {
+    font-size: 15px;
+    color: #0f172a;
+}
 
 .info-item.destaque {
     background: #fffbeb;
     border: 1px solid #fde68a;
 }
 
-.decisao-form { display: flex; flex-direction: column; gap: 16px; }
+.decisao-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
 .campo label {
     display: block;
@@ -106,7 +126,10 @@
     box-sizing: border-box;
 }
 
-.campo textarea { resize: vertical; min-height: 96px; }
+.campo textarea {
+    resize: vertical;
+    min-height: 96px;
+}
 
 .campo select:focus,
 .campo textarea:focus,
@@ -134,7 +157,9 @@
     cursor: pointer;
 }
 
-.btn-salvar:hover { background: #1d4ed8; }
+.btn-salvar:hover {
+    background: #1d4ed8;
+}
 
 .aviso-decidida {
     margin: 0;
@@ -145,7 +170,11 @@
     font-size: 14px;
 }
 
-.linha-tempo { display: flex; flex-direction: column; gap: 12px; }
+.linha-tempo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
 .linha-tempo-item {
     padding: 14px 16px;
@@ -161,13 +190,32 @@
     margin-bottom: 6px;
 }
 
-.linha-tempo-topo small { color: #64748b; }
-.linha-tempo-item p { margin: 2px 0; font-size: 14px; color: #334155; }
-.linha-tempo-item .parecer { margin-top: 8px; }
+.linha-tempo-topo small {
+    color: #64748b;
+}
 
-.texto-vazio { margin: 0; color: #64748b; font-size: 14px; }
+.linha-tempo-item p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #334155;
+}
+
+.linha-tempo-item .parecer {
+    margin-top: 8px;
+}
+
+.texto-vazio {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
 
 @media (max-width: 900px) {
-    .decisao-grid { grid-template-columns: 1fr; }
-    .info-grid { grid-template-columns: 1fr; }
+    .decisao-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
 }

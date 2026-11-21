@@ -1,8 +1,3 @@
-
-/* =====================================================
-   CENTRAL DE NEGOCIAÇÕES - VENDACERTA
-===================================================== */
-
 .neg-resumo {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -65,8 +60,6 @@
     line-height: 1;
 }
 
-/* SEÇÃO DA TABELA */
-
 .neg-section {
     margin-top: 10px;
 }
@@ -118,8 +111,6 @@
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
 }
-
-/* TABELA */
 
 .neg-table-container {
     overflow-x: auto;
@@ -181,8 +172,6 @@
     font-weight: 700;
 }
 
-/* SITUAÇÕES */
-
 .neg-status {
     display: inline-flex;
     align-items: center;
@@ -217,8 +206,6 @@
     background: #e2e8f0;
 }
 
-/* AÇÕES */
-
 .neg-action {
     display: inline-flex;
     align-items: center;
@@ -248,8 +235,6 @@
     font-size: 11px;
 }
 
-/* ESTADO VAZIO */
-
 .neg-empty {
     padding: 45px 20px !important;
     text-align: center;
@@ -273,8 +258,6 @@
     font-size: 12px;
 }
 
-/* MENSAGENS */
-
 .neg-messages {
     margin-bottom: 20px;
 }
@@ -287,8 +270,6 @@
     border-radius: 8px;
     font-size: 13px;
 }
-
-/* RESPONSIVIDADE */
 
 @media (max-width: 1200px) {
     .neg-resumo {
@@ -316,8 +297,6 @@
         grid-template-columns: 1fr;
     }
 }
-
-/* AJUSTES DE ESPAÇAMENTO E LEITURA */
 
 .topbar {
     margin-bottom: 24px;

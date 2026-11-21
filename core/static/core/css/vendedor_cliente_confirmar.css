@@ -1,5 +1,11 @@
-.topo-form h1 { margin: 0 0 4px; }
-.topo-form p { margin: 0 0 20px; color: #6b7280; }
+.topo-form h1 {
+    margin: 0 0 4px;
+}
+
+.topo-form p {
+    margin: 0 0 20px;
+    color: #6b7280;
+}
 
 .confirmar-card {
     max-width: 560px;
@@ -17,10 +23,22 @@
     line-height: 1.5;
     margin-bottom: 20px;
 }
-.confirmar-alerta strong { display: block; margin-bottom: 4px; }
-.confirmar-alerta-ok { background: #f0fdf4; color: #166534; }
 
-.confirmar-acoes { display: flex; justify-content: flex-end; gap: 10px; }
+.confirmar-alerta strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.confirmar-alerta-ok {
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.confirmar-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
 
 .btn-voltar, .btn-perigo, .btn-salvar {
     padding: 10px 16px;
@@ -33,5 +51,15 @@
     cursor: pointer;
     text-decoration: none;
 }
-.btn-perigo { background: #dc2626; border-color: #dc2626; color: #fff; }
-.btn-salvar { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+.btn-perigo {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+
+.btn-salvar {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}

@@ -1,29 +1,103 @@
-/* ==============================
-   DETALHES DA VENDA
-============================== */
-.detalhes-container { grid-template-columns: minmax(0, 1fr); min-width: 0; }
-.detalhes-container .informacoes, .detalhes-container .card-info { min-width: 0; }
-.detalhes-container .card-info h3 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-.detalhes-container .info-item small { color: #64748b; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
-.detalhes-container .info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-/* MARGEM E STATUS */
-.detalhes-container .info-item strong.valor-negativo { color: #991b1b; }
-.status-margem-negativa, .status-cancelada { background: #fee2e2; color: #991b1b; }
-.detalhes-container .custo-explicacao { line-height: 1.6; overflow-wrap: anywhere; }
-/* FORMULÁRIO E AÇÕES */
-.detalhes-container .form-situacao, .detalhes-container .form-situacao .campo-form { max-width: 100%; }
-.detalhes-container .form-situacao .btn-liberar, .topo-acoes .btn-voltar, .topo-acoes .btn-preco { min-height: 44px; }
-.topo { gap: 16px; }
-.topo > div:first-child { min-width: 0; }
-.topo p { overflow-wrap: anywhere; }
-.topo-acoes { flex-wrap: wrap; }
-/* RESPONSIVIDADE */
-@media (max-width: 1100px) { .detalhes-container .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 700px) { .topo-acoes { width: 100%; justify-content: flex-start; } }
+.detalhes-container {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+}
+
+.detalhes-container .informacoes, .detalhes-container .card-info {
+    min-width: 0;
+}
+
+.detalhes-container .card-info h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.detalhes-container .info-item small {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.detalhes-container .info-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detalhes-container .info-item strong.valor-negativo {
+    color: #991b1b;
+}
+
+.status-margem-negativa, .status-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.detalhes-container .custo-explicacao {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.detalhes-container .form-situacao, .detalhes-container .form-situacao .campo-form {
+    max-width: 100%;
+}
+
+.detalhes-container .form-situacao .btn-liberar, .topo-acoes .btn-voltar, .topo-acoes .btn-preco {
+    min-height: 44px;
+}
+
+.topo {
+    gap: 16px;
+}
+
+.topo > div:first-child {
+    min-width: 0;
+}
+
+.topo p {
+    overflow-wrap: anywhere;
+}
+
+.topo-acoes {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+    .detalhes-container .info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .topo-acoes {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
 @media (max-width: 500px) {
-    .detalhes-container .info-grid { grid-template-columns: minmax(0, 1fr); }
-    .topo-acoes { flex-direction: column; align-items: stretch; }
-    .topo-acoes .btn-voltar, .topo-acoes .btn-preco { width: 100%; justify-content: center; text-align: center; }
-    .detalhes-container .card-info { padding: 16px; }
-    .detalhes-container .form-situacao .btn-liberar { width: 100%; }
+    .detalhes-container .info-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .topo-acoes {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .topo-acoes .btn-voltar, .topo-acoes .btn-preco {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .detalhes-container .card-info {
+        padding: 16px;
+    }
+
+    .detalhes-container .form-situacao .btn-liberar {
+        width: 100%;
+    }
 }

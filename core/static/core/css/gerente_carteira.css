@@ -1,4 +1,3 @@
-/* T16 — Carteira de clientes */
 .cart-pagina {
     width: 100%;
     max-width: 1500px;
@@ -370,7 +369,6 @@
     }
 }
 
-/* T17 */
 .cart-tabela {
     min-width: 1200px;
 }

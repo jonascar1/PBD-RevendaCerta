@@ -1,11 +1,9 @@
-
 .aprovacoes-page {
     --ap-primary: #0f172a;
     --ap-accent: #2563eb;
     --ap-bg: #f8fafc;
     --ap-border: #e2e8f0;
     --ap-muted: #64748b;
-
     max-width: 1250px;
     margin: 0 auto;
     padding: 28px;

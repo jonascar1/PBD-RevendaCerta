@@ -6,10 +6,19 @@
     margin-bottom: 24px;
 }
 
-.topo-detalhes h1 { margin: 0 0 4px; }
-.topo-detalhes p { margin: 0; color: #6b7280; }
+.topo-detalhes h1 {
+    margin: 0 0 4px;
+}
 
-.topo-acoes { display: flex; gap: 10px; }
+.topo-detalhes p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.topo-acoes {
+    display: flex;
+    gap: 10px;
+}
 
 .btn-editar {
     display: inline-flex;
@@ -46,7 +55,10 @@
     object-fit: cover;
 }
 
-.sem-foto { text-align: center; color: #9ca3af; }
+.sem-foto {
+    text-align: center;
+    color: #9ca3af;
+}
 
 .miniaturas {
     display: flex;
@@ -66,10 +78,21 @@
     background: none;
 }
 
-.miniatura img { width: 100%; height: 100%; object-fit: cover; }
-.miniatura.ativa { border-color: #2563eb; }
+.miniatura img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-.informacoes { display: flex; flex-direction: column; gap: 16px; }
+.miniatura.ativa {
+    border-color: #2563eb;
+}
+
+.informacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
 .card-info {
     background: #fff;
@@ -85,7 +108,10 @@
     margin-bottom: 14px;
 }
 
-.card-cabecalho h3 { margin: 0; font-size: 1.05rem; }
+.card-cabecalho h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
 
 .info-grid {
     display: grid;
@@ -93,8 +119,16 @@
     gap: 14px;
 }
 
-.info-item span { display: block; font-size: .8rem; color: #6b7280; }
-.info-item strong { display: block; margin-top: 2px; }
+.info-item span {
+    display: block;
+    font-size: .8rem;
+    color: #6b7280;
+}
+
+.info-item strong {
+    display: block;
+    margin-top: 2px;
+}
 
 .badge {
     padding: 4px 10px;
@@ -103,14 +137,39 @@
     font-weight: 600;
     background: #e5e7eb;
 }
-.status-disponivel { background: #dcfce7; color: #166534; }
-.status-reservado { background: #fef3c7; color: #92400e; }
-.status-vendido, .status-entregue { background: #dbeafe; color: #1e40af; }
-.status-preparacao { background: #f3f4f6; color: #374151; }
 
-.opcionais { margin: 0; line-height: 1.5; }
-.sem-registros { margin: 0; color: #9ca3af; }
+.status-disponivel {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-reservado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-vendido, .status-entregue {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-preparacao {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.opcionais {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.sem-registros {
+    margin: 0;
+    color: #9ca3af;
+}
 
 @media (max-width: 900px) {
-    .veiculo-container { grid-template-columns: 1fr; }
+    .veiculo-container {
+        grid-template-columns: 1fr;
+    }
 }

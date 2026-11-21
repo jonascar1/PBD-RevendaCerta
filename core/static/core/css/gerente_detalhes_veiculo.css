@@ -1,17 +1,9 @@
-/* ==============================
-   DETALHES DO VEÍCULO
-============================== */
-
 .detalhes-container {
     display: grid;
     grid-template-columns: minmax(400px, 0.95fr) minmax(450px, 1.05fr);
     gap: 28px;
     align-items: start;
 }
-
-/* ==============================
-   GALERIA
-============================== */
 
 .galeria {
     background: white;
@@ -70,10 +62,6 @@
     font-size: 13px;
 }
 
-/* ==============================
-   MINIATURAS
-============================== */
-
 .miniaturas {
     display: flex;
     gap: 9px;
@@ -110,20 +98,12 @@
     border-color: #2563eb;
 }
 
-/* ==============================
-   INFORMAÇÕES
-============================== */
-
 .informacoes {
     display: flex;
     flex-direction: column;
     gap: 14px;
     min-width: 0;
 }
-
-/* ==============================
-   TÍTULO DO VEÍCULO
-============================== */
 
 .titulo-veiculo {
     background: white;
@@ -154,10 +134,6 @@
     color: #6b7280;
     font-size: 13px;
 }
-
-/* ==============================
-   STATUS
-============================== */
 
 .status {
     display: inline-flex;
@@ -195,10 +171,6 @@
     color: #374151;
 }
 
-/* ==============================
-   CARDS
-============================== */
-
 .card-info {
     background: white;
     border: 1px solid #e5e7eb;
@@ -211,10 +183,6 @@
     margin-bottom: 18px;
     color: #1f2937;
 }
-
-/* ==============================
-   GRID DE INFORMAÇÕES
-============================== */
 
 .info-grid {
     display: grid;
@@ -239,10 +207,6 @@
     font-size: 13px;
     word-break: break-word;
 }
-
-/* ==============================
-   CUSTOS
-============================== */
 
 .custo-total strong {
     font-size: 18px;
@@ -312,10 +276,6 @@
     font-size: 14px;
 }
 
-/* ==============================
-   OPCIONAIS
-============================== */
-
 .opcionais {
     color: #4b5563;
     font-size: 13px;
@@ -328,10 +288,6 @@
     font-size: 13px;
     margin: 0;
 }
-
-/* ==============================
-   TOPO E BOTÕES DE AÇÃO
-============================== */
 
 .topo {
     display: flex;
@@ -409,10 +365,6 @@
 .topo-acoes .btn-preco {
     margin: 0;
 }
-
-/* =========================================================
-   SITUAÇÃO DO VEÍCULO
-   ========================================================= */
 
 .situacao-card {
     padding: 0;
@@ -495,7 +447,6 @@
     border-color: #a7f3d0;
 }
 
-/* PRAZO DA RESERVA (DENTRO DE .situacao-mensagem) */
 .prazo-reserva {
     display: flex;
     align-items: center;
@@ -535,7 +486,6 @@
     margin: 4px 0;
 }
 
-/* FORMULÁRIOS DA SITUAÇÃO */
 .form-situacao {
     display: flex;
     flex-direction: column;
@@ -601,7 +551,6 @@
     flex: 1;
 }
 
-/* BOTÕES DA SITUAÇÃO */
 .btn-situacao {
     display: inline-flex;
     align-items: center;
@@ -628,18 +577,51 @@
     flex-shrink: 0;
 }
 
-.btn-disponivel { background: #dcfce7; color: #15803d; }
-.btn-disponivel:hover { background: #bbf7d0; }
-.btn-reservar { background: #eff6ff; color: #2563eb; }
-.btn-reservar:hover { background: #dbeafe; }
-.btn-vendido { background: #fef3c7; color: #92400e; }
-.btn-vendido:hover { background: #fde68a; }
-.btn-liberar { background: #fff1f2; color: #be123c; }
-.btn-liberar:hover { background: #ffe4e6; }
-.btn-entregue { background: #dcfce7; color: #15803d; }
-.btn-entregue:hover { background: #bbf7d0; }
+.btn-disponivel {
+    background: #dcfce7;
+    color: #15803d;
+}
 
-/* VENDA E CANCELAMENTO */
+.btn-disponivel:hover {
+    background: #bbf7d0;
+}
+
+.btn-reservar {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-reservar:hover {
+    background: #dbeafe;
+}
+
+.btn-vendido {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-vendido:hover {
+    background: #fde68a;
+}
+
+.btn-liberar {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.btn-liberar:hover {
+    background: #ffe4e6;
+}
+
+.btn-entregue {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.btn-entregue:hover {
+    background: #bbf7d0;
+}
+
 .acoes-situacao {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -667,10 +649,6 @@
     width: 100%;
     margin-top: auto;
 }
-
-/* =========================================
-   MENSAGENS / ALERTAS
-========================================= */
 
 .messages {
     display: flex;
@@ -704,10 +682,6 @@
     border-color: #fde68a;
     color: #92400e;
 }
-
-/* =========================================
-   HISTÓRICO DE RESERVAS & PROPOSTAS PENDENTES
-========================================= */
 
 .historico-reservas {
     margin-top: 28px;
@@ -769,7 +743,6 @@
     color: #334155;
 }
 
-/* Formulário de recusa dentro de Propostas Pendentes */
 .historico-reservas__item form {
     display: flex;
     flex-direction: column;
@@ -880,10 +853,6 @@
     color: #64748b;
 }
 
-/* ==============================
-   RESPONSIVIDADE
-============================== */
-
 @media (max-width: 1100px) {
     .detalhes-container {
         grid-template-columns: 1fr;
@@ -961,11 +930,6 @@
         padding: 16px;
     }
 }
-
-
-/* ==============================
-   BOTÕES EM LINKS
-============================== */
 
 a.btn-entregue {
     display: inline-flex;
