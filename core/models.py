@@ -134,7 +134,6 @@ class PerfilVendedor(models.Model):
 # ============================================================
 # Veículos
 # ============================================================
-
 class Veiculo(models.Model):
     class Origem(models.TextChoices):
         COMPRADO = "COMPRADO", "Comprado de terceiro"
@@ -153,6 +152,19 @@ class Veiculo(models.Model):
         VENDIDO = "VENDIDO", "Vendido"
         ENTREGUE = "ENTREGUE", "Entregue"
 
+    class Tipo(models.TextChoices):
+        HATCH = "HATCH", "Hatch"
+        SEDA = "SEDA", "Sedã"
+        SUV = "SUV", "SUV"
+        PICAPE = "PICAPE", "Picape"
+        UTILITARIO = "UTILITARIO", "Utilitário"
+        OUTRO = "OUTRO", "Outro"
+
+    class Cambio(models.TextChoices):
+        MANUAL = "MANUAL", "Manual"
+        AUTOMATICO = "AUTOMATICO", "Automático"
+        OUTRO = "OUTRO", "Outro"
+
     placa = models.CharField(max_length=8)
     chassi = models.CharField(max_length=17)
     renavam = models.CharField(max_length=11)
@@ -162,6 +174,13 @@ class Veiculo(models.Model):
     ano_modelo = models.PositiveSmallIntegerField()
     cor = models.CharField(max_length=30)
     combustivel = models.CharField(max_length=30)
+    tipo = models.CharField(
+        max_length=12, choices=Tipo.choices, blank=True, default=""
+    )
+    cambio = models.CharField(
+        max_length=12, choices=Cambio.choices, blank=True, default=""
+    )
+
     quilometragem = models.PositiveIntegerField()
     opcionais = models.TextField(blank=True)
 
@@ -253,8 +272,6 @@ class Veiculo(models.Model):
         return self.reservas.filter(
             cancelada=False, expira_em__gt=timezone.now()
         ).first()
-
-
 class HistoricoSituacaoVeiculo(models.Model):
     veiculo = models.ForeignKey(
         Veiculo, on_delete=models.PROTECT, related_name="historico_situacoes"
@@ -2386,3 +2403,271 @@ class ContatoCarteira(models.Model):
                 })
     def __str__(self):
         return f"{self.cliente} - {self.vendedor} - {self.realizado_em:%d/%m/%Y}"
+
+
+# ============================================================
+# T18 - Procura registrada
+# ============================================================
+
+class Procura(models.Model):
+    """
+    O carro que o cliente procura e ainda não temos no pátio.
+    Nos campos de critério, vazio significa "tanto faz".
+    """
+
+    class Situacao(models.TextChoices):
+        ABERTA = "ABERTA", "Aberta"
+        ATENDIDA = "ATENDIDA", "Atendida"
+        VENCIDA = "VENCIDA", "Vencida"
+        ENCERRADA = "ENCERRADA", "Encerrada pelo vendedor"
+
+    cliente = models.ForeignKey(
+        Cliente, on_delete=models.PROTECT, related_name="procuras"
+    )
+    vendedor = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="procuras_registradas",
+        limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
+    )
+
+    # Critérios (todos opcionais: vazio = tanto faz)
+    tipo = models.CharField(
+        max_length=12, choices=Veiculo.Tipo.choices, blank=True, default=""
+    )
+    marca_modelo = models.CharField(max_length=120, blank=True)
+    preco_minimo = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    preco_maximo = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    ano_minimo = models.PositiveSmallIntegerField(null=True, blank=True)
+    cambio = models.CharField(
+        max_length=12, choices=Veiculo.Cambio.choices, blank=True, default=""
+    )
+    combustivel = models.CharField(max_length=30, blank=True)
+
+    valido_ate = models.DateField()
+
+    situacao = models.CharField(
+        max_length=12,
+        choices=Situacao.choices,
+        default=Situacao.ABERTA,
+        editable=False,
+    )
+    encerrada_em = models.DateTimeField(null=True, blank=True, editable=False)
+    encerrada_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="procuras_encerradas",
+        editable=False,
+    )
+    venda_atendida = models.ForeignKey(
+        "Venda",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="procuras_atendidas",
+        editable=False,
+    )
+
+    criada_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criada_em", "-pk"]
+        indexes = [
+            models.Index(
+                fields=["situacao", "valido_ate"],
+                name="procura_abertas_idx",
+            ),
+        ]
+
+    def clean(self):
+        erros = {}
+
+        if self.vendedor_id and not self.vendedor.is_vendedor():
+            erros["vendedor"] = "A procura deve pertencer a um vendedor."
+
+        if self.cliente_id and not self.pk and not self.cliente.ativo:
+            erros["cliente"] = "Cliente desativado não pode ter procura."
+
+        if (
+            self.preco_minimo is not None
+            and self.preco_maximo is not None
+            and self.preco_minimo > self.preco_maximo
+        ):
+            erros["preco_maximo"] = (
+                "O preço máximo não pode ser menor que o mínimo."
+            )
+
+        if self.ano_minimo is not None and not 1900 <= self.ano_minimo <= 2100:
+            erros["ano_minimo"] = "Informe um ano entre 1900 e 2100."
+
+        if self.valido_ate and not self.pk and self.valido_ate < timezone.localdate():
+            erros["valido_ate"] = "A validade não pode estar no passado."
+
+        if erros:
+            raise ValidationError(erros)
+
+    # ------------------------------------------------------------------
+    # Consultas e regras
+    # ------------------------------------------------------------------
+    @property
+    def esta_aberta(self):
+        return self.situacao == self.Situacao.ABERTA
+
+    def resumo(self):
+        """Texto curto com os critérios preenchidos, para telas e avisos."""
+        partes = []
+        if self.tipo:
+            partes.append(self.get_tipo_display())
+        if self.marca_modelo:
+            partes.append(self.marca_modelo)
+        if self.cambio:
+            partes.append(self.get_cambio_display())
+        if self.combustivel:
+            partes.append(self.combustivel)
+        if self.ano_minimo:
+            partes.append(f"a partir de {self.ano_minimo}")
+        if self.preco_minimo is not None and self.preco_maximo is not None:
+            partes.append(
+                f"R$ {self.preco_minimo:,.2f} a R$ {self.preco_maximo:,.2f}"
+            )
+        elif self.preco_maximo is not None:
+            partes.append(f"até R$ {self.preco_maximo:,.2f}")
+        elif self.preco_minimo is not None:
+            partes.append(f"a partir de R$ {self.preco_minimo:,.2f}")
+        return " · ".join(partes) or "Qualquer veículo"
+
+    def combina_com(self, veiculo):
+        """True se o veículo bate com todos os critérios preenchidos."""
+        if self.tipo and veiculo.tipo != self.tipo:
+            return False
+        if self.cambio and veiculo.cambio != self.cambio:
+            return False
+        if (
+            self.combustivel
+            and veiculo.combustivel.strip().lower()
+            != self.combustivel.strip().lower()
+        ):
+            return False
+        if self.marca_modelo:
+            texto = f"{veiculo.marca} {veiculo.modelo}".lower()
+            if self.marca_modelo.strip().lower() not in texto:
+                return False
+        if self.ano_minimo and veiculo.ano_modelo < self.ano_minimo:
+            return False
+
+        preco = veiculo.preco_venda
+        if self.preco_minimo is not None or self.preco_maximo is not None:
+            if not preco:
+                return False
+            if self.preco_minimo is not None and preco < self.preco_minimo:
+                return False
+            if self.preco_maximo is not None and preco > self.preco_maximo:
+                return False
+
+        return True
+
+    def encerrar(self, usuario):
+        """O vendedor dono (ou o gerente) encerra a procura."""
+        if not (
+            getattr(usuario, "is_authenticated", False)
+            and usuario.ativo
+            and (
+                usuario.is_gerente()
+                or (usuario.is_vendedor() and self.vendedor_id == usuario.pk)
+            )
+        ):
+            raise PermissionDenied(
+                "Somente o vendedor da procura ou o gerente pode encerrá-la."
+            )
+
+        with transaction.atomic():
+            procura = Procura.objects.select_for_update().get(pk=self.pk)
+
+            if procura.situacao != self.Situacao.ABERTA:
+                raise ValidationError("Esta procura já foi encerrada.")
+
+            procura.situacao = self.Situacao.ENCERRADA
+            procura.encerrada_em = timezone.now()
+            procura.encerrada_por = usuario
+            procura.save(
+                update_fields=["situacao", "encerrada_em", "encerrada_por"]
+            )
+
+        self.refresh_from_db()
+        return self
+
+    @classmethod
+    def encerrar_vencidas(cls, hoje=None):
+        """
+        Não há agendador (como nas reservas): o encerramento automático
+        acontece quando alguém abre uma tela que lista procuras.
+        A procura vale até o fim do dia de `valido_ate`.
+        """
+        hoje = hoje or timezone.localdate()
+        return cls.objects.filter(
+            situacao=cls.Situacao.ABERTA,
+            valido_ate__lt=hoje,
+        ).update(
+            situacao=cls.Situacao.VENCIDA,
+            encerrada_em=timezone.now(),
+        )
+
+    def __str__(self):
+        return f"Procura #{self.pk} — {self.cliente} — {self.resumo()}"
+    
+
+class AvisoProcura(models.Model):
+    """
+    Aviso ao vendedor: um veículo que acabou de ficar disponível
+    bate com uma procura aberta do cliente dele.
+    """
+
+    procura = models.ForeignKey(
+        Procura, on_delete=models.PROTECT, related_name="avisos"
+    )
+    veiculo = models.ForeignKey(
+        Veiculo, on_delete=models.PROTECT, related_name="avisos_procura"
+    )
+    vendedor = models.ForeignKey(
+        Usuario, on_delete=models.PROTECT, related_name="avisos_procura"
+    )
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    lido = models.BooleanField(default=False)
+    lido_em = models.DateTimeField(null=True, blank=True, editable=False)
+
+    class Meta:
+        ordering = ["lido", "-criado_em", "-pk"]
+        constraints = [
+            # Um aviso por par procura/veículo, mesmo que o carro
+            # volte a ficar disponível mais de uma vez.
+            models.UniqueConstraint(
+                fields=["procura", "veiculo"],
+                name="um_aviso_por_procura_e_veiculo",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["vendedor", "lido"],
+                name="aviso_procura_pendente_idx",
+            ),
+        ]
+
+    def marcar_como_lido(self, usuario):
+        if self.vendedor_id != usuario.pk:
+            raise PermissionDenied(
+                "Você não pode alterar o aviso de outro vendedor."
+            )
+        if not self.lido:
+            self.lido = True
+            self.lido_em = timezone.now()
+            self.save(update_fields=["lido", "lido_em"])
+
+    def __str__(self):
+        return f"Aviso: {self.procura.cliente} — {self.veiculo}"

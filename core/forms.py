@@ -4,7 +4,7 @@ Todas as validações dos formulários ficam aqui (e nos models), nunca no HTML.
 
 from decimal import Decimal, InvalidOperation
 import re
-from datetime import date
+from datetime import date, timedelta
 
 from django import forms
 from django.core.validators import MaxLengthValidator
@@ -23,6 +23,7 @@ from .models import (
     FotoAvaliacaoTroca,
     LancamentoFinanceiro,
     PerfilVendedor,
+    Procura,
     Proposta,
     TelefoneCliente,
     Usuario,
@@ -334,6 +335,7 @@ class VeiculoForm(BaseForm, forms.ModelForm):
             "ano_fabricacao", "ano_modelo", "cor", "combustivel",
             "quilometragem", "opcionais",
             "origem", "custo_aquisicao", "preco_venda", "valor_repasse",
+            "ano_fabricacao", "ano_modelo", "cor", "tipo", "cambio", "combustivel",
         ]
         labels = {
             "placa": "Placa",
@@ -350,6 +352,8 @@ class VeiculoForm(BaseForm, forms.ModelForm):
             "custo_aquisicao": "Custo de aquisição",
             "preco_venda": "Preço de venda",
             "valor_repasse": "Valor de repasse",
+            "tipo": "Tipo",
+            "cambio": "Câmbio",
         }
         widgets = {
             "placa": forms.TextInput(attrs={"placeholder": "ABC1D23 ou ABC1234"}),
@@ -402,6 +406,8 @@ class VeiculoForm(BaseForm, forms.ModelForm):
                 "invalid": "Quilometragem inválida.",
             },
             "origem": {"required": "Selecione a origem do veículo."},
+            "tipo": {"invalid_choice": "Tipo inválido."},
+            "cambio": {"invalid_choice": "Câmbio inválido."},
         }
 
     def __init__(self, *args, **kwargs):
@@ -1466,3 +1472,108 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
                 "A data de retorno não pode estar no passado."
             )
         return retorno
+    
+
+
+
+# ============================================================
+# T18 - Procura registrada
+# ============================================================
+
+class ProcuraForm(BaseForm, forms.ModelForm):
+    preco_minimo = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        required=False,
+        min_value=Decimal("0.01"),
+        label="Preço mínimo",
+    )
+    preco_maximo = CampoMonetarioBR(
+        max_digits=12,
+        decimal_places=2,
+        required=False,
+        min_value=Decimal("0.01"),
+        label="Preço máximo",
+    )
+    combustivel = forms.ChoiceField(
+        label="Combustível",
+        choices=COMBUSTIVEIS,
+        required=False,
+    )
+
+    class Meta:
+        model = Procura
+        fields = [
+            "cliente",
+            "tipo",
+            "marca_modelo",
+            "preco_minimo",
+            "preco_maximo",
+            "ano_minimo",
+            "cambio",
+            "combustivel",
+            "valido_ate",
+        ]
+        labels = {
+            "cliente": "Cliente",
+            "tipo": "Tipo",
+            "marca_modelo": "Marca ou modelo",
+            "ano_minimo": "Ano mínimo",
+            "cambio": "Câmbio",
+            "valido_ate": "Procura válida até",
+        }
+        widgets = {
+            "marca_modelo": forms.TextInput(
+                attrs={"placeholder": "Ex.: Toyota ou Corolla"}
+            ),
+            "ano_minimo": forms.NumberInput(
+                attrs={"placeholder": "Ex.: 2018"}
+            ),
+            "valido_ate": forms.DateInput(
+                format="%Y-%m-%d", attrs={"type": "date"}
+            ),
+        }
+        error_messages = {
+            "cliente": {
+                "required": "Selecione o cliente.",
+                "invalid_choice": "Selecione um cliente válido.",
+            },
+            "tipo": {"invalid_choice": "Tipo inválido."},
+            "cambio": {"invalid_choice": "Câmbio inválido."},
+            "ano_minimo": {"invalid": "Ano inválido."},
+            "valido_ate": {
+                "required": "Informe até quando a procura vale.",
+                "invalid": "Data inválida.",
+            },
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        cliente = self.fields["cliente"]
+        cliente.queryset = Cliente.objects.filter(ativo=True).order_by(
+            "nome", "razao_social"
+        )
+        cliente.empty_label = "Selecione o cliente..."
+        cliente.label_from_instance = lambda c: (
+            f"{c.nome_exibicao} — {c.cpf or c.cnpj}"
+        )
+
+        # Validade padrão: 30 dias a partir de hoje.
+        self.fields["valido_ate"].initial = (
+            lambda: timezone.localdate() + timedelta(days=30)
+        )
+
+    def clean_ano_minimo(self):
+        ano = self.cleaned_data.get("ano_minimo")
+        if ano is not None and not 1900 <= ano <= 2100:
+            raise forms.ValidationError("Informe um ano entre 1900 e 2100.")
+        return ano
+
+    def clean_valido_ate(self):
+        validade = self.cleaned_data.get("valido_ate")
+        if validade and validade < timezone.localdate():
+            raise forms.ValidationError(
+                "A validade não pode estar no passado."
+            )
+        return validade

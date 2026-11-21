@@ -419,7 +419,15 @@
                     <span>Combustível</span>
                     <strong>{{ veiculo.combustivel }}</strong>
                 </div>
+                <div class="info-item">
+                    <span>Tipo</span>
+                    <strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong>
+                </div>
 
+                <div class="info-item">
+                    <span>Câmbio</span>
+                    <strong>{{ veiculo.get_cambio_display|default:"Não informado" }}</strong>
+                </div>
                 <div class="info-item">
                     <span>Quilometragem</span>
                     <strong>{{ veiculo.quilometragem }} km</strong>

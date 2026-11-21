@@ -1,0 +1,103 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Nova procura | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira_contato.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_procuras.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Procura registrada</span>
+            <h1>Nova procura</h1>
+            <p>
+                Anote o carro que o cliente procura. Deixe em branco o que
+                for "tanto faz": o sistema avisa quando entrar um veículo parecido.
+            </p>
+        </div>
+
+        <a class="cart-botao cart-botao-secundario" href="{% url 'procuras_vendedor' %}">
+            <i data-lucide="arrow-left"></i> Voltar às procuras
+        </a>
+    </header>
+
+    <section class="cart-painel cart-formulario proc-formulario">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="cart-campo proc-campo-largo">
+                <label for="{{ form.cliente.id_for_label }}">{{ form.cliente.label }}</label>
+                {{ form.cliente }}
+                {{ form.cliente.errors }}
+            </div>
+
+            <div class="proc-grid">
+                <div class="cart-campo">
+                    <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+                    {{ form.tipo }}
+                    {{ form.tipo.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.marca_modelo.id_for_label }}">{{ form.marca_modelo.label }}</label>
+                    {{ form.marca_modelo }}
+                    {{ form.marca_modelo.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.preco_minimo.id_for_label }}">{{ form.preco_minimo.label }}</label>
+                    {{ form.preco_minimo }}
+                    {{ form.preco_minimo.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.preco_maximo.id_for_label }}">{{ form.preco_maximo.label }}</label>
+                    {{ form.preco_maximo }}
+                    {{ form.preco_maximo.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.ano_minimo.id_for_label }}">{{ form.ano_minimo.label }}</label>
+                    {{ form.ano_minimo }}
+                    {{ form.ano_minimo.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.cambio.id_for_label }}">{{ form.cambio.label }}</label>
+                    {{ form.cambio }}
+                    {{ form.cambio.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.combustivel.id_for_label }}">{{ form.combustivel.label }}</label>
+                    {{ form.combustivel }}
+                    {{ form.combustivel.errors }}
+                </div>
+
+                <div class="cart-campo">
+                    <label for="{{ form.valido_ate.id_for_label }}">{{ form.valido_ate.label }}</label>
+                    {{ form.valido_ate }}
+                    {{ form.valido_ate.errors }}
+                    <small>Padrão de 30 dias. Vencida, a procura se encerra sozinha.</small>
+                </div>
+            </div>
+
+            <div class="cart-acoes">
+                <button type="submit" class="cart-botao">Registrar procura</button>
+                <a class="cart-botao cart-botao-secundario" href="{% url 'procuras_vendedor' %}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

@@ -35,6 +35,7 @@ from .forms import (
     EtapaDocumentacaoForm,
     LoginForm,
     PrecoVendaForm,
+    ProcuraForm,
     PropostaFiltroForm,
     PropostaForm,
     ReservaForm,
@@ -59,6 +60,7 @@ from .models import (
     HistoricoSituacaoVeiculo,
     LancamentoFinanceiro,
     PerfilVendedor,
+    Procura,
     Proposta,
     ReservaVeiculo,
     TelefoneCliente,
@@ -2884,5 +2886,113 @@ def registrar_contato_carteira_view(request, cliente_id):
             "form": form,
             "cliente": cliente,
             "linha": linha,
+        },
+    )
+    
+    
+
+# ============================================================
+# T18 - Procura registrada
+# ============================================================
+
+@perfil_requerido("VENDEDOR")
+@require_GET
+def procuras_vendedor_view(request):
+    Procura.encerrar_vencidas()
+
+    procuras = (
+        Procura.objects.filter(vendedor=request.user)
+        .select_related("cliente")
+        .order_by("-criada_em", "-pk")
+    )
+
+    return render(
+        request,
+        "core/vendedor_painel_procuras.html",
+        {
+            "abertas": [p for p in procuras if p.esta_aberta],
+            "encerradas": [p for p in procuras if not p.esta_aberta],
+        },
+    )
+
+
+@perfil_requerido("VENDEDOR")
+def nova_procura_view(request):
+    if request.method == "POST":
+        form = ProcuraForm(request.POST)
+
+        if form.is_valid():
+            procura = form.save(commit=False)
+            procura.vendedor = request.user
+
+            try:
+                procura.full_clean()
+                procura.save()
+            except ValidationError as erro:
+                adicionar_erros_de_validacao(form, erro)
+            else:
+                messages.success(
+                    request,
+                    "Procura registrada. Você será avisado quando um "
+                    "veículo compatível ficar disponível.",
+                )
+                return redirect("procuras_vendedor")
+    else:
+        initial = {}
+        cliente_id = request.GET.get("cliente", "")
+        if cliente_id.isdigit():
+            initial["cliente"] = int(cliente_id)
+
+        form = ProcuraForm(initial=initial)
+
+    return render(
+        request,
+        "core/vendedor_procura_form.html",
+        {"form": form},
+    )
+
+
+@perfil_requerido("VENDEDOR", "GERENTE")
+@require_POST
+def encerrar_procura_view(request, procura_id):
+    procura = get_object_or_404(Procura, pk=procura_id)
+
+    try:
+        procura.encerrar(request.user)
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+    except PermissionDenied as erro:
+        messages.error(request, str(erro))
+    else:
+        messages.success(request, "Procura encerrada.")
+
+    if request.user.is_gerente():
+        return redirect("procuras_gerente")
+    return redirect("procuras_vendedor")
+
+
+@perfil_requerido("GERENTE")
+@require_GET
+def procuras_gerente_view(request):
+    Procura.encerrar_vencidas()
+
+    situacao = request.GET.get("situacao", "")
+    procuras = Procura.objects.select_related("cliente", "vendedor")
+
+    if situacao in dict(Procura.Situacao.choices):
+        procuras = procuras.filter(situacao=situacao)
+    else:
+        situacao = ""
+
+    return render(
+        request,
+        "core/gerente_painel_procuras.html",
+        {
+            "procuras": procuras.order_by("-criada_em", "-pk"),
+            "situacoes": Procura.Situacao.choices,
+            "situacao_selecionada": situacao,
+            "total_abertas": Procura.objects.filter(
+                situacao=Procura.Situacao.ABERTA
+            ).count(),
         },
     )

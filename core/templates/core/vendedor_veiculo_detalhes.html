@@ -140,6 +140,15 @@
                 <div class="info-item"><span>Ano do modelo</span><strong>{{ veiculo.ano_modelo|unlocalize }}</strong></div>
                 <div class="info-item"><span>Cor</span><strong>{{ veiculo.cor }}</strong></div>
                 <div class="info-item"><span>Combustível</span><strong>{{ veiculo.combustivel }}</strong></div>
+                <div class="info-item">
+                    <span>Tipo</span>
+                    <strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Câmbio</span>
+                    <strong>{{ veiculo.get_cambio_display|default:"Não informado" }}</strong>
+                </div>
                 <div class="info-item"><span>Quilometragem</span><strong>{{ veiculo.quilometragem }} km</strong></div>
             </div>
         </div>
