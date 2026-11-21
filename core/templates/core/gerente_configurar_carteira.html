@@ -1,0 +1,69 @@
+{% extends "core/gerente_base.html" %}
+{% load static %}
+
+{% block title %}Configurar carteira | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_configurar_carteira.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Carteira de clientes</span>
+            <h1>Configurar prazo</h1>
+            <p>Defina quando os clientes voltarão a aparecer na fila de contato.</p>
+        </div>
+
+        <a class="cart-botao cart-botao-secundario" href="{% url 'carteira_gerente' %}">
+            <i data-lucide="arrow-left"></i> Voltar à carteira
+        </a>
+    </header>
+
+    {% if messages %}
+        <div class="cart-mensagens">
+            {% for message in messages %}
+                <p class="cart-mensagem">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="cart-painel cart-formulario">
+        <h2>Prazo sem comprar</h2>
+        <p>
+            Um cliente entra na carteira quando a última venda válida dele completa
+            o período configurado. Uma nova compra reinicia a contagem para todos
+            os vendedores.
+        </p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="cart-erro">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="cart-campo">
+                <label for="{{ form.anos_sem_comprar.id_for_label }}">
+                    {{ form.anos_sem_comprar.label }}
+                </label>
+                {{ form.anos_sem_comprar }}
+                {% for erro in form.anos_sem_comprar.errors %}
+                    <small class="cart-erro">{{ erro }}</small>
+                {% endfor %}
+                <small>Informe um número inteiro entre 1 e 50.</small>
+            </div>
+
+            <div class="cart-acoes">
+                <button type="submit" class="cart-botao">Salvar configuração</button>
+                <a class="cart-botao cart-botao-secundario" href="{% url 'carteira_gerente' %}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

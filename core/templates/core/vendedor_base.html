@@ -62,6 +62,12 @@
                 Negociações
             </a>
 
+            <a href="{% url 'carteira_vendedor' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'carteira_vendedor' or request.resolver_match.url_name == 'registrar_contato_carteira' or request.resolver_match.url_name == 'configurar_carteira' %}active{% endif %}">
+                <span><i data-lucide="phone-call"></i></span>
+                Carteira de clientes
+            </a>
+
             <a href="{% url 'minhas_comissoes' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'minhas_comissoes' %}active{% endif %}">
                 <span><i data-lucide="wallet"></i></span>

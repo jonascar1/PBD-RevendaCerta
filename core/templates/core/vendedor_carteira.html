@@ -1,0 +1,120 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Minha carteira | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Relacionamento com clientes</span>
+            <h1>Minha carteira</h1>
+            <p>
+                Clientes que já compraram com você e estão há pelo menos
+                {{ carteira.anos_configurados }} ano(s) sem comprar na loja.
+            </p>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="cart-mensagens">
+            {% for message in messages %}
+                <p class="cart-mensagem">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="cart-indicadores">
+        <div class="cart-indicador">
+            <span>Clientes na carteira</span>
+            <strong>{{ carteira.total_clientes }}</strong>
+        </div>
+
+        <div class="cart-indicador">
+            <span>Contatados neste mês</span>
+            <strong>{{ carteira.contatados_mes }}</strong>
+        </div>
+    </div>
+
+    <section class="cart-painel">
+        <div class="cart-secao-topo">
+            <h2>Quem ligar hoje</h2>
+            <span>Mais antigos primeiro</span>
+        </div>
+
+        {% if carteira.linhas %}
+            <div class="cart-tabela-wrap">
+                <table class="cart-tabela">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
+                            <th>Último veículo comprado</th>
+                            <th>Data da compra</th>
+                            <th>Tempo decorrido</th>
+                            <th>Contato no mês</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in carteira.linhas %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'detalhes_cliente' item.cliente.pk %}" class="cart-link">
+                                        {{ item.cliente }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if item.telefone %}
+                                        <a href="tel:{{ item.telefone }}" class="cart-link">
+                                            {{ item.telefone }}
+                                        </a>
+                                    {% else %}
+                                        <span class="cart-muted">Não informado</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.veiculo }}</td>
+                                <td>{{ item.data_compra|date:"d/m/Y" }}</td>
+                                <td>
+                                    {{ item.dias_decorridos }} dias
+                                    <span class="cart-muted">(aprox. {{ item.anos_decorridos }} anos)</span>
+                                </td>
+                                <td>
+                                    {% if item.contatado_mes %}
+                                        <span class="cart-status cart-status-ok">Contatado</span>
+                                    {% else %}
+                                        <span class="cart-status cart-status-pendente">Pendente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'registrar_contato_carteira' item.cliente.pk %}">
+                                        {% csrf_token %}
+                                        <button class="cart-botao" type="submit">
+                                            Registrar contato
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="cart-vazio">
+                <i data-lucide="phone-off"></i>
+                <h3>Nenhum cliente para contatar</h3>
+                <p>
+                    Quando clientes das suas vendas atingirem o prazo configurado,
+                    aparecerão automaticamente aqui.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

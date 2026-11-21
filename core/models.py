@@ -2285,3 +2285,104 @@ class EntregaVeiculo(models.Model):
 
     def __str__(self):
         return f"Entrega da venda #{self.venda_id} em {self.data_entrega:%d/%m/%Y}"
+    
+    
+    
+
+
+# ============================================================
+# T16 - Carteira de clientes
+# ============================================================
+
+class ConfiguracaoCarteira(models.Model):
+    """Configuração única do prazo de retorno à carteira."""
+
+    anos_sem_comprar = models.PositiveSmallIntegerField(
+        default=3,
+        help_text="Anos desde a última compra válida.",
+    )
+    atualizado_por = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="configuracoes_carteira",
+    )
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Configuração da carteira"
+        verbose_name_plural = "Configurações da carteira"
+
+    def clean(self):
+        super().clean()
+        if self.anos_sem_comprar is not None and not 1 <= self.anos_sem_comprar <= 50:
+            raise ValidationError({
+                "anos_sem_comprar": "Informe um prazo entre 1 e 50 anos."
+            })
+
+    def save(self, *args, **kwargs):
+        # Existe apenas uma configuração para toda a loja.
+        self.pk = 1
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Carteira: {self.anos_sem_comprar} ano(s)"
+
+
+class ContatoCarteira(models.Model):
+    """Histórico de contatos, sem armazenar a fila calculada."""
+
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name="contatos_carteira",
+    )
+    vendedor = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="contatos_carteira_realizados",
+        limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
+    )
+    realizado_em = models.DateTimeField(default=timezone.now)
+    observacao = models.TextField(blank=True)
+    class Canal(models.TextChoices):
+        TELEFONE = "TELEFONE", "Telefone"
+        WHATSAPP = "WHATSAPP", "WhatsApp"
+        PRESENCIAL = "PRESENCIAL", "Presencial"
+
+    canal = models.CharField(
+        max_length=12,
+        choices=Canal.choices,
+        default=Canal.TELEFONE,
+    )
+    data_retorno = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Quando voltar a falar com o cliente (opcional).",
+    )
+    class Meta:
+        ordering = ["-realizado_em", "-pk"]
+        indexes = [
+            models.Index(
+                fields=["vendedor", "realizado_em"],
+                name="carteira_contato_mes_idx",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.vendedor_id and not self.vendedor.is_vendedor():
+            raise ValidationError({
+                "vendedor": "O contato deve pertencer a um vendedor."
+            })
+
+        if self.data_retorno:
+            data_contato = timezone.localtime(self.realizado_em).date()
+            if self.data_retorno < data_contato:
+                raise ValidationError({
+                    "data_retorno": "A data de retorno não pode ser anterior ao contato."
+                })
+    def __str__(self):
+        return f"{self.cliente} - {self.vendedor} - {self.realizado_em:%d/%m/%Y}"

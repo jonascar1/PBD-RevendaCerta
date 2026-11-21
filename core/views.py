@@ -12,8 +12,11 @@ from django.db import IntegrityError, transaction
 from django.db.models import Count, Max, ProtectedError, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_GET
-
+from django.views.decorators.http import require_GET, require_POST
+from .carteira import (
+    calcular_carteira,
+    obter_configuracao_carteira,
+)
 from .historico import linha_do_tempo_veiculo, resumo_cliente
 
 # 3. Imports locais da aplicação (Local apps / Relative imports)
@@ -23,6 +26,7 @@ from .forms import (
     CancelarVendaForm,
     ClienteForm,
     ComposicaoFormSet,
+    ConfiguracaoCarteiraForm,
     DecisaoPropostaForm,
     DespesaEditarForm,
     DespesaForm,
@@ -45,6 +49,7 @@ from .forms import (
 from .models import (
     AvaliacaoTroca,
     Cliente,
+    ContatoCarteira,
     EntregaVeiculo,
     EtapaDocumentacao,
     FotoAvaliacaoTroca,
@@ -2755,3 +2760,99 @@ def historico_cliente_view(request, cliente_id):
             "resumo": resumo_cliente(cliente),
         },
     )
+    
+    
+
+
+# ============================================================
+# T16 - Carteira de clientes
+# ============================================================
+
+@perfil_requerido("VENDEDOR")
+@require_GET
+def carteira_vendedor_view(request):
+    carteira = calcular_carteira(vendedor=request.user)
+
+    return render(
+        request,
+        "core/vendedor_carteira.html",
+        {"carteira": carteira},
+    )
+
+
+@perfil_requerido("GERENTE")
+@require_GET
+def carteira_gerente_view(request):
+    carteira = calcular_carteira()
+
+    return render(
+        request,
+        "core/gerente_carteira.html",
+        {"carteira": carteira},
+    )
+
+
+@perfil_requerido("GERENTE")
+def configurar_carteira_view(request):
+    configuracao = obter_configuracao_carteira()
+
+    if request.method == "POST":
+        form = ConfiguracaoCarteiraForm(
+            request.POST,
+            instance=configuracao,
+        )
+
+        if form.is_valid():
+            configuracao = form.save(commit=False)
+            configuracao.atualizado_por = request.user
+            configuracao.save()
+
+            messages.success(
+                request,
+                "Prazo da carteira atualizado com sucesso.",
+            )
+            return redirect("carteira_gerente")
+    else:
+        form = ConfiguracaoCarteiraForm(
+            instance=configuracao,
+        )
+
+    return render(
+        request,
+        "core/gerente_configurar_carteira.html",
+        {"form": form, "configuracao": configuracao},
+    )
+
+
+@perfil_requerido("VENDEDOR")
+@require_POST
+def registrar_contato_carteira_view(request, cliente_id):
+    cliente = get_object_or_404(
+        Cliente,
+        pk=cliente_id,
+        ativo=True,
+    )
+
+    carteira = calcular_carteira(vendedor=request.user)
+
+    clientes_elegiveis = {
+        linha["cliente"].pk
+        for linha in carteira["linhas"]
+    }
+
+    if cliente.pk not in clientes_elegiveis:
+        raise PermissionDenied(
+            "Este cliente não pertence à sua carteira atual."
+        )
+
+    ContatoCarteira.objects.create(
+        cliente=cliente,
+        vendedor=request.user,
+        observacao=request.POST.get("observacao", "").strip(),
+    )
+
+    messages.success(
+        request,
+        "Contato registrado com sucesso.",
+    )
+    return redirect("carteira_vendedor")

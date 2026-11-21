@@ -95,4 +95,31 @@ urlpatterns = [
         # T15 - Histórico (Gerente, somente leitura)
     path("painel/gerente/veiculos/<int:veiculo_id>/historico/", views.historico_veiculo_view, name="historico_veiculo"),
     path("painel/gerente/clientes/<int:cliente_id>/historico/", views.historico_cliente_view, name="historico_cliente"),
+    
+    # T16 - Carteira de clientes
+
+    # Vendedor
+    path(
+        "painel/vendedor/carteira/",
+        views.carteira_vendedor_view,
+        name="carteira_vendedor",
+    ),
+    path(
+        "painel/vendedor/carteira/<int:cliente_id>/contatar/",
+        views.registrar_contato_carteira_view,
+        name="registrar_contato_carteira",
+    ),
+
+    # Gerente
+    path(
+        "painel/gerente/carteira/",
+        views.carteira_gerente_view,
+        name="carteira_gerente",
+    ),
+    path(
+        "painel/gerente/carteira/configurar/",
+        views.configurar_carteira_view,
+        name="configurar_carteira",
+    ),
+
 ]

@@ -90,6 +90,12 @@
                     Documentação
                 </a>
 
+                <a href="{% url 'carteira_gerente' %}" class="menu-item
+                    {% if request.resolver_match.url_name == 'carteira_gerente' or request.resolver_match.url_name == 'registrar_contato_carteira' or request.resolver_match.url_name == 'configurar_carteira' %}active{% endif %}">
+                    <span><i data-lucide="phone-call"></i></span>
+                    Carteira de clientes
+                </a>
+
                 <a href="{% url 'vendedores' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'vendedores' or request.resolver_match.url_name == 'cadastrar_vendedor' or request.resolver_match.url_name == 'editar_vendedor' %}active{% endif %}">
                     <span><i data-lucide="users"></i></span>

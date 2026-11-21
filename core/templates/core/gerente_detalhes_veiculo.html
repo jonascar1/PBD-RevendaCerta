@@ -39,9 +39,15 @@
                 Ver venda #{{ venda.pk }}
             </a>
         {% endif %}
-                <a href="{% url 'historico_veiculo' venda.veiculo_id %}" class="btn-voltar">Histórico do veículo</a>
-        {% if request.user.is_gerente %}
-            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">Histórico do cliente</a>
+
+        <a href="{% url 'historico_veiculo' veiculo.id %}" class="btn-voltar">
+            Histórico do veículo
+        </a>
+
+        {% if venda and request.user.is_gerente %}
+            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">
+                Histórico do cliente
+            </a>
         {% endif %}
     </div>
 </header>

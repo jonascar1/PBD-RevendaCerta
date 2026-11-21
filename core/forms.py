@@ -16,6 +16,7 @@ from .models import (
     AvaliacaoTroca,
     Cliente,
     ComposicaoPagamento,
+    ConfiguracaoCarteira,
     DecisaoProposta,
     EtapaDocumentacao,
     FotoAvaliacaoTroca,
@@ -1392,3 +1393,33 @@ class EtapaDocumentacaoForm(BaseForm, forms.Form):
         if data and data > timezone.localdate():
             raise forms.ValidationError("A data da etapa não pode ser futura.")
         return data
+    
+    
+
+
+# ============================================================
+# T16 - Carteira de clientes
+# ============================================================
+
+class ConfiguracaoCarteiraForm(BaseForm, forms.ModelForm):
+    class Meta:
+        model = ConfiguracaoCarteira
+        fields = ["anos_sem_comprar"]
+        labels = {
+            "anos_sem_comprar": "Anos sem comprar",
+        }
+        widgets = {
+            "anos_sem_comprar": forms.NumberInput(
+                attrs={"step": "1", "placeholder": "Ex.: 3"}
+            ),
+        }
+
+    def clean_anos_sem_comprar(self):
+        anos = self.cleaned_data["anos_sem_comprar"]
+
+        if not 1 <= anos <= 50:
+            raise forms.ValidationError(
+                "Informe um prazo entre 1 e 50 anos."
+            )
+
+        return anos

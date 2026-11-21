@@ -1,0 +1,63 @@
+/* Complemento a gerente_detalhes_veiculo.css */
+.hist-resumo, .hist-secao { min-width: 0; max-width: 100%; }
+.hist-resumo { margin-bottom: 24px; }
+.hist-resumo .card-info { box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.hist-resumo .info-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+.hist-resumo .info-item strong { overflow-wrap: anywhere; }
+.hist-secao { margin-bottom: 24px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px; }
+.hist-secao > h2 { margin: 0 0 22px; font-size: 18px; line-height: 1.4; color: #1f2937; }
+.hist-vazio { color: #6b7280; font-size: 14px; line-height: 1.6; }
+.topo { gap: 16px; min-width: 0; }
+.topo > div:first-child { min-width: 0; }
+.topo p { overflow-wrap: anywhere; }
+.topo-acoes .btn-voltar { min-height: 44px; display: inline-flex; justify-content: center; gap: 6px; text-align: center; }
+@media (max-width: 900px) {
+  .hist-resumo .info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .topo { flex-direction: column; align-items: stretch; }
+  .topo-acoes { justify-content: flex-start; flex-wrap: wrap; }
+  .hist-secao { padding: 16px; }
+  .hist-resumo .card-info { padding: 16px; }
+}
+@media (max-width: 400px) {
+  .hist-resumo .info-grid { grid-template-columns: minmax(0,1fr); }
+}
+
+/* Linha do tempo vertical */
+.hist-linha { list-style: none; margin: 0; padding: 0 0 0 20px; position: relative; min-width: 0; }
+.hist-linha::before { content: ""; position: absolute; top: 12px; bottom: 12px; left: 6px; width: 2px; background: #d1d5db; }
+.hist-evento { --hist-cor: #64748b; --hist-fundo: #f1f5f9; position: relative; display: grid; grid-template-columns: 132px minmax(0,1fr); gap: 20px; padding: 0 0 24px 12px; min-width: 0; }
+.hist-evento:last-child { padding-bottom: 0; }
+.hist-evento::before { content: ""; position: absolute; top: 8px; left: -19px; width: 12px; height: 12px; border: 3px solid #fff; border-radius: 50%; background: var(--hist-cor); box-shadow: 0 0 0 1px var(--hist-cor); z-index: 1; }
+.hist-data { display: flex; flex-direction: column; gap: 3px; padding-top: 5px; color: #374151; font-size: 13px; font-variant-numeric: tabular-nums; }
+.hist-data small { font-size: 12px; color: #6b7280; }
+.hist-corpo { min-width: 0; padding: 16px; background: #fff; border: 1px solid #e5e7eb; border-left: 3px solid var(--hist-cor); border-radius: 8px; }
+.hist-categoria { display: inline-block; padding: 4px 9px; border-radius: 999px; background: var(--hist-fundo); color: var(--hist-cor); font-size: 11px; font-weight: 700; line-height: 1.5; }
+.hist-titulo { display: block; margin-top: 9px; color: #1f2937; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.hist-detalhe { margin: 8px 0 0; color: #4b5563; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.hist-autor { display: block; margin-top: 12px; color: #6b7280; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.hist-autor a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: #2563eb; font-weight: 600; text-decoration: none; }
+.hist-autor a:hover { text-decoration: underline; }
+.hist-autor a:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; border-radius: 4px; }
+.hist-origem { --hist-cor: #475569; --hist-fundo: #f1f5f9; }
+.hist-situacao { --hist-cor: #1d4ed8; --hist-fundo: #dbeafe; }
+.hist-preco { --hist-cor: #2563eb; --hist-fundo: #eff6ff; }
+.hist-despesa { --hist-cor: #b45309; --hist-fundo: #fef3c7; }
+.hist-proposta { --hist-cor: #6d28d9; --hist-fundo: #ede9fe; }
+.hist-reserva { --hist-cor: #1e40af; --hist-fundo: #dbeafe; }
+.hist-venda { --hist-cor: #15803d; --hist-fundo: #dcfce7; }
+.hist-documentacao { --hist-cor: #0f766e; --hist-fundo: #ccfbf1; }
+.hist-entrega { --hist-cor: #166534; --hist-fundo: #dcfce7; }
+.hist-linha > .hist-vazio { padding: 14px 0; }
+@media (max-width: 768px) {
+  .hist-evento { grid-template-columns: minmax(0,1fr); gap: 8px; padding-bottom: 20px; }
+  .hist-data { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 8px; padding-top: 0; }
+}
+@media (max-width: 400px) {
+  .hist-linha { padding-left: 17px; }
+  .hist-linha::before { left: 5px; }
+  .hist-evento { padding-left: 9px; }
+  .hist-evento::before { left: -17px; }
+  .hist-corpo { padding: 12px; }
+}
