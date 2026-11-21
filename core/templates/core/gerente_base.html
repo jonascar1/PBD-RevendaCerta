@@ -67,14 +67,27 @@
 
                 <a href="{% url 'veiculos' %}"
                 class="menu-item
-                {% if request.resolver_match.url_name == 'veiculos' or request.resolver_match.url_name == 'cadastrar_veiculo' or request.resolver_match.url_name == 'detalhes_veiculo' or request.resolver_match.url_name == 'alterar_preco_veiculo'  %}active{% endif %}">
+                {% if request.resolver_match.url_name == 'veiculos' or request.resolver_match.url_name == 'cadastrar_veiculo' or request.resolver_match.url_name == 'detalhes_veiculo' or request.resolver_match.url_name == 'alterar_preco_veiculo' or request.resolver_match.url_name == 'editar_veiculo' %}active{% endif %}">
                     <span><i data-lucide="car-front"></i></span>
                     Veículos
                 </a>
 
-                <a href="{% url 'negociacoes_gerente' %}" class="menu-item">
+                <a href="{% url 'negociacoes_gerente' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'negociacoes_gerente' %}active{% endif %}">
                     <span><i data-lucide="circle-dollar-sign"></i></span>
                     Negociações
+                </a>
+
+                <a href="{% url 'margens' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'margens' %}active{% endif %}">
+                    <span><i data-lucide="trending-up"></i></span>
+                    Margens
+                </a>
+
+                <a href="{% url 'documentacao_pendente' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'documentacao_pendente' %}active{% endif %}">
+                    <span><i data-lucide="file-check"></i></span>
+                    Documentação
                 </a>
 
                 <a href="{% url 'vendedores' %}" class="menu-item
@@ -83,7 +96,8 @@
                     Vendedores
                 </a>
 
-                <a href="#" class="menu-item">
+                <a href="{% url 'avaliacoes_troca' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'avaliacoes_troca' or request.resolver_match.url_name == 'nova_avaliacao_troca' or request.resolver_match.url_name == 'editar_avaliacao_troca' %}active{% endif %}">
                     <span><i data-lucide="arrow-left-right"></i></span>
                     Avaliar troca
                 </a>

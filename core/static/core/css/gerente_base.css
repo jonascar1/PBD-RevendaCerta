@@ -150,6 +150,12 @@ body {
     .sidebar {
         width: 210px;
     }
+
+    .main-content {
+        margin-left: 210px;
+        width: calc(100% - 210px);
+        padding: 25px;
+    }
 }
 
 @media (max-width: 650px) {
@@ -163,9 +169,34 @@ body {
         flex-direction: column;
     }
 
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px 16px;
+    }
+
     .topbar {
         align-items: flex-start;
         gap: 15px;
         flex-direction: column;
+    }
+}
+/* Evita que conteúdos internos forcem a largura da página. */
+.main-content { min-width: 0; }
+
+
+
+/* ==============================
+   SIDEBAR - TELAS BAIXAS
+============================== */
+
+@media (min-width: 651px) {
+    .sidebar {
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
+
+    .sidebar-bottom {
+        flex-shrink: 0;
     }
 }

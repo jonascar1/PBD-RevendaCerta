@@ -62,6 +62,12 @@
                 Negociações
             </a>
 
+            <a href="{% url 'minhas_comissoes' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'minhas_comissoes' %}active{% endif %}">
+                <span><i data-lucide="wallet"></i></span>
+                Minhas comissões
+            </a>
+            
             <a href="#" class="menu-item">
                 <span><i data-lucide="arrow-left-right"></i></span>
                 Registrar troca

@@ -9,7 +9,6 @@
     align-items: start;
 }
 
-
 /* ==============================
    GALERIA
 ============================== */
@@ -19,12 +18,14 @@
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: 16px;
+    min-width: 0;
 }
 
 .galeria .situacao-card {
     margin-top: 16px;
     width: 100%;
     box-sizing: border-box;
+    min-width: 0;
 }
 
 .foto-principal-container {
@@ -53,14 +54,21 @@
 }
 
 .sem-foto span {
-    font-size: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 8px;
+}
+
+.sem-foto svg,
+.sem-foto i {
+    width: 42px;
+    height: 42px;
 }
 
 .sem-foto p {
     font-size: 13px;
 }
-
 
 /* ==============================
    MINIATURAS
@@ -102,7 +110,6 @@
     border-color: #2563eb;
 }
 
-
 /* ==============================
    INFORMAÇÕES
 ============================== */
@@ -111,11 +118,11 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    min-width: 0;
 }
 
-
 /* ==============================
-   TÍTULO
+   TÍTULO DO VEÍCULO
 ============================== */
 
 .titulo-veiculo {
@@ -148,17 +155,24 @@
     font-size: 13px;
 }
 
-
 /* ==============================
    STATUS
 ============================== */
 
 .status {
-    padding: 7px 11px;
-    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 20px;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     white-space: nowrap;
+}
+
+.status-preparacao {
+    background: #fef3c7;
+    color: #92400e;
 }
 
 .status-disponivel {
@@ -167,15 +181,19 @@
 }
 
 .status-reservado {
-    background: #fef3c7;
-    color: #b45309;
+    background: #dbeafe;
+    color: #1d4ed8;
 }
 
 .status-vendido {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: #ede9fe;
+    color: #6d28d9;
 }
 
+.status-entregue {
+    background: #e5e7eb;
+    color: #374151;
+}
 
 /* ==============================
    CARDS
@@ -193,7 +211,6 @@
     margin-bottom: 18px;
     color: #1f2937;
 }
-
 
 /* ==============================
    GRID DE INFORMAÇÕES
@@ -224,7 +241,7 @@
 }
 
 /* ==============================
-  CUSTOS
+   CUSTOS
 ============================== */
 
 .custo-total strong {
@@ -242,10 +259,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-top: 18px;
     padding-top: 16px;
-
     border-top: 1px solid #e5e7eb;
 }
 
@@ -262,9 +277,7 @@
 .sem-lancamento {
     margin-top: 18px;
     padding-top: 16px;
-
     border-top: 1px solid #e5e7eb;
-
     font-size: 13px;
     color: #64748b;
 }
@@ -275,19 +288,29 @@
     border: 1px solid #e0b04b;
     border-radius: 10px;
     background: #fff8e6;
+    color: #78350f;
 }
 
 .alerta-preco-custo strong {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 6px;
     font-size: 15px;
+}
+
+.alerta-preco-custo strong svg,
+.alerta-preco-custo strong i {
+    width: 18px;
+    height: 18px;
+    color: #d97706;
+    flex-shrink: 0;
 }
 
 .alerta-preco-custo p {
     margin: 0;
     font-size: 14px;
 }
-
 
 /* ==============================
    OPCIONAIS
@@ -306,9 +329,8 @@
     margin: 0;
 }
 
-
 /* ==============================
-   TOPO
+   TOPO E BOTÕES DE AÇÃO
 ============================== */
 
 .topo {
@@ -329,13 +351,10 @@
     margin-bottom: 16px;
 }
 
-/* ==============================
-   BOTÃO VOLTAR
-============================== */
-
 .btn-voltar {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    gap: 6px;
     padding: 8px 13px;
     border-radius: 6px;
     background: white;
@@ -345,11 +364,10 @@
     font-size: 12px;
     transition: 0.3s;
     margin-top: 20px;
-
 }
 
-.btn-voltar svg {
-    margin-right: 6px;
+.btn-voltar svg,
+.btn-voltar i {
     width: 14px;
     height: 14px;
 }
@@ -357,7 +375,6 @@
 .btn-voltar:hover {
     border-color: #256eeb;
     color: #2563eb;
-    transition: 0.3s;
 }
 
 .btn-preco {
@@ -397,23 +414,6 @@
    SITUAÇÃO DO VEÍCULO
    ========================================================= */
 
-.prazo-reserva {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 12px 0;
-    padding: 12px;
-    border: 1px solid #f3d39a;
-    border-radius: 8px;
-    background: #fff8e8;
-    color: #8a5a00;
-}
-
-.prazo-reserva p {
-    margin: 4px 0 0;
-    font-size: 13px;
-}
-
 .situacao-card {
     padding: 0;
     overflow: hidden;
@@ -442,11 +442,13 @@
 
 .situacao-conteudo {
     padding: 20px 22px;
+    min-width: 0;
 }
 
 .situacao-mensagem {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 13px;
     padding: 14px 16px;
     margin-bottom: 18px;
@@ -464,7 +466,13 @@
     flex-shrink: 0;
     border-radius: 50%;
     background: #eef2ff;
-    font-size: 17px;
+    color: #2563eb;
+}
+
+.situacao-icone svg,
+.situacao-icone i {
+    width: 18px;
+    height: 18px;
 }
 
 .situacao-mensagem strong {
@@ -481,6 +489,51 @@
     line-height: 1.5;
 }
 
+.situacao-mensagem.entregue {
+    margin-bottom: 0;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+/* PRAZO DA RESERVA (DENTRO DE .situacao-mensagem) */
+.prazo-reserva {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-basis: 100%;
+    width: 100%;
+    margin: 4px 0 0;
+    padding: 12px;
+    border: 1px solid #f3d39a;
+    border-radius: 8px;
+    background: #fff8e8;
+    color: #8a5a00;
+    box-sizing: border-box;
+}
+
+.prazo-reserva svg,
+.prazo-reserva i {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.prazo-reserva strong {
+    color: #8a5a00;
+}
+
+.prazo-reserva p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #8a5a00;
+}
+
+.separador-reserva {
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    margin: 4px 0;
+}
 
 /* FORMULÁRIOS DA SITUAÇÃO */
 .form-situacao {
@@ -497,6 +550,7 @@
     display: flex;
     flex-direction: column;
     gap: 7px;
+    width: 100%;
     min-width: 0;
 }
 
@@ -521,7 +575,7 @@
     font: inherit;
     font-size: 14px;
     box-sizing: border-box;
-    transition: border-color .2s, box-shadow .2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-situacao textarea {
@@ -534,14 +588,17 @@
 .form-situacao textarea:focus {
     outline: none;
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-.form-linha {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+.form-situacao .form-linha {
+    display: flex;
     width: 100%;
+    gap: 12px;
+}
+
+.form-situacao .form-linha .campo-form {
+    flex: 1;
 }
 
 /* BOTÕES DA SITUAÇÃO */
@@ -558,9 +615,17 @@
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     box-sizing: border-box;
-    transition: background .2s, border-color .2s;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-situacao svg,
+.btn-situacao i {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .btn-disponivel { background: #dcfce7; color: #15803d; }
@@ -574,7 +639,7 @@
 .btn-entregue { background: #dcfce7; color: #15803d; }
 .btn-entregue:hover { background: #bbf7d0; }
 
-/* VENDA E CANCELAMENTO: DOIS CARDS RESPONSIVOS */
+/* VENDA E CANCELAMENTO */
 .acoes-situacao {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -584,6 +649,8 @@
 }
 
 .acoes-situacao .form-situacao {
+    width: 100%;
+    min-width: 0;
     padding: 18px;
     background: #fff;
     border: 1px solid #e2e8f0;
@@ -591,7 +658,7 @@
 }
 
 .acoes-situacao .form-situacao h4 {
-    margin: 0;
+    margin: 0 0 3px;
     font-size: 14px;
     color: #1f2937;
 }
@@ -601,148 +668,9 @@
     margin-top: auto;
 }
 
-/* STATUS */
-
-.status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.status-preparacao {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.status-disponivel {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.status-reservado {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-.status-vendido {
-    background: #ede9fe;
-    color: #6d28d9;
-}
-
-.status-entregue {
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.situacao-mensagem.entregue {
-    margin-bottom: 0;
-    background: #ecfdf5;
-    border-color: #a7f3d0;
-}
-
-
-
-/* ==============================
-   RESPONSIVIDADE
-============================== */
-
-@media (max-width: 1100px) {
-
-    .detalhes-container {
-        grid-template-columns: 1fr;
-    }
-
-    .foto-principal-container {
-        height: 420px;
-    }
-}
-
-
-@media (max-width: 700px) {
-
-    .topo-acoes {
-        align-items: flex-start;    
-    }
-
-    .titulo-veiculo {
-        flex-direction: column;
-    }
-
-    .info-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .foto-principal-container {
-        height: 300px;
-    }
-
-    .situacao-cabecalho {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .form-linha,
-    .acoes-situacao {
-        grid-template-columns: 1fr;
-    }
-
-    .btn-situacao {
-        width: 100%;
-    }
-}
-
-
-@media (max-width: 500px) {
-
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .foto-principal-container {
-        height: 250px;
-    }
-
-    .galeria,
-    .card-info,
-    .titulo-veiculo {
-        padding: 16px;
-    }
-}
-
-/* A coluna da galeria pode ficar estreita antes do breakpoint geral. */
-@media (max-width: 1350px) {
-    .acoes-situacao {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 500px) {
-    .acoes-situacao .form-situacao {
-        padding: 14px;
-    }
-    .situacao-conteudo {
-        padding: 16px;
-    }
-    .situacao-mensagem {
-        flex-wrap: wrap;
-    }
-}
-
-/* Ajustes finais: situação dentro da coluna da galeria */
-.galeria, .galeria .situacao-card, .situacao-conteudo { min-width: 0; }
-.situacao-card .acoes-situacao { grid-template-columns: minmax(0, 1fr); }
-.situacao-card .acoes-situacao .form-situacao { width: 100%; min-width: 0; }
-.situacao-card .acoes-situacao h4 { margin: 0 0 3px; font-size: 14px; color: #1f2937; }
-.situacao-card .acoes-situacao .campo-form { width: 100%; }
-.situacao-card .acoes-situacao .btn-situacao { width: 100%; }
-.situacao-card .prazo-reserva { margin-left: auto; max-width: 100%; box-sizing: border-box; }
-@media (max-width: 700px) { .situacao-card { padding: 0; } }
-
+/* =========================================
+   MENSAGENS / ALERTAS
+========================================= */
 
 .messages {
     display: flex;
@@ -777,36 +705,8 @@
     color: #92400e;
 }
 
-.separador-reserva {
-    text-align: center;
-    color: #64748b;
-    font-size: 13px;
-    margin: 12px 0;
-}
-
-.form-situacao .campo-form {
-    width: 100%;
-    min-width: 0;
-}
-
-.form-situacao .form-linha {
-    display: flex;
-    width: 100%;
-    gap: 12px;
-}
-
-.form-situacao .form-linha .campo-form {
-    flex: 1;
-}
-
-@media (max-width: 700px) {
-    .form-situacao .form-linha {
-        flex-direction: column;
-    }
-}
-
 /* =========================================
-   HISTÓRICO DE RESERVAS
+   HISTÓRICO DE RESERVAS & PROPOSTAS PENDENTES
 ========================================= */
 
 .historico-reservas {
@@ -817,6 +717,18 @@
     border-radius: 14px;
 }
 
+.historico-reservas > h2 {
+    margin: 0 0 18px;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.historico-reservas > p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
 .historico-reservas__cabecalho {
     margin-bottom: 22px;
 }
@@ -824,6 +736,7 @@
 .historico-reservas__cabecalho h2 {
     margin: 0 0 6px;
     font-size: 20px;
+    color: #1f2937;
 }
 
 .historico-reservas__cabecalho p {
@@ -840,6 +753,77 @@
     padding: 18px;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
+}
+
+.historico-reservas__item + .historico-reservas__item {
+    margin-top: 16px;
+}
+
+.historico-reservas__lista .historico-reservas__item + .historico-reservas__item {
+    margin-top: 0;
+}
+
+.historico-reservas__item > p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #334155;
+}
+
+/* Formulário de recusa dentro de Propostas Pendentes */
+.historico-reservas__item form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.historico-reservas__item form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.historico-reservas__item form textarea {
+    width: 100%;
+    min-height: 84px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    color: #0f172a;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.historico-reservas__item form textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.historico-reservas__item form button[type="submit"] {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #fff1f2;
+    color: #be123c;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.historico-reservas__item form button[type="submit"]:hover {
+    background: #ffe4e6;
 }
 
 .historico-reservas__topo {
@@ -896,7 +880,55 @@
     color: #64748b;
 }
 
+/* ==============================
+   RESPONSIVIDADE
+============================== */
+
+@media (max-width: 1100px) {
+    .detalhes-container {
+        grid-template-columns: 1fr;
+    }
+
+    .foto-principal-container {
+        height: 420px;
+    }
+}
+
 @media (max-width: 700px) {
+    .topo {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .topo-acoes {
+        align-items: flex-start;
+    }
+
+    .titulo-veiculo {
+        flex-direction: column;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .foto-principal-container {
+        height: 300px;
+    }
+
+    .situacao-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .form-situacao .form-linha {
+        flex-direction: column;
+    }
+
+    .btn-situacao {
+        width: 100%;
+    }
+
     .historico-reservas {
         padding: 16px;
     }
@@ -904,4 +936,54 @@
     .historico-reservas__dados {
         grid-template-columns: 1fr;
     }
+}
+
+@media (max-width: 500px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .foto-principal-container {
+        height: 250px;
+    }
+
+    .galeria,
+    .card-info,
+    .titulo-veiculo {
+        padding: 16px;
+    }
+
+    .acoes-situacao .form-situacao {
+        padding: 14px;
+    }
+
+    .situacao-conteudo {
+        padding: 16px;
+    }
+}
+
+
+/* ==============================
+   BOTÕES EM LINKS
+============================== */
+
+a.btn-entregue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    text-decoration: none;
+}
+
+a.btn-preco {
+    gap: 8px;
+    min-height: 44px;
+}
+
+a.btn-entregue svg,
+a.btn-preco svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
 }

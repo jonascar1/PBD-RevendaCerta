@@ -68,7 +68,7 @@
 
         <section class="prop-card prop-card-p">
             <h2 class="prop-card-titulo">Resumo financeiro</h2>
-            <div class="prop-financeiro-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+            <div class="prop-financeiro-grid prop-financeiro-duas-colunas">
                 <div class="prop-financeiro-item"><span>Preço de tabela</span><strong>R$ {{ proposta.preco_tabela|default:proposta.veiculo.preco_venda|floatformat:2 }}</strong></div>
                 <div class="prop-financeiro-item"><span>Valor oferecido</span><strong>R$ {{ proposta.valor_oferecido|floatformat:2 }}</strong></div>
                 <div class="prop-financeiro-item"><span>Desconto embutido</span><strong>R$ {{ proposta.desconto_embutido|default:0|floatformat:2 }}</strong></div>
@@ -148,6 +148,57 @@
             </section>
         {% endif %}
 
+        {% if venda %}
+            <section class="prop-card prop-card-p prop-span-total">
+                <h2 class="prop-card-titulo">Venda fechada</h2>
+
+                <div class="prop-dados-grid">
+                    <div class="prop-dado">
+                        <span>Venda</span>
+                        <strong>#{{ venda.pk }}</strong>
+                    </div>
+                    <div class="prop-dado">
+                        <span>Data</span>
+                        <strong>{{ venda.data|date:"d/m/Y" }}</strong>
+                    </div>
+                    <div class="prop-dado">
+                        <span>Valor</span>
+                        <strong>R$ {{ venda.valor_venda|floatformat:2 }}</strong>
+                    </div>
+                </div>
+
+                <div class="prop-links-relacionados">
+                    <a class="prop-btn prop-btn-primario"
+                       href="{% url 'contrato_venda' venda.pk %}"
+                       target="_blank">
+                        Ver contrato
+                    </a>
+                </div>
+            </section>
+
+        {% elif pode_fechar_venda %}
+            <section class="prop-card prop-card-p prop-span-total">
+                <h2 class="prop-card-titulo">Fechar venda</h2>
+
+                <p>
+                    O veículo está reservado para este cliente e a proposta está
+                    liberada. Ao fechar, o veículo passa a vendido e o contrato é gerado.
+                </p>
+
+                <form
+                    method="post"
+                    action="{% url 'fechar_venda' proposta.pk %}"
+                    onsubmit="return confirm('Fechar a venda? O veículo passará a vendido.');"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit" class="prop-btn prop-btn-primario">
+                        Fechar venda
+                    </button>
+                </form>
+            </section>
+        {% endif %}
+
         {% if proposta.status_aprovacao == "CONTRAPROPOSTA" %}
             <section class="prop-card prop-card-p prop-span-total">
                 <h2 class="prop-card-titulo">Contraproposta do gerente</h2>
@@ -155,8 +206,7 @@
                 {% with decisao=proposta.decisoes.first %}
                     {% if decisao and decisao.tipo == "CONTRAPROPOSTA" %}
 
-                        <div class="prop-financeiro-grid"
-                             style="grid-template-columns:repeat(2,minmax(0,1fr))">
+                        <div class="prop-financeiro-grid prop-financeiro-duas-colunas">
 
                             <div class="prop-financeiro-item">
                                 <span>Valor originalmente oferecido</span>

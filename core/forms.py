@@ -13,9 +13,12 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied, ValidationError
 
 from .models import (
+    AvaliacaoTroca,
     Cliente,
     ComposicaoPagamento,
     DecisaoProposta,
+    EtapaDocumentacao,
+    FotoAvaliacaoTroca,
     LancamentoFinanceiro,
     PerfilVendedor,
     Proposta,
@@ -432,6 +435,38 @@ class VeiculoForm(BaseForm, forms.ModelForm):
     # unicidade no estoque já são validados pelo Veiculo.clean() do model.
 
 
+class EditarVeiculoForm(VeiculoForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.pk:
+            self.fields["origem"].initial = self.instance.origem
+
+    def clean_origem(self):
+        origem = self.cleaned_data["origem"]
+
+        if self.instance.pk and origem != self.instance.origem:
+            raise forms.ValidationError(
+                "A origem de um veículo já cadastrado não pode ser alterada."
+            )
+
+        return origem
+
+    def clean_custo_aquisicao(self):
+        custo = self.cleaned_data["custo_aquisicao"]
+
+        if (
+            self.instance.pk
+            and self.instance.venda_fechada
+            and custo != self.instance.custo_aquisicao
+        ):
+            raise forms.ValidationError(
+                "O custo de aquisição não pode ser alterado após o fechamento da venda."
+            )
+
+        return custo
+
+
 # ======================================================================
 # AÇÕES NA TELA DE DETALHES DO VEÍCULO
 # ======================================================================
@@ -504,14 +539,62 @@ class AlterarSituacaoForm(BaseForm, forms.Form):
         error_messages={"invalid_choice": "Selecione um cliente válido."},
     )
 
+    # T11: a venda parte de uma proposta, é dela que vêm as trocas avaliadas.
+    proposta = forms.ModelChoiceField(
+        queryset=Proposta.objects.none(),
+        required=False,
+        label="Proposta da venda",
+        empty_label="Selecione a proposta...",
+    )
+
+    def __init__(self, *args, veiculo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if veiculo is not None:
+            self.fields["proposta"].queryset = (
+                Proposta.objects.filter(
+                    veiculo=veiculo,
+                    situacao=Proposta.Situacao.ATIVA,
+                    status_aprovacao__in=[
+                        Proposta.StatusAprovacao.NAO_NECESSARIA,
+                        Proposta.StatusAprovacao.APROVADA,
+                    ],
+                )
+                .select_related("cliente")
+                .order_by("-criada_em")
+            )
+
     def clean(self):
         cleaned_data = super().clean()
+
         situacao = cleaned_data.get("situacao")
         cliente = cleaned_data.get("cliente")
+        proposta = cleaned_data.get("proposta")
 
-        # Exige a seleção de cliente apenas se a nova situação for VENDIDO
         if situacao == Veiculo.Situacao.VENDIDO and not cliente:
-            self.add_error("cliente", "Para registrar a venda, é necessário selecionar o cliente comprador.")
+            self.add_error(
+                "cliente",
+                "Para registrar a venda, é necessário selecionar o cliente comprador.",
+            )
+
+        if situacao == Veiculo.Situacao.VENDIDO and not proposta:
+            self.add_error(
+                "proposta",
+                "Para registrar a venda, é necessário selecionar uma proposta.",
+            )
+
+        if situacao == Veiculo.Situacao.VENDIDO and proposta:
+            if cliente and proposta.cliente_id != cliente.pk:
+                self.add_error(
+                    "proposta",
+                    "A proposta selecionada não pertence ao cliente comprador.",
+                )
+
+            if not proposta.composicao_fecha:
+                self.add_error(
+                    "proposta",
+                    "A composição do pagamento deve fechar exatamente o valor da proposta.",
+                )
 
         return cleaned_data
 
@@ -908,6 +991,7 @@ class ComposicaoPagamentoForm(BaseForm, forms.ModelForm):
             "tipo",
             "valor",
             "troca_descricao",
+            "avaliacao_troca",
             "financ_banco",
             "financ_parcelas",
             "financ_valor_parcela",
@@ -929,6 +1013,7 @@ class ComposicaoPagamentoForm(BaseForm, forms.ModelForm):
             "tipo",
             "valor",
             "troca_descricao",
+            "avaliacao_troca",
             "financ_banco",
             "financ_parcelas",
             "financ_valor_parcela",
@@ -950,8 +1035,43 @@ class ComposicaoPagamentoForm(BaseForm, forms.ModelForm):
         self.fields["tipo"].error_messages["invalid_choice"] = "Tipo inválido."
         self.fields["valor"].error_messages["required"] = "Informe o valor."
         self.fields["valor"].error_messages["invalid"] = "Informe um valor válido."
- 
- 
+
+        avaliacoes = self.fields["avaliacao_troca"]
+        avaliacoes.queryset = AvaliacaoTroca.objects.all().order_by("-criado_em")
+        avaliacoes.empty_label = "Selecione a avaliação..."
+        avaliacoes.label_from_instance = lambda avaliacao: (
+            f"{avaliacao.marca} {avaliacao.modelo} "
+            f"{avaliacao.ano_modelo} - {avaliacao.placa} "
+            f"(R$ {avaliacao.valor_avaliado:,.2f})"
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        tipo = cleaned_data.get("tipo")
+        avaliacao = cleaned_data.get("avaliacao_troca")
+        valor = cleaned_data.get("valor")
+
+        if tipo == ComposicaoPagamento.Tipo.TROCA:
+            if not avaliacao:
+                self.add_error(
+                    "avaliacao_troca",
+                    "Selecione uma avaliação de troca realizada pelo gerente.",
+                )
+            elif Veiculo.objects.filter(avaliacao_origem=avaliacao).exists():
+                self.add_error(
+                    "avaliacao_troca",
+                    "Esta avaliação já foi utilizada em uma venda e o veículo já entrou no estoque.",
+                )
+            elif valor is not None and valor != avaliacao.valor_avaliado:
+                self.add_error(
+                    "valor",
+                    "O valor da troca deve ser igual ao valor avaliado pelo gerente.",
+                )
+
+        return cleaned_data
+
+
 class BaseComposicaoFormSet(BaseInlineFormSet):
     """
     Valida a composição como um todo: precisa ter ao menos uma linha e a
@@ -973,11 +1093,23 @@ class BaseComposicaoFormSet(BaseInlineFormSet):
  
         total = Decimal("0.00")
         linhas = 0
+        avaliacoes_utilizadas = set()
  
         for form in self.forms:
             dados = getattr(form, "cleaned_data", None)
             if not dados or dados.get("DELETE"):
                 continue
+
+            avaliacao = dados.get("avaliacao_troca")
+            if avaliacao:
+                if avaliacao.pk in avaliacoes_utilizadas:
+                    form.add_error(
+                        "avaliacao_troca",
+                        "Esta avaliação já foi selecionada em outra linha da proposta.",
+                    )
+                else:
+                    avaliacoes_utilizadas.add(avaliacao.pk)
+
             valor = dados.get("valor")
             if valor is None:
                 continue
@@ -1069,3 +1201,194 @@ class CancelarReservaForm(BaseForm, forms.Form):
             )
 
         return motivo
+
+
+# ======================================================================
+# AVALIAÇÃO DE TROCA (T11)
+# ======================================================================
+class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
+
+    fotos = MultipleImageField(required=False)
+    class Meta:
+        model = AvaliacaoTroca
+
+        fields = [
+            "placa",
+            "chassi",
+            "renavam",
+            "marca",
+            "modelo",
+            "ano_fabricacao",
+            "ano_modelo",
+            "cor",
+            "combustivel",
+            "quilometragem",
+            "opcionais",
+            "estado_geral",
+            "possui_debitos",
+            "descricao_debitos",
+            "possui_pendencias_documentacao",
+            "descricao_pendencias",
+            "valor_avaliado",
+            "observacoes",
+        ]
+
+        widgets = {
+            "descricao_debitos": forms.Textarea(attrs={"rows": 3}),
+            "descricao_pendencias": forms.Textarea(attrs={"rows": 3}),
+            "observacoes": forms.Textarea(attrs={"rows": 4}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["renavam"].required = True
+
+    def clean_renavam(self):
+        renavam = self.cleaned_data.get("renavam", "").strip()
+
+        if len(renavam) != 11 or not renavam.isascii() or not renavam.isdigit():
+            raise forms.ValidationError(
+                "O Renavam deve conter exatamente 11 dígitos numéricos."
+            )
+
+        return renavam
+    
+
+    def clean_fotos(self):
+        fotos = self.cleaned_data.get("fotos") or []
+
+        formatos_permitidos = {
+            "JPEG",
+            "PNG",
+            "WEBP",
+        }
+
+        tamanho_maximo = 5 * 1024 * 1024  # 5 MB
+
+        for foto in fotos:
+            if foto.size > tamanho_maximo:
+                raise forms.ValidationError(
+                    f'A foto "{foto.name}" ultrapassa o limite de 5 MB.'
+                )
+
+            if foto.image.format not in formatos_permitidos:
+                raise forms.ValidationError(
+                    f'A foto "{foto.name}" possui um formato não permitido. '
+                    "Envie apenas JPG, PNG ou WEBP."
+                )
+
+        return fotos
+
+
+class FotoAvaliacaoTrocaForm(BaseForm, forms.ModelForm):    
+    class Meta:
+        model = FotoAvaliacaoTroca
+
+        fields = [
+            "imagem",
+            "descricao",
+        ]
+        
+        
+# ======================================================================
+# CANCELAMENTO DE VENDA (T12)
+# ======================================================================
+class CancelarVendaForm(BaseForm, forms.Form):
+    motivo = forms.CharField(
+        label="Motivo do cancelamento",
+        min_length=5,
+        max_length=1000,
+        widget=forms.Textarea(attrs={
+            "rows": 3,
+            "placeholder": "Explique por que a venda será cancelada...",
+        }),
+        error_messages={
+            "required": "Informe o motivo do cancelamento.",
+            "min_length": "O motivo precisa ter pelo menos 5 caracteres.",
+        },
+    )
+
+    def clean_motivo(self):
+        return self.cleaned_data["motivo"].strip()
+
+# ======================================================================
+# ENTREGA DO VEÍCULO (T13)
+# ======================================================================
+class EntregaVeiculoForm(BaseForm, forms.Form):
+    data_entrega = forms.DateField(
+        label="Data da entrega",
+        error_messages={
+            "required": "Informe a data da entrega.",
+            "invalid": "Data inválida.",
+        },
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+    )
+
+    documentos_entregues = forms.BooleanField(
+        required=False, label="Documentos do veículo entregues"
+    )
+    chaves_entregues = forms.BooleanField(
+        required=False, label="Chaves entregues"
+    )
+    manual_entregue = forms.BooleanField(
+        required=False, label="Manual e acessórios entregues"
+    )
+    veiculo_conferido = forms.BooleanField(
+        required=False, label="Veículo conferido pelo cliente"
+    )
+    checklist_assinado = forms.BooleanField(
+        required=False, label="Checklist assinado pelo cliente"
+    )
+
+    observacoes = forms.CharField(
+        label="Observações",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["data_entrega"].initial = timezone.localdate
+
+    def clean_data_entrega(self):
+        data = self.cleaned_data["data_entrega"]
+        if data > timezone.localdate():
+            raise forms.ValidationError("A data da entrega não pode ser futura.")
+        return data
+
+    def checklist(self):
+        """Dict {campo: bool} no formato que Venda.registrar_entrega espera."""
+        return {
+            campo: self.cleaned_data.get(campo, False)
+            for campo in (
+                "documentos_entregues",
+                "chaves_entregues",
+                "manual_entregue",
+                "veiculo_conferido",
+                "checklist_assinado",
+            )
+        }
+        
+# ======================================================================
+# DOCUMENTAÇÃO DA VENDA (T13)
+# ======================================================================
+class EtapaDocumentacaoForm(BaseForm, forms.Form):
+    situacao = forms.ChoiceField(
+        choices=EtapaDocumentacao.Situacao.choices,
+        error_messages={
+            "required": "Informe a situação da etapa.",
+            "invalid_choice": "Situação inválida.",
+        },
+    )
+    data = forms.DateField(
+        required=False,
+        error_messages={"invalid": "Data inválida."},
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+    )
+    observacao = forms.CharField(required=False, max_length=255)
+
+    def clean_data(self):
+        data = self.cleaned_data.get("data")
+        if data and data > timezone.localdate():
+            raise forms.ValidationError("A data da etapa não pode ser futura.")
+        return data

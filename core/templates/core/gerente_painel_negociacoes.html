@@ -1,5 +1,6 @@
 {% extends 'core/gerente_base.html' %}
 {% load static %}
+{% load l10n %}
 
 {% block title %}Negociações | VENDACERTA{% endblock %}
 
@@ -133,16 +134,16 @@
                         <small>{{ proposta.criada_em|date:"d/m/Y" }}</small>
                     </td>
 
-                    <td>
-                        <strong>{{ proposta.cliente }}</strong>
-                    </td>
+                <strong>
+                            <a href="{% url 'historico_cliente' proposta.cliente_id %}">{{ proposta.cliente }}</a>
+                        </strong>
 
                     <td>
                         <strong>
                             {{ proposta.veiculo.marca }}
                             {{ proposta.veiculo.modelo }}
                         </strong>
-                        <small>{{ proposta.veiculo.ano_modelo }}</small>
+                        <small>{{ proposta.veiculo.ano_modelo|unlocalize }}</small>
                     </td>
 
                     <td>
@@ -192,4 +193,4 @@
 
 </section>
 
-{% endblock content %}
+{% endblock content %}s

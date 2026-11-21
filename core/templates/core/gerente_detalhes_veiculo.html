@@ -33,9 +33,20 @@
                 Definir preço
             </a>
         {% endif %}
+
+        {% if venda %}
+            <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-preco">
+                Ver venda #{{ venda.pk }}
+            </a>
+        {% endif %}
+                <a href="{% url 'historico_veiculo' venda.veiculo_id %}" class="btn-voltar">Histórico do veículo</a>
+        {% if request.user.is_gerente %}
+            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">Histórico do cliente</a>
+        {% endif %}
     </div>
 </header>
-    {% if messages %}
+
+{% if messages %}
 <div class="messages">
     {% for message in messages %}
         <div class="message message-{{ message.tags }}">
@@ -240,6 +251,11 @@
                             </div>
 
                             <div class="campo-form">
+                                {{ form_venda.proposta.label_tag }}
+                                {{ form_venda.proposta }}
+                            </div>
+
+                            <div class="campo-form">
                                 {{ form_venda.motivo.label_tag }}
                                 {{ form_venda.motivo }}
                             </div>
@@ -289,29 +305,14 @@
                         </div>
                     </div>
 
-                    <form
-                        method="post" novalidate
-                        action="{% url 'alterar_situacao_veiculo' veiculo.id %}"
-                        class="form-situacao"
-                    >
-                        {% csrf_token %}
-
-                        <input
-                            type="hidden"
-                            name="situacao"
-                            value="ENTREGUE"
+                    {% if venda %}
+                        <a
+                            href="{% url 'registrar_entrega' venda.pk %}"
+                            class="btn-situacao btn-entregue"
                         >
-
-                        <input
-                            type="text"
-                            name="motivo"
-                            placeholder="Motivo da entrega"
-                        >
-
-                        <button type="submit" class="btn-situacao btn-entregue">
                             <i data-lucide="check"></i> Registrar entrega
-                        </button>
-                    </form>
+                        </a>
+                    {% endif %}
 
 
                 {% elif veiculo.situacao == "ENTREGUE" %}
@@ -335,8 +336,6 @@
 
     </div>
 
-    
-
 
     <!-- INFORMAÇÕES -->
     <div class="informacoes">
@@ -359,8 +358,6 @@
                 </p>
 
             </div>
-
-            
 
         </div>
 
@@ -527,46 +524,46 @@
                     </strong>
                 </div>
 
-        </div>
+            </div>
 
-        {% if ultimo_historico_preco and ultimo_historico_preco.abaixo_do_custo %}
-            <div class="alerta-preco-custo">
-                <strong><i data-lucide="alert-triangle"></i> Atenção</strong>
-                <p>
-                    O preço de venda está abaixo do custo total acumulado
-                    do veículo.
+            {% if ultimo_historico_preco and ultimo_historico_preco.abaixo_do_custo %}
+                <div class="alerta-preco-custo">
+                    <strong><i data-lucide="alert-triangle"></i> Atenção</strong>
+                    <p>
+                        O preço de venda está abaixo do custo total acumulado
+                        do veículo.
+                    </p>
+                </div>
+            {% endif %}
+
+
+            {% if ultimo_lancamento %}
+
+                <div class="ultimo-lancamento">
+
+                    <span>Último lançamento</span>
+
+                    <strong>
+                        {{ ultimo_lancamento.data_lancamento|date:"d/m/Y" }}
+                    </strong>
+
+                </div>
+
+            {% else %}
+
+                <p class="sem-lancamento">
+                    Nenhuma despesa registrada até o momento.
                 </p>
-            </div>
-        {% endif %}
+
+            {% endif %}
 
 
-        {% if ultimo_lancamento %}
-
-            <div class="ultimo-lancamento">
-
-                <span>Último lançamento</span>
-
-                <strong>
-                    {{ ultimo_lancamento.data_lancamento|date:"d/m/Y" }}
-                </strong>
-
-            </div>
-
-        {% else %}
-
-            <p class="sem-lancamento">
-                Nenhuma despesa registrada até o momento.
+            <p class="custo-explicacao">
+                O custo total acumulado corresponde ao custo de aquisição
+                somado às despesas ativas registradas para este veículo.
             </p>
 
-        {% endif %}
-
-
-        <p class="custo-explicacao">
-            O custo total acumulado corresponde ao custo de aquisição
-            somado às despesas ativas registradas para este veículo.
-        </p>
-
-    </div>
+        </div>
 
 
         <!-- OPCIONAIS -->

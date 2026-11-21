@@ -192,7 +192,7 @@ body {
 
 }
 
-@media (max-width: px) {
+@media (max-width: 650px) {
 
     .sidebar {
         display: none;
@@ -200,5 +200,25 @@ body {
 
     .conteudo {
         margin-left: 0;
+        width: 100%;
+        padding: 20px 16px;
     }
+}
+
+/* Evita que conteúdos internos forcem a largura da página. */
+.conteudo { min-width: 0; }
+
+
+
+/* ==============================
+   SIDEBAR - TELAS BAIXAS
+============================== */
+
+.sidebar {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
+
+.menu-inferior {
+    flex-shrink: 0;
 }

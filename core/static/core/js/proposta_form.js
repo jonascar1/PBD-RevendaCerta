@@ -39,6 +39,15 @@
         veiculos = {};
     }
 
+    // Dados das avaliações de troca feitas pelo gerente (T11)
+    var avaliacoesEl = document.getElementById("avaliacoes-troca-info");
+    var avaliacoesTroca = {};
+    try {
+        avaliacoesTroca = avaliacoesEl ? JSON.parse(avaliacoesEl.textContent) : {};
+    } catch (e) {
+        avaliacoesTroca = {};
+    }
+
     function centavos(valor) {
         if (valor === null || valor === undefined || valor === "") {
             return 0;
@@ -231,6 +240,50 @@
         renumerarLinhas();
     }
 
+    // Preenche valor e descrição ao escolher a avaliação da troca (T11)
+    function preencherAvaliacaoTroca(linha) {
+        var campoAvaliacao = $('[name$="-avaliacao_troca"]', linha);
+        var campoValorTroca = $('[name$="-valor"]', linha);
+        var campoDescricao = $('[name$="-troca_descricao"]', linha);
+
+        if (!campoAvaliacao || !campoAvaliacao.value) return;
+
+        var avaliacao = avaliacoesTroca[campoAvaliacao.value];
+        if (!avaliacao) return;
+
+        if (campoValorTroca) {
+            campoValorTroca.value = (centavos(avaliacao.valor) / 100)
+                .toFixed(2)
+                .replace(".", ",");
+        }
+        if (campoDescricao) {
+            campoDescricao.value = avaliacao.descricao;
+        }
+
+        recalcular();
+    }
+
+    // Avisa quando a mesma avaliação é escolhida em duas linhas (T11)
+    function verificarAvaliacoesDuplicadas() {
+        var usadas = new Set();
+
+        linhasAtivas().forEach(function (linha) {
+            var campo = $('[name$="-avaliacao_troca"]', linha);
+            var tipo = $('[name$="-tipo"]', linha);
+
+            if (!campo || !tipo || tipo.value !== "TROCA" || !campo.value) return;
+
+            campo.setCustomValidity("");
+
+            if (usadas.has(campo.value)) {
+                campo.setCustomValidity("Esta avaliação já foi selecionada em outra linha da proposta.");
+                campo.reportValidity();
+            } else {
+                usadas.add(campo.value);
+            }
+        });
+    }
+
     // ---------- Eventos ----------
     form.addEventListener("input", recalcular);
 
@@ -240,6 +293,13 @@
             var linha = alvo.closest("[data-form-row], .composicao-linha");
             if (linha) atualizarLinha(linha);
         }
+
+        if (alvo && alvo.name && /-avaliacao_troca$/.test(alvo.name)) {
+            var linhaTroca = alvo.closest("[data-form-row], .composicao-linha");
+            if (linhaTroca) preencherAvaliacaoTroca(linhaTroca);
+        }
+
+        verificarAvaliacoesDuplicadas();
         recalcular();
     });
 

@@ -15,10 +15,8 @@
 
 <header class="topo-detalhes">
     <div>
-
-    <div>
         <h1>Ficha do Cliente</h1>
-                <p>Visualize os dados do cliente, veículos comprados e propostas.</p>
+        <p>Visualize os dados do cliente, veículos comprados e propostas.</p>
     </div>
 
     <div class="topo-acoes">
@@ -28,7 +26,7 @@
         <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">
             <i data-lucide="square-pen"></i> Editar cliente
         </a>
-                {% if cliente.ativo %}
+        {% if cliente.ativo %}
             <a href="{% url 'desativar_cliente' cliente.id %}" class="btn-voltar">
                 <i data-lucide="user-x"></i> Desativar
             </a>
@@ -38,12 +36,14 @@
             </a>
         {% endif %}
     </div>
-        </header>
-        {% if messages %}
-        {% for message in messages %}
-            <div class="mensagem-cliente {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
+</header>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="mensagem-cliente {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
 <section class="cliente-container">
 
     <!-- DADOS DO CLIENTE -->
@@ -96,7 +96,6 @@
                 <div class="info-item">
                     <span>Responsável</span>
                     <strong>{{ cliente.responsavel|default:"-" }}</strong>
-                    
                 </div>
             {% endif %}
 
@@ -118,7 +117,8 @@
             </div>
         </div>
     </div>
-        <!-- ENDEREÇO -->
+
+    <!-- ENDEREÇO -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="map-pin"></i> Endereço</h3>
@@ -150,6 +150,7 @@
             <p class="sem-registros">Endereço não informado.</p>
         {% endif %}
     </div>
+
     <!-- VEÍCULOS COMPRADOS -->
     <div class="card-info">
         <div class="card-cabecalho">
@@ -204,7 +205,52 @@
         {% endif %}
     </div>
 
-        <!-- PROPOSTAS -->
+    <!-- DOCUMENTAÇÃO DOS VEÍCULOS COMPRADOS -->
+    <div class="card-info">
+        <div class="card-cabecalho">
+            <h3><i data-lucide="file-check"></i> Documentação do veículo comprado</h3>
+            <span class="contador-badge">{{ vendas|length }}</span>
+        </div>
+
+        {% for venda in vendas %}
+            <p>
+                <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</strong>
+                — {{ venda.veiculo.placa }} · venda #{{ venda.pk }}
+                de {{ venda.data|date:"d/m/Y" }}
+            </p>
+
+            <div class="tabela-responsive">
+                <table class="tabela">
+                    <thead>
+                        <tr><th>Etapa</th><th>Situação</th><th>Data</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for etapa in venda.etapas_documentacao.all %}
+                            <tr>
+                                <td>{{ etapa.get_tipo_display }}</td>
+                                <td>{{ etapa.get_situacao_display }}</td>
+                                <td>{{ etapa.data|date:"d/m/Y"|default:"—" }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>Entrega</td>
+                            {% if venda.entrega %}
+                                <td>Entregue</td>
+                                <td>{{ venda.entrega.data_entrega|date:"d/m/Y" }}</td>
+                            {% else %}
+                                <td>Aguardando entrega</td>
+                                <td>—</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% empty %}
+            <p class="sem-registros">Este cliente ainda não comprou nenhum veículo.</p>
+        {% endfor %}
+    </div>
+
+    <!-- PROPOSTAS -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="circle-dollar-sign"></i> Propostas</h3>

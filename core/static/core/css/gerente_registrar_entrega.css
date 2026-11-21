@@ -1,0 +1,38 @@
+/* ==============================
+   REGISTRO DE ENTREGA
+============================== */
+.detalhes-container { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.detalhes-container .informacoes, .detalhes-container .card-info { min-width: 0; }
+.detalhes-container .info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* CHECKLIST DE ENTREGA */
+.checklist-entrega { display: flex; flex-direction: column; gap: 10px; }
+.checklist-entrega > label {
+    display: flex; align-items: center; gap: 12px; min-height: 48px; width: 100%;
+    padding: 12px 14px; background: #f8fafc; border: 1px solid #e5e7eb;
+    border-radius: 8px; color: #334155; font-size: 13px; line-height: 1.5; cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+.checklist-entrega > label:hover { background: #eff6ff; border-color: #bfdbfe; }
+.checklist-entrega > label:has(input:checked) { background: #ecfdf5; border-color: #a7f3d0; }
+.checklist-entrega input[type="checkbox"] {
+    display: inline-block; width: 18px; height: 18px; min-width: 18px; min-height: 18px;
+    margin: 0; padding: 0; flex-shrink: 0; accent-color: #2563eb; cursor: pointer;
+}
+.checklist-entrega input:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+/* FORMULÁRIO */
+.form-situacao .campo-form textarea { min-height: 110px; }
+.form-situacao .btn-entregue, .topo-acoes .btn-voltar { min-height: 44px; }
+.detalhes-container .opcionais { margin-top: 16px; padding: 14px; background: #f8fafc; border-radius: 8px; color: #374151; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.topo { gap: 16px; }
+.topo > div:first-child { min-width: 0; }
+.topo p { overflow-wrap: anywhere; }
+.topo-acoes { flex-wrap: wrap; }
+/* RESPONSIVIDADE */
+@media (max-width: 1100px) { .detalhes-container .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .topo-acoes { width: 100%; } .form-situacao .btn-entregue { width: 100%; } }
+@media (max-width: 500px) {
+    .detalhes-container .info-grid { grid-template-columns: minmax(0, 1fr); }
+    .topo-acoes .btn-voltar { width: 100%; justify-content: center; }
+    .detalhes-container .card-info { padding: 16px; }
+    .checklist-entrega > label { padding: 14px 12px; }
+}

@@ -247,11 +247,21 @@ Veículos | VENDACERTA
 
                     <td>
 
-                        <a
-                            href="{% url 'detalhes_veiculo' v.id %}"
-                            class="btn-ver">
-                            Ver detalhes
-                        </a>
+                        <div class="acoes">
+                            <a
+                                href="{% url 'detalhes_veiculo' v.id %}"
+                                class="btn-ver"
+                            >
+                                Ver detalhes
+                            </a>
+
+                            <a
+                                href="{% url 'editar_veiculo' v.id %}"
+                                class="btn-ver"
+                            >
+                                Editar
+                            </a>
+                        </div>
 
                     </td>
 

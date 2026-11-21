@@ -88,6 +88,14 @@
                                 </div>
 
                                 <div class="prop-extra-troca campos-troca" data-extra="troca">
+                                    <div class="prop-campo {% if pagamento.avaliacao_troca.errors %}erro{% endif %}">
+                                        <label for="{{ pagamento.avaliacao_troca.id_for_label }}">
+                                            Avaliação do veículo na troca
+                                        </label>
+                                        {{ pagamento.avaliacao_troca }}
+                                        {{ pagamento.avaliacao_troca.errors }}
+                                    </div>
+
                                     <div class="prop-campo {% if pagamento.troca_descricao.errors %}erro{% endif %}">
                                         <label for="{{ pagamento.troca_descricao.id_for_label }}">Descrição do veículo recebido na troca</label>
                                         {{ pagamento.troca_descricao }}
@@ -140,6 +148,13 @@
                                 </div>
 
                                 <div class="prop-extra-troca campos-troca" data-extra="troca">
+                                    <div class="prop-campo">
+                                        <label for="{{ formset.empty_form.avaliacao_troca.id_for_label }}">
+                                            Avaliação do veículo na troca
+                                        </label>
+                                        {{ formset.empty_form.avaliacao_troca }}
+                                    </div>
+
                                     <div class="prop-campo">
                                         <label for="{{ formset.empty_form.troca_descricao.id_for_label }}">Descrição do veículo recebido na troca</label>
                                         {{ formset.empty_form.troca_descricao }}
@@ -208,6 +223,7 @@
 
     <!-- Dados em formato JSON passados pelo Django (deve ficar DENTRO do block content) -->
     {{ veiculos_info|json_script:"veiculos-info" }}
+    {{ avaliacoes_troca_info|json_script:"avaliacoes-troca-info" }}
 
 </div>
 {% endblock %}

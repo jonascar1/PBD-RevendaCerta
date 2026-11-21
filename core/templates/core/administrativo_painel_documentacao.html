@@ -1,0 +1,149 @@
+{% extends 'core/gerente_base.html' %}
+{% load static %}
+
+{% block title %}Documentação | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_negociacoes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/administrativo_painel_documentacao.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topbar">
+    <div>
+        <h1>Documentação das vendas</h1>
+        <p>Acompanhe o que falta depois da venda, do mais antigo para o mais novo.</p>
+    </div>
+</header>
+
+{% if messages %}
+<section class="neg-messages">
+    {% for message in messages %}
+        <div class="neg-message">{{ message }}</div>
+    {% endfor %}
+</section>
+{% endif %}
+
+<!-- PRONTAS PARA ENTREGA -->
+{% if prontas %}
+<section class="neg-section">
+    <div class="neg-section-header">
+        <div>
+            <h2>Prontas para entrega</h2>
+            <p>Documentação concluída. Falta registrar a entrega.</p>
+        </div>
+    </div>
+
+    <div class="neg-table-container">
+        <table class="neg-table">
+            <thead>
+                <tr><th>Venda</th><th>Cliente</th><th>Veículo</th><th>Ação</th></tr>
+            </thead>
+            <tbody>
+                {% for venda in prontas %}
+                <tr>
+                    <td><strong>#{{ venda.pk }}</strong><small>{{ venda.data|date:"d/m/Y" }}</small></td>
+                    <td>{{ venda.cliente.nome_exibicao }}</td>
+                    <td>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</td>
+                    <td>
+                        <a class="neg-action" href="{% url 'registrar_entrega' venda.pk %}">
+                            Registrar entrega <i data-lucide="arrow-right"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+
+<!-- ETAPAS -->
+<section class="neg-section">
+    <div class="neg-section-header">
+        <div>
+            <h2>{% if mostrar_todas %}Todas as etapas{% else %}Etapas pendentes{% endif %}</h2>
+            <p>Atualize a situação e a data de cada etapa.</p>
+        </div>
+
+        {% if mostrar_todas %}
+            <a class="neg-action" href="{% url 'documentacao_pendente' %}">Mostrar só pendentes</a>
+        {% else %}
+            <a class="neg-action" href="{% url 'documentacao_pendente' %}?todas=1">Mostrar todas</a>
+        {% endif %}
+    </div>
+
+    <div class="neg-table-container">
+        <table class="neg-table">
+            <thead>
+                <tr>
+                    <th>Venda</th>
+                    <th>Cliente / Veículo</th>
+                    <th>Etapa</th>
+                    <th>Situação atual</th>
+                    <th>Atualizar</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for etapa in etapas %}
+                <tr>
+                    <td>
+                        <strong>
+                            <a href="{% url 'detalhes_venda' etapa.venda_id %}">#{{ etapa.venda_id }}</a>
+                        </strong>
+                        <small>{{ etapa.venda.data|date:"d/m/Y" }}</small>
+                    </td>
+
+                    <td>
+                        <strong>{{ etapa.venda.cliente.nome_exibicao }}</strong>
+                        <small>{{ etapa.venda.veiculo.marca }} {{ etapa.venda.veiculo.modelo }} — {{ etapa.venda.veiculo.placa }}</small>
+                    </td>
+
+                    <td><strong>{{ etapa.get_tipo_display }}</strong></td>
+
+                    <td>
+                        <span class="neg-status {% if etapa.concluida %}status-aprovada{% elif etapa.situacao == 'EM_ANDAMENTO' %}status-contraproposta{% else %}status-pendente{% endif %}">
+                            {{ etapa.get_situacao_display }}
+                        </span>
+                        <small>{{ etapa.data|date:"d/m/Y" }}</small>
+                    </td>
+
+                    <td>
+                        <form class="neg-form-etapa" method="post" action="{% url 'atualizar_etapa_documentacao' etapa.pk %}">
+                            {% csrf_token %}
+
+                            <select name="situacao">
+                                {% for valor, rotulo in situacoes %}
+                                    <option value="{{ valor }}" {% if etapa.situacao == valor %}selected{% endif %}>
+                                        {{ rotulo }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <input type="date" name="data" title="Data (vazio = hoje)">
+
+                            <input type="text" name="observacao" maxlength="255"
+                                   placeholder="Observação" value="{{ etapa.observacao }}">
+
+                            <button type="submit" class="neg-action">Salvar</button>
+                        </form>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="neg-empty">
+                        <i data-lucide="inbox"></i>
+                        <strong>Nenhuma etapa pendente</strong>
+                        <span>Toda a documentação está em dia.</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock content %}

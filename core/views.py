@@ -1,6 +1,7 @@
 # 1. Biblioteca padrão do Python (Standard Library)
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
+import json
 
 # 2. Django e bibliotecas de terceiros (Third-party packages)
 from django.contrib import messages
@@ -8,20 +9,25 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import ProtectedError, Q, Sum
+from django.db.models import Count, Max, ProtectedError, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 
+from .historico import linha_do_tempo_veiculo, resumo_cliente
 
 # 3. Imports locais da aplicação (Local apps / Relative imports)
 from .decorators import perfil_requerido
 from .forms import (
     AlterarSituacaoForm,
+    CancelarVendaForm,
     ClienteForm,
     ComposicaoFormSet,
     DecisaoPropostaForm,
     DespesaEditarForm,
     DespesaForm,
+    EntregaVeiculoForm,
+    EtapaDocumentacaoForm,
     LoginForm,
     PrecoVendaForm,
     PropostaFiltroForm,
@@ -30,11 +36,18 @@ from .forms import (
     TelefoneClienteFormSet,
     VeiculoForm,
     VendedorCadastroForm,
-    VendedorEdicaoForm,    ConfirmarPropostaForm,
+    VendedorEdicaoForm,
+    ConfirmarPropostaForm,
     CancelarReservaForm,
+    AvaliacaoTrocaForm,
+    EditarVeiculoForm,
 )
 from .models import (
+    AvaliacaoTroca,
     Cliente,
+    EntregaVeiculo,
+    EtapaDocumentacao,
+    FotoAvaliacaoTroca,
     FotoVeiculo,
     HistoricoPrecoVeiculo,
     HistoricoSituacaoVeiculo,
@@ -46,6 +59,7 @@ from .models import (
     Usuario,
     Veiculo,
     DecisaoProposta,
+    Venda,
 )
 
 
@@ -643,7 +657,7 @@ def detalhes_veiculo_view(request, veiculo_id):
             "ultimo_lancamento": ultimo_lancamento,
             "ultimo_historico_preco": ultimo_historico_preco,
             "reserva": reserva,
-
+            "venda": veiculo.vendas.filter(situacao=Venda.Situacao.FECHADA).first(),
             "fila": veiculo.propostas.filter(
                 situacao=Proposta.Situacao.AGUARDANDO
             ).select_related(
@@ -661,7 +675,8 @@ def detalhes_veiculo_view(request, veiculo_id):
             "form_venda": AlterarSituacaoForm(
                 initial={
                     "situacao": Veiculo.Situacao.VENDIDO,
-                }
+                },
+                veiculo=veiculo,
             ),
             "historico_reservas": historico_reservas,
             "propostas_pendentes": veiculo.propostas.filter(
@@ -674,6 +689,7 @@ def detalhes_veiculo_view(request, veiculo_id):
     "vendedor",
 ).order_by("criada_em", "pk"),
         },
+        
     )
 
 
@@ -942,6 +958,7 @@ def cancelar_reserva_view(request, reserva_id):
         veiculo_id=reserva_base.veiculo_id,
     )
     
+    
 @perfil_requerido("GERENTE", "ADMINISTRATIVO")
 def alterar_situacao_veiculo_view(request, veiculo_id):
     veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
@@ -949,7 +966,7 @@ def alterar_situacao_veiculo_view(request, veiculo_id):
     if request.method != "POST":
         return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
 
-    form = AlterarSituacaoForm(request.POST)
+    form = AlterarSituacaoForm(request.POST, veiculo=veiculo)
 
     if not form.is_valid():
         erros_do_form_como_mensagens(request, form)
@@ -957,52 +974,49 @@ def alterar_situacao_veiculo_view(request, veiculo_id):
 
     nova_situacao = form.cleaned_data["situacao"]
     motivo = form.cleaned_data["motivo"]
-    cliente = form.cleaned_data.get("cliente")
+
+    # T12: a venda é fechada pelo model, que valida tudo de uma vez.
+    if nova_situacao == Veiculo.Situacao.VENDIDO:
+        try:
+            venda = Venda.fechar(
+                veiculo_id=veiculo.pk,
+                proposta_id=form.cleaned_data["proposta"].pk,
+                cliente_id=form.cleaned_data["cliente"].pk,
+                usuario=request.user,
+                motivo=motivo,
+            )
+        except ValidationError as erro:
+            messages.error(request, " ".join(erro.messages))
+        except PermissionDenied as erro:
+            messages.error(request, str(erro))
+        except IntegrityError:
+            messages.error(
+                request,
+                "Não foi possível fechar a venda: já existe uma venda fechada ou "
+                "um veículo com a mesma placa/chassi no estoque.",
+            )
+        else:
+            messages.success(request, f"Venda #{venda.pk} registrada com sucesso.")
+
+        return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
 
     transicoes_permitidas = {
         Veiculo.Situacao.PREPARACAO: [Veiculo.Situacao.DISPONIVEL],
-        Veiculo.Situacao.DISPONIVEL: [],  # só reserva pelo fluxo de reserva
-        Veiculo.Situacao.RESERVADO: [Veiculo.Situacao.VENDIDO],  # liberar = cancelar a reserva
-        Veiculo.Situacao.VENDIDO: [Veiculo.Situacao.ENTREGUE],
-        Veiculo.Situacao.ENTREGUE: [],
+       
     }
-    if nova_situacao == Veiculo.Situacao.VENDIDO:
-        aprovacao_em_aberto = veiculo.propostas.filter(
-            status_aprovacao__in=[
-                Proposta.StatusAprovacao.PENDENTE,
-                Proposta.StatusAprovacao.CONTRAPROPOSTA,
-            ],
-        ).exclude(situacao=Proposta.Situacao.CANCELADA).exists()
 
-        if aprovacao_em_aberto:
-            messages.error(
-                request,
-                "Há proposta aguardando decisão do gerente ou resposta do vendedor. "
-                "Resolva antes de registrar a venda.",
-            )
-            return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
     if nova_situacao not in transicoes_permitidas.get(veiculo.situacao, []):
         messages.error(request, "Essa transição de situação não é permitida.")
         return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
 
     situacao_anterior = veiculo.situacao
     veiculo.situacao = nova_situacao
-
-    update_fields = ["situacao", "status", "venda_fechada"]
-
-    if nova_situacao in [Veiculo.Situacao.PREPARACAO, Veiculo.Situacao.DISPONIVEL]:
-        veiculo.status = Veiculo.Status.DISPONIVEL
-    elif nova_situacao == Veiculo.Situacao.RESERVADO:
-        veiculo.status = Veiculo.Status.RESERVADO
-    elif nova_situacao in [Veiculo.Situacao.VENDIDO, Veiculo.Situacao.ENTREGUE]:
-        veiculo.status = Veiculo.Status.VENDIDO
-        veiculo.venda_fechada = True
-
-    if nova_situacao == Veiculo.Situacao.VENDIDO:
-        veiculo.cliente_comprador = cliente
-        update_fields.append("cliente_comprador")
-
-    veiculo.save(update_fields=update_fields)
+    veiculo.status = (
+        Veiculo.Status.VENDIDO
+        if nova_situacao == Veiculo.Situacao.ENTREGUE
+        else Veiculo.Status.DISPONIVEL
+    )
+    veiculo.save(update_fields=["situacao", "status"])
 
     HistoricoSituacaoVeiculo.objects.create(
         veiculo=veiculo,
@@ -1014,7 +1028,6 @@ def alterar_situacao_veiculo_view(request, veiculo_id):
 
     messages.success(request, "Situação do veículo alterada com sucesso.")
     return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
-
 
 def vitrine_view(request):
     expirar_reservas_vencidas()
@@ -1229,8 +1242,17 @@ def detalhes_cliente_view(request, cliente_id):
     {
         "cliente": cliente,
         "veiculos_comprados": veiculos_comprados,
-        "propostas": propostas,  # <- Altere apenas esta linha!
+        "propostas": propostas,
+        "vendas": (
+                Venda.objects.filter(
+                    cliente=cliente, situacao=Venda.Situacao.FECHADA
+                )
+                .select_related("veiculo")
+                .prefetch_related("etapas_documentacao")
+                .order_by("-data", "-pk")
+            ),
     },
+
 )
 
 @login_required
@@ -1488,6 +1510,16 @@ def _proposta_form_view(request, proposta, titulo):
             "titulo": titulo,
             "proposta": proposta if editando else None,
             "veiculos_info": _dados_veiculos_para_js(form.fields["veiculo"].queryset),
+            "avaliacoes_troca_info": {
+                str(avaliacao.pk): {
+                    "valor": str(avaliacao.valor_avaliado),
+                    "descricao": (
+                        f"{avaliacao.marca} {avaliacao.modelo} "
+                        f"{avaliacao.ano_modelo} - {avaliacao.placa}"
+                    ),
+                }
+                for avaliacao in AvaliacaoTroca.objects.all()
+            },
         },
     )
  
@@ -1544,7 +1576,25 @@ def detalhes_proposta_view(request, proposta_id):
                 else None
             ),
             "form_confirmacao": ConfirmarPropostaForm(),
+            "venda": proposta.vendas.filter(
+                situacao=Venda.Situacao.FECHADA
+            ).first(),
 
+            "pode_fechar_venda": (
+                proposta.situacao == Proposta.Situacao.ATIVA
+                and proposta.status_aprovacao in (
+                    Proposta.StatusAprovacao.NAO_NECESSARIA,
+                    Proposta.StatusAprovacao.APROVADA,
+                )
+                and proposta.veiculo.situacao == Veiculo.Situacao.RESERVADO
+                and ReservaVeiculo.objects.filter(
+                    proposta_origem=proposta,
+                    cancelada=False,
+                ).exists()
+                and not proposta.vendas.filter(
+                    situacao=Venda.Situacao.FECHADA
+                ).exists()
+            ),
             "reserva_gerada": ReservaVeiculo.objects.filter(
     proposta_origem=proposta,
 ).first(),
@@ -1640,18 +1690,24 @@ def decidir_proposta_view(request, proposta_id):
 
             try:
                 with transaction.atomic():
+                    # Mesma ordem de bloqueio da T10: primeiro o veículo, depois a proposta.
                     veiculo_id = Proposta.objects.only(
-                    "veiculo_id"
-                ).get(pk=proposta_id).veiculo_id
+                        "veiculo_id"
+                    ).get(pk=proposta_id).veiculo_id
 
-                Veiculo.objects.select_for_update().get(
-                    pk=veiculo_id
-                )
+                    Veiculo.objects.select_for_update().get(pk=veiculo_id)
 
-                proposta = Proposta.objects.select_for_update().get(
-                    pk=proposta_id,
-                    veiculo_id=veiculo_id,
-                )
+                    proposta = Proposta.objects.select_for_update().get(
+                        pk=proposta_id,
+                        veiculo_id=veiculo_id,
+                    )
+
+                    proposta.decidir(
+                        request.user,
+                        cd["acao"],
+                        parecer=cd["parecer"],
+                        novo_valor=cd["novo_valor"],
+                    )
 
                 messages.success(
                     request,
@@ -1998,3 +2054,704 @@ def recusar_contraproposta_view(request, proposta_id):
         )
 
     return redirect("detalhes_proposta", proposta_id=proposta.pk)
+
+
+# ---------------------------------------------------------------------
+# T11: editar veículo e avaliação de troca
+# ---------------------------------------------------------------------
+
+@perfil_requerido("GERENTE")
+def editar_veiculo_view(request, veiculo_id):
+    veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
+
+    if request.method == "POST":
+        form = EditarVeiculoForm(
+            request.POST,
+            request.FILES,
+            instance=veiculo,
+        )
+
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    form.save()
+
+                    ids_excluir = [
+                        int(foto_id)
+                        for foto_id in request.POST.get("fotos_excluir", "").split(",")
+                        if foto_id.strip().isdigit()
+                    ]
+
+                    FotoVeiculo.objects.filter(
+                        veiculo=veiculo,
+                        id__in=ids_excluir,
+                    ).delete()
+
+                    ids_ordem = list(dict.fromkeys(
+                        int(foto_id)
+                        for foto_id in request.POST.get("ordem_fotos", "").split(",")
+                        if foto_id.strip().isdigit()
+                    ))
+
+                    fotos_ordenadas = list(
+                        veiculo.fotos.filter(id__in=ids_ordem)
+                    )
+
+                    fotos_por_id = {foto.id: foto for foto in fotos_ordenadas}
+
+                    for ordem, foto_id in enumerate(ids_ordem):
+                        foto = fotos_por_id.get(foto_id)
+
+                        if foto is not None:
+                            foto.ordem = ordem
+                            foto.save(update_fields=["ordem"])
+
+                    ids_ordenados = set(ids_ordem)
+
+                    proxima_ordem = len(ids_ordenados & set(fotos_por_id))
+
+                    for foto in veiculo.fotos.exclude(id__in=ids_ordenados).order_by("ordem", "id"):
+                        foto.ordem = proxima_ordem
+                        foto.save(update_fields=["ordem"])
+                        proxima_ordem += 1
+        
+                    fotos_novas = form.cleaned_data.get("fotos") or []
+
+                    ultima_foto = (
+                        veiculo.fotos.order_by("-ordem", "-id").first()
+                    )
+
+                    proxima_ordem = veiculo.fotos.count()
+
+                    for indice, imagem in enumerate(fotos_novas):
+                        FotoVeiculo.objects.create(
+                            veiculo=veiculo,
+                            imagem=imagem,
+                            ordem=proxima_ordem + indice,
+                            principal=(ultima_foto is None and indice == 0),
+                        )
+                    primeira_foto = veiculo.fotos.order_by("ordem", "id").first()
+
+                    if primeira_foto:
+                        veiculo.fotos.exclude(pk=primeira_foto.pk).update(principal=False)
+                        veiculo.fotos.filter(pk=primeira_foto.pk).update(principal=True)
+
+                messages.success(
+                    request,
+                    "Veículo atualizado com sucesso.",
+                )
+                return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
+
+            except IntegrityError:
+                form.add_error(
+                    None,
+                    "Já existe um veículo com essa placa ou chassi no estoque.",
+                )
+    else:
+        form = EditarVeiculoForm(instance=veiculo)
+
+    return render(
+        request,
+        "core/gerente_editar_veiculo.html",
+        {
+            "form": form,
+            "veiculo": veiculo,
+            "fotos_existentes": veiculo.fotos.order_by("ordem", "id"),
+        },
+    )
+
+
+@perfil_requerido("GERENTE")
+def avaliacoes_troca_view(request):
+    busca = request.GET.get("busca", "").strip()
+
+    avaliacoes = (
+        AvaliacaoTroca.objects
+        .select_related("avaliado_por")
+        .prefetch_related("fotos")
+        .order_by("-criado_em")
+    )
+
+    if busca:
+        avaliacoes = avaliacoes.filter(
+            Q(placa__icontains=busca)
+            | Q(marca__icontains=busca)
+            | Q(modelo__icontains=busca)
+        )
+
+    return render(
+        request,
+        "core/gerente_painel_avaliacoes_troca.html",
+        {
+            "avaliacoes": avaliacoes,
+            "busca": busca,
+        },
+    )
+
+
+@perfil_requerido("GERENTE")
+def nova_avaliacao_troca_view(request):
+    if request.method == "POST":
+        form = AvaliacaoTrocaForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    avaliacao = form.save(commit=False)
+                    avaliacao.avaliado_por = request.user
+                    avaliacao.full_clean()
+                    avaliacao.save()
+
+                    # Salva as fotos enviadas junto com a avaliação
+                    for ordem, imagem in enumerate(
+                        form.cleaned_data["fotos"],
+                        start=0
+                        ):
+                        FotoAvaliacaoTroca.objects.create(
+                            avaliacao=avaliacao,
+                            imagem=imagem,
+                            ordem=ordem,
+                        )
+
+                messages.success(
+                    request,
+                    "Avaliação de troca cadastrada com sucesso.",
+                )
+                return redirect("avaliacoes_troca")
+
+            except ValidationError as erro:
+                adicionar_erros_de_validacao(form, erro)
+
+    else:
+        form = AvaliacaoTrocaForm()
+
+    return render(
+        request,
+        "core/gerente_cadastrar_avaliacao_troca.html",
+        {
+            "form": form,
+            "avaliacao": None,
+            "titulo": "Nova avaliação de troca",
+        },
+    )
+
+
+@perfil_requerido("GERENTE")
+def editar_avaliacao_troca_view(request, avaliacao_id):
+    avaliacao = get_object_or_404(
+        AvaliacaoTroca.objects.prefetch_related("fotos"),
+        pk=avaliacao_id
+    )
+
+    if request.method == "POST":
+        form = AvaliacaoTrocaForm(
+            request.POST,
+            request.FILES,
+            instance=avaliacao
+        )
+
+        if form.is_valid():
+            try:
+                # Lê os IDs enviados pelo JavaScript
+                fotos_removidas_texto = (
+                    request.POST.get("fotos_removidas") or "[]"
+                ).strip()
+
+                fotos_removidas = json.loads(fotos_removidas_texto)
+
+                # Lê a nova ordem das fotos cadastradas
+                ordem_fotos_texto = (
+                    request.POST.get("ordem_fotos_existentes") or "[]"
+                ).strip()
+
+                ordem_fotos = json.loads(ordem_fotos_texto)
+
+                if not isinstance(ordem_fotos, list):
+                    raise ValueError("Ordem das fotos inválida.")
+
+                if any(
+                    isinstance(foto_id, bool)
+                    or not str(foto_id).isdigit()
+                    for foto_id in ordem_fotos
+                ):
+                    raise ValueError("Identificadores de fotos inválidos.")
+
+                ids_ordenados = [int(foto_id) for foto_id in ordem_fotos]
+
+                if len(ids_ordenados) != len(set(ids_ordenados)):
+                    raise ValueError("Existem fotos repetidas na ordenação.")
+
+                # Valida a estrutura recebida
+                if not isinstance(fotos_removidas, list):
+                    raise ValueError("Lista de fotos inválida.")
+
+                if any(
+                    isinstance(foto_id, bool)
+                    or not str(foto_id).isdigit()
+                    for foto_id in fotos_removidas
+                ):
+                    raise ValueError("Identificadores de fotos inválidos.")
+
+                ids_removidos = [
+                    int(foto_id) for foto_id in fotos_removidas
+                ]
+
+                with transaction.atomic():
+                    avaliacao = form.save(commit=False)
+                    avaliacao.full_clean()
+                    avaliacao.save()
+
+                    # Exclui somente fotos desta avaliação
+                    FotoAvaliacaoTroca.objects.filter(
+                        avaliacao=avaliacao,
+                        id__in=ids_removidos
+                    ).delete()
+
+                    # Salva a nova ordem das fotos existentes
+                    if ids_ordenados:
+                        fotos_existentes = list(
+                            FotoAvaliacaoTroca.objects.filter(
+                                avaliacao=avaliacao
+                            )
+                        )
+
+                        fotos_por_id = {
+                            foto.id: foto
+                            for foto in fotos_existentes
+                        }
+
+                        # Garante que a lista contém exatamente as fotos restantes
+                        if set(ids_ordenados) != set(fotos_por_id):
+                            raise ValidationError(
+                                "A ordem das fotos está desatualizada. "
+                                "Atualize a página e tente novamente."
+                            )
+
+                        for posicao, foto_id in enumerate(ids_ordenados):
+                            fotos_por_id[foto_id].ordem = posicao
+
+                        FotoAvaliacaoTroca.objects.bulk_update(
+                            [fotos_por_id[foto_id] for foto_id in ids_ordenados],
+                            ["ordem"]
+                        )
+
+                    # Descobre a próxima posição disponível
+                    ultima_ordem = (
+                        FotoAvaliacaoTroca.objects
+                        .filter(avaliacao=avaliacao)
+                        .aggregate(maior=Max("ordem"))["maior"]
+                    )
+
+                    proxima_ordem = (
+                        ultima_ordem + 1
+                        if ultima_ordem is not None
+                        else 0
+                    )
+
+                    # Salva as novas fotos
+                    for imagem in form.cleaned_data["fotos"]:
+                        FotoAvaliacaoTroca.objects.create(
+                            avaliacao=avaliacao,
+                            imagem=imagem,
+                            ordem=proxima_ordem
+                        )
+                        proxima_ordem += 1
+
+                messages.success(
+                    request,
+                    "Avaliação de troca atualizada com sucesso."
+                )
+                return redirect("avaliacoes_troca")
+
+            except (ValueError, TypeError, json.JSONDecodeError):
+                form.add_error(
+                    None,
+                    "Não foi possível processar as fotos removidas."
+                )
+
+            except ValidationError as erro:
+                adicionar_erros_de_validacao(form, erro)
+
+    else:
+        form = AvaliacaoTrocaForm(instance=avaliacao)
+
+    return render(
+        request,
+        "core/gerente_editar_avaliacao_troca.html",
+        {
+            "form": form,
+            "avaliacao": avaliacao,
+            "titulo": "Editar avaliação de troca",
+        }
+    )
+    
+    
+# ---------------------------------------------------------------------
+# T12: venda, contrato e cancelamento
+# ---------------------------------------------------------------------
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def detalhes_venda_view(request, venda_id):
+    venda = get_object_or_404(
+        Venda.objects.select_related(
+            "proposta", "veiculo", "cliente", "vendedor",
+            "fechada_por", "cancelada_por",
+        ),
+        pk=venda_id,
+    )
+
+    return render(
+        request,
+        "core/gerente_detalhes_venda.html",
+        {
+            "venda": venda,
+            "pagamentos": venda.pagamentos.all(),
+            "form_cancelamento": CancelarVendaForm(),
+            "margem": venda.calcular_margem() if request.user.is_gerente() else None,
+        },
+        
+    )
+
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO", "VENDEDOR")
+def contrato_venda_view(request, venda_id):
+    vendas = Venda.objects.select_related("veiculo", "cliente", "vendedor")
+
+    # O vendedor só vê o contrato das próprias vendas.
+    if request.user.is_vendedor():
+        vendas = vendas.filter(vendedor=request.user)
+
+    venda = get_object_or_404(vendas, pk=venda_id)
+    return render(
+        request,
+        "core/gerente_contrato_venda.html",
+        {
+            "venda": venda,
+            "cliente": venda.cliente,
+            "veiculo": venda.veiculo,
+            "pagamentos": venda.pagamentos.all(),
+            "entrada": venda.entrada,
+            "financiamento": venda.financiamento,
+        },
+    )
+
+
+@perfil_requerido("GERENTE")
+def cancelar_venda_view(request, venda_id):
+    venda = get_object_or_404(Venda, pk=venda_id)
+
+    if request.method != "POST":
+        return redirect("detalhes_venda", venda_id=venda.pk)
+
+    form = CancelarVendaForm(request.POST)
+
+    if not form.is_valid():
+        erros_do_form_como_mensagens(request, form)
+        return redirect("detalhes_venda", venda_id=venda.pk)
+
+    try:
+        venda.cancelar(request.user, form.cleaned_data["motivo"])
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+    except PermissionDenied as erro:
+        messages.error(request, str(erro))
+    except IntegrityError:
+        messages.error(
+            request,
+            "Não foi possível devolver o veículo ao estoque: já existe outro "
+            "veículo ativo com a mesma placa ou chassi.",
+        )
+    else:
+        aviso = ""
+        if venda.pagamentos.filter(tipo="TROCA").exists():
+            aviso = (
+                " Atenção: o veículo recebido na troca continua no estoque "
+                "e precisa ser tratado manualmente."
+            )
+
+        messages.success(
+            request,
+            "Venda cancelada. O veículo voltou ao estoque como disponível." + aviso,
+        )
+
+    return redirect("detalhes_venda", venda_id=venda.pk)
+
+
+@perfil_requerido("VENDEDOR")
+def fechar_venda_view(request, proposta_id):
+    if request.method != "POST":
+        return redirect("detalhes_proposta", proposta_id=proposta_id)
+
+    proposta = get_object_or_404(
+        _propostas_visiveis(request.user),
+        pk=proposta_id,
+    )
+
+    try:
+        venda = Venda.fechar(
+            veiculo_id=proposta.veiculo_id,
+            proposta_id=proposta.pk,
+            cliente_id=proposta.cliente_id,
+            usuario=request.user,
+        )
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+    except PermissionDenied as erro:
+        messages.error(request, str(erro))
+    except IntegrityError:
+        messages.error(
+            request,
+            "Não foi possível fechar a venda: já existe uma venda fechada "
+            "ou um veículo com a mesma placa/chassi no estoque.",
+        )
+    else:
+        messages.success(
+            request,
+            f"Venda #{venda.pk} fechada com sucesso. O contrato já está disponível.",
+        )
+
+    return redirect("detalhes_proposta", proposta_id=proposta.pk)
+
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def registrar_entrega_view(request, venda_id):
+    venda = get_object_or_404(
+        Venda.objects.select_related("veiculo", "cliente", "vendedor"),
+        pk=venda_id,
+    )
+
+    entrega_existente = EntregaVeiculo.objects.filter(venda=venda).first()
+
+    if request.method == "POST":
+        form = EntregaVeiculoForm(request.POST)
+
+        if form.is_valid():
+            try:
+                venda.registrar_entrega(
+                    usuario=request.user,
+                    data_entrega=form.cleaned_data["data_entrega"],
+                    checklist=form.checklist(),
+                    observacoes=form.cleaned_data["observacoes"],
+                )
+            except ValidationError as erro:
+                for mensagem in erro.messages:
+                    form.add_error(None, mensagem)
+            except PermissionDenied as erro:
+                messages.error(request, str(erro))
+                return redirect("detalhes_venda", venda_id=venda.pk)
+            except IntegrityError:
+                form.add_error(None, "Esta entrega já foi registrada.")
+            else:
+                messages.success(request, "Entrega registrada. O veículo foi entregue.")
+                return redirect("detalhes_venda", venda_id=venda.pk)
+    else:
+        form = EntregaVeiculoForm()
+
+    return render(
+        request,
+        "core/gerente_registrar_entrega.html",
+        {
+            "venda": venda,
+            "form": form,
+            "etapas": venda.etapas_documentacao.all(),
+            "entrega": entrega_existente,
+            "pode_entregar": (
+                venda.esta_fechada
+                and venda.veiculo.situacao == Veiculo.Situacao.VENDIDO
+                and entrega_existente is None
+            ),
+        },
+    )
+    
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def documentacao_pendente_view(request):
+    mostrar_todas = request.GET.get("todas") == "1"
+
+    etapas = (
+        EtapaDocumentacao.objects.filter(venda__situacao=Venda.Situacao.FECHADA)
+        .select_related("venda", "venda__cliente", "venda__veiculo", "venda__vendedor")
+        .order_by("venda__data", "venda_id", "id")
+    )
+
+    # Por padrão, só o que falta: do mais antigo para o mais novo.
+    if not mostrar_todas:
+        etapas = etapas.exclude(situacao=EtapaDocumentacao.Situacao.CONCLUIDA)
+
+    # Vendas com toda a documentação concluída, aguardando a entrega.
+    prontas = (
+        Venda.objects.filter(
+            situacao=Venda.Situacao.FECHADA,
+            veiculo__situacao=Veiculo.Situacao.VENDIDO,
+            entrega__isnull=True,
+        )
+        .annotate(
+            concluidas=Count(
+                "etapas_documentacao",
+                filter=Q(
+                    etapas_documentacao__situacao=EtapaDocumentacao.Situacao.CONCLUIDA
+                ),
+            )
+        )
+        .filter(concluidas=len(EtapaDocumentacao.Tipo.choices))
+        .select_related("cliente", "veiculo")
+        .order_by("data", "pk")
+    )
+
+    return render(
+        request,
+        "core/administrativo_painel_documentacao.html",
+        {
+            "etapas": etapas,
+            "prontas": prontas,
+            "situacoes": EtapaDocumentacao.Situacao.choices,
+            "mostrar_todas": mostrar_todas,
+        },
+    )
+
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def atualizar_etapa_documentacao_view(request, etapa_id):
+    etapa = get_object_or_404(EtapaDocumentacao, pk=etapa_id)
+
+    if request.method != "POST":
+        return redirect("documentacao_pendente")
+
+    form = EtapaDocumentacaoForm(request.POST)
+
+    if not form.is_valid():
+        erros_do_form_como_mensagens(request, form)
+        return redirect("documentacao_pendente")
+
+    try:
+        etapa.atualizar(
+            request.user,
+            form.cleaned_data["situacao"],
+            data=form.cleaned_data["data"],
+            observacao=form.cleaned_data["observacao"],
+        )
+    except ValidationError as erro:
+        messages.error(request, " ".join(erro.messages))
+    except PermissionDenied as erro:
+        messages.error(request, str(erro))
+    else:
+        messages.success(
+            request,
+            f"{etapa.get_tipo_display()} da venda #{etapa.venda_id} atualizada.",
+        )
+
+    return redirect("documentacao_pendente")
+
+
+# ---------------------------------------------------------------------
+# T14: margem real e comissão
+# ---------------------------------------------------------------------
+
+@perfil_requerido("GERENTE")
+def margens_view(request):
+    somente_negativas = request.GET.get("negativas") == "1"
+
+    vendas = (
+        Venda.objects.filter(situacao=Venda.Situacao.FECHADA)
+        .select_related("veiculo", "cliente", "vendedor")
+        .order_by("-data", "-pk")
+    )
+
+    # A margem NUNCA é guardada: é recalculada a cada abertura da tela.
+    linhas = [
+        {"venda": venda, "margem": venda.calcular_margem()}
+        for venda in vendas
+    ]
+
+    total_vendas = len(linhas)
+    total_negativas = sum(1 for linha in linhas if linha["margem"]["negativa"])
+    total_margem = sum(
+        (linha["margem"]["margem"] for linha in linhas), Decimal("0.00")
+    )
+
+    if somente_negativas:
+        linhas = [linha for linha in linhas if linha["margem"]["negativa"]]
+
+    return render(
+        request,
+        "core/gerente_painel_margens.html",
+        {
+            "linhas": linhas,
+            "somente_negativas": somente_negativas,
+            "total_vendas": total_vendas,
+            "total_negativas": total_negativas,
+            "total_margem": total_margem,
+            "calculada_em": timezone.now(),
+        },
+    )
+
+
+@perfil_requerido("VENDEDOR")
+def minhas_comissoes_view(request):
+    # O vendedor vê só a comissão das vendas dele. A margem da loja
+    # nem é calculada nesta tela.
+    vendas = (
+        Venda.objects.filter(
+            vendedor=request.user,
+            situacao=Venda.Situacao.FECHADA,
+        )
+        .select_related("veiculo", "cliente")
+        .annotate(
+            comissao=Sum(
+                "lancamentos_financeiros__valor",
+                filter=Q(
+                    lancamentos_financeiros__tipo=LancamentoFinanceiro.Tipo.COMISSAO,
+                    lancamentos_financeiros__excluido=False,
+                ),
+            )
+        )
+        .order_by("-data", "-pk")
+    )
+
+    total_comissao = sum(
+        ((venda.comissao or Decimal("0.00")) for venda in vendas),
+        Decimal("0.00"),
+    )
+
+    return render(
+        request,
+        "core/vendedor_painel_comissoes.html",
+        {
+            "vendas": vendas,
+            "total_comissao": total_comissao,
+            "perfil": getattr(request.user, "dados_vendedor", None),
+        },
+    )
+    
+# ---------------------------------------------------------------------
+# T15: fichas de histórico (somente leitura)
+# ---------------------------------------------------------------------
+
+@perfil_requerido("GERENTE")
+@require_GET
+def historico_veiculo_view(request, veiculo_id):
+    # Não chama a expiração de reservas: esta tela não grava nada.
+    veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
+
+    return render(
+        request,
+        "core/gerente_historico_veiculo.html",
+        {
+            "veiculo": veiculo,
+            "eventos": linha_do_tempo_veiculo(veiculo),
+        },
+    )
+
+
+@perfil_requerido("GERENTE")
+@require_GET
+def historico_cliente_view(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+
+    return render(
+        request,
+        "core/gerente_historico_cliente.html",
+        {
+            "cliente": cliente,
+            "resumo": resumo_cliente(cliente),
+        },
+    )

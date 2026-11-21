@@ -1,0 +1,173 @@
+
+{% extends "core/gerente_base.html" %}
+{% load static %}
+{% load l10n %}
+
+{% block title %}Avaliações de troca | VENDACERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_avaliacoes_troca.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- CABEÇALHO -->
+<header class="topbar">
+    <div>
+        <h1>Avaliações de troca</h1>
+        <p>Gerencie as avaliações dos veículos oferecidos em troca.</p>
+    </div>
+
+    <a href="{% url 'nova_avaliacao_troca' %}" class="add-button">
+        <i data-lucide="plus-circle"></i>
+        Cadastrar avaliação
+    </a>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- LISTAGEM -->
+<section class="section">
+    <div class="card avaliacoes-card">
+
+        <div class="section-header">
+            <span class="contador-avaliacoes">
+                {{ avaliacoes|length }}
+                {% if avaliacoes|length == 1 %}
+                    avaliação encontrada
+                {% else %}
+                    avaliações encontradas
+                {% endif %}
+            </span>
+        </div>
+
+        <!-- PESQUISA -->
+        <form method="GET" class="barra-pesquisa-avaliacoes">
+            <div class="campo-pesquisa-avaliacoes">
+                <i data-lucide="search"></i>
+
+                <input
+                    type="search"
+                    name="busca"
+                    placeholder="Pesquisar por placa, marca ou modelo..."
+                    value="{{ busca }}"
+                >
+            </div>
+
+            <button type="submit" class="btn-pesquisar-avaliacoes">
+                Pesquisar
+            </button>
+
+            {% if busca %}
+            <a href="{% url 'avaliacoes_troca' %}" class="btn-limpar-avaliacoes">
+                Limpar
+            </a>
+            {% endif %}
+        </form>
+
+        <!-- TABELA -->
+        <div class="table-container">
+            <table class="avaliacoes-tabela">
+                <thead>
+                    <tr>
+                        <th>Veículo</th>
+                        <th>Placa</th>
+                        <th>Quilometragem</th>
+                        <th>Estado geral</th>
+                        <th>Valor avaliado</th>
+                        <th>Data</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for avaliacao in avaliacoes %}
+                    <tr>
+                        <td>
+                            <div class="veiculo-info">
+                                <div class="veiculo-icon">
+                                    {% with foto_principal=avaliacao.fotos.all|first %}
+                                        {% if foto_principal %}
+                                            <img
+                                                src="{{ foto_principal.imagem.url }}"
+                                                alt="Foto de {{ avaliacao.marca }} {{ avaliacao.modelo }}"
+                                                class="foto-veiculo-troca"
+                                            >
+                                        {% else %}  
+                                            <div class="icone-veiculo-troca">
+                                                <i data-lucide="car-front"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+
+                                <div class="veiculo-texto">
+                                    <strong>
+                                        {{ avaliacao.marca }} {{ avaliacao.modelo }}
+                                    </strong>
+                                    <small>
+                                        {{ avaliacao.ano_fabricacao | unlocalize }}/{{ avaliacao.ano_modelo | unlocalize }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="placa-veiculo">
+                                {{ avaliacao.placa }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ avaliacao.quilometragem }} km
+                        </td>
+
+                        <td>
+                            <span class="estado-geral">
+                                {{ avaliacao.get_estado_geral_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="valor-avaliado">
+                                R$ {{ avaliacao.valor_avaliado|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ avaliacao.criado_em|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'editar_avaliacao_troca' avaliacao.id %}"
+                                class="edit-button"
+                            >
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty">
+                            Nenhuma avaliação encontrada.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+{% endblock content %}

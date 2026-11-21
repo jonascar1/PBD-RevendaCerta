@@ -377,3 +377,33 @@
     font-weight: 700;
     margin-right: 5px;
 }
+
+
+
+/* ==============================
+   CAMPOS DA TROCA
+============================== */
+
+.prop-extra-troca {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+}
+
+.prop-extra-troca > * {
+    min-width: 0;
+}
+
+/* ==============================
+   RESPONSIVIDADE
+============================== */
+
+@media (max-width: 960px) {
+    .prop-extra-troca {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .prop-extra-troca,
+    .prop-extra-financiamento {
+        grid-column: 1 / -1;
+    }
+}

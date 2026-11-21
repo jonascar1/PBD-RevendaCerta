@@ -1,0 +1,859 @@
+{% extends "core/gerente_base.html" %}
+
+{% load static %}
+{% load static l10n %}
+
+{% block title %}
+Editar veículo | VENDACERTA
+{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'core/css/gerente_editar_veiculo.css' %}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<header class="topo">
+
+    <div>
+
+        <h1>Editar veículo</h1>
+        <p>Atualize as informações do veículo {{ veiculo.marca }} {{ veiculo.modelo }}.</p>
+
+    </div>
+
+
+</header>
+
+
+{% if messages %}
+
+<div class="messages">
+
+    {% for message in messages %}
+
+    <div class="message message-{{ message.tags }}">
+        {{ message }}
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+
+<form method="POST" enctype="multipart/form-data" novalidate>
+
+    {% csrf_token %}
+
+    <input type="hidden" name="fotos_excluir" id="fotos-excluir" value="">
+    <input type="hidden" name="ordem_fotos" id="ordem-fotos" value="">
+
+    {{ form.non_field_errors }}
+
+
+    <!-- DADOS DO VEÍCULO -->
+
+    <section class="card">
+
+        <div class="card-header">
+
+            <h2>Dados do veículo</h2>
+
+            <p>
+                Informe os dados de identificação e características.
+            </p>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <div class="campo">
+
+                <label for="placa">
+                    Placa
+                </label>
+
+                {{ form.placa }}
+{{ form.placa.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="chassi">
+                    Chassi
+                </label>
+
+                {{ form.chassi }}
+{{ form.chassi.errors }}
+
+            </div>
+
+            <div class="campo">
+                <label for="renavam">
+                    Renavam
+                </label>
+
+                {{ form.renavam }}
+{{ form.renavam.errors }}
+            </div>
+
+            <div class="campo">
+
+                <label for="marca">
+                    Marca
+                </label>
+
+                {{ form.marca }}
+{{ form.marca.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="modelo">
+                    Modelo
+                </label>
+
+                {{ form.modelo }}
+{{ form.modelo.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="ano_fabricacao">
+                    Ano de fabricação
+                </label>
+
+                {{ form.ano_fabricacao }}
+{{ form.ano_fabricacao.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="ano_modelo">
+                    Ano do modelo
+                </label>
+
+                {{ form.ano_modelo }}
+{{ form.ano_modelo.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="cor">
+                    Cor
+                </label>
+
+                {{ form.cor }}
+{{ form.cor.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="combustivel">
+                    Combustível
+                </label>
+
+                {{ form.combustivel }}
+                {{ form.combustivel.errors }}
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="quilometragem">
+                    Quilometragem
+                </label>
+
+                <div class="input-unidade">
+
+                    {{ form.quilometragem }}
+
+                    <span>km</span>
+
+                </div>
+{{ form.quilometragem.errors }}
+
+            </div>
+
+
+        </div>
+
+
+        <div class="campo-opcionais">
+
+            <label for="opcionais">
+                Opcionais
+            </label>
+
+            <span class="descricao">
+                Informe os principais opcionais do veículo.
+            </span>
+
+            {{ form.opcionais }}
+            {{ form.opcionais.errors }}
+
+        </div>
+
+    </section>
+
+
+    <!-- ORIGEM -->
+
+    <section class="card">
+
+        <div class="card-header">
+
+            <h2>Origem e valores</h2>
+
+            <p>
+                Informe como o veículo entrou no estoque.
+            </p>
+
+        </div>
+
+
+        <div class="campo">
+
+            <label>
+                Origem do veículo
+            </label>
+
+            <div class="aviso">
+                <i data-lucide="lock"></i>
+                <span>
+                    A origem do veículo não pode ser alterada após o cadastro.
+                </span>
+            </div>
+
+            <div class="origens">
+
+                <label class="origem-option">
+
+                    <input
+                        type="radio"
+                        name="origem"
+                        value="COMPRADO"
+                        {% if form.origem.value == "COMPRADO" %}checked{% endif %}
+                        disabled
+                    >
+
+                    <div>
+
+                        <strong>
+                            Comprado de terceiro
+                        </strong>
+
+                        <span>
+                            Veículo adquirido de um terceiro.
+                        </span>
+
+                    </div>
+
+                </label>
+
+
+                <label class="origem-option">
+
+                    <input
+                        type="radio"
+                        name="origem"
+                        value="TROCA"
+                        {% if form.origem.value == "TROCA" %}checked{% endif %}
+                        disabled
+                    >
+
+                    <div>
+
+                        <strong>
+                            Recebido em troca
+                        </strong>
+
+                        <span>
+                            Veículo recebido em uma negociação.
+                        </span>
+
+                    </div>
+
+                </label>
+
+
+                <label class="origem-option">
+
+                    <input
+                        type="radio"
+                        name="origem"
+                        value="CONSIGNADO"
+                        {% if form.origem.value == "CONSIGNADO" %}checked{% endif %}
+                        disabled
+                    >
+
+                    <div>
+
+                        <strong>
+                            Consignado
+                        </strong>
+
+                        <span>
+                            Veículo recebido para venda em consignação.
+                        </span>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+            <input type="hidden" name="origem" value="{{ veiculo.origem }}">
+
+        </div>
+
+
+        {{ form.origem.errors }}
+
+        <div class="form-grid valores">
+
+            <div class="campo" id="campo-custo">
+                <label for="custo_aquisicao">
+                    Custo de aquisição
+                </label>
+
+                <div class="input-moeda">
+                    <span>R$</span>
+
+                    {{ form.custo_aquisicao }}
+                </div>
+{{ form.custo_aquisicao.errors }}
+
+                <div class="campo">
+                    <label for="preco_venda">
+                        Preço de venda
+                    </label>
+
+                    <div class="input-moeda">
+                        <span>R$</span>
+
+                        {{ form.preco_venda }}
+                    </div>
+{{ form.preco_venda.errors }}
+
+    <small class="descricao">
+        Preço pelo qual o veículo será anunciado para venda.
+    </small>
+</div>
+
+                <small class="descricao" id="descricao-custo">
+                    Obrigatório para veículo comprado ou recebido em troca.
+                </small>
+            </div>
+
+
+            <div class="campo" id="campo-repasse">
+                <label for="valor_repasse">
+                    Valor de repasse
+                </label>
+
+                <div class="input-moeda">
+                    <span>R$</span>
+
+                    {{ form.valor_repasse }}
+                </div>
+{{ form.valor_repasse.errors }}
+
+                <small class="descricao" id="descricao-repasse">
+                    Utilizado quando o veículo for consignado.
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="aviso">
+
+            <i data-lucide="lock"></i><span>O custo de aquisição não poderá ser alterado após o fechamento da venda.</span>
+
+        </div>
+
+    </section>
+
+    <section class="card">
+
+        <div class="campo fotos-campo">
+
+            <label>Fotos do veículo</label>
+
+            <span class="descricao">
+                Adicione fotos para apresentar o veículo no sistema.
+            </span>
+
+            {% if fotos_existentes %}
+            <div class="fotos-existentes">
+                <p class="descricao">Fotos já cadastradas:</p>
+
+                <div class="preview-fotos" id="fotos-existentes-container">
+                    {% for foto in fotos_existentes %}
+                    <div class="foto-preview foto-existente" data-foto-id="{{ foto.id }}" draggable="true">
+                        <img src="{{ foto.imagem.url }}" alt="Foto do veículo">
+                        <button
+                            type="button"
+                            class="remover-foto-existente"
+                            title="Remover foto"
+                            aria-label="Remover foto"
+                        >
+                            ×
+                        </button>
+
+                        {% if foto.principal %}
+                        <span class="foto-principal">Principal</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="upload-area" id="area-upload">
+
+                <div class="upload-icon">
+                    <i data-lucide="image"></i>
+                </div>
+
+                <strong>Adicione fotos do veículo</strong>
+
+                <p>
+                    Selecione uma ou várias imagens para enviar.
+                </p>
+
+                <label for="fotos" class="btn-selecionar">
+                    Selecionar fotos
+                </label>
+
+                <input
+                    type="file"
+                    id="fotos"
+                    name="fotos"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    hidden
+                >
+
+                <small>
+                    JPG, PNG ou WEBP
+                </small>
+
+            </div>
+
+            <div
+                id="preview-fotos"
+                class="preview-fotos"
+            ></div>
+
+            {{ form.fotos.errors }}
+
+            <div class="aviso-fotos">
+                <i data-lucide="info"></i><span>A primeira foto será utilizada como foto principal.</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOTÕES -->
+
+    <div class="acoes">
+
+        <a
+            href="{% url 'veiculos' %}"
+            class="btn-voltar"
+        >
+            Cancelar
+        </a>
+
+        <button
+            type="submit"
+            class="btn-salvar"
+        >
+            Salvar alterações
+        </button>
+
+    </div>
+
+
+</form>
+{% endblock content %}
+
+{% block extra_js %}
+
+<script>
+const origens = document.querySelectorAll('input[name="origem"]');
+
+const campoCusto = document.getElementById("campo-custo");
+const custoAquisicao = document.getElementById("custo_aquisicao");
+
+const campoRepasse = document.getElementById("campo-repasse");
+const valorRepasse = document.getElementById("valor_repasse");
+
+function atualizarOrigem() {
+
+    const origemSelecionada = document.querySelector(
+        'input[name="origem"]:checked'
+    );
+
+    if (!origemSelecionada) {
+        return;
+    }
+
+    const origem = origemSelecionada.value;
+
+    if (origem === "CONSIGNADO") {
+
+        // Consignado não possui custo de aquisição
+        custoAquisicao.disabled = false;
+
+        campoCusto.classList.add("campo-desabilitado");
+
+        // No consignado, o repasse é obrigatório
+        valorRepasse.disabled = false;
+
+        campoRepasse.classList.remove("campo-desabilitado");
+
+    } else {
+
+        // Comprado ou troca precisam de custo
+        custoAquisicao.disabled = false;
+
+        campoCusto.classList.remove("campo-desabilitado");
+
+        // Repasse não é necessário nesses casos
+        valorRepasse.disabled = false;
+
+        campoRepasse.classList.add("campo-desabilitado");
+    }
+}
+
+
+origens.forEach(function (origem) {
+    origem.addEventListener("change", atualizarOrigem);
+});
+
+
+atualizarOrigem();
+
+const inputFotos = document.getElementById("fotos");
+const previewFotos = document.getElementById("preview-fotos");
+
+let arquivosSelecionados = [];
+let indiceArrastado = null;
+
+const areaUpload = document.getElementById("area-upload");
+
+areaUpload.addEventListener("dragover", function (event) {
+    event.preventDefault();
+    areaUpload.classList.add("arrastando-arquivos");
+});
+
+areaUpload.addEventListener("dragleave", function () {
+    areaUpload.classList.remove("arrastando-arquivos");
+});
+
+areaUpload.addEventListener("drop", function (event) {
+    event.preventDefault();
+
+    areaUpload.classList.remove("arrastando-arquivos");
+
+    const arquivos = Array.from(event.dataTransfer.files);
+
+    const imagens = arquivos.filter(function (arquivo) {
+        return arquivo.type.startsWith("image/");
+    });
+
+    arquivosSelecionados = [
+        ...arquivosSelecionados,
+        ...imagens
+    ];
+
+    atualizarInput();
+    atualizarPreview();
+});
+
+
+inputFotos.addEventListener("change", function () {
+
+    const novosArquivos = Array.from(this.files);
+
+    arquivosSelecionados = [
+        ...arquivosSelecionados,
+        ...novosArquivos
+    ];
+
+    atualizarInput();
+    atualizarPreview();
+});
+
+
+function atualizarPreview() {
+
+    previewFotos.innerHTML = "";
+
+    arquivosSelecionados.forEach((arquivo, index) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+
+            const item = document.createElement("div");
+
+            item.className = "foto-preview";
+            item.draggable = true;
+
+            item.innerHTML = `
+                <img
+                    src="${e.target.result}"
+                    alt="Pré-visualização da foto"
+                >
+
+                ${index === 0 &&
+                document.querySelectorAll(
+                    ".foto-existente:not([style*='display: none'])"
+                ).length === 0
+                    ? '<span class="foto-principal">Principal</span>'
+                    : ''
+                }
+
+                <button
+                    type="button"
+                    class="remover-foto"
+                >
+                    ×
+                </button>
+            `;
+
+
+            const botaoRemover =
+                item.querySelector(".remover-foto");
+
+            botaoRemover.addEventListener("click", function () {
+
+                const indiceAtual =
+                    Array.from(previewFotos.children)
+                    .indexOf(item);
+
+                removerFoto(indiceAtual);
+            });
+
+
+            item.addEventListener("dragstart", function () {
+
+                indiceArrastado =
+                    Array.from(previewFotos.children)
+                    .indexOf(item);
+
+                item.classList.add("arrastando");
+            });
+
+
+            item.addEventListener("dragend", function () {
+
+                item.classList.remove("arrastando");
+
+                indiceArrastado = null;
+            });
+
+
+            item.addEventListener("dragover", function (event) {
+
+                event.preventDefault();
+            });
+
+
+            item.addEventListener("drop", function (event) {
+
+                event.preventDefault();
+
+                const indiceDestino =
+                    Array.from(previewFotos.children)
+                    .indexOf(item);
+
+                if (
+                    indiceArrastado === null ||
+                    indiceArrastado === indiceDestino
+                ) {
+                    return;
+                }
+
+
+                const arquivoMovido =
+                    arquivosSelecionados[indiceArrastado];
+
+
+                arquivosSelecionados.splice(
+                    indiceArrastado,
+                    1
+                );
+
+
+                arquivosSelecionados.splice(
+                    indiceDestino,
+                    0,
+                    arquivoMovido
+                );
+
+
+                atualizarInput();
+                atualizarPreview();
+            });
+
+
+            previewFotos.appendChild(item);
+        };
+
+
+        reader.readAsDataURL(arquivo);
+    });
+}
+
+
+function removerFoto(index) {
+
+    arquivosSelecionados.splice(index, 1);
+
+    atualizarInput();
+    atualizarPreview();
+}
+
+
+function atualizarInput() {
+
+    const dataTransfer = new DataTransfer();
+
+    arquivosSelecionados.forEach(function (arquivo) {
+
+        dataTransfer.items.add(arquivo);
+    });
+
+    inputFotos.files = dataTransfer.files;
+}
+
+// Fotos existentes marcadas para exclusão
+const fotosExcluir = document.getElementById("fotos-excluir");
+
+document.querySelectorAll(".remover-foto-existente").forEach(function (botao) {
+    botao.addEventListener("click", function () {
+        const foto = botao.closest(".foto-existente");
+        const fotoId = foto.dataset.fotoId;
+
+        const ids = fotosExcluir.value
+            ? fotosExcluir.value.split(",")
+            : [];
+
+        if (!ids.includes(fotoId)) {
+            ids.push(fotoId);
+        }
+
+        fotosExcluir.value = ids.join(",");
+        foto.style.display = "none";
+
+        atualizarOrdemFotos();
+    });
+});
+
+// Reordenar fotos já cadastradas
+const ordemFotos = document.getElementById("ordem-fotos");
+let fotoArrastada = null;
+
+function atualizarOrdemFotos() {
+    const ids = Array.from(
+        document.querySelectorAll(".foto-existente")
+    )
+        .filter(foto => foto.style.display !== "none")
+        .map(foto => foto.dataset.fotoId);
+
+    ordemFotos.value = ids.join(",");
+
+    // A etiqueta Principal deve acompanhar a primeira posição
+    const container = document.getElementById("fotos-existentes-container");
+
+    const fotosVisiveis = Array.from(
+        container.querySelectorAll(".foto-existente")
+    ).filter(foto => foto.style.display !== "none");
+
+    fotosVisiveis.forEach(function (foto, indice) {
+        const etiqueta = foto.querySelector(".foto-principal");
+
+        if (etiqueta) {
+            etiqueta.remove();
+        }
+
+        if (indice === 0) {
+            const novaEtiqueta = document.createElement("span");
+            novaEtiqueta.className = "foto-principal";
+            novaEtiqueta.textContent = "Principal";
+            foto.appendChild(novaEtiqueta);
+        }
+    });
+}
+
+document.querySelectorAll(".foto-existente").forEach(function (foto) {
+    foto.addEventListener("dragstart", function () {
+        fotoArrastada = foto;
+    });
+
+    foto.addEventListener("dragover", function (event) {
+        event.preventDefault();
+    });
+
+    foto.addEventListener("drop", function (event) {
+        event.preventDefault();
+
+        if (!fotoArrastada || fotoArrastada === foto) {
+            return;
+        }
+
+        const container = foto.parentElement;
+
+        const fotos = Array.from(container.children);
+
+        const origem = fotos.indexOf(fotoArrastada);
+        const destino = fotos.indexOf(foto);
+
+        if (origem < destino) {
+            foto.after(fotoArrastada);
+        } else {
+            foto.before(fotoArrastada);
+        }
+
+        atualizarOrdemFotos();
+    });
+
+    foto.addEventListener("dragend", function () {
+        fotoArrastada = null;
+    });
+});
+
+atualizarOrdemFotos();
+</script>
+
+{% endblock extra_js %}

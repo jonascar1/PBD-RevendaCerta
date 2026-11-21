@@ -1,0 +1,37 @@
+/* ==============================
+   MINHAS COMISSÕES
+============================== */
+.clientes-pagina, .clientes-cabecalho, .clientes-cabecalho > div { min-width: 0; }
+.clientes-cabecalho p { line-height: 1.6; overflow-wrap: anywhere; }
+/* TOTAL DE COMISSÕES */
+.clientes-card .clientes-header { padding: 20px; flex-wrap: wrap; }
+.clientes-card .contador-clientes {
+    display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; max-width: 100%;
+    padding: 12px 16px; border-radius: 8px; font-size: 13px; white-space: normal;
+}
+.clientes-card .contador-clientes strong { color: #1d4ed8; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+/* TABELA */
+.clientes-tabela-container { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.clientes-tabela { min-width: 780px; }
+.clientes-tabela td { vertical-align: middle; }
+.clientes-tabela td:nth-child(4), .clientes-tabela td:nth-child(5) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.clientes-tabela td:nth-child(5) strong { color: #15803d; font-weight: 700; }
+.clientes-tabela td:last-child { text-align: center; }
+.clientes-tabela td .acao-cliente { width: 44px; height: 44px; margin: 0 auto; }
+.clientes-tabela td .acao-cliente svg { width: 18px; height: 18px; }
+.clientes-tabela td .acao-cliente:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+/* RODAPÉ */
+.clientes-card .sem-registros { padding: 16px 20px; border-top: 1px solid #e5e7eb; background: #f9fafb; color: #6b7280; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+/* RESPONSIVIDADE */
+@media (max-width: 900px) { .clientes-cabecalho { flex-wrap: wrap; align-items: flex-start; } }
+@media (max-width: 700px) {
+    .clientes-card .clientes-header { padding: 16px; }
+    .clientes-card .contador-clientes { width: 100%; justify-content: space-between; }
+    .clientes-card .sem-registros { padding: 14px 16px; }
+}
+@media (max-width: 480px) {
+    .clientes-cabecalho { flex-direction: column; gap: 12px; }
+    .clientes-cabecalho h1 { font-size: 24px; }
+    .clientes-card .contador-clientes { flex-direction: column; align-items: flex-start; }
+    .clientes-card .contador-clientes strong { font-size: 22px; }
+}
