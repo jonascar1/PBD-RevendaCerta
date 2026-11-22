@@ -1534,8 +1534,12 @@ class Venda(models.Model):
                 tipo=LancamentoFinanceiro.Tipo.DESPESA,
                 excluido=False,
             )
-        )
-        custo = self.veiculo.custo_aquisicao or Decimal("0.00")
+                )
+        if self.veiculo.origem == Veiculo.Origem.CONSIGNADO:
+            custo = self.veiculo.valor_repasse or Decimal("0.00")
+        else:
+            custo = self.veiculo.custo_aquisicao or Decimal("0.00")
+            
         base = self.valor_venda - custo - despesas
 
         if base <= 0:

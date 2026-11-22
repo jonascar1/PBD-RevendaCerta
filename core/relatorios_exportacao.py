@@ -138,14 +138,22 @@ def obter_dados_exportacao(data_inicio, data_fim, dias_parados=30):
 
     limite = data_referencia - timedelta(days=dias_parados)
 
-    estoque = Veiculo.objects.filter(
-        situacao__in=[
-            Veiculo.Situacao.PREPARACAO,
-            Veiculo.Situacao.DISPONIVEL,
-            Veiculo.Situacao.RESERVADO,
-        ],
-        criado_em__date__lte=limite,
-    ).order_by("criado_em", "pk")
+    estoque = (
+        Veiculo.objects.filter(
+            status__in=[
+                Veiculo.Status.DISPONIVEL,
+                Veiculo.Status.RESERVADO,
+            ],
+            situacao__in=[
+                Veiculo.Situacao.PREPARACAO,
+                Veiculo.Situacao.DISPONIVEL,
+                Veiculo.Situacao.RESERVADO,
+            ],
+            venda_fechada=False,
+            criado_em__date__lte=limite,
+        )
+        .order_by("criado_em", "pk")
+    )
 
     linhas_estoque = [
         [
@@ -235,7 +243,6 @@ def formatar_valor_relatorio(valor, tipo="texto"):
         numero = number_format(
             valor,
             decimal_pos=2,
-            use_l10n=True,
             force_grouping=True,
         )
         return f"R$ {numero}"
@@ -244,7 +251,6 @@ def formatar_valor_relatorio(valor, tipo="texto"):
         numero = number_format(
             valor,
             decimal_pos=2,
-            use_l10n=True,
         )
         return f"{numero}%"
 

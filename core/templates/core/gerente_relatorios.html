@@ -7,6 +7,66 @@
 
     <h1>Relatórios Gerenciais</h1>
 
+    <form method="get" class="filtros-relatorios">
+        <div>
+            <label for="data_inicio">Data inicial</label>
+            <input
+                type="date"
+                id="data_inicio"
+                name="data_inicio"
+                value="{{ data_inicio }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="data_fim">Data final</label>
+            <input
+                type="date"
+                id="data_fim"
+                name="data_fim"
+                value="{{ data_fim }}"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="dias_filtro">Dias mínimos em estoque</label>
+            <input
+                type="number"
+                id="dias_filtro"
+                name="dias_parados"
+                min="1"
+                max="3650"
+                value="{{ dias_parados }}"
+                required
+            >
+        </div>
+
+        <button type="submit">Filtrar relatórios</button>
+    </form>
+
+    {% for erro in erros %}
+        <p class="erro-relatorio">{{ erro }}</p>
+    {% endfor %}
+
+    <div class="indicadores-relatorios">
+        <div class="indicador">
+            <span>Vendas no período</span>
+            <strong>{{ quantidade_vendas }}</strong>
+        </div>
+
+        <div class="indicador">
+            <span>Faturamento</span>
+            <strong>R$ {{ faturamento|floatformat:2 }}</strong>
+        </div>
+
+        <div class="indicador">
+            <span>Ticket médio</span>
+            <strong>R$ {{ ticket_medio|floatformat:2 }}</strong>
+        </div>
+    </div>
+
     <div class="acoes-exportacao">
         <a href="{% url 'exportar_relatorio_excel' %}?data_inicio={{ data_inicio|urlencode }}&data_fim={{ data_fim|urlencode }}&dias_parados={{ dias_parados }}">
             <i data-lucide="file-spreadsheet"></i>
