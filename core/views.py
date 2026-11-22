@@ -369,6 +369,23 @@ def painel_vendedor_view(request):
 
 
 @perfil_requerido("VENDEDOR")
+@require_GET
+def veiculos_vendedor_view(request):
+    """Catálogo interno do vendedor; não permite editar o estoque."""
+    expirar_reservas_vencidas()
+    busca = request.GET.get("busca", "").strip()
+    veiculos = Veiculo.objects.prefetch_related("fotos").order_by("-criado_em")
+    if busca:
+        veiculos = veiculos.filter(
+            Q(marca__icontains=busca) | Q(modelo__icontains=busca)
+            | Q(placa__icontains=busca)
+        )
+    return render(request, "core/vendedor_veiculos.html", {
+        "veiculos": veiculos, "busca": busca,
+    })
+
+
+@perfil_requerido("VENDEDOR")
 def detalhes_veiculo_vendedor_view(request, veiculo_id):
     """Ficha técnica do veículo sob a visão operacional do vendedor."""
     expirar_reservas_vencidas()
@@ -1162,46 +1179,47 @@ def marcar_aviso_procura_lido_view(request, aviso_id):
 
 @perfil_requerido("ADMINISTRATIVO")
 def painel_administrativo_view(request):
-    return render(request, "core/administrativo_painel_inicio.html")
+    """Visão inicial do administrativo com os veículos e resumo de despesas."""
+    veiculos = Veiculo.objects.prefetch_related("fotos").order_by("marca", "modelo")
+    despesas_ativas = LancamentoFinanceiro.objects.filter(
+        tipo=LancamentoFinanceiro.Tipo.DESPESA, excluido=False
+    )
+    return render(request, "core/administrativo_painel_inicio.html", {
+        "veiculos": veiculos,
+        "total_despesas": despesas_ativas.count(),
+        "valor_total": despesas_ativas.aggregate(total=Sum("valor"))["total"] or 0,
+        "veiculos_com_despesas": Veiculo.objects.filter(
+            lancamentos__tipo=LancamentoFinanceiro.Tipo.DESPESA,
+            lancamentos__excluido=False,
+        ).distinct().count(),
+    })
 
 
 @perfil_requerido("ADMINISTRATIVO")
 def despesas_view(request):
-    """Visão geral de despesas operacionais vinculadas aos veículos do estoque."""
-    veiculos = (
-        Veiculo.objects.prefetch_related("fotos")
-        .all()
-        .order_by("marca", "modelo")
+    """Listagem de despesas e acesso ao cadastro por veículo."""
+    busca = request.GET.get("busca", "").strip()
+    despesas_ativas = LancamentoFinanceiro.objects.filter(
+        tipo=LancamentoFinanceiro.Tipo.DESPESA, excluido=False
     )
-    total_despesas = LancamentoFinanceiro.objects.filter(
-        tipo=LancamentoFinanceiro.Tipo.DESPESA,
-        excluido=False,
-    ).count()
-    valor_total = (
-        LancamentoFinanceiro.objects.filter(
-            tipo=LancamentoFinanceiro.Tipo.DESPESA, excluido=False
-        ).aggregate(total=Sum("valor"))["total"]
-        or 0
-    )
-    veiculos_com_despesas = (
-        Veiculo.objects.filter(
+    despesas = despesas_ativas.select_related("veiculo", "registrado_por")
+    if busca:
+        despesas = despesas.filter(
+            Q(descricao__icontains=busca) | Q(veiculo__marca__icontains=busca)
+            | Q(veiculo__modelo__icontains=busca) | Q(veiculo__placa__icontains=busca)
+        )
+    despesas = despesas.order_by("-data_lancamento", "-criado_em")
+    return render(request, "core/administrativo_painel_despesas.html", {
+        "despesas": despesas,
+        "busca": busca,
+        "veiculos": Veiculo.objects.order_by("marca", "modelo"),
+        "total_despesas": despesas_ativas.count(),
+        "valor_total": despesas_ativas.aggregate(total=Sum("valor"))["total"] or 0,
+        "veiculos_com_despesas": Veiculo.objects.filter(
             lancamentos__tipo=LancamentoFinanceiro.Tipo.DESPESA,
             lancamentos__excluido=False,
-        )
-        .distinct()
-        .count()
-    )
-
-    return render(
-        request,
-        "core/administrativo_painel_despesas.html",
-        {
-            "veiculos": veiculos,
-            "total_despesas": total_despesas,
-            "valor_total": valor_total,
-            "veiculos_com_despesas": veiculos_com_despesas,
-        },
-    )
+        ).distinct().count(),
+    })
 
 
 @perfil_requerido("ADMINISTRATIVO")
@@ -2622,6 +2640,7 @@ def detalhes_venda_view(request, venda_id):
         request,
         "core/gerente_detalhes_venda.html",
         {
+            "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "venda": venda,
             "pagamentos": venda.pagamentos.all(),
             "form_cancelamento": CancelarVendaForm(),
@@ -2641,6 +2660,7 @@ def contrato_venda_view(request, venda_id):
         request,
         "core/gerente_contrato_venda.html",
         {
+            "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "venda": venda,
             "cliente": venda.cliente,
             "veiculo": venda.veiculo,
@@ -2690,6 +2710,7 @@ def registrar_entrega_view(request, venda_id):
         request,
         "core/gerente_registrar_entrega.html",
         {
+            "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "venda": venda,
             "form": form,
             "etapas": venda.etapas_documentacao.all(),
@@ -2740,6 +2761,7 @@ def documentacao_pendente_view(request):
         request,
         "core/administrativo_painel_documentacao.html",
         {
+            "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "etapas": etapas,
             "prontas": prontas,
             "situacoes": EtapaDocumentacao.Situacao.choices,

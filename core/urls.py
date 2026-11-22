@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Vendedor
     path("painel/vendedor/inicio/", views.painel_vendedor_view, name="painel_vendedor"),
+    path("painel/vendedor/veiculos/", views.veiculos_vendedor_view, name="veiculos_vendedor"),
     path("painel/vendedor/veiculos/<int:veiculo_id>/", views.detalhes_veiculo_vendedor_view, name="detalhes_veiculo_vendedor"),
     path("painel/vendedor/clientes/", views.clientes_view, name="clientes"),
     path("painel/vendedor/clientes/cadastrar/", views.cadastrar_cliente_view, name="cadastrar_cliente"),

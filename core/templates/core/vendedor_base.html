@@ -16,6 +16,7 @@
     <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}">
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
 </head>
 
 <body>
@@ -51,7 +52,7 @@
                 Clientes
             </a>
 
-            <a href="#" class="menu-item">
+            <a href="{% url 'veiculos_vendedor' %}" class="menu-item {% if request.resolver_match.url_name == 'veiculos_vendedor' or request.resolver_match.url_name == 'detalhes_veiculo_vendedor' %}active{% endif %}">
                 <span><i data-lucide="car-front"></i></span>
                 Veículos
             </a>
@@ -80,10 +81,7 @@
                 Minhas comissões
             </a>
             
-            <a href="#" class="menu-item">
-                <span><i data-lucide="arrow-left-right"></i></span>
-                Registrar troca
-            </a>
+            <!-- Registrar troca: exige rota própria de registro, distinta da avaliação gerencial. -->
 
         </nav>
 

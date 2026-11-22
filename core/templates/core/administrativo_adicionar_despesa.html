@@ -7,7 +7,7 @@ Adicionar despesa | {{ veiculo.marca }} {{ veiculo.modelo }}
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/administrativo_adicionar_despesa.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/administrativo_adicionar_despesa.css' %}?v=7">
 {% endblock %}
 
 {% block content %}
@@ -29,7 +29,7 @@ Adicionar despesa | {{ veiculo.marca }} {{ veiculo.modelo }}
 
         {{ form.non_field_errors }}
 
-        <div class="form-group">
+        <div class="campo">
             <label for="{{ form.categoria_despesa.id_for_label }}">
                 Categoria da despesa
             </label>

@@ -1,127 +1,175 @@
 {% extends "core/administrativo_base.html" %}
 
 {% load static %}
+{% load static l10n %}
 
-{% block title %}Painel Administrativo | VENDACERTA{% endblock %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'core/css/administrativo_painel_inicio.css' %}">
+{% block title %}
+Início administrativo | VENDACERTA
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/administrativo_painel_despesas.css' %}">
+{% endblock %}
+
+
 {% block content %}
-    <!-- CABEÇALHO -->
-            <header class="cabecalho">
 
-                <div>
-                    <h1>Painel Administrativo</h1>
-                    <p>Olá, {{ request.user.get_full_name|default:request.user.username }}!</p>
+<header class="topo">
+
+    <div>
+        <h1>Painel Administrativo</h1>
+
+        <p>
+            Visão geral dos veículos e das despesas da loja.
+        </p>
+    </div>
+
+    <div class="badge-perfil">
+        Administrativo
+    </div>
+
+</header>
+
+
+<!-- =========================
+     RESUMO
+========================= -->
+
+<section class="secao">
+
+    <div class="titulo-secao">
+
+        <h2>Resumo</h2>
+
+        <p>
+            Visão geral das despesas registradas no sistema.
+        </p>
+
+    </div>
+
+
+    <div class="resumo">
+
+        <div class="resumo-card">
+
+            <span class="resumo-titulo">
+                Total de despesas
+            </span>
+
+            <strong>
+                {{ total_despesas }}
+            </strong>
+
+        </div>
+
+
+        <div class="resumo-card">
+
+            <span class="resumo-titulo">
+                Valor total
+            </span>
+
+            <strong>
+                R$ {{ valor_total|floatformat:2 }}
+            </strong>
+
+        </div>
+
+
+        <div class="resumo-card">
+
+            <span class="resumo-titulo">
+                Veículos com despesas
+            </span>
+
+            <strong>
+                {{ veiculos_com_despesas }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     VEÍCULOS
+========================= -->
+
+<section class="secao">
+
+    <div class="titulo-secao">
+
+        <h2>Veículos</h2>
+
+        <p>
+            Selecione um veículo para consultar sua ficha e suas despesas.
+        </p>
+
+    </div>
+
+
+    <div class="cards">
+
+        {% for veiculo in veiculos %}
+
+            <a href="{% url 'despesas_veiculo' veiculo.id %}" class="card">
+
+                <div class="veiculo-icone">
+                    {% if veiculo.fotos.all %}
+                        <img
+                            src="{{ veiculo.fotos.all.0.imagem.url }}"
+                            alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}"
+                        >
+                    {% else %}
+                        <span><i data-lucide="image-off"></i></span>
+                    {% endif %}
                 </div>
 
-                <div class="badge-perfil">
-                    Administrativo
-                </div>
 
-            </header>
+                <div class="card-texto">
 
-
-            <!-- AÇÕES RÁPIDAS -->
-            <section class="secao">
-
-                <div class="titulo-secao">
-                    <h2>Ações rápidas</h2>
+                    <h3>
+                        {{ veiculo.marca }} {{ veiculo.modelo }}
+                    </h3>
 
                     <p>
-                        Acesse rapidamente as principais funções.
+                        Placa: {{ veiculo.placa }}
+                        · {{ veiculo.ano_modelo|unlocalize }}
                     </p>
-                </div>
-
-
-                <div class="cards">
-                    <!-- ENTREGA -->
-                    <a href="#" class="card">
-
-                        <div class="card-icone">
-                            <i  data-lucide="car"></i>
-                        </div>
-
-                        <div class="card-texto">
-                            <h3>Entrega do veículo</h3>
-
-                            <p>
-                                Controle os veículos prontos para entrega.
-                            </p>
-                        </div>
-
-                        <span class="seta">→</span>
-
-                    </a>
-
-
-                    <!-- HISTÓRICO -->
-                    <a href="#" class="card">
-
-                        <div class="card-icone">
-                            <i data-lucide="check"></i>
-                        </div>
-
-                        <div class="card-texto">
-                            <h3>Entregas realizadas</h3>
-
-                            <p>
-                                Consulte o histórico de veículos entregues.
-                            </p>
-                        </div>
-
-                        <span class="seta">→</span>
-
-                    </a>
 
                 </div>
 
-            </section>
 
-
-            <!-- RESUMO -->
-            <section class="secao">
-
-                <div class="titulo-secao">
-                    <h2>Resumo</h2>
-
-                    <p>
-                        Informações gerais do setor administrativo.
-                    </p>
+                <div class="seta">
+                    <span><i data-lucide="chevrons-right"></i></span>
                 </div>
 
+            </a>
 
-                <div class="resumo">
+        {% empty %}
 
-                    <div class="resumo-card">
-                        <span class="resumo-titulo">
-                            Despesas pendentes
-                        </span>
+            <div class="vazio">
 
-                        <strong>0</strong>
-                    </div>
-
-
-                    <div class="resumo-card">
-                        <span class="resumo-titulo">
-                            Documentações pendentes
-                        </span>
-
-                        <strong>0</strong>
-                    </div>
-
-
-                    <div class="resumo-card">
-                        <span class="resumo-titulo">
-                            Veículos aguardando entrega
-                        </span>
-
-                        <strong>0</strong>
-                    </div>
-
+                <div class="vazio-icone">
+                    <i data-lucide="car "></i>
                 </div>
 
-            </section>
+                <strong>
+                    Nenhum veículo cadastrado
+                </strong>
+
+                <p>
+                    Ainda não existem veículos disponíveis no sistema.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
 {% endblock %}

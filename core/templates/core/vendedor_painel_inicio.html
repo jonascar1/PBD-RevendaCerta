@@ -21,36 +21,6 @@
     </header>
 
 
-    <section>
-
-        <div class="titulo-secao">
-            <h2>Ações rápidas</h2>
-            <p>Acesse rapidamente as principais funções.</p>
-        </div>
-
-
-        <div class="cards-acoes">
-
-            <a href="{% url 'nova_proposta' %}" class="card-acao">
-
-                <div class="icone">
-                    <i data-lucide="dollar-sign"></i>
-                </div>
-
-                <div class="card-texto">
-                    <strong>Nova negociação</strong>
-                    <span>Crie uma proposta para seu cliente.</span>
-                </div>
-
-                <div class="seta">
-                    <i data-lucide="chevrons-right"></i>
-                </div>
-
-            </a>
-
-        </div>
-
-    </section>
     {% if avisos_procura %}
     <section class="avisos-propostas">
         <h2>Veículos compatíveis com procuras</h2>
@@ -166,66 +136,6 @@
 
     </section>
 
-
-    <section class="atividade-section">
-
-        <div class="titulo-secao">
-            <h2>Fila de hoje</h2>
-            <p>Clientes e negociações que precisam de atenção hoje.</p>
-        </div>
-
-        <div class="fila-card">
-
-            <div class="fila-item">
-
-                <div class="fila-horario">
-                    <strong>09:00</strong>
-                </div>
-
-                <div class="fila-info">
-                    <strong>João da Silva</strong>
-                    <span>Retorno sobre proposta do Honda Civic</span>
-                </div>
-
-                <span class="fila-status">Aguardando</span>
-
-            </div>
-
-
-            <div class="fila-item">
-
-                <div class="fila-horario">
-                    <strong>11:30</strong>
-                </div>
-
-                <div class="fila-info">
-                    <strong>Maria Oliveira</strong>
-                    <span>Apresentação do Toyota Corolla</span>
-                </div>
-
-                <span class="fila-status">Agendado</span>
-
-            </div>
-
-
-            <div class="fila-item">
-
-                <div class="fila-horario">
-                    <strong>15:00</strong>
-                </div>
-
-                <div class="fila-info">
-                    <strong>Carlos Souza</strong>
-                    <span>Negociação de veículo</span>
-                </div>
-
-                <span class="fila-status">Agendado</span>
-
-            </div>
-
-        </div>
-
-    </section>
 
     <section class="dados-section">
 

@@ -1,28 +1,42 @@
+/* TOPO */
+
 .topo {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
+
     margin-bottom: 35px;
 }
 
 .topo h1 {
     font-size: 28px;
+
     margin-bottom: 6px;
 }
 
 .topo p {
     color: #6b7280;
+
     font-size: 14px;
 }
 
 .cargo {
     background: white;
+
     border: 1px solid #e5e7eb;
+
     padding: 10px 16px;
+
     border-radius: 8px;
+
     font-size: 14px;
+
     font-weight: bold;
 }
+
+
+/* TÍTULOS */
 
 .titulo-secao {
     margin-bottom: 16px;
@@ -30,13 +44,18 @@
 
 .titulo-secao h2 {
     font-size: 18px;
+
     margin-bottom: 5px;
 }
 
 .titulo-secao p {
     font-size: 12px;
+
     color: #64748b;
 }
+
+
+/* CARDS */
 
 .cards-acoes {
     display: grid;
@@ -81,20 +100,28 @@
 
 .card-texto strong {
     display: block;
+
     color: #142033;
+
     font-size: 14px;
+
     margin-bottom: 5px;
 }
 
 .card-texto span {
     color: #64748b;
+
     font-size: 12px;
 }
 
 .seta {
     color: #94a3b8;
+
     font-size: 20px;
 }
+
+
+/* DADOS */
 
 .dados-section {
     margin-top: 32px;
@@ -102,43 +129,64 @@
 
 .dados-grid {
     display: grid;
+
     grid-template-columns: 1fr 1fr 1.5fr;
+
     gap: 16px;
 }
 
 .dado {
     background: white;
+
     border: 1px solid #dfe4ec;
+
     border-radius: 10px;
+
     padding: 20px;
 }
 
 .dado span {
     display: block;
+
     color: #64748b;
+
     font-size: 12px;
+
     margin-bottom: 8px;
 }
 
 .dado strong {
     display: block;
+
     font-size: 25px;
+
     color: #142033;
+
     margin-bottom: 5px;
 }
 
 .dado small {
     color: #94a3b8;
+
     font-size: 11px;
 }
 
+
+/* AVISO */
+
 .aviso {
     background: #eef5ff;
+
     border: 1px solid #d7e5ff;
+
     border-radius: 10px;
+
     padding: 18px;
+
     display: flex;
+
     gap: 12px;
+
     align-items: flex-start;
 }
 
@@ -148,19 +196,30 @@
 
 .aviso strong {
     display: block;
+
     font-size: 13px;
+
     margin-bottom: 5px;
 }
 
 .aviso p {
     color: #64748b;
+
     font-size: 11px;
+
     line-height: 1.5;
 }
+
+/* ==============================
+   PROPOSTAS E FILA
+============================== */
 
 .atividade-section {
     margin-top: 32px;
 }
+
+
+/* PROPOSTAS */
 
 .propostas-card {
     background: white;
@@ -174,7 +233,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+
     padding: 18px 20px;
+
     border-bottom: 1px solid #eef1f5;
 }
 
@@ -205,10 +266,16 @@
     margin-bottom: 6px;
 }
 
+
+/* STATUS DA PROPOSTA */
+
 .status {
     display: inline-block;
+
     padding: 5px 9px;
+
     border-radius: 20px;
+
     font-size: 11px;
     font-weight: bold;
 }
@@ -228,6 +295,9 @@
     color: #dc2626;
 }
 
+
+/* FILA */
+
 .fila-card {
     background: white;
     border: 1px solid #dfe4ec;
@@ -239,7 +309,9 @@
     display: flex;
     align-items: center;
     gap: 20px;
+
     padding: 18px 20px;
+
     border-bottom: 1px solid #eef1f5;
 }
 
@@ -249,7 +321,9 @@
 
 .fila-horario {
     min-width: 55px;
+
     color: #2563eb;
+
     font-size: 14px;
 }
 
@@ -259,22 +333,31 @@
 
 .fila-info strong {
     display: block;
+
     color: #142033;
+
     font-size: 14px;
+
     margin-bottom: 5px;
 }
 
 .fila-info span {
     color: #64748b;
+
     font-size: 12px;
 }
 
 .fila-status {
     padding: 5px 9px;
+
     border-radius: 20px;
+
     background: #edf4ff;
+
     color: #2563eb;
+
     font-size: 11px;
+
     font-weight: bold;
 }
 
@@ -339,19 +422,22 @@
 }
 
 @media (max-width: 900px) {
+
     .dados-grid {
         grid-template-columns: 1fr;
     }
+
 }
 
 @media (max-width: 700px) {
+
     .cards-acoes {
         grid-template-columns: 1fr;
     }
 
     .proposta {
-        align-items: flex-start;
-        flex-direction: column;
+    align-items: flex-start;
+    flex-direction: column;
     }
 
     .proposta-valor {
@@ -367,8 +453,9 @@
     .fila-status {
         margin-left: 75px;
     }
-}
 
+}
+/* Estilos para os novos status de proposta / reserva */
 .status.aguardando {
     background-color: var(--warning-bg, #fffbe6);
     color: var(--warning-color, #d46b08);
@@ -387,13 +474,13 @@
     border: 1px solid var(--danger-border, #ffa39e);
 }
 
+/* Ajuste para o elemento .proposta quando for uma tag de link <a> */
 a.proposta,
 .proposta {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: block; /* Garante que o link se comporte como bloco/card completo */
 }
-
 .avisos-propostas {
     padding: 20px;
     margin-bottom: 24px;
@@ -447,6 +534,7 @@ a.proposta,
     }
 }
 
+/* T17 — fila real */
 .fila-acao {
     padding: 8px 12px;
     border-radius: 7px;
@@ -458,32 +546,23 @@ a.proposta,
     white-space: nowrap;
 }
 
-.fila-acao:hover {
-    background: #1d4ed8;
-}
+.fila-acao:hover { background: #1d4ed8; }
 
-.aviso-acoes {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.aviso-acoes form {
-    margin: 0;
-}
-
-.aviso-lido {
-    padding: 9px 14px;
-    border: 1px solid #bfdbfe;
-    border-radius: 7px;
-    background: #fff;
-    color: #1e40af;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.aviso-lido:hover {
-    background: #eff6ff;
+/* T18 — avisos de procura */
+.aviso-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.aviso-acoes form{margin:0}
+.aviso-lido{padding:9px 14px;border:1px solid #bfdbfe;border-radius:7px;background:#fff;color:#1e40af;font:inherit;font-weight:600;cursor:pointer}
+.aviso-lido:hover{background:#eff6ff}
+/* Links dos cards sem sublinhado, inclusive filhos e estados de visita. */
+.conteudo .veiculos-grid a,
+.conteudo .veiculos-grid a:link,
+.conteudo .veiculos-grid a:visited,
+.conteudo .veiculos-grid a:hover,
+.conteudo .veiculos-grid a:focus,
+.conteudo .veiculos-grid a *,
+.conteudo .veiculos-grid a:hover *,
+.conteudo .veiculos-grid .dado,
+.conteudo .veiculos-grid .dado * {
+    text-decoration: none !important;
+    text-decoration-line: none !important;
 }

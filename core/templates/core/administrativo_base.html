@@ -15,7 +15,7 @@
     </title>
 
     <!-- CSS PADRÃO DO PAINEL -->
-    <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}?v=5">
     <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}">
 
     <!-- CSS ESPECÍFICO DE CADA PÁGINA -->
@@ -24,6 +24,7 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
 </head>
 
 <body>
@@ -64,12 +65,12 @@
                     Despesas
                 </a>
 
-                <a href="#" class="menu-item">
+                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
                     <span class="icone"><i data-lucide="file-text"></i></span>
                     Documentação
                 </a>
 
-                <a href="#" class="menu-item">
+                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
                     <span class="icone"><i data-lucide="truck"></i></span>
                     Entrega do veículo
                 </a>
