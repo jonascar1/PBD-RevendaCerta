@@ -59,6 +59,12 @@
                 <div class="prop-dado"><span>Vendedor responsável</span><strong>{{ proposta.vendedor }}</strong></div>
                 <div class="prop-dado"><span>Situação</span><strong><span class="prop-badge prop-badge-{{ proposta.situacao|lower }}">{{ proposta.get_situacao_display|default:proposta.situacao }}</span></strong></div>
                 <div class="prop-dado"><span>Identificador</span><strong>#{{ proposta.pk }}</strong></div>
+                {% if proposta.contato_origem %}
+                    <div class="prop-dado">
+                        <span>Nasceu do contato</span>
+                        <strong>{{ proposta.contato_origem.realizado_em|date:"d/m/Y" }} · {{ proposta.contato_origem.get_canal_display }}</strong>
+                    </div>
+                {% endif %}
             </div>
             <div class="prop-links-relacionados">
                 <a class="prop-btn prop-btn-secundario prop-btn-pequeno" href="{% url 'detalhes_cliente' proposta.cliente.pk %}">Abrir ficha do cliente ↗</a>

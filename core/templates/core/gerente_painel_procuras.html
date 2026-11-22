@@ -36,6 +36,40 @@
 
     <section class="cart-painel">
         <div class="cart-secao-topo">
+            <h2>Procurado e sem veículo no pátio</h2>
+            <span>O que a loja deveria comprar</span>
+        </div>
+
+        {% if procuras_sem_estoque %}
+            <div class="cart-tabela-wrap">
+                <table class="cart-tabela proc-tabela">
+                    <thead>
+                        <tr>
+                            <th>O que procuram</th>
+                            <th>Procuras abertas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in procuras_sem_estoque %}
+                            <tr>
+                                <td>{{ item.resumo }}</td>
+                                <td>{{ item.quantidade }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="cart-vazio">
+                <i data-lucide="check-circle"></i>
+                <h3>Tudo o que é procurado existe no pátio</h3>
+                <p>Nenhuma procura aberta está sem veículo compatível.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="cart-painel cart-secao-espaco">
+        <div class="cart-secao-topo">
             <h2>Todas as procuras</h2>
 
             <form method="get" class="proc-filtro">

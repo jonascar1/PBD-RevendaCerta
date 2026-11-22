@@ -1,6 +1,11 @@
 {% extends "core/gerente_base.html" %}
 
 {% block title %}Relatórios | VENDACERTA{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_relatorios.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="relatorios">
@@ -224,12 +229,40 @@
         </div>
     </section>
 
+    <section class="relatorio-contatos">
+        <h2>Contatos e oportunidades</h2>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_contatos.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_contatos.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="relatorio-carros-parados">
         <h2>Carros parados no estoque</h2>
 
         <p>
-            Veículos com pelo menos {{ dias_parados }}
-            dias desde o cadastro.
+            Veículos disponíveis ou reservados há pelo menos
+            {{ dias_parados }} dias, contados até a data final
+            do período selecionado acima (ou até hoje, se a data final
+            for futura).
         </p>
 
         <form method="get">
@@ -282,7 +315,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 Nenhum veículo encontrado.
                             </td>
                         </tr>

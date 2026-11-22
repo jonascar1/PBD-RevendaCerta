@@ -733,6 +733,14 @@ class Proposta(models.Model):
         default=StatusAprovacao.NAO_NECESSARIA,
         editable=False,
     )
+    contato_origem = models.ForeignKey(
+        "ContatoCarteira",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="propostas_geradas",
+    )
 
     criada_em = models.DateTimeField(auto_now_add=True)
     atualizada_em = models.DateTimeField(auto_now=True)
@@ -2190,6 +2198,12 @@ class ContatoCarteira(models.Model):
         WHATSAPP = "WHATSAPP", "WhatsApp"
         PRESENCIAL = "PRESENCIAL", "Presencial"
 
+    class Resultado(models.TextChoices):
+        AINDA_COM_CARRO = "AINDA_COM_CARRO", "Ainda está com o carro"
+        NAO_QUER_AGORA = "NAO_QUER_AGORA", "Não quer agora"
+        TROCOU_OUTRA_LOJA = "TROCOU_OUTRA_LOJA", "Já trocou em outra loja"
+        QUER_VER_OPCOES = "QUER_VER_OPCOES", "Quer ver opções"
+
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.PROTECT,
@@ -2200,6 +2214,11 @@ class ContatoCarteira(models.Model):
         on_delete=models.PROTECT,
         related_name="contatos_carteira_realizados",
         limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
+    )
+    resultado = models.CharField(
+        max_length=20,
+        choices=Resultado.choices,
+        default=Resultado.AINDA_COM_CARRO,
     )
     canal = models.CharField(
         max_length=12,
@@ -2230,6 +2249,14 @@ class ContatoCarteira(models.Model):
                 "vendedor": "O contato deve pertencer a um vendedor."
             })
 
+        if (
+            self.resultado == self.Resultado.NAO_QUER_AGORA
+            and not self.data_retorno
+        ):
+            raise ValidationError({
+                "data_retorno": "Informe a data de retorno para quem não quer agora."
+            })
+
         if self.data_retorno:
             data_contato = timezone.localtime(self.realizado_em).date()
             if self.data_retorno < data_contato:
@@ -2239,6 +2266,34 @@ class ContatoCarteira(models.Model):
 
     def __str__(self):
         return f"{self.cliente} - {self.vendedor} - {self.realizado_em:%d/%m/%Y}"
+
+
+class Oportunidade(models.Model):
+    """Interesse demonstrado num contato da carteira ("quer ver opções")."""
+
+    contato = models.OneToOneField(
+        ContatoCarteira,
+        on_delete=models.PROTECT,
+        related_name="oportunidade",
+    )
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.PROTECT,
+        related_name="oportunidades",
+    )
+    vendedor = models.ForeignKey(
+        Usuario,
+        on_delete=models.PROTECT,
+        related_name="oportunidades",
+        limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
+    )
+    criada_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criada_em", "-pk"]
+
+    def __str__(self):
+        return f"Oportunidade #{self.pk} — {self.cliente} — {self.vendedor}"
 
 
 # ==============================================================================

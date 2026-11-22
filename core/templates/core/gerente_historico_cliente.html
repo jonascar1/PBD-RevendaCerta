@@ -211,6 +211,7 @@
                 <tr>
                     <th>Data</th>
                     <th>Canal</th>
+                    <th>Resultado</th>
                     <th>Vendedor</th>
                     <th>O que foi conversado</th>
                     <th>Retorno</th>
@@ -224,6 +225,7 @@
                         <small>{{ contato.realizado_em|date:"H:i" }}</small>
                     </td>
                     <td>{{ contato.get_canal_display }}</td>
+                    <td>{{ contato.get_resultado_display }}</td>
                     <td>{{ contato.vendedor.get_full_name|default:contato.vendedor.username }}</td>
                     <td class="hist-motivo">{{ contato.observacao|default:"—" }}</td>
                     <td>
@@ -235,7 +237,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="hist-vazio">Nenhum contato registrado na carteira.</td></tr>
+                <tr><td colspan="6" class="hist-vazio">Nenhum contato registrado na carteira.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

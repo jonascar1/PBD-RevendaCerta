@@ -73,6 +73,23 @@ def calcular_carteira(vendedor=None, hoje=None):
         and (vendedor is None or vendedor.pk in dados["vendedores"])
     }
 
+    # "Já trocou em outra loja": o cliente sai da carteira, a menos que tenha
+    # comprado de novo depois do contato. O caso é contado para o gerente.
+    ids_trocou = set()
+    for cliente_id, realizado_em in ContatoCarteira.objects.filter(
+        cliente_id__in=elegiveis,
+        resultado=ContatoCarteira.Resultado.TROCOU_OUTRA_LOJA,
+    ).values_list("cliente_id", "realizado_em"):
+        data_contato = timezone.localtime(realizado_em).date()
+        if data_contato >= elegiveis[cliente_id]["ultima_venda"].data:
+            ids_trocou.add(cliente_id)
+
+    elegiveis = {
+        cliente_id: dados
+        for cliente_id, dados in elegiveis.items()
+        if cliente_id not in ids_trocou
+    }
+
     telefones = {
         cliente.pk: next((t.numero for t in cliente.telefones.all()), "")
         for cliente in Cliente.objects.filter(pk__in=elegiveis).prefetch_related(
@@ -119,6 +136,14 @@ def calcular_carteira(vendedor=None, hoje=None):
         retorno_chegou = retorno is not None and retorno <= hoje
         contatado_mes = cliente_id in ids_contatados
 
+        # "Não quer agora": sai da fila até a data de retorno pedida.
+        adiado = (
+            ultimo is not None
+            and ultimo.resultado == ContatoCarteira.Resultado.NAO_QUER_AGORA
+            and retorno is not None
+            and retorno > hoje
+        )
+
         linhas.append(
             {
                 "cliente": dados["cliente"],
@@ -137,7 +162,10 @@ def calcular_carteira(vendedor=None, hoje=None):
                 "ultimo_contato": ultimo,
                 "retorno": retorno,
                 "retorno_chegou": retorno_chegou,
-                "para_ligar_hoje": (not contatado_mes) or retorno_chegou,
+                "adiado": adiado,
+                "para_ligar_hoje": (
+                    retorno_chegou or (not contatado_mes and not adiado)
+                ),
             }
         )
 
@@ -163,6 +191,7 @@ def calcular_carteira(vendedor=None, hoje=None):
         "total_hoje": len(linhas_hoje),
         "retornos_hoje": sum(1 for item in linhas_hoje if item["retorno_chegou"]),
         "contatados_mes": len(ids_contatados),
+        "trocaram_outra_loja": len(ids_trocou),
         "anos_configurados": configuracao.anos_sem_comprar,
         "data_limite": limite,
     }

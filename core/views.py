@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Max, ProtectedError, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
@@ -46,6 +47,7 @@ from .models import (
     AvaliacaoTroca,
     AvisoProcura,
     Cliente,
+    ContatoCarteira,
     DecisaoProposta,
     EntregaVeiculo,
     EtapaDocumentacao,
@@ -54,6 +56,7 @@ from .models import (
     HistoricoPrecoVeiculo,
     HistoricoSituacaoVeiculo,
     LancamentoFinanceiro,
+    Oportunidade,
     PerfilVendedor,
     Procura,
     Proposta,
@@ -105,6 +108,16 @@ def _propostas_visiveis(usuario):
     return propostas
 
 
+def _contato_origem_do_vendedor(request):
+    """Contato da carteira (do próprio vendedor) que originou a proposta, se informado."""
+    valor = request.POST.get("contato") or request.GET.get("contato") or ""
+    if not valor.isdigit():
+        return None
+    return ContatoCarteira.objects.filter(
+        pk=int(valor), vendedor=request.user
+    ).first()
+
+
 def _dados_veiculos_para_js(veiculos):
     """Serializa preço e status de reserva dos veículos para consumo no formulário de proposta."""
     reservas = {
@@ -128,6 +141,14 @@ def _dados_veiculos_para_js(veiculos):
             ),
         }
     return dados
+
+
+def _veiculos_disponiveis_para_procura():
+    """Veículos que estão à venda agora, usados no cruzamento com as procuras."""
+    return Veiculo.objects.filter(
+        situacao=Veiculo.Situacao.DISPONIVEL,
+        status=Veiculo.Status.DISPONIVEL,
+    )
 
 
 # ==============================================================================
@@ -634,6 +655,12 @@ def _proposta_form_view(request, proposta, titulo):
                 proposta = form.save(commit=False)
                 if not editando:
                     proposta.vendedor = request.user
+                    contato_origem = _contato_origem_do_vendedor(request)
+                    if (
+                        contato_origem
+                        and contato_origem.cliente_id == proposta.cliente_id
+                    ):
+                        proposta.contato_origem = contato_origem
                 proposta.save(usuario=request.user)
 
                 formset.instance = proposta
@@ -672,6 +699,9 @@ def _proposta_form_view(request, proposta, titulo):
         form = PropostaForm(instance=proposta, initial=initial)
         formset = ComposicaoFormSet(instance=proposta)
 
+    contato_origem = None if editando else _contato_origem_do_vendedor(request)
+    contato_origem_id = contato_origem.pk if contato_origem else None
+
     return render(
         request,
         "core/vendedor_painel_proposta_formulario.html",
@@ -679,6 +709,7 @@ def _proposta_form_view(request, proposta, titulo):
             "form": form,
             "formset": formset,
             "titulo": titulo,
+            "contato_origem_id": contato_origem_id,
             "proposta": proposta if editando else None,
             "veiculos_info": _dados_veiculos_para_js(form.fields["veiculo"].queryset),
             "avaliacoes_troca_info": {
@@ -1015,10 +1046,27 @@ def registrar_contato_carteira_view(request, cliente_id):
 
             try:
                 contato.full_clean()
-                contato.save()
+                with transaction.atomic():
+                    contato.save()
+                    if contato.resultado == ContatoCarteira.Resultado.QUER_VER_OPCOES:
+                        Oportunidade.objects.create(
+                            contato=contato,
+                            cliente=cliente,
+                            vendedor=request.user,
+                        )
             except ValidationError as erro:
                 adicionar_erros_de_validacao(form, erro)
             else:
+                if contato.resultado == ContatoCarteira.Resultado.QUER_VER_OPCOES:
+                    messages.success(
+                        request,
+                        "Contato registrado e oportunidade criada. "
+                        "Registre a proposta para o cliente.",
+                    )
+                    return redirect(
+                        f"{reverse('nova_proposta')}"
+                        f"?cliente={cliente.pk}&contato={contato.pk}"
+                    )
                 messages.success(request, "Contato registrado com sucesso.")
                 return redirect("carteira_vendedor")
     else:
@@ -1042,11 +1090,20 @@ def procuras_vendedor_view(request):
         .order_by("-criada_em", "-pk")
     )
 
+    abertas = [p for p in procuras if p.esta_aberta]
+
+    # Veículos do estoque que casam com cada procura aberta, hoje.
+    disponiveis = list(_veiculos_disponiveis_para_procura())
+    for procura in abertas:
+        procura.compativeis = [
+            v for v in disponiveis if procura.combina_com(v)
+        ]
+
     return render(
         request,
         "core/vendedor_painel_procuras.html",
         {
-            "abertas": [p for p in procuras if p.esta_aberta],
+            "abertas": abertas,
             "encerradas": [p for p in procuras if not p.esta_aberta],
         },
     )
@@ -2275,10 +2332,27 @@ def procuras_gerente_view(request):
     else:
         situacao = ""
 
+    # Relatório: o que é procurado e não existe no pátio.
+    disponiveis = list(_veiculos_disponiveis_para_procura())
+    sem_estoque = {}
+    for procura in Procura.objects.filter(
+        situacao=Procura.Situacao.ABERTA
+    ).select_related("cliente"):
+        if any(procura.combina_com(v) for v in disponiveis):
+            continue
+        item = sem_estoque.setdefault(
+            procura.resumo(), {"resumo": procura.resumo(), "quantidade": 0}
+        )
+        item["quantidade"] += 1
+    procuras_sem_estoque = sorted(
+        sem_estoque.values(), key=lambda i: (-i["quantidade"], i["resumo"])
+    )
+
     return render(
         request,
         "core/gerente_painel_procuras.html",
         {
+            "procuras_sem_estoque": procuras_sem_estoque,
             "procuras": procuras.order_by("-criada_em", "-pk"),
             "situacoes": Procura.Situacao.choices,
             "situacao_selecionada": situacao,

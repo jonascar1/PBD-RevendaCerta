@@ -26,6 +26,9 @@
 
     <form method="post" enctype="multipart/form-data" novalidate id="proposta-form">
         {% csrf_token %}
+        {% if contato_origem_id %}
+            <input type="hidden" name="contato" value="{{ contato_origem_id }}">
+        {% endif %}
         {{ form.non_field_errors }}
 
         <div class="prop-grid-form">

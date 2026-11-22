@@ -44,6 +44,7 @@
                         <tr>
                             <th>Cliente</th>
                             <th>O que procura</th>
+                            <th>No estoque hoje</th>
                             <th>Válida até</th>
                             <th>Ação</th>
                         </tr>
@@ -57,6 +58,17 @@
                                     </a>
                                 </td>
                                 <td>{{ procura.resumo }}</td>
+                                <td>
+                                    {% for veiculo in procura.compativeis %}
+                                        <div>
+                                            <a href="{% url 'detalhes_veiculo_vendedor' veiculo.pk %}" class="cart-link">
+                                                {{ veiculo.marca }} {{ veiculo.modelo }} · {{ veiculo.placa }}
+                                            </a>
+                                        </div>
+                                    {% empty %}
+                                        <span class="cart-muted">Nenhum veículo combina</span>
+                                    {% endfor %}
+                                </td>
                                 <td>{{ procura.valido_ate|date:"d/m/Y" }}</td>
                                 <td>
                                     <form method="post"

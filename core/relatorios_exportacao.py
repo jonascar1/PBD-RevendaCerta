@@ -1,11 +1,19 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from django.db.models import Count, Sum
+from django.db.models import Count, DateTimeField, F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.formats import number_format
 
-from .models import LancamentoFinanceiro, Veiculo, Venda
+from .models import (
+    ContatoCarteira,
+    HistoricoSituacaoVeiculo,
+    LancamentoFinanceiro,
+    Oportunidade,
+    Veiculo,
+    Venda,
+)
 
 
 def obter_dados_exportacao(data_inicio, data_fim, dias_parados=30):
@@ -131,44 +139,120 @@ def obter_dados_exportacao(data_inicio, data_fim, dias_parados=30):
         for item in despesas
     ]
 
-    hoje = timezone.localdate()
+    total_contatos = ContatoCarteira.objects.filter(
+        realizado_em__date__range=(inicio, fim)
+    ).count()
 
-    # Data de referência limitada ao presente.
-    data_referencia = min(fim, hoje)
+    oportunidades = Oportunidade.objects.filter(
+        criada_em__date__range=(inicio, fim)
+    )
+    total_oportunidades = oportunidades.count()
+    oportunidades_vendidas = (
+        oportunidades.filter(
+            contato__propostas_geradas__vendas__situacao=Venda.Situacao.FECHADA
+        )
+        .distinct()
+        .count()
+    )
 
+    # O relatório de parados é uma fotografia do estoque na data final do
+    # período (limitada a hoje): conta dias a partir de quando o carro
+    # ficou disponível.
+    data_referencia = min(fim, timezone.localdate())
     limite = data_referencia - timedelta(days=dias_parados)
+
+    ultima_disponibilidade = (
+        HistoricoSituacaoVeiculo.objects.filter(
+            veiculo=OuterRef("pk"),
+            situacao_nova=Veiculo.Situacao.DISPONIVEL,
+        )
+        .order_by("-alterado_em")
+        .values("alterado_em")[:1]
+    )
 
     estoque = (
         Veiculo.objects.filter(
+            situacao__in=[
+                Veiculo.Situacao.DISPONIVEL,
+                Veiculo.Situacao.RESERVADO,
+            ],
             status__in=[
                 Veiculo.Status.DISPONIVEL,
                 Veiculo.Status.RESERVADO,
             ],
-            situacao__in=[
-                Veiculo.Situacao.PREPARACAO,
-                Veiculo.Situacao.DISPONIVEL,
-                Veiculo.Situacao.RESERVADO,
-            ],
             venda_fechada=False,
-            criado_em__date__lte=limite,
         )
-        .order_by("criado_em", "pk")
+        .annotate(
+            disponivel_desde=Coalesce(
+                Subquery(ultima_disponibilidade),
+                F("criado_em"),
+                output_field=DateTimeField(),
+            )
+        )
+        .filter(disponivel_desde__date__lte=limite)
+        .prefetch_related(
+            Prefetch(
+                "lancamentos",
+                queryset=LancamentoFinanceiro.objects.filter(
+                    excluido=False,
+                    tipo__in=[
+                        LancamentoFinanceiro.Tipo.CUSTO_AQUISICAO,
+                        LancamentoFinanceiro.Tipo.DESPESA,
+                    ],
+                ),
+                to_attr="custos_ativos",
+            )
+        )
+        .order_by("disponivel_desde", "pk")
     )
 
-    linhas_estoque = [
-        [
+    linhas_estoque = []
+
+    for veiculo in estoque:
+        custo_aquisicao_lancamentos = sum(
+            (
+                lancamento.valor
+                for lancamento in veiculo.custos_ativos
+                if lancamento.tipo
+                == LancamentoFinanceiro.Tipo.CUSTO_AQUISICAO
+            ),
+            Decimal("0.00"),
+        )
+
+        despesas_acumuladas = sum(
+            (
+                lancamento.valor
+                for lancamento in veiculo.custos_ativos
+                if lancamento.tipo
+                == LancamentoFinanceiro.Tipo.DESPESA
+            ),
+            Decimal("0.00"),
+        )
+
+        if veiculo.origem == Veiculo.Origem.CONSIGNADO:
+            custo_base = veiculo.valor_repasse or Decimal("0.00")
+        else:
+            custo_base = (
+                custo_aquisicao_lancamentos
+                if custo_aquisicao_lancamentos
+                else veiculo.custo_aquisicao or Decimal("0.00")
+            )
+
+        custo_acumulado = custo_base + despesas_acumuladas
+
+        desde = timezone.localtime(veiculo.disponivel_desde).date()
+        dias_estoque = (data_referencia - desde).days
+
+        linhas_estoque.append([
             str(veiculo),
             veiculo.placa,
-            timezone.localtime(veiculo.criado_em).date(),
-            (
-                data_referencia
-                - timezone.localtime(veiculo.criado_em).date()
-            ).days,
+            desde,
+            dias_estoque,
+            custo_acumulado,
             veiculo.preco_venda,
             veiculo.get_situacao_display(),
-        ]
-        for veiculo in estoque
-    ]
+        ])
+
 
     return {
         "periodo": (inicio, fim),
@@ -181,15 +265,15 @@ def obter_dados_exportacao(data_inicio, data_fim, dias_parados=30):
                     ["Faturamento", faturamento],
                     ["Ticket médio", ticket_medio],
                 ],
-            },
-            "Vendas": {
+            },"Vendas": {
                 "cabecalhos": [
-                    "Data", "Veículo", "Vendedor", "Valor",
+                    "Data", "Veículo", "Cliente", "Vendedor", "Valor",
                 ],
                 "linhas": [
                     [
                         venda.data,
                         str(venda.veiculo),
+                        venda.cliente.nome_exibicao,
                         venda.vendedor.get_full_name()
                         or venda.vendedor.username,
                         venda.valor_venda,
@@ -218,12 +302,24 @@ def obter_dados_exportacao(data_inicio, data_fim, dias_parados=30):
                 ],
                 "linhas": linhas_despesas,
             },
+            "Contatos e oportunidades": {
+                "cabecalhos": ["Indicador", "Valor"],
+                "linhas": [
+                    ["Contatos realizados", total_contatos],
+                    ["Oportunidades criadas", total_oportunidades],
+                    ["Oportunidades que viraram venda", oportunidades_vendidas],
+                ],
+            },
             "Carros parados": {
                 "cabecalhos": [
-                    "Veículo", "Placa", "Cadastro",
-                    "Dias em estoque", "Preço atual",
-                    "Situação",
-                ],
+                "Veículo",
+                "Placa",
+                "Disponível desde",
+                "Dias em estoque",
+                "Custo acumulado",
+                "Preço atual",
+                "Situação",
+            ],
                 "linhas": linhas_estoque,
             },
         },
@@ -263,8 +359,8 @@ def formatar_valor_relatorio(valor, tipo="texto"):
 TIPOS_COLUNAS_RELATORIOS = {
     "Resumo": ["texto", "texto"],
     "Vendas": [
-        "data", "texto", "texto", "moeda",
-    ],
+    "data", "texto", "texto", "texto", "moeda",
+],
     "Vendedores": [
         "texto", "texto", "moeda", "moeda", "moeda",
     ],
@@ -275,10 +371,16 @@ TIPOS_COLUNAS_RELATORIOS = {
     "Despesas": [
         "texto", "texto", "moeda",
     ],
-    "Carros parados": [
-        "texto", "texto", "data", "texto",
-        "moeda", "texto",
-    ],
+   "Contatos e oportunidades": ["texto", "texto"],
+   "Carros parados": [
+    "texto",
+    "texto",
+    "data",
+    "texto",
+    "moeda",
+    "moeda",
+    "texto",
+],
 }
 
 
@@ -334,6 +436,7 @@ def obter_contexto_relatorios(data_inicio, data_fim, dias_parados=30):
         "relatorio_vendedores": secoes["Vendedores"],
         "relatorio_margens": secoes["Margens"],
         "relatorio_despesas": secoes["Despesas"],
+        "relatorio_contatos": secoes["Contatos e oportunidades"],
         "relatorio_estoque": secoes["Carros parados"],
         "quantidade_parados": len(
             secoes["Carros parados"]["linhas"]

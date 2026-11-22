@@ -1417,8 +1417,9 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
 
     class Meta:
         model = ContatoCarteira
-        fields = ["canal", "observacao", "data_retorno"]
+        fields = ["resultado", "canal", "observacao", "data_retorno"]
         labels = {
+            "resultado": "Resultado do contato",
             "canal": "Canal",
             "observacao": "O que foi conversado",
             "data_retorno": "Voltar a falar em",
@@ -1432,6 +1433,10 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
             ),
         }
         error_messages = {
+            "resultado": {
+                "required": "Selecione o resultado do contato.",
+                "invalid_choice": "Resultado inválido.",
+            },
             "canal": {
                 "required": "Selecione o canal do contato.",
                 "invalid_choice": "Canal inválido.",
@@ -1453,6 +1458,18 @@ class ContatoCarteiraForm(BaseForm, forms.ModelForm):
                 "A data de retorno não pode estar no passado."
             )
         return retorno
+
+    def clean(self):
+        cleaned = super().clean()
+        if (
+            cleaned.get("resultado") == ContatoCarteira.Resultado.NAO_QUER_AGORA
+            and not cleaned.get("data_retorno")
+        ):
+            self.add_error(
+                "data_retorno",
+                "Informe a data de retorno para quem não quer agora.",
+            )
+        return cleaned
 
 
 class ProcuraForm(BaseForm, forms.ModelForm):
