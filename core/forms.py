@@ -1325,44 +1325,57 @@ class DespesaForm(BaseForm, forms.ModelForm):
 
     class Meta:
         model = LancamentoFinanceiro
-        fields = ["valor", "data_lancamento", "descricao"]
+
+
+        fields = [
+            "categoria_despesa",
+            "valor",
+            "data_lancamento",
+            "descricao",
+        ]
+
+
         labels = {
             "valor": "Valor",
             "data_lancamento": "Data do lançamento",
             "descricao": "Descrição",
+            "categoria_despesa": "Categoria da despesa",
+
         }
         widgets = {
             "valor": forms.NumberInput(attrs={"step": "0.01"}),
-            "data_lancamento": forms.DateInput(
-                format="%Y-%m-%d", attrs={"type": "date"}
-            ),
-            "descricao": forms.Textarea(
-                attrs={
-                    "rows": 4,
-                    "placeholder": "Ex.: Funilaria, documentação, limpeza...",
-                }
-            ),
-        }
-        error_messages = {
-            "valor": {
-                "required": "Informe o valor.",
-                "invalid": "Informe um valor válido.",
-            },
+            "data_lancamento": forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "descricao": forms.Textarea(attrs={"rows": 4,"placeholder": "Ex.: Funilaria, documentação, limpeza...",} ),
+            "categoria_despesa": forms.Select(attrs={"class": "form-control"}),}
+        
+        error_messages = {"valor": {"required":
+            "Informe o valor.",
+            "invalid": "Informe um valor válido.",},
             "data_lancamento": {
-                "required": "Informe a data do lançamento.",
-                "invalid": "Data inválida.",
+            "required": "Informe a data do lançamento.",
+            "invalid": "Data inválida.",
             },
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["data_lancamento"].initial = timezone.localdate
 
     def clean_valor(self):
         valor = self.cleaned_data["valor"]
         if valor <= 0:
             raise forms.ValidationError("O valor deve ser maior que zero.")
         return valor
+
+    def clean_categoria_despesa(self):
+        categoria = self.cleaned_data.get("categoria_despesa")
+
+        if not categoria:
+            raise forms.ValidationError(
+                "Selecione uma categoria para a despesa."
+            )
+
+        return categoria
+    
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["data_lancamento"].initial = timezone.localdate
 
 
 class DespesaEditarForm(DespesaForm):

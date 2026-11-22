@@ -1,8 +1,10 @@
-{% extends "base.html" %}
+{% extends "core/vendedor_base.html" %}
 {% load static %}
 
 {% block title %}Minha Carteira · VendaCerta{% endblock %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
+{% endblock %}
 {% block content %}
 <div class="cart-pagina">
     <header class="cart-cabecalho">

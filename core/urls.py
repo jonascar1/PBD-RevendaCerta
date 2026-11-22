@@ -1,5 +1,7 @@
 from django.urls import path
 
+from core import views_exportacao
+
 from . import views
 
 urlpatterns = [
@@ -33,6 +35,8 @@ urlpatterns = [
     path("painel/vendedor/carteira/", views.carteira_vendedor_view, name="carteira_vendedor"),
     path("painel/vendedor/carteira/<int:cliente_id>/contatar/", views.registrar_contato_carteira_view, name="registrar_contato_carteira"),
     path("painel/vendedor/avisos-procura/<int:aviso_id>/lido/", views.marcar_aviso_procura_lido_view, name="marcar_aviso_procura_lido"),
+    path("painel/vendedor/procuras/", views.procuras_vendedor_view, name="procuras_vendedor"),
+    path("painel/vendedor/procuras/nova/", views.nova_procura_view, name="nova_procura"),
 
     # Administrativo
     path("painel/administrativo/inicio/", views.painel_administrativo_view, name="painel_administrativo"),
@@ -70,6 +74,13 @@ urlpatterns = [
     path("painel/gerente/carteira/", views.carteira_gerente_view, name="carteira_gerente"),
     path("painel/gerente/carteira/configurar/", views.configurar_carteira_view, name="configurar_carteira"),
     path("painel/gerente/clientes/<int:cliente_id>/historico/", views.historico_cliente_view, name="historico_cliente"),
+    path("painel/gerente/procuras/",views.procuras_gerente_view,name="procuras_gerente",),
+    path("procuras/<int:procura_id>/encerrar/", views.encerrar_procura_view, name="encerrar_procura"),
+    path("painel/gerente/relatorios/",views.relatorios_gerente_view,name="relatorios_gerente",),
+    path("painel/gerente/relatorios/exportar/csv/",views_exportacao.exportar_relatorio_csv,name="exportar_relatorio_csv",),
+    path("painel/gerente/relatorios/exportar/excel/",views_exportacao.exportar_relatorio_excel,name="exportar_relatorio_excel",),
+    path("painel/gerente/relatorios/exportar/pdf/",views_exportacao.exportar_relatorio_pdf,name="exportar_relatorio_pdf",),
+
 
     # Compartilhadas
     path("veiculos/<int:veiculo_id>/situacao/", views.alterar_situacao_veiculo_view, name="alterar_situacao_veiculo"),

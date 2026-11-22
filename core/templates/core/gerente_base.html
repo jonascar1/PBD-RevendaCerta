@@ -84,6 +84,13 @@
                     Margens
                 </a>
 
+                <a href="{% url 'relatorios_gerente' %}"
+                class="menu-item
+                {% if request.resolver_match.url_name == 'relatorios_gerente' %}active{% endif %}">
+                    <span><i data-lucide="chart-column"></i></span>
+                    Relatórios
+                </a>
+
                 <a href="{% url 'documentacao_pendente' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'documentacao_pendente' %}active{% endif %}">
                     <span><i data-lucide="file-check"></i></span>

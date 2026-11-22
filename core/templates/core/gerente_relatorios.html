@@ -1,0 +1,236 @@
+{% extends "core/gerente_base.html" %}
+
+{% block title %}Relatórios | VENDACERTA{% endblock %}
+
+{% block content %}
+<div class="relatorios">
+
+    <h1>Relatórios Gerenciais</h1>
+
+    <div class="acoes-exportacao">
+        <a href="{% url 'exportar_relatorio_excel' %}?data_inicio={{ data_inicio|urlencode }}&data_fim={{ data_fim|urlencode }}&dias_parados={{ dias_parados }}">
+            <i data-lucide="file-spreadsheet"></i>
+            Exportar Excel
+        </a>
+
+        <a href="{% url 'exportar_relatorio_pdf' %}?data_inicio={{ data_inicio|urlencode }}&data_fim={{ data_fim|urlencode }}&dias_parados={{ dias_parados }}">
+            <i data-lucide="file-text"></i>
+            Exportar PDF
+        </a>
+
+        <a href="{% url 'exportar_relatorio_csv' %}?data_inicio={{ data_inicio|urlencode }}&data_fim={{ data_fim|urlencode }}&dias_parados={{ dias_parados }}">
+            <i data-lucide="download"></i>
+            Exportar CSV
+        </a>
+    </div>
+
+    <p>Consulte os resultados comerciais por período.</p>
+
+    <section class="relatorio-vendas">
+        <h2>Vendas no período</h2>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_vendas.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_vendas.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                Nenhuma venda encontrada no período.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="relatorio-desempenho">
+        <h2>Desempenho dos vendedores</h2>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_vendedores.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_vendedores.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                Nenhuma venda encontrada no período.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="relatorio-margens">
+        <h2>Margem por veículo vendido</h2>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_margens.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_margens.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7">
+                                Nenhuma margem encontrada no período.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+{% if despesas_sem_categoria %}
+    <p class="erro-relatorio">
+        Existem {{ despesas_sem_categoria }}
+        despesa(s) sem categoria no período.
+
+        Esses lançamentos estão incluídos nos totais,
+        mas precisam ser classificados pelo administrativo.
+    </p>
+{% endif %}
+
+    <section class="relatorio-despesas">
+        <h2>Despesas por categoria</h2>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_despesas.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_despesas.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">
+                                Nenhuma despesa encontrada no período.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="relatorio-carros-parados">
+        <h2>Carros parados no estoque</h2>
+
+        <p>
+            Veículos com pelo menos {{ dias_parados }}
+            dias desde o cadastro.
+        </p>
+
+        <form method="get">
+            <input type="hidden"
+                   name="data_inicio"
+                   value="{{ data_inicio }}">
+
+            <input type="hidden"
+                   name="data_fim"
+                   value="{{ data_fim }}">
+
+            <label for="dias_parados">
+                Mínimo de dias em estoque
+            </label>
+
+            <input
+                type="number"
+                id="dias_parados"
+                name="dias_parados"
+                min="1"
+                max="3650"
+                value="{{ dias_parados }}"
+                required
+            >
+
+            <button type="submit">Aplicar filtro</button>
+        </form>
+
+        <p>
+            <strong>{{ quantidade_parados }}</strong>
+            veículo(s) encontrado(s).
+        </p>
+
+        <div class="tabela-responsiva">
+            <table>
+                <thead>
+                    <tr>
+                        {% for cabecalho in relatorio_estoque.cabecalhos %}
+                            <th>{{ cabecalho }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for linha in relatorio_estoque.linhas %}
+                        <tr>
+                            {% for valor in linha %}
+                                <td>{{ valor }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                Nenhum veículo encontrado.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

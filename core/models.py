@@ -439,51 +439,31 @@ class ReservaVeiculo(models.Model):
 
 class LancamentoFinanceiro(models.Model):
     """Movimentações financeiras vinculadas ao veículo (custo, despesas, venda e comissão)."""
-
+    class CategoriaDespesa(models.TextChoices):
+        MANUTENCAO = "MANUTENCAO", "Manutenção"
+        DOCUMENTACAO = "DOCUMENTACAO", "Documentação"
+        LIMPEZA = "LIMPEZA", "Limpeza"
+        OUTROS = "OUTROS", "Outros"
     class Tipo(models.TextChoices):
         CUSTO_AQUISICAO = "CUSTO_AQUISICAO", "Custo de aquisição"
         DESPESA = "DESPESA", "Despesa (preparo, documentação, etc.)"
         VENDA = "VENDA", "Valor de venda"
         COMISSAO = "COMISSAO", "Comissão paga"
 
-    veiculo = models.ForeignKey(
-        Veiculo,
-        on_delete=models.PROTECT,
-        related_name="lancamentos",
-    )
-    venda = models.ForeignKey(
-        "Venda",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name="lancamentos_financeiros",
-    )
+    veiculo = models.ForeignKey(Veiculo,on_delete=models.PROTECT,related_name="lancamentos",)
+    venda = models.ForeignKey("Venda",on_delete=models.PROTECT,null=True,blank=True,related_name="lancamentos_financeiros",)
     tipo = models.CharField(max_length=30, choices=Tipo.choices)
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     descricao = models.CharField(max_length=200, blank=True)
     data_lancamento = models.DateField(default=timezone.now)
-
     registrado_por = models.ForeignKey(Usuario, on_delete=models.PROTECT)
     criado_em = models.DateTimeField(auto_now_add=True)
-
-    editado_por = models.ForeignKey(
-        Usuario,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name="despesas_editadas",
-    )
+    editado_por = models.ForeignKey(Usuario,on_delete=models.PROTECT,null=True,blank=True,related_name="despesas_editadas",)
     editado_em = models.DateTimeField(null=True, blank=True)
-
     excluido = models.BooleanField(default=False)
-    excluido_por = models.ForeignKey(
-        Usuario,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name="despesas_excluidas",
-    )
+    excluido_por = models.ForeignKey( Usuario,on_delete=models.PROTECT,null=True,blank=True,related_name="despesas_excluidas",)
     excluido_em = models.DateTimeField(null=True, blank=True)
+    categoria_despesa = models.CharField(max_length=30,choices=CategoriaDespesa.choices,blank=True,null=True,)
 
     def __str__(self):
         return f"{self.get_tipo_display()}: R$ {self.valor} — {self.veiculo}"
@@ -1584,7 +1564,12 @@ class Venda(models.Model):
         )
 
         preco_vendido = self.valor_venda
-        custo = self.veiculo.custo_aquisicao or Decimal("0.00")
+
+        if self.veiculo.origem == Veiculo.Origem.CONSIGNADO:
+            custo = self.veiculo.valor_repasse or Decimal("0.00")
+        else:
+            custo = self.veiculo.custo_aquisicao or Decimal("0.00")
+
         margem = preco_vendido - custo - despesas - comissao
 
         percentual = (
