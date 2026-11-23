@@ -1,0 +1,245 @@
+﻿id;marca;modelo;ano_fabricacao;ano_modelo;combustivel
+186;Audi;A1;2018;2019;Flex
+187;Audi;A3;2018;2018;Flex
+188;Audi;A4;2023;2023;Flex
+189;Audi;A5;2020;2021;Flex
+190;Audi;A6;2023;2024;Flex
+191;Audi;Q3;2023;2024;Flex
+192;Audi;Q5;2023;2024;Flex
+193;Audi;Q7;2023;2024;Flex
+195;Audi;R8;2018;2018;Flex
+194;Audi;TT;2018;2018;Flex
+174;BMW;320i;2023;2023;Flex
+175;BMW;330i;2020;2021;Flex
+176;BMW;520i;2024;2025;Flex
+184;BMW;i3;2024;2024;Flex
+185;BMW;iX;2020;2021;Flex
+181;BMW;M3;2017;2017;Flex
+182;BMW;M4;2019;2020;Flex
+177;BMW;X1;2023;2023;Flex
+178;BMW;X3;2023;2023;Flex
+179;BMW;X5;2024;2025;Flex
+180;BMW;X6;2023;2023;Flex
+183;BMW;Z4;2020;2020;Flex
+211;BYD;Dolphin;2022;2023;Flex
+212;BYD;Dolphin Mini;2021;2021;Flex
+216;BYD;Han;2022;2023;Flex
+215;BYD;Seal;2018;2019;Flex
+213;BYD;Song Plus;2023;2024;Flex
+214;BYD;Yuan Plus;2020;2021;Flex
+220;Chery;Tiggo 2;2023;2024;Flex
+221;Chery;Tiggo 5X;2022;2023;Flex
+222;Chery;Tiggo 7;2023;2023;Flex
+223;Chery;Tiggo 8;2024;2025;Flex
+75;Chevrolet;Astra;2022;2022;Flex
+78;Chevrolet;Bolt;2018;2019;Flex
+11;Chevrolet;Camaro;2022;2023;Flex
+73;Chevrolet;Captiva;2019;2019;Flex
+65;Chevrolet;Celta;2021;2022;Flex
+67;Chevrolet;Classic;2021;2022;Flex
+66;Chevrolet;Corsa;2023;2024;Flex
+23;Chevrolet;Cruze;2021;2021;Flex
+71;Chevrolet;Equinox;2023;2024;Flex
+70;Chevrolet;Montana;2022;2022;Flex
+77;Chevrolet;Omega;2019;2020;Flex
+22;Chevrolet;Onix;2021;2021;Flex
+1;Chevrolet;Onix LT 1.0;2021;2022;Flex
+68;Chevrolet;Prisma;2018;2019;Flex
+25;Chevrolet;S10;2019;2019;Flex
+74;Chevrolet;Sonic;2024;2025;Flex
+69;Chevrolet;Spin;2017;2017;Flex
+24;Chevrolet;Tracker;2024;2024;Flex
+72;Chevrolet;Trailblazer;2022;2022;Flex
+76;Chevrolet;Vectra;2022;2022;Flex
+150;Citroen;Aircross;2021;2022;Flex
+148;Citroen;C3;2020;2020;Flex
+149;Citroen;C4 Cactus;2023;2024;Flex
+151;Citroen;C5 Aircross;2022;2022;Flex
+37;Fiat;Argo;2021;2022;Flex
+42;Fiat;Cronos;2017;2017;Flex
+50;Fiat;Doblo;2017;2018;Flex
+47;Fiat;Fastback;2019;2020;Flex
+51;Fiat;Fiorino;2018;2019;Flex
+44;Fiat;Grand Siena;2022;2022;Flex
+49;Fiat;Idea;2019;2019;Flex
+38;Fiat;Mobi;2024;2025;Flex
+40;Fiat;Palio;2019;2019;Flex
+48;Fiat;Pulse;2024;2025;Flex
+41;Fiat;Punto;2017;2018;Flex
+43;Fiat;Siena;2021;2021;Flex
+46;Fiat;Strada;2017;2018;Flex
+45;Fiat;Toro;2024;2025;Flex
+39;Fiat;Uno;2018;2018;Flex
+84;Ford;Bronco;2023;2024;Flex
+80;Ford;EcoSport;2021;2022;Flex
+82;Ford;Edge;2019;2020;Flex
+88;Ford;Escape;2024;2024;Flex
+87;Ford;Explorer;2021;2021;Flex
+86;Ford;F-150;2018;2018;Flex
+27;Ford;Fiesta;2017;2018;Flex
+26;Ford;Focus;2017;2017;Flex
+81;Ford;Fusion;2023;2024;Flex
+79;Ford;Ka;2022;2023;Flex
+85;Ford;Maverick;2020;2020;Flex
+10;Ford;Mustang;2020;2020;Flex
+28;Ford;Ranger;2018;2019;Flex
+83;Ford;Territory;2022;2022;Flex
+217;GWM;Haval H6;2024;2024;Flex
+218;GWM;Ora 03;2017;2017;Flex
+219;GWM;Tank 300;2024;2025;Flex
+101;Honda;Accord;2024;2024;Flex
+4;Honda;CG 160 Fan;2022;2023;Gasolina
+99;Honda;City;2022;2022;Flex
+8;Honda;Civic;2021;2022;Flex
+18;Honda;CR-V;2021;2022;Flex
+16;Honda;Fit;2024;2024;Flex
+17;Honda;HR-V;2020;2020;Flex
+104;Honda;Jazz;2021;2022;Flex
+106;Honda;NSX;2019;2020;Flex
+103;Honda;Odyssey;2024;2024;Flex
+102;Honda;Pilot;2021;2022;Flex
+105;Honda;Prelude;2021;2022;Flex
+100;Honda;WR-V;2019;2020;Flex
+115;Hyundai;Azera;2024;2025;Flex
+30;Hyundai;Creta;2021;2021;Flex
+109;Hyundai;Elantra;2020;2021;Flex
+29;Hyundai;HB20;2018;2018;Flex
+5;Hyundai;HB20 Comfort 1.0;2020;2021;Flex
+107;Hyundai;HB20S;2024;2025;Flex
+108;Hyundai;i30;2024;2025;Flex
+114;Hyundai;Ioniq 5;2018;2018;Flex
+113;Hyundai;Kona;2018;2019;Flex
+112;Hyundai;Palisade;2023;2024;Flex
+111;Hyundai;Santa Fe;2024;2025;Flex
+110;Hyundai;Sonata;2021;2021;Flex
+31;Hyundai;Tucson;2019;2020;Flex
+224;JAC;T40;2024;2025;Flex
+239;Jaguar;F-Pace;2019;2020;Flex
+240;Jaguar;F-Type;2018;2018;Flex
+237;Jaguar;XE;2018;2018;Flex
+238;Jaguar;XF;2017;2017;Flex
+137;Jeep;Commander;2020;2021;Flex
+136;Jeep;Compass;2023;2023;Flex
+140;Jeep;Gladiator;2024;2024;Flex
+139;Jeep;Grand Cherokee;2023;2023;Flex
+135;Jeep;Renegade;2019;2019;Flex
+138;Jeep;Wrangler;2017;2017;Flex
+173;Kia;Carnival;2020;2021;Flex
+169;Kia;Cerato;2021;2022;Flex
+167;Kia;Picanto;2023;2024;Flex
+168;Kia;Rio;2022;2023;Flex
+171;Kia;Sorento;2024;2025;Flex
+172;Kia;Soul;2018;2019;Flex
+170;Kia;Sportage;2022;2023;Flex
+236;Lexus;ES 300h;2022;2022;Flex
+234;Lexus;NX 300h;2017;2018;Flex
+235;Lexus;RX 350;2019;2020;Flex
+233;Lexus;UX 250h;2017;2018;Flex
+230;Mazda;CX-3;2024;2025;Flex
+231;Mazda;CX-5;2020;2020;Flex
+228;Mazda;Mazda3;2020;2021;Flex
+229;Mazda;Mazda6;2020;2021;Flex
+232;Mazda;MX-5;2024;2024;Flex
+210;Mini;Clubman;2023;2024;Flex
+208;Mini;Cooper;2022;2023;Flex
+209;Mini;Countryman;2018;2018;Flex
+153;Mitsubishi;ASX;2018;2019;Flex
+156;Mitsubishi;Eclipse Cross;2023;2023;Flex
+152;Mitsubishi;L200;2024;2025;Flex
+157;Mitsubishi;Lancer;2019;2020;Flex
+154;Mitsubishi;Outlander;2024;2025;Flex
+155;Mitsubishi;Pajero;2021;2021;Flex
+124;Nissan;370Z;2020;2020;Flex
+123;Nissan;Altima;2020;2021;Flex
+119;Nissan;Frontier;2023;2024;Flex
+125;Nissan;GT-R;2021;2022;Flex
+33;Nissan;Kicks;2020;2020;Flex
+122;Nissan;Leaf;2020;2020;Flex
+118;Nissan;Livina;2023;2024;Flex
+116;Nissan;March;2022;2022;Flex
+121;Nissan;Qashqai;2023;2024;Flex
+32;Nissan;Sentra;2017;2017;Flex
+117;Nissan;Tiida;2018;2019;Flex
+34;Nissan;Versa;2021;2021;Flex
+120;Nissan;X-Trail;2024;2024;Flex
+142;Peugeot;2008;2020;2021;Flex
+147;Peugeot;207;2023;2024;Flex
+141;Peugeot;208;2023;2024;Flex
+143;Peugeot;3008;2019;2019;Flex
+145;Peugeot;308;2020;2020;Flex
+146;Peugeot;408;2024;2024;Flex
+144;Peugeot;5008;2022;2022;Flex
+206;Porsche;718 Cayman;2024;2025;Flex
+205;Porsche;911;2017;2017;Flex
+203;Porsche;Cayenne;2017;2017;Flex
+202;Porsche;Macan;2020;2021;Flex
+204;Porsche;Panamera;2022;2022;Flex
+207;Porsche;Taycan;2020;2020;Flex
+225;RAM;1500;2024;2024;Flex
+226;RAM;2500;2018;2018;Flex
+227;RAM;Rampage;2024;2024;Flex
+128;Renault;Captur;2017;2017;Flex
+132;Renault;Clio;2021;2022;Flex
+36;Renault;Duster;2024;2025;Flex
+130;Renault;Fluence;2022;2023;Flex
+133;Renault;Kardian;2023;2024;Flex
+134;Renault;Koleos;2018;2018;Flex
+127;Renault;Kwid;2019;2020;Flex
+126;Renault;Logan;2021;2021;Flex
+131;Renault;Megane;2024;2025;Flex
+129;Renault;Oroch;2022;2023;Flex
+35;Renault;Sandero;2021;2022;Flex
+166;Subaru;BRZ;2023;2024;Flex
+163;Subaru;Forester;2023;2023;Flex
+162;Subaru;Impreza;2022;2023;Flex
+164;Subaru;Outback;2023;2023;Flex
+165;Subaru;WRX;2017;2018;Flex
+158;Suzuki;Jimny;2021;2022;Flex
+160;Suzuki;S-Cross;2022;2022;Flex
+161;Suzuki;Swift;2023;2024;Flex
+159;Suzuki;Vitara;2018;2019;Flex
+241;Tesla;Model 3;2024;2025;Flex
+243;Tesla;Model S;2022;2022;Flex
+244;Tesla;Model X;2020;2021;Elétrico
+242;Tesla;Model Y;2024;2024;Flex
+90;Toyota;Camry;2021;2022;Flex
+95;Toyota;C-HR;2024;2025;Flex
+7;Toyota;Corolla;2021;2021;Flex
+93;Toyota;Corolla Cross;2021;2022;Flex
+2;Toyota;Corolla XEi 2.0;2019;2020;Flex
+89;Toyota;Etios;2020;2021;Flex
+97;Toyota;GR86;2018;2019;Flex
+20;Toyota;Hilux;2019;2020;Flex
+94;Toyota;Land Cruiser;2019;2019;Flex
+91;Toyota;Prius;2024;2024;Flex
+21;Toyota;RAV4;2018;2018;Flex
+98;Toyota;Sienna;2018;2018;Flex
+96;Toyota;Supra;2021;2021;Flex
+92;Toyota;SW4;2024;2024;Flex
+19;Toyota;Yaris;2019;2020;Flex
+58;Volkswagen;Amarok;2017;2018;Flex
+62;Volkswagen;Beetle;2020;2020;Flex
+60;Volkswagen;Fox;2017;2018;Flex
+6;Volkswagen;Fusca;1986;1986;Gasolina
+52;Volkswagen;Gol;2017;2017;Flex
+9;Volkswagen;Golf;2020;2021;Flex
+64;Volkswagen;ID.4;2021;2022;Flex
+13;Volkswagen;Jetta;2018;2019;Flex
+55;Volkswagen;Nivus;2021;2021;Flex
+15;Volkswagen;Passat;2024;2025;Flex
+12;Volkswagen;Polo;2019;2019;Flex
+59;Volkswagen;Saveiro;2017;2017;Flex
+57;Volkswagen;Taos;2020;2021;Flex
+56;Volkswagen;T-Cross;2021;2021;Flex
+14;Volkswagen;Tiguan;2018;2018;Flex
+63;Volkswagen;Touareg;2019;2020;Flex
+61;Volkswagen;Up;2017;2017;Flex
+54;Volkswagen;Virtus;2018;2018;Flex
+53;Volkswagen;Voyage;2018;2019;Flex
+201;Volvo;C40;2017;2018;Flex
+199;Volvo;S60;2020;2021;Flex
+200;Volvo;S90;2022;2023;Flex
+196;Volvo;XC40;2022;2022;Flex
+197;Volvo;XC60;2023;2023;Flex
+198;Volvo;XC90;2019;2020;Flex
+3;Yamaha;Fazer FZ25 ABS;2021;2022;Gasolina

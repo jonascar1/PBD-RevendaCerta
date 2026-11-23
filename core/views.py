@@ -400,7 +400,7 @@ def detalhes_veiculo_vendedor_view(request, veiculo_id):
         "core/vendedor_veiculo_detalhes.html",
         {
             "veiculo": veiculo,
-            "fotos": veiculo.fotos.all(),
+            "fotos": veiculo.fotos.order_by("-principal", "ordem", "id"),
             "dados": dados,
             "reserva": veiculo.reserva_ativa,
             "fila": veiculo.propostas.filter(situacao=Proposta.Situacao.AGUARDANDO)
@@ -1629,7 +1629,7 @@ def detalhes_veiculo_view(request, veiculo_id):
         "core/gerente_detalhes_veiculo.html",
         {
             "veiculo": veiculo,
-            "fotos": veiculo.fotos.all(),
+            "fotos": veiculo.fotos.order_by("-principal", "ordem", "pk"),
             "despesas": despesas,
             "total_despesas": total_despesas,
             "custo_total": custo_total,
@@ -1672,6 +1672,12 @@ def editar_veiculo_view(request, veiculo_id):
     veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
 
     if request.method == "POST":
+        print("\n========== DEBUG GALERIA ==========")
+        print("Foto principal:", request.POST.get("foto_principal"))
+        print("Fotos para excluir:", request.POST.get("fotos_excluir"))
+        print("Ordem das fotos:", request.POST.get("ordem_fotos"))
+        print("===================================\n")
+
         form = EditarVeiculoForm(request.POST, request.FILES, instance=veiculo)
 
         if form.is_valid():
@@ -1727,14 +1733,23 @@ def editar_veiculo_view(request, veiculo_id):
                             principal=(ultima_foto is None and indice == 0),
                         )
 
-                    primeira_foto = veiculo.fotos.order_by("ordem", "id").first()
-                    if primeira_foto:
-                        veiculo.fotos.exclude(pk=primeira_foto.pk).update(
-                            principal=False
+                    # A foto principal ocupa sempre a posição zero.
+                    principal_id = request.POST.get("foto_principal", "").strip()
+                    principal = (
+                        veiculo.fotos.filter(pk=int(principal_id)).first()
+                        if principal_id.isdigit() else None
+                    )
+                    if principal is None:
+                        principal = veiculo.fotos.order_by("ordem", "pk").first()
+                    if principal is not None:
+                        veiculo.fotos.exclude(pk=principal.pk).update(principal=False)
+                        veiculo.fotos.filter(pk=principal.pk).update(principal=True)
+                        restantes = list(
+                            veiculo.fotos.exclude(pk=principal.pk).order_by("ordem", "pk")
                         )
-                        veiculo.fotos.filter(pk=primeira_foto.pk).update(
-                            principal=True
-                        )
+                        FotoVeiculo.objects.filter(pk=principal.pk).update(ordem=0)
+                        for posicao, foto in enumerate(restantes, start=1):
+                            FotoVeiculo.objects.filter(pk=foto.pk).update(ordem=posicao)
 
                 messages.success(request, "Veículo atualizado com sucesso.")
                 return redirect("detalhes_veiculo", veiculo_id=veiculo.id)
@@ -1744,6 +1759,7 @@ def editar_veiculo_view(request, veiculo_id):
                     None,
                     "Já existe um veículo com essa placa ou chassi no estoque.",
                 )
+
     else:
         form = EditarVeiculoForm(instance=veiculo)
 
@@ -1753,7 +1769,7 @@ def editar_veiculo_view(request, veiculo_id):
         {
             "form": form,
             "veiculo": veiculo,
-            "fotos_existentes": veiculo.fotos.order_by("ordem", "id"),
+            "fotos_existentes": veiculo.fotos.order_by("-principal", "ordem", "id"),
         },
     )
 

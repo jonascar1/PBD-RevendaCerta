@@ -247,100 +247,142 @@ function atualizarInput() {
     inputFotos.files = dataTransfer.files;
 }
 
-// Fotos existentes marcadas para exclusão
+// As exclusões só são aplicadas quando o formulário é salvo.
+const galeriaExistente = document.getElementById("fotos-existentes-container");
 const fotosExcluir = document.getElementById("fotos-excluir");
-
-document.querySelectorAll(".remover-foto-existente").forEach(function (botao) {
-    botao.addEventListener("click", function () {
-        const foto = botao.closest(".foto-existente");
-        const fotoId = foto.dataset.fotoId;
-
-        const ids = fotosExcluir.value
-            ? fotosExcluir.value.split(",")
-            : [];
-
-        if (!ids.includes(fotoId)) {
-            ids.push(fotoId);
-        }
-
-        fotosExcluir.value = ids.join(",");
-        foto.style.display = "none";
-
-        atualizarOrdemFotos();
-    });
-});
-
-// Reordenar fotos já cadastradas
 const ordemFotos = document.getElementById("ordem-fotos");
-let fotoArrastada = null;
+const fotoPrincipalInput = document.getElementById("foto-principal");
 
-function atualizarOrdemFotos() {
-    const ids = Array.from(
-        document.querySelectorAll(".foto-existente")
-    )
-        .filter(foto => foto.style.display !== "none")
-        .map(foto => foto.dataset.fotoId);
-
-    ordemFotos.value = ids.join(",");
-
-    // A etiqueta Principal deve acompanhar a primeira posição
-    const container = document.getElementById("fotos-existentes-container");
-
-    const fotosVisiveis = Array.from(
-        container.querySelectorAll(".foto-existente")
-    ).filter(foto => foto.style.display !== "none");
-
-    fotosVisiveis.forEach(function (foto, indice) {
-        const etiqueta = foto.querySelector(".foto-principal");
-
-        if (etiqueta) {
-            etiqueta.remove();
-        }
-
-        if (indice === 0) {
-            const novaEtiqueta = document.createElement("span");
-            novaEtiqueta.className = "foto-principal";
-            novaEtiqueta.textContent = "Principal";
-            foto.appendChild(novaEtiqueta);
-        }
-    });
+function fotosAtivas() {
+    return galeriaExistente
+        ? [...galeriaExistente.querySelectorAll(".foto-existente:not(.pendente-exclusao)")]
+        : [];
 }
 
-document.querySelectorAll(".foto-existente").forEach(function (foto) {
-    foto.addEventListener("dragstart", function () {
-        fotoArrastada = foto;
-    });
+function fixarPrincipalNoInicio() {
+    if (!galeriaExistente || !fotoPrincipalInput) return;
+    const principal = fotosAtivas().find(foto => foto.dataset.fotoId === fotoPrincipalInput.value);
+    if (principal && galeriaExistente.firstElementChild !== principal) {
+        galeriaExistente.insertBefore(principal, galeriaExistente.firstElementChild);
+    }
+}
 
-    foto.addEventListener("dragover", function (event) {
-        event.preventDefault();
-    });
+function atualizarGaleriaExistente() {
+    const ativas = fotosAtivas();
+    if (!ativas.some(foto => foto.dataset.fotoId === fotoPrincipalInput.value)) {
+        fotoPrincipalInput.value = ativas[0]?.dataset.fotoId || "";
+    }
+    fixarPrincipalNoInicio();
+    const fotos = fotosAtivas();
+    const ids = fotos.map(foto => foto.dataset.fotoId);
+    ordemFotos.value = ids.join(",");
+    fotosExcluir.value = galeriaExistente
+        ? [...galeriaExistente.querySelectorAll(".foto-existente.pendente-exclusao")]
+            .map(foto => foto.dataset.fotoId).join(",")
+        : "";
+    if (!ids.includes(fotoPrincipalInput.value)) {
+        fotoPrincipalInput.value = ids[0] || "";
+    }
+    if (galeriaExistente) {
+        galeriaExistente.querySelectorAll(".foto-existente").forEach(foto => {
+            const principal = !foto.classList.contains("pendente-exclusao") &&
+                foto.dataset.fotoId === fotoPrincipalInput.value;
+            foto.classList.toggle("is-principal", principal);
+            foto.draggable = !principal && !foto.classList.contains("pendente-exclusao");
+            const estrela = foto.querySelector(".selecionar-principal");
+            if (estrela) {
+                estrela.setAttribute("aria-pressed", String(principal));
+                estrela.title = principal ? "Imagem principal" : "Definir como imagem principal";
+                estrela.setAttribute("aria-label", estrela.title);
+                estrela.disabled = foto.classList.contains("pendente-exclusao");
+            }
+            const botao = foto.querySelector(".remover-foto-existente");
+            if (botao) {
+                const restaurar = foto.classList.contains("pendente-exclusao");
+                botao.textContent = restaurar ? "✓" : "×";
+                botao.title = restaurar ? "Restaurar imagem" : "Marcar para excluir";
+                botao.setAttribute("aria-label", botao.title);
+            }
+        });
+    }
+}
 
-    foto.addEventListener("drop", function (event) {
-        event.preventDefault();
+if (galeriaExistente) {
+    galeriaExistente.addEventListener("dragstart", function (event) {
+        const foto = event.target.closest(".foto-existente");
+        if (foto && foto.dataset.fotoId === fotoPrincipalInput.value) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+    }, true);
+}
 
-        if (!fotoArrastada || fotoArrastada === foto) {
+if (galeriaExistente) {
+    const inicial = galeriaExistente.querySelector('.selecionar-principal[aria-pressed="true"]');
+    if (inicial) fotoPrincipalInput.value = inicial.closest(".foto-existente").dataset.fotoId;
+    galeriaExistente.addEventListener("click", event => {
+        const estrela = event.target.closest(".selecionar-principal");
+        if (estrela && galeriaExistente.contains(estrela)) {
+            event.preventDefault();
+            const foto = estrela.closest(".foto-existente");
+            if (!foto.classList.contains("pendente-exclusao")) {
+                fotoPrincipalInput.value = foto.dataset.fotoId;
+                galeriaExistente.prepend(foto);
+                atualizarGaleriaExistente();
+            }
             return;
         }
-
-        const container = foto.parentElement;
-
-        const fotos = Array.from(container.children);
-
-        const origem = fotos.indexOf(fotoArrastada);
-        const destino = fotos.indexOf(foto);
-
-        if (origem < destino) {
-            foto.after(fotoArrastada);
-        } else {
-            foto.before(fotoArrastada);
+        const botao = event.target.closest(".remover-foto-existente");
+        if (botao && galeriaExistente.contains(botao)) {
+            event.preventDefault();
+            botao.closest(".foto-existente").classList.toggle("pendente-exclusao");
+            atualizarGaleriaExistente();
         }
+    });
+    atualizarGaleriaExistente();
+}
 
-        atualizarOrdemFotos();
+// Reordenação das fotos já cadastradas (não interfere nos controles de estrela/exclusão).
+if (galeriaExistente) {
+    let fotoArrastada = null;
+
+    galeriaExistente.addEventListener("dragstart", event => {
+        if (event.target.closest("button")) {
+            event.preventDefault();
+            return;
+        }
+        const foto = event.target.closest(".foto-existente");
+        if (!foto || foto.classList.contains("pendente-exclusao") || foto.dataset.fotoId === fotoPrincipalInput.value) {
+            event.preventDefault();
+            return;
+        }
+        fotoArrastada = foto;
+        foto.classList.add("foto-arrastando");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", foto.dataset.fotoId);
     });
 
-    foto.addEventListener("dragend", function () {
+    galeriaExistente.addEventListener("dragover", event => {
+        const destino = event.target.closest(".foto-existente");
+        if (!fotoArrastada || !destino || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+    });
+
+    galeriaExistente.addEventListener("drop", event => {
+        const destino = event.target.closest(".foto-existente");
+        if (!fotoArrastada || !destino || destino === fotoArrastada || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value) return;
+        event.preventDefault();
+        const elementos = [...galeriaExistente.children];
+        const origem = elementos.indexOf(fotoArrastada);
+        const alvo = elementos.indexOf(destino);
+        if (origem < alvo) destino.after(fotoArrastada);
+        else destino.before(fotoArrastada);
+        atualizarGaleriaExistente();
+    });
+
+    galeriaExistente.addEventListener("dragend", () => {
+        if (fotoArrastada) fotoArrastada.classList.remove("foto-arrastando");
         fotoArrastada = null;
     });
-});
-
-atualizarOrdemFotos();
+}

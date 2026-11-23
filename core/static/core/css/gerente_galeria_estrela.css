@@ -1,0 +1,115 @@
+/* Galeria de fotos: controles discretos nos cantos superiores. */
+#fotos-existentes-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 12px !important;
+}
+#fotos-existentes-container .foto-existente {
+    position: relative !important;
+    display: block !important;
+    height: 112px !important;
+    min-height: 112px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    border: 2px solid transparent !important;
+    border-radius: 10px !important;
+    background: #eef2f7 !important;
+}
+#fotos-existentes-container .foto-existente[hidden] {
+    display: none !important;
+}
+#fotos-existentes-container .foto-existente.is-principal {
+    border-color: #2563eb !important;
+}
+#fotos-existentes-container .foto-existente > img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+#fotos-existentes-container .foto-existente .selecionar-principal,
+#fotos-existentes-container .foto-existente .remover-foto-existente {
+    position: absolute !important;
+    top: 7px !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 29px !important;
+    height: 29px !important;
+    padding: 5px !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,.96) !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,.18) !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
+#fotos-existentes-container .foto-existente .selecionar-principal {
+    left: 7px !important;
+    right: auto !important;
+    border: 1px solid #d4dce8 !important;
+    color: #64748b !important;
+}
+#fotos-existentes-container .foto-existente .selecionar-principal svg {
+    width: 17px !important;
+    height: 17px !important;
+    stroke: currentColor !important;
+    stroke-width: 1.8 !important;
+    fill: none !important;
+    pointer-events: none !important;
+}
+#fotos-existentes-container .foto-existente.is-principal .selecionar-principal {
+    color: #2563eb !important;
+    border-color: #93c5fd !important;
+}
+#fotos-existentes-container .foto-existente.is-principal .selecionar-principal svg {
+    fill: #2563eb !important;
+}
+#fotos-existentes-container .foto-existente .remover-foto-existente {
+    right: 7px !important;
+    left: auto !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+}
+#fotos-existentes-container .foto-existente .selecionar-principal:hover {
+    background: #eff6ff !important;
+}
+#fotos-existentes-container .foto-existente .foto-principal,
+#fotos-existentes-container .foto-existente .foto-acoes {
+    display: none !important;
+}
+
+/* Exclusão reversível até salvar o formulário. */
+#fotos-existentes-container .foto-existente.pendente-exclusao > img {
+    opacity: .28 !important;
+    filter: grayscale(1) !important;
+}
+#fotos-existentes-container .foto-existente.pendente-exclusao {
+    border: 2px dashed #94a3b8 !important;
+    background: #e2e8f0 !important;
+}
+#fotos-existentes-container .foto-existente.pendente-exclusao .remover-foto-existente {
+    color: #15803d !important;
+    border-color: #86efac !important;
+    background: #dcfce7 !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
+}
+#fotos-existentes-container .foto-existente.pendente-exclusao .selecionar-principal {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+}
+
+/* Ordenação manual das fotos existentes. */
+#fotos-existentes-container .foto-existente:not(.pendente-exclusao) {
+    cursor: grab;
+}
+#fotos-existentes-container .foto-existente.foto-arrastando {
+    opacity: .45 !important;
+    cursor: grabbing;
+}
+#fotos-existentes-container .foto-existente button {
+    cursor: pointer;
+}

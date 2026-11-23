@@ -1,6 +1,5 @@
 {% extends "core/gerente_base.html" %}
 
-{% load static %}
 {% load static l10n %}
 
 {% block title %}
@@ -14,6 +13,7 @@ Editar veículo | REVENDA CERTA
     href="{% static 'core/css/gerente_editar_veiculo.css' %}"
 >
 
+<link rel="stylesheet" href="{% static 'core/css/gerente_galeria_estrela.css' %}">
 {% endblock %}
 
 
@@ -55,6 +55,7 @@ Editar veículo | REVENDA CERTA
 
     <input type="hidden" name="fotos_excluir" id="fotos-excluir" value="">
     <input type="hidden" name="ordem_fotos" id="ordem-fotos" value="">
+    <input type="hidden" name="foto_principal" id="foto-principal" value="">
 
     {{ form.non_field_errors }}
 
@@ -433,22 +434,22 @@ Editar veículo | REVENDA CERTA
             <div class="fotos-existentes">
                 <p class="descricao">Fotos já cadastradas:</p>
 
+                <p class="descricao">Arraste as fotos para mudar a ordem. A estrela azul indica a imagem principal.</p>
                 <div class="preview-fotos" id="fotos-existentes-container">
                     {% for foto in fotos_existentes %}
-                    <div class="foto-preview foto-existente" data-foto-id="{{ foto.id }}" draggable="true">
+                    <div class="foto-preview foto-existente" data-foto-id="{{ foto.id|unlocalize }}" draggable="true">
                         <img src="{{ foto.imagem.url }}" alt="Foto do veículo">
-                        <button
-                            type="button"
-                            class="remover-foto-existente"
-                            title="Remover foto"
-                            aria-label="Remover foto"
-                        >
-                            ×
+                        <button type="button"
+                                class="selecionar-principal"
+                                title="Definir como imagem principal"
+                                aria-label="Definir como imagem principal"
+                                aria-pressed="{% if foto.principal %}true{% else %}false{% endif %}">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="m12 2 3.1 6.3 7 .99-5.05 4.93 1.2 6.97L12 17.9l-6.25 3.29 1.2-6.97L1.9 9.29l7-.99L12 2Z"/>
+                            </svg>
                         </button>
-
-                        {% if foto.principal %}
-                        <span class="foto-principal">Principal</span>
-                        {% endif %}
+                        <button type="button" class="remover-foto-existente"
+                                title="Marcar para excluir" aria-label="Marcar para excluir">×</button>
                     </div>
                     {% endfor %}
                 </div>
@@ -494,7 +495,7 @@ Editar veículo | REVENDA CERTA
             {{ form.fotos.errors }}
 
             <div class="aviso-fotos">
-                <i data-lucide="info"></i><span>A primeira foto será utilizada como foto principal.</span>
+                <i data-lucide="info"></i><span>Arraste para reordenar ou clique em “Definir principal”. Se a principal for excluída, a primeira foto restante será usada.</span>
             </div>
 
         </div>
@@ -528,6 +529,6 @@ Editar veículo | REVENDA CERTA
 
 {% block extra_js %}
 
-<script src="{% static 'core/js/gerente_editar_veiculo.js' %}"></script>
+<script src="{% static 'core/js/gerente_editar_veiculo.js' %}?v=20261123-3"></script>
 
 {% endblock extra_js %}

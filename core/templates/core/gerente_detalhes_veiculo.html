@@ -1,6 +1,5 @@
 {% extends "core/gerente_base.html" %}
 
-{% load static %}
 {% load static l10n %}
 
 {% block title %}
@@ -20,35 +19,9 @@
     </div>
 
     <div class="topo-acoes">
-    
         <a href="{% url 'veiculos' %}" class="btn-voltar">
             <i data-lucide="chevron-left"></i> Voltar para veículos
         </a>
-
-        {% if veiculo.situacao != "VENDIDO" and veiculo.situacao != "ENTREGUE" %}
-            <a
-                href="{% url 'alterar_preco_veiculo' veiculo.id %}"
-                class="btn-preco"
-            >
-                Definir preço
-            </a>
-        {% endif %}
-
-        {% if venda %}
-            <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-preco">
-                Ver venda #{{ venda.pk }}
-            </a>
-        {% endif %}
-
-        <a href="{% url 'historico_veiculo' veiculo.id %}" class="btn-voltar">
-            Histórico do veículo
-        </a>
-
-        {% if venda and request.user.is_gerente %}
-            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">
-                Histórico do cliente
-            </a>
-        {% endif %}
     </div>
 </header>
 
@@ -363,7 +336,25 @@
                 </p>
 
             </div>
-
+            <div class="acoes-identificacao">
+                <a href="{% url 'editar_veiculo' veiculo.id %}" class="btn-preco">
+                    <i data-lucide="pencil"></i> Editar veículo
+                </a>
+                {% if veiculo.situacao != "VENDIDO" and veiculo.situacao != "ENTREGUE" %}
+                <a href="{% url 'alterar_preco_veiculo' veiculo.id %}" class="btn-voltar">
+                    <i data-lucide="tag"></i> Definir preço
+                </a>
+                {% endif %}
+                <a href="{% url 'historico_veiculo' veiculo.id %}" class="btn-voltar">
+                    <i data-lucide="history"></i> Histórico do veículo
+                </a>
+                {% if venda %}
+                <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">Ver venda #{{ venda.pk }}</a>
+                {% if request.user.is_gerente %}
+                <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">Histórico do cliente</a>
+                {% endif %}
+                {% endif %}
+            </div>
         </div>
 
 
