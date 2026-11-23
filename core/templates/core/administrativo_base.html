@@ -10,13 +10,13 @@
 
     <title>
         {% block title %}
-        Painel Administrativo | VENDACERTA
+        Painel Administrativo | REVENDA CERTA
         {% endblock %}
     </title>
 
     <!-- CSS PADRÃO DO PAINEL -->
     <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}?v=5">
-    <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
 
     <!-- CSS ESPECÍFICO DE CADA PÁGINA -->
     {% block extra_css %}
@@ -25,6 +25,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
 </head>
 
 <body>
@@ -35,7 +36,7 @@
         <aside class="sidebar">
 
             <div class="logo">
-                <span>VENDA</span>CERTA
+                {% include "core/includes/marca.html" %}
             </div>
 
             <!-- PERFIL -->

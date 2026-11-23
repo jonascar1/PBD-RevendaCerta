@@ -289,3 +289,11 @@ body {
  .layout > aside.sidebar { width: 210px !important; }
  .layout > main.conteudo { margin-left: 210px !important; width: calc(100% - 210px) !important; }
 }
+
+/* Ajuste automatico logo/icone */
+.logo img, .logo-icone img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}

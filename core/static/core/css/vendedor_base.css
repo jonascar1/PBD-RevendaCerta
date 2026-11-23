@@ -230,3 +230,11 @@ body {
 /* Remove sublinhado padrão de links dos cards e ações */
 .conteudo a,.conteudo a:visited,.conteudo a:hover,
 .conteudo a *,.conteudo a:hover * {text-decoration:none!important;}
+
+/* Ajuste automatico logo/icone */
+.logo img, .logo-icone img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}

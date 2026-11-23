@@ -1,7 +1,7 @@
 {% extends "core/gerente_base.html" %}
 {% load static %}
 
-{% block title %}Entrega da venda #{{ venda.pk }} | VENDACERTA{% endblock %}
+{% block title %}Entrega da venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}">

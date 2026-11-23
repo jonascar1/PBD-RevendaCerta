@@ -7,15 +7,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ veiculo.marca }} {{ veiculo.modelo }} | VENDACERTA</title>
+    <title>{{ veiculo.marca }} {{ veiculo.modelo }} | REVENDA CERTA</title>
 
     <link
         rel="stylesheet"
         href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}"
     >
-    <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}" >
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
 
     <script src="https://unpkg.com/lucide@0.469.0"></script>
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
 </head>
 <body>
 
@@ -23,9 +24,9 @@
         <div class="container cabecalho-conteudo">
             <a href="{% url 'vitrine' %}" class="logo">
                 <span class="logo-icone">
-                    <img src="{% static 'core/img/favicon.png' %}" alt="Logo VendaCerta">
+                    <img src="{% static 'core/img/logorevendacerta.svg' %}" alt="Logo Revenda Certa">
                 </span>
-                <span>Venda<span class="logo-destaque">Certa</span></span>
+                <span class="fonte-marca">REVENDA CERTA</span>
             </a>
             <div>
                 <a href="{% url 'vitrine' %}" class="link-voltar">
@@ -166,7 +167,7 @@
     <footer class="rodape">
         <div class="container">
             <p>
-                &copy; {% now "Y" %} VendaCerta. Todos os direitos reservados.
+                &copy; {% now "Y" %} Revenda Certa. Todos os direitos reservados.
             </p>
         </div>
     </footer>

@@ -172,3 +172,11 @@ body {
         flex-shrink: 0;
     }
 }
+
+/* Ajuste automatico logo/icone */
+.logo img, .logo-icone img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}

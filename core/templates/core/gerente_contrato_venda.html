@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrato da venda #{{ venda.pk }} | VENDACERTA</title>
+    <title>Contrato da venda #{{ venda.pk }} | REVENDA CERTA</title>
 
     <style>
         body { font-family: Arial, sans-serif; color: #111; max-width: 800px; margin: 0 auto; padding: 32px; line-height: 1.5; }
@@ -23,6 +23,7 @@
         .acoes button { padding: 8px 16px; font-size: 14px; cursor: pointer; }
         @media print { .acoes { display: none; } body { padding: 0; } }
     </style>
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
 </head>
 <body>
 
@@ -38,7 +39,7 @@
     <p class="sub">Contrato nº {{ venda.pk }} · {{ venda.data|date:"d/m/Y" }}</p>
 
     <h2>Vendedora</h2>
-    <p><strong>VENDACERTA</strong> — representada pelo vendedor
+    <p><strong>REVENDA CERTA</strong> — representada pelo vendedor
         {{ venda.vendedor.get_full_name|default:venda.vendedor.username }}.</p>
 
     <h2>Comprador</h2>
@@ -96,7 +97,7 @@
     </table>
 
     <div class="assinaturas">
-        <div class="assinatura">VENDACERTA<br>Vendedora</div>
+        <div class="assinatura">REVENDA CERTA<br>Vendedora</div>
         <div class="assinatura">{{ cliente.nome_exibicao }}<br>Comprador</div>
     </div>
 

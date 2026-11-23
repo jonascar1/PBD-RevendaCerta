@@ -1,0 +1,568 @@
+/* TOPO */
+
+.topo {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+}
+
+.topo h1 {
+    font-size: 28px;
+
+    margin-bottom: 6px;
+}
+
+.topo p {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.cargo {
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+/* TÍTULOS */
+
+.titulo-secao {
+    margin-bottom: 16px;
+}
+
+.titulo-secao h2 {
+    font-size: 18px;
+
+    margin-bottom: 5px;
+}
+
+.titulo-secao p {
+    font-size: 12px;
+
+    color: #64748b;
+}
+
+
+/* CARDS */
+
+.cards-acoes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.card-acao {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+    transition: 0.2s;
+}
+
+.card-acao:hover {
+    border-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.icone {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    flex-shrink: 0;
+}
+
+.card-texto {
+    flex: 1;
+}
+
+.card-texto strong {
+    display: block;
+
+    color: #142033;
+
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
+
+.card-texto span {
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.seta {
+    color: #94a3b8;
+
+    font-size: 20px;
+}
+
+
+/* DADOS */
+
+.dados-section {
+    margin-top: 32px;
+}
+
+.dados-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr 1.5fr;
+
+    gap: 16px;
+}
+
+.dado {
+    background: white;
+
+    border: 1px solid #dfe4ec;
+
+    border-radius: 10px;
+
+    padding: 20px;
+}
+
+.dado span {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    margin-bottom: 8px;
+}
+
+.dado strong {
+    display: block;
+
+    font-size: 25px;
+
+    color: #142033;
+
+    margin-bottom: 5px;
+}
+
+.dado small {
+    color: #94a3b8;
+
+    font-size: 11px;
+}
+
+
+/* AVISO */
+
+.aviso {
+    background: #eef5ff;
+
+    border: 1px solid #d7e5ff;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    display: flex;
+
+    gap: 12px;
+
+    align-items: flex-start;
+}
+
+.aviso > span {
+    font-size: 20px;
+}
+
+.aviso strong {
+    display: block;
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+}
+
+.aviso p {
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+/* ==============================
+   PROPOSTAS E FILA
+============================== */
+
+.atividade-section {
+    margin-top: 32px;
+}
+
+
+/* PROPOSTAS */
+
+.propostas-card {
+    background: white;
+    border: 1px solid #dfe4ec;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.proposta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #eef1f5;
+}
+
+.proposta:last-child {
+    border-bottom: none;
+}
+
+.proposta-info strong {
+    display: block;
+    color: #142033;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.proposta-info span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.proposta-valor {
+    text-align: right;
+}
+
+.proposta-valor strong {
+    display: block;
+    color: #142033;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+
+/* STATUS DA PROPOSTA */
+
+.status {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status.pendente {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.status.aprovada {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.status.recusada {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+
+/* FILA */
+
+.fila-card {
+    background: white;
+    border: 1px solid #dfe4ec;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.fila-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #eef1f5;
+}
+
+.fila-item:last-child {
+    border-bottom: none;
+}
+
+.fila-horario {
+    min-width: 55px;
+
+    color: #2563eb;
+
+    font-size: 14px;
+}
+
+.fila-info {
+    flex: 1;
+}
+
+.fila-info strong {
+    display: block;
+
+    color: #142033;
+
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
+
+.fila-info span {
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.fila-status {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: #edf4ff;
+
+    color: #2563eb;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+.veiculos-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.veiculos-grid .dado {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+}
+
+.veiculos-grid .dado img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    background: #f1f1f1;
+    flex-shrink: 0;
+}
+
+.veiculos-grid .dado span,
+.veiculos-grid .dado strong {
+    margin-left: 14px;
+    margin-right: 14px;
+}
+
+.veiculos-grid .dado span {
+    margin-top: 10px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.veiculos-grid .veiculo-info {
+    display: block;
+    margin: 0 14px 8px;
+    min-height: 15px;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.veiculos-grid .dado strong {
+    display: block;
+    margin-bottom: 4px;
+    min-height: 20px;
+    font-size: 16px;
+}
+
+.veiculos-grid .dado small {
+    display: block;
+    margin: auto 14px 14px;
+    font-size: 11px;
+}
+
+@media (max-width: 900px) {
+
+    .dados-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .cards-acoes {
+        grid-template-columns: 1fr;
+    }
+
+    .proposta {
+    align-items: flex-start;
+    flex-direction: column;
+    }
+
+    .proposta-valor {
+        width: 100%;
+        text-align: left;
+    }
+
+    .fila-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .fila-status {
+        margin-left: 75px;
+    }
+
+}
+/* Estilos para os novos status de proposta / reserva */
+.status.aguardando {
+    background-color: var(--warning-bg, #fffbe6);
+    color: var(--warning-color, #d46b08);
+    border: 1px solid var(--warning-border, #ffe58f);
+}
+
+.status.ativa {
+    background-color: var(--success-bg, #f6ffed);
+    color: var(--success-color, #389e0d);
+    border: 1px solid var(--success-border, #b7eb8f);
+}
+
+.status.cancelada {
+    background-color: var(--danger-bg, #fff1f0);
+    color: var(--danger-color, #cf1322);
+    border: 1px solid var(--danger-border, #ffa39e);
+}
+
+/* Ajuste para o elemento .proposta quando for uma tag de link <a> */
+a.proposta,
+.proposta {
+    text-decoration: none;
+    color: inherit;
+    display: block; /* Garante que o link se comporte como bloco/card completo */
+}
+.avisos-propostas {
+    padding: 20px;
+    margin-bottom: 24px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+}
+
+.avisos-propostas h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: #1e40af;
+}
+
+.avisos-propostas > p {
+    margin-bottom: 16px;
+    color: #475569;
+}
+
+.aviso-proposta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px;
+    margin-top: 10px;
+    background: #fff;
+    border: 1px solid #dbeafe;
+    border-radius: 9px;
+}
+
+.aviso-proposta p {
+    margin: 5px 0 0;
+    color: #64748b;
+}
+
+.aviso-proposta a {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    color: #fff;
+    background: #2563eb;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .aviso-proposta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+/* T17 — fila real */
+.fila-acao {
+    padding: 8px 12px;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.fila-acao:hover { background: #1d4ed8; }
+
+/* T18 — avisos de procura */
+.aviso-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.aviso-acoes form{margin:0}
+.aviso-lido{padding:9px 14px;border:1px solid #bfdbfe;border-radius:7px;background:#fff;color:#1e40af;font:inherit;font-weight:600;cursor:pointer}
+.aviso-lido:hover{background:#eff6ff}
+/* Links dos cards sem sublinhado, inclusive filhos e estados de visita. */
+.conteudo .veiculos-grid a,
+.conteudo .veiculos-grid a:link,
+.conteudo .veiculos-grid a:visited,
+.conteudo .veiculos-grid a:hover,
+.conteudo .veiculos-grid a:focus,
+.conteudo .veiculos-grid a *,
+.conteudo .veiculos-grid a:hover *,
+.conteudo .veiculos-grid .dado,
+.conteudo .veiculos-grid .dado * {
+    text-decoration: none !important;
+    text-decoration-line: none !important;
+}

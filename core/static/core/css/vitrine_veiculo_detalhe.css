@@ -499,3 +499,11 @@ img {
         animation-iteration-count: 1 !important;
     }
 }
+
+/* Ajuste automatico logo/icone */
+.logo img, .logo-icone img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
