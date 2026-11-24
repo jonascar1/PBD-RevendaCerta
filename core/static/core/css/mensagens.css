@@ -10,46 +10,46 @@
 .prop-mensagem {
     padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
-    color: #0f172a;
+    border: 1px solid light-dark(#e2e8f0, #29384e);
+    background: light-dark(#f8fafc, #121c2e);
+    color: light-dark(#0f172a, #eef4fc);
     font-size: 14px;
     line-height: 1.4;
 }
 
 .message-success,
 .prop-mensagem-success {
-    background: #ecfdf5;
-    border-color: #a7f3d0;
-    color: #065f46;
+    background: light-dark(#ecfdf5, #14382d);
+    border-color: light-dark(#a7f3d0, #2d5947);
+    color: light-dark(#065f46, #86efac);
 }
 
 .message-error,
 .prop-mensagem-error {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #991b1b;
+    background: light-dark(#fef2f2, #3b2533);
+    border-color: light-dark(#fecaca, #70404f);
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .message-warning,
 .prop-mensagem-warning {
-    background: #fffbeb;
-    border-color: #fde68a;
-    color: #92400e;
+    background: light-dark(#fffbeb, #392e20);
+    border-color: light-dark(#fde68a, #67502e);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .message-info,
 .prop-mensagem-info {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    color: #1e40af;
+    background: light-dark(#eff6ff, #1a3455);
+    border-color: light-dark(#bfdbfe, #385982);
+    color: light-dark(#1e40af, #78b5ff);
 }
 
 .prop-aviso-aprovacao {
     margin-bottom: 20px;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #92400e;
+    background: light-dark(#fffbeb, #392e20);
+    border: 1px solid light-dark(#fde68a, #67502e);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .prop-aviso-aprovacao h2 {

@@ -2,16 +2,26 @@
 'use strict';
 const f=document.querySelector('#ri-form'); if(!f)return;
 const status=document.querySelector('#ri-status'),actions=document.querySelector('#ri-actions');
-let pdf, filename, revision=0;
+let pdf, filename, revision=0, logoReady=null, shareMessage="", pdfFile=null;
+const phoneInput=f.elements.telefone, phoneError=document.querySelector('#ri-phone-error'), shareButton=document.querySelector('#ri-share');
+function setStatus(message,kind='error'){status.textContent=message;status.dataset.kind=kind;}
+function clearPhone(){phoneInput.removeAttribute('aria-invalid');phoneError.textContent='';}
+phoneInput.addEventListener('input',()=>{const n=phoneInput.value.replace(/\D/g,'').slice(0,11);phoneInput.value=n.length<=2?n:n.length<=6?'('+n.slice(0,2)+') '+n.slice(2):'('+n.slice(0,2)+') '+n.slice(2,-4)+'-'+n.slice(-4);clearPhone();});
+function shareData(){return {files:[pdfFile],text:shareMessage};}
+function canShareFile(){try{return !!(window.isSecureContext && navigator.share && navigator.canShare && navigator.canShare({files:[pdfFile]}));}catch{return false;}}
+async function sharePDF(){if(!pdfFile || !canShareFile())return;try{await navigator.share(shareData());setStatus('Compartilhamento concluído no dispositivo.','success');}catch(e){if(e.name==='AbortError'){setStatus('Ficha pronta. Você pode compartilhar novamente.','success');}else{setStatus('Não foi possível compartilhar. Use Baixar PDF ou tente novamente.','error');}}}
+shareButton.addEventListener('click',sharePDF);
+
 f.ano.max=new Date().getFullYear()+1;
 const logoPromise=new Promise(resolve=>{const img=new Image(); const src=document.querySelector('link[rel="icon"]')?.href; if(!src){resolve(null);return;} const timer=setTimeout(()=>resolve(null),2500); img.onload=()=>{clearTimeout(timer);try{const c=document.createElement('canvas');c.width=240;c.height=240;const ctx=c.getContext('2d');const scale=240/Math.max(img.naturalWidth,img.naturalHeight);const w=img.naturalWidth*scale,h=img.naturalHeight*scale;ctx.drawImage(img,(240-w)/2,(240-h)/2,w,h);resolve(c.toDataURL('image/png'));}catch{resolve(null);}};img.onerror=()=>{clearTimeout(timer);resolve(null);};img.src=src;});
-f.addEventListener('input',()=>{revision++;pdf=null;actions.hidden=true;status.textContent='';});
+logoPromise.then(value=>{logoReady=value;});
+f.addEventListener('input',()=>{revision++;pdf=null;pdfFile=null;actions.hidden=true;status.textContent='';});
 f.addEventListener('submit',async e=>{
-e.preventDefault();const ticket=++revision;pdf=null;actions.hidden=true;
+e.preventDefault();const ticket=++revision;pdf=null;pdfFile=null;actions.hidden=true;
 const d=Object.fromEntries(new FormData(f));const digits=d.telefone.replace(/\D/g,'');
-if(![10,11].includes(digits.length)){status.textContent='Informe um telefone brasileiro com DDD (10 ou 11 dígitos).';return;}
-if(!window.jspdf){status.textContent='Não foi possível carregar o gerador de PDF. Recarregue a página.';return;}
-status.textContent='Preparando sua ficha...';const logo=await logoPromise;if(ticket!==revision)return;
+if(![10,11].includes(digits.length)){phoneInput.setAttribute('aria-invalid','true');phoneError.textContent='Informe um telefone com DDD (10 ou 11 dígitos).';phoneInput.focus();return;}
+if(!window.jspdf){setStatus('Não foi possível carregar o gerador de PDF. Recarregue a página.');return;}
+setStatus('Preparando sua ficha...','pending');const logo=logoReady;if(ticket!==revision)return;
 try{
 const p=new window.jspdf.jsPDF({unit:'mm',format:'a4'});const navy=[16,30,56],blue=[33,101,223],muted=[79,98,123],light=[240,244,249];
 const fill=(c)=>p.setFillColor(...c);const ink=(c)=>p.setTextColor(...c);
@@ -31,8 +41,14 @@ section('03','Observações adicionais');p.setFont('helvetica','normal');p.setFo
 ensure(16);fill([231,240,255]);p.roundedRect(14,y,182,14,2,2,'F');text('Esta ficha é uma solicitação de avaliação, sem compromisso de compra.',19,y+5.5,9,false,navy);text('Os dados foram informados pelo solicitante e estão sujeitos à conferência.',19,y+10,8,false,muted);
 const total=p.getNumberOfPages();for(let i=1;i<=total;i++){p.setPage(i);fill(navy);p.rect(0,277,210,20,'F');text('REVENDA CERTA  |  WhatsApp (87) 98102-5012',14,288,9,true,[255,255,255]);text(`${i} / ${total}`,184,288,9,false,[255,255,255]);}
 p.setProperties({title:'Ficha de avaliação veicular',author:'Revenda Certa'});pdf=p;filename='RevendaCerta_Avaliacao_'+title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').slice(0,100)+'.pdf';
-document.querySelector('#ri-wa').href='https://wa.me/5587981025012?text='+encodeURIComponent('Olá! Gostaria de solicitar uma avaliação do meu veículo '+title+'. Segue a ficha em PDF.');actions.hidden=false;status.textContent='Ficha gerada. Baixe o PDF e abra a conversa para anexá-lo.';
-}catch(err){console.error(err);status.textContent='Não foi possível gerar a ficha. Tente novamente.';}
+shareMessage='Olá! Gostaria de solicitar uma avaliação do meu veículo '+title+'. Segue a ficha em PDF.';
+pdfFile=new File([p.output('blob')],filename,{type:'application/pdf'});
+document.querySelector('#ri-wa').href='https://wa.me/5587981025012?text='+encodeURIComponent(shareMessage);
+actions.hidden=false;shareButton.hidden=!canShareFile();
+if(!shareButton.hidden){setStatus('Ficha pronta para compartilhar.','success');await sharePDF();}
+else{setStatus(window.isSecureContext?'Ficha pronta. Este navegador não oferece compartilhamento de arquivos.':'Ficha pronta. O compartilhamento direto requer HTTPS ou localhost.','success');}
+
+}catch(err){console.error(err);setStatus('Não foi possível gerar a ficha. Tente novamente.');}
 });
-document.querySelector('#ri-download').addEventListener('click',()=>pdf?.save(filename));
+document.querySelector('#ri-download').addEventListener('click',()=>{if(!pdfFile)return;const url=URL.createObjectURL(pdfFile);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);});
 })();

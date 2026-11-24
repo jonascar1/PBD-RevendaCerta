@@ -9,19 +9,19 @@
 .prop-contra-parecer span {
     display: block;
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     margin-bottom: 2px;
 }
 
 .prop-contra-meta strong {
     font-size: 14px;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .prop-contra-parecer {
     margin-top: 16px;
     padding: 12px 16px;
-    background: #f8fafc;
+    background: light-dark(#f8fafc, #121c2e);
     border-left: 3px solid #2563eb;
     border-radius: 8px;
 }
@@ -29,7 +29,7 @@
 .prop-contra-parecer p {
     margin: 0;
     font-size: 14px;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .prop-contra-acoes {
@@ -40,11 +40,11 @@
 }
 
 .prop-contra-acoes .prop-btn-perigo {
-    color: #b91c1c;
-    border-color: #fecaca;
-    background: #fff;
+    color: light-dark(#b91c1c, #fda4af);
+    border-color: light-dark(#fecaca, #70404f);
+    background: light-dark(#fff, #121c2e);
 }
 
 .prop-contra-acoes .prop-btn-perigo:hover {
-    background: #fef2f2;
+    background: light-dark(#fef2f2, #3b2533);
 }

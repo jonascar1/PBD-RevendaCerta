@@ -1,7 +1,7 @@
 {% extends "core/administrativo_base.html" %}
 {% load static %}
 {% block title %}{{ veiculo.marca }} {{ veiculo.modelo }} | Administrativo{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/administrativo_despesas_veiculo.css' %}"><link rel="stylesheet" href="{% static 'core/css/administrativo_listagem_despesas.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/administrativo_despesas_veiculo.css' %}?v=rc4-1ab2aefb336e"><link rel="stylesheet" href="{% static 'core/css/administrativo_listagem_despesas.css' %}?v=rc4-51a304084134">{% endblock %}
 {% block content %}
 <header class="ad-page-header"><div><a href="{% url 'painel_administrativo' %}" class="ad-back">← Voltar aos veículos</a><h1>{{ veiculo.marca }} {{ veiculo.modelo }}</h1><p>Ficha do veículo · {{ veiculo.placa }}</p></div><a class="ad-btn ad-btn-primary" href="{% url 'adicionar_despesa' veiculo.pk %}">+ Adicionar despesa</a></header>
 <section class="ad-vehicle-detail"><div class="ad-photo">{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="ad-photo-empty">Veículo sem foto</div>{% endif %}{% endwith %}</div><div class="ad-vehicle-facts"><h2>Informações do veículo</h2><dl><div><dt>Marca e modelo</dt><dd>{{ veiculo.marca }} {{ veiculo.modelo }}</dd></div><div><dt>Placa</dt><dd>{{ veiculo.placa }}</dd></div><div><dt>Ano</dt><dd>{{ veiculo.ano_modelo }}</dd></div><div><dt>Situação</dt><dd>{{ veiculo.get_situacao_display }}</dd></div><div><dt>Origem</dt><dd>{{ veiculo.get_origem_display }}</dd></div><div><dt>Preço de venda</dt><dd>R$ {{ veiculo.preco_venda|floatformat:2 }}</dd></div></dl></div></section>

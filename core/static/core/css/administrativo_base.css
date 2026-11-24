@@ -10,8 +10,8 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fb;
-    color: #1f2937;
+    background: light-dark(#f5f7fb, #121c2e);
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 
@@ -63,7 +63,7 @@ body {
 }
 
 .logo span {
-    color: #2864e8;
+    color: light-dark(#2864e8, #78b5ff);
 }
 
 
@@ -110,7 +110,7 @@ body {
 }
 
 .perfil-info span {
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 12px;
 
     margin-top: 3px;
@@ -140,7 +140,7 @@ body {
 
     text-decoration: none;
 
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
 
     font-size: 14px;
 
@@ -220,15 +220,15 @@ body {
 }
 
 .cabecalho p {
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
 
     font-size: 14px;
 }
 
 .badge-perfil {
-    background: white;
+    background: light-dark(white, #121c2e);
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid light-dark(#e5e7eb, #29384e);
 
     border-radius: 8px;
 
@@ -238,7 +238,7 @@ body {
 
     font-weight: bold;
 
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }
 
 /* =========================

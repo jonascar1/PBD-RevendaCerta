@@ -21,3 +21,37 @@
     font-size: clamp(12px, 1.2vw, 19px);
     line-height: 1.35;
 }
+
+/* Marca lateral: ícone original à esquerda, nome em duas linhas. */
+.rc-panel-body .sidebar .logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-left: 4px;
+    margin-right: 4px;
+    min-width: 0;
+}
+.rc-panel-body .sidebar .logo img.rc-panel-brand-mark {
+    display: block;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+.rc-panel-body .sidebar .logo .rc-panel-brand-name {
+    display: block;
+    min-width: 0;
+    font-size: clamp(11px, 1.05vw, 16px);
+    line-height: 1.35;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+.rc-panel-body .sidebar .logo .rc-panel-brand-name > span {
+    display: block;
+    white-space: nowrap;
+    color: inherit;
+}
+@media (max-width: 900px) {
+    .rc-panel-body .sidebar .logo .rc-panel-brand-name { font-size: 15px; }
+}

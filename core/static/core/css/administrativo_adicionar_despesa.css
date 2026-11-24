@@ -12,7 +12,7 @@
 }
 
 .titulo-secao p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
     margin: 0;
 }
@@ -23,9 +23,9 @@
 ========================= */
 
 .formulario-card {
-    background: white;
+    background: light-dark(white, #121c2e);
 
-    border: 1px solid #e1e5eb;
+    border: 1px solid light-dark(#e1e5eb, #29384e);
 
     border-radius: 10px;
 
@@ -50,7 +50,7 @@
 
     font-weight: 600;
 
-    color: #1e293b;
+    color: light-dark(#1e293b, #eef4fc);
 
     margin-bottom: 7px;
 }
@@ -63,13 +63,13 @@
 
     padding: 11px 12px;
 
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
 
     border-radius: 7px;
 
-    background: white;
+    background: light-dark(white, #121c2e);
 
-    color: #1e293b;
+    color: light-dark(#1e293b, #eef4fc);
 
     font-family: inherit;
 
@@ -111,7 +111,7 @@
 
     padding-top: 20px;
 
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 
@@ -163,17 +163,17 @@
 /* Botão cancelar */
 
 .botao-secundario {
-    background: white;
+    background: light-dark(white, #121c2e);
 
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
 }
 
 .botao-secundario:hover {
-    background: #f8fafc;
+    background: light-dark(#f8fafc, #121c2e);
 
-    border-color: #94a3b8;
+    border-color: light-dark(#94a3b8, #29384e);
 }
 
 
@@ -201,13 +201,13 @@
 }
 /* v6: campo categoria alinhado aos demais campos do formulário */
 .formulario-card .campo { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
-.formulario-card .campo label { display: block; font-size: 13px; font-weight: 600; color: #1e293b; }
+.formulario-card .campo label { display: block; font-size: 13px; font-weight: 600; color: light-dark(#1e293b, #eef4fc); }
 .formulario-card .campo select,
 .formulario-card .campo input,
 .formulario-card .campo textarea {
   display: block; width: 100%; box-sizing: border-box; min-height: 43px;
-  padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 7px;
-  background: #fff; color: #1e293b; font: inherit; font-size: 14px;
+  padding: 10px 12px; border: 1px solid light-dark(#cbd5e1, #29384e); border-radius: 7px;
+  background: light-dark(#fff, #121c2e); color: light-dark(#1e293b, #eef4fc); font: inherit; font-size: 14px;
 }
 .formulario-card .campo select { appearance: auto; cursor: pointer; }
 .formulario-card .campo select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.10); }

@@ -103,3 +103,6 @@ to{opacity:1;transform:none}
 .vd .vd-opcionais span, .vd .vd-acoes a { font-size: 15px; }
 @media(max-width: 950px) { .vd .vd-grid { grid-template-columns: minmax(0,1fr); } }
 @media(max-width: 680px) { .vd .container { width: calc(100% - 32px); } .vd .vd-info { padding: 18px; } .vd .vd-hero { min-height: 250px; padding: 30px 0 95px; } .vd .vd-miniatura { flex-basis: 82px; height: 60px; } .vd .vd-ficha > div { padding: 9px; gap: 6px; } .vd .vd-ficha small { font-size: 10px; } .vd .vd-ficha strong { font-size: 13px; } .vd .vd-ficha > div > svg { width: 28px; height: 28px; } }
+
+/* RC mobile: revisão dos breakpoints */
+@media(max-width:1023px){.vd .vd-grid{grid-template-columns:minmax(0,1fr)}} @media(max-width:639px){.vd .vd-cards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:12px}.vd .vd-cards>*{flex:0 0 80%;min-width:0;scroll-snap-align:start}.vd .vd-info{min-width:0}.vd .vd-ficha>div{min-width:0;overflow-wrap:anywhere}}

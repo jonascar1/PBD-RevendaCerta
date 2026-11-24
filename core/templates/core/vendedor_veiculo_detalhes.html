@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculo_detalhes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculo_detalhes.css' %}?v=rc4-f7eaa7a7ace8">
 {% endblock %}
 
 {% block content %}
@@ -68,7 +68,7 @@
             <div class="info-grid">
                 <div class="info-item">
                     <span>Preço de tabela</span>
-                    <strong>
+                    <strong class="rc-preco-veiculo">
                         {% if veiculo.preco_venda %}
                             R$ {{ veiculo.preco_venda|floatformat:2 }}
                         {% else %}

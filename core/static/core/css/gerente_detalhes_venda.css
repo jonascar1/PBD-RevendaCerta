@@ -16,7 +16,7 @@
 }
 
 .detalhes-container .info-item small {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
     line-height: 1.5;
     overflow-wrap: anywhere;
@@ -27,12 +27,12 @@
 }
 
 .detalhes-container .info-item strong.valor-negativo {
-    color: #991b1b;
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .status-margem-negativa, .status-cancelada {
-    background: #fee2e2;
-    color: #991b1b;
+    background: light-dark(#fee2e2, #3b2533);
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .detalhes-container .custo-explicacao {

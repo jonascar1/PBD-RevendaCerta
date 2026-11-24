@@ -1,15 +1,46 @@
 {% extends "core/vendedor_base.html" %}
 {% load static l10n %}
 {% block title %}Veículos | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculos.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculos.css' %}?v=rc-filtros-1">{% endblock %}
 {% block content %}
 <header class="vv-header"><h1>Veículos</h1><p>Consulte o estoque da loja.</p></header>
-<form method="get" class="vv-search"><div><label for="busca">Buscar por marca, modelo ou placa</label><input id="busca" type="search" name="busca" value="{{ busca }}" placeholder="Buscar veículo"></div><button type="submit">Buscar</button></form>
+<form method="get" action="{% url 'veiculos_vendedor' %}" class="vv-filter-panel">
+    <div class="vv-filter-top">
+        <div class="vv-filter-field vv-search-field">
+            <label for="busca">Buscar por marca, modelo ou placa</label>
+            <div class="vv-input-icon"><i data-lucide="search" aria-hidden="true"></i><input id="busca" type="search" name="busca" value="{{ busca }}" placeholder="Ex.: Volkswagen Polo ou placa"></div>
+        </div>
+        <div class="vv-filter-actions">
+            <button class="vv-submit" type="submit"><i data-lucide="search" aria-hidden="true"></i> Buscar</button>
+            <a class="vv-clear" href="{% url 'veiculos_vendedor' %}"><i data-lucide="rotate-ccw" aria-hidden="true"></i> Limpar</a>
+        </div>
+    </div>
+    <details class="vv-filter-details" {% if filtros_ativos %}open{% endif %}>
+        <summary><i data-lucide="sliders-horizontal" aria-hidden="true"></i> Filtros e ordenação <i class="vv-chevron" data-lucide="chevron-down" aria-hidden="true"></i></summary>
+        <div class="vv-filter-grid">
+            {% for campo in campos_select %}
+            <div class="vv-filter-field">
+                <label for="vv-{{ campo.nome }}">{{ campo.rotulo }}</label>
+                <select id="vv-{{ campo.nome }}" name="{{ campo.nome }}">
+                    <option value="">Todos</option>
+                    {% for valor, rotulo in campo.opcoes %}<option value="{{ valor }}" {% if valor == campo.valor %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+            <div class="vv-filter-field"><label for="vv-preco-min">Preço mínimo (R$)</label><input id="vv-preco-min" name="preco_min" type="number" min="0" max="9999999999.99" step="0.01" inputmode="decimal" value="{{ filtros.preco_min }}" placeholder="Sem mínimo"></div>
+            <div class="vv-filter-field"><label for="vv-preco-max">Preço máximo (R$)</label><input id="vv-preco-max" name="preco_max" type="number" min="0" max="9999999999.99" step="0.01" inputmode="decimal" value="{{ filtros.preco_max }}" placeholder="Sem máximo"></div>
+            <div class="vv-filter-field"><label for="vv-ordem">Ordenar por</label><select name="ordem" id="vv-ordem">{% for valor, rotulo in opcoes_ordem %}<option value="{{ valor }}" {% if valor == filtros.ordem %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></div>
+        </div>
+        <div class="vv-filter-bottom"><button type="submit" class="vv-submit"><i data-lucide="check" aria-hidden="true"></i> Aplicar filtros</button></div>
+    </details>
+    {% if erros_filtro %}<div class="vv-filter-errors" role="alert">{% for erro in erros_filtro %}<p>{{ erro }}</p>{% endfor %}</div>{% endif %}
+</form>
+<div class="vv-results" aria-live="polite"><span><strong>{{ veiculos|length }}</strong> veículo{{ veiculos|length|pluralize }} encontrado{{ veiculos|length|pluralize }}</span><span>{% if filtros_ativos or busca %}Filtros em uso{% else %}Estoque completo{% endif %}</span></div>
 <div class="vv-grid">
 {% for veiculo in veiculos %}
 <a class="vv-card" href="{% url 'detalhes_veiculo_vendedor' veiculo.pk %}">
-{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="vv-no-photo">Sem foto</div>{% endif %}{% endwith %}
+{% with foto=veiculo.fotos.all|first %}{% if foto %}<img loading="lazy" decoding="async" src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="vv-no-photo">Sem foto</div>{% endif %}{% endwith %}
 <div class="vv-info"><span class="vv-name">{{ veiculo.marca }} {{ veiculo.modelo }}</span><span class="vv-meta">{{ veiculo.ano_modelo|unlocalize }} · {{ veiculo.get_situacao_display }}</span><span class="vv-price">R$ {{ veiculo.preco_venda|floatformat:2 }}</span></div></a>
-{% empty %}<p class="vv-empty">Nenhum veículo encontrado.</p>{% endfor %}
+{% empty %}<div class="vv-empty"><i data-lucide="car-front" aria-hidden="true"></i><strong>Nenhum veículo encontrado.</strong><p>Tente ajustar a busca ou os filtros.</p><a href="{% url 'veiculos_vendedor' %}" class="vv-clear">Limpar filtros</a></div>{% endfor %}
 </div>
 {% endblock %}

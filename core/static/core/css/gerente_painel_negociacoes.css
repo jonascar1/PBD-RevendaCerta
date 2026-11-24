@@ -11,11 +11,11 @@
     gap: 14px;
     min-width: 0;
     padding: 20px 18px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
     border-radius: 12px;
     text-decoration: none;
-    color: #17243a;
+    color: light-dark(#17243a, #eef4fc);
     transition: border-color .2s, transform .2s, box-shadow .2s;
 }
 
@@ -36,8 +36,8 @@
     flex-shrink: 0;
     width: 44px;
     height: 44px;
-    color: #2563eb;
-    background: #eff6ff;
+    color: light-dark(#2563eb, #78b5ff);
+    background: light-dark(#eff6ff, #1a3455);
     border-radius: 10px;
 }
 
@@ -49,13 +49,13 @@
 .neg-card span {
     display: block;
     margin-bottom: 5px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
 }
 
 .neg-card strong {
     display: block;
-    color: #17243a;
+    color: light-dark(#17243a, #eef4fc);
     font-size: 25px;
     line-height: 1;
 }
@@ -74,13 +74,13 @@
 
 .neg-section-header h2 {
     margin: 0 0 5px;
-    color: #17243a;
+    color: light-dark(#17243a, #eef4fc);
     font-size: 20px;
 }
 
 .neg-section-header p {
     margin: 0;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .neg-filter label {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
     font-weight: 600;
 }
@@ -100,9 +100,9 @@
 .neg-filter select {
     width: 100%;
     padding: 10px 12px;
-    color: #17243a;
-    background: #fff;
-    border: 1px solid #dbe2ea;
+    color: light-dark(#17243a, #eef4fc);
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#dbe2ea, #29384e);
     border-radius: 8px;
     outline: none;
 }
@@ -114,8 +114,8 @@
 
 .neg-table-container {
     overflow-x: auto;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
     border-radius: 12px;
 }
 
@@ -126,12 +126,12 @@
 }
 
 .neg-table thead {
-    background: #f8fafc;
+    background: light-dark(#f8fafc, #121c2e);
 }
 
 .neg-table th {
     padding: 15px 16px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -140,9 +140,9 @@
 
 .neg-table td {
     padding: 15px 16px;
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
     font-size: 13px;
-    border-top: 1px solid #e8edf3;
+    border-top: 1px solid light-dark(#e8edf3, #29384e);
     white-space: nowrap;
 }
 
@@ -151,24 +151,24 @@
 }
 
 .neg-table tbody tr:hover {
-    background: #f8fafc;
+    background: light-dark(#f8fafc, #121c2e);
 }
 
 .neg-table td strong {
     display: block;
-    color: #17243a;
+    color: light-dark(#17243a, #eef4fc);
     font-weight: 600;
 }
 
 .neg-table td small {
     display: block;
     margin-top: 4px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
     font-size: 11px;
 }
 
 .neg-valor {
-    color: #17243a !important;
+    color: light-dark(#17243a, #eef4fc) !important;
     font-weight: 700;
 }
 
@@ -182,28 +182,28 @@
 }
 
 .status-pendente {
-    color: #92400e;
-    background: #fef3c7;
+    color: light-dark(#92400e, #fcd38b);
+    background: light-dark(#fef3c7, #392e20);
 }
 
 .status-aprovada {
-    color: #166534;
-    background: #dcfce7;
+    color: light-dark(#166534, #86efac);
+    background: light-dark(#dcfce7, #14382d);
 }
 
 .status-recusada {
-    color: #991b1b;
-    background: #fee2e2;
+    color: light-dark(#991b1b, #fda4af);
+    background: light-dark(#fee2e2, #3b2533);
 }
 
 .status-contraproposta {
-    color: #6b21a8;
-    background: #f3e8ff;
+    color: light-dark(#6b21a8, #c4b5fd);
+    background: light-dark(#f3e8ff, #302849);
 }
 
 .status-outro {
-    color: #475569;
-    background: #e2e8f0;
+    color: light-dark(#475569, #a0b1c8);
+    background: light-dark(#e2e8f0, #19263a);
 }
 
 .neg-action {
@@ -211,8 +211,8 @@
     align-items: center;
     gap: 7px;
     padding: 8px 12px;
-    color: #2563eb;
-    background: #eff6ff;
+    color: light-dark(#2563eb, #78b5ff);
+    background: light-dark(#eff6ff, #1a3455);
     border-radius: 7px;
     text-decoration: none;
     font-size: 12px;
@@ -231,7 +231,7 @@
 }
 
 .neg-sem-acao {
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
     font-size: 11px;
 }
 
@@ -246,7 +246,7 @@
     width: 32px;
     height: 32px;
     margin: 0 auto 12px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
 }
 
 .neg-empty strong {
@@ -254,7 +254,7 @@
 }
 
 .neg-empty span {
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
     font-size: 12px;
 }
 
@@ -264,9 +264,9 @@
 
 .neg-message {
     padding: 12px 16px;
-    color: #166534;
-    background: #dcfce7;
-    border: 1px solid #bbf7d0;
+    color: light-dark(#166534, #86efac);
+    background: light-dark(#dcfce7, #14382d);
+    border: 1px solid light-dark(#bbf7d0, #2d5947);
     border-radius: 8px;
     font-size: 13px;
 }
@@ -307,7 +307,7 @@
 }
 
 .topbar p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
     margin: 0;
 }
@@ -344,7 +344,7 @@
 }
 
 .neg-table tbody tr:hover {
-    background: #f1f6ff;
+    background: light-dark(#f1f6ff, #1a3455);
 }
 
 .neg-action {

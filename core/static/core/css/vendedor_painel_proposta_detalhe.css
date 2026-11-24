@@ -1,12 +1,12 @@
 :root {
-    --primary-color: #0f172a;
+    --primary-color: light-dark(#0f172a, #eef4fc);
     --accent-color: #2563eb;
     --accent-hover: #1d4ed8;
-    --bg-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+    --bg-color: light-dark(#f8fafc, #121c2e);
+    --card-bg: light-dark(#ffffff, #121c2e);
+    --text-main: light-dark(#1e293b, #eef4fc);
+    --text-muted: light-dark(#64748b, #a0b1c8);
+    --border-color: light-dark(#e2e8f0, #29384e);
     --radius-sm: 6px;
     --radius-md: 10px;
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -67,13 +67,13 @@
     text-decoration: none;
     cursor: pointer;
     border: 1px solid var(--border-color);
-    background-color: #ffffff;
+    background-color: light-dark(#ffffff, #121c2e);
     color: var(--text-main);
     transition: all 0.2s ease;
 }
 
 .prop-btn:hover {
-    background-color: #f1f5f9;
+    background-color: light-dark(#f1f5f9, #19263a);
 }
 
 .prop-btn-primario {
@@ -87,13 +87,13 @@
 }
 
 .prop-btn-secundario {
-    background-color: #f1f5f9;
+    background-color: light-dark(#f1f5f9, #19263a);
     color: var(--primary-color);
     border-color: var(--border-color);
 }
 
 .prop-btn-secundario:hover {
-    background-color: #e2e8f0;
+    background-color: light-dark(#e2e8f0, #19263a);
 }
 
 .prop-btn-pequeno {
@@ -112,18 +112,18 @@
 }
 
 .prop-badge-em_analise, .prop-badge-analise, .prop-badge-pendente {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: light-dark(#fef3c7, #392e20);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .prop-badge-aprovada, .prop-badge-aprovado, .prop-badge-aceita {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: light-dark(#dcfce7, #14382d);
+    color: light-dark(#166534, #86efac);
 }
 
 .prop-badge-recusada, .prop-badge-rejeitada, .prop-badge-cancelada {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: light-dark(#fee2e2, #3b2533);
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .prop-detalhe-grid {
@@ -195,7 +195,7 @@
 }
 
 .prop-financeiro-item {
-    background-color: #f8fafc;
+    background-color: light-dark(#f8fafc, #121c2e);
     padding: 1rem;
     border-radius: var(--radius-sm);
     display: flex;
@@ -226,7 +226,7 @@
 }
 
 .prop-tabela th {
-    background-color: #f8fafc;
+    background-color: light-dark(#f8fafc, #121c2e);
     padding: 0.75rem 1rem;
     font-weight: 600;
     color: var(--text-muted);
@@ -301,7 +301,7 @@
 .prop-form-confirmacao input {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid #d1d5db;
+    border: 1px solid light-dark(#d1d5db, #29384e);
     border-radius: 8px;
     font: inherit;
 }
@@ -312,7 +312,7 @@
 }
 
 .prop-form-confirmacao small {
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
 }
 
 .prop-form-confirmacao button {

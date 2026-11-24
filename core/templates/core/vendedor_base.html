@@ -2,31 +2,36 @@
 {% load static l10n %}
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-rc-theme-scope="panel" data-rc-theme-user="{{ request.user.pk|stringformat:'s' }}">
 
 <head>
+    <script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% block title %}Painel do Vendedor | REVENDA CERTA{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'core/css/vendedor_base.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/mensagens.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/vendedor_base.css' %}?v=rc4-d7ef0d8f5590">
+    <link rel="stylesheet" href="{% static 'core/css/mensagens.css' %}?v=rc4-f8206d0612f0">
     {% block extra_css %}{% endblock %}
     <link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
-    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=rc4-3c558988acdf">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}?v=rc-marca-1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}?v=rc4-4044a89494c9">
+<link rel="stylesheet" href="{% static 'core/css/painel_responsivo.css' %}?v=rc-mobile-1">
 </head>
 
-<body>
+<body class="rc-panel-body" data-pref-user="{{ request.user.pk|stringformat:'s' }}">
+<script>window.RCTheme?.apply();</script>
+<button type="button" class="rc-mobile-toggle" aria-controls="rc-sidebar" aria-expanded="false">☰ <span>Menu</span></button><button type="button" class="rc-mobile-backdrop" aria-label="Fechar menu" hidden></button>
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="rc-sidebar">
 
         <div class="logo">
             {% include "core/includes/marca.html" %}
@@ -92,7 +97,7 @@
 
         <div class="menu-inferior">
 
-            <a href="#" class="menu-item">
+            <a href="{% url 'preferencias' %}" class="menu-item {% if request.resolver_match.url_name == 'preferencias' %}active{% endif %}">
                 <span><i data-lucide="settings"></i></span>
                 Configurações
             </a>
@@ -119,5 +124,6 @@
     {% block extra_js %}
     {% endblock %}
 
+<script src="{% static 'core/js/painel_preferencias.js' %}?v=rc6-2"></script>
 </body>
 </html>

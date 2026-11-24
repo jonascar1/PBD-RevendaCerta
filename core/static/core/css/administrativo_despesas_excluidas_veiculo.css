@@ -14,7 +14,7 @@
 .excluidas-label {
     display: inline-block;
     margin-bottom: 8px;
-    color: #dc2626;
+    color: light-dark(#dc2626, #fda4af);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -22,27 +22,27 @@
 
 .excluidas-header h1 {
     margin: 0;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
     font-size: 26px;
 }
 
 .excluidas-header p {
     margin: 8px 0 0;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
 }
 
 .excluidas-header p span {
     margin: 0 5px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
 }
 
 .btn-voltar-excluidas {
     padding: 10px 16px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 8px;
-    background: #ffffff;
-    color: #334155;
+    background: light-dark(#ffffff, #121c2e);
+    color: light-dark(#334155, #eef4fc);
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
@@ -51,7 +51,7 @@
 }
 
 .btn-voltar-excluidas:hover {
-    background: #f1f5f9;
+    background: light-dark(#f1f5f9, #19263a);
 }
 
 .excluidas-lista {
@@ -66,9 +66,9 @@
     justify-content: space-between;
     gap: 20px;
     padding: 20px;
-    border: 1px solid #fecaca;
+    border: 1px solid light-dark(#fecaca, #70404f);
     border-radius: 12px;
-    background: #fffafa;
+    background: light-dark(#fffafa, #121c2e);
 }
 
 .excluida-info {
@@ -78,17 +78,17 @@
 }
 
 .excluida-info strong {
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
     font-size: 15px;
 }
 
 .excluida-info span {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
 .excluida-valor {
-    color: #991b1b;
+    color: light-dark(#991b1b, #fda4af);
     font-size: 17px;
     font-weight: 700;
     white-space: nowrap;
@@ -96,20 +96,20 @@
 
 .excluidas-vazio {
     padding: 40px 20px;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed light-dark(#cbd5e1, #29384e);
     border-radius: 12px;
-    background: #ffffff;
+    background: light-dark(#ffffff, #121c2e);
     text-align: center;
 }
 
 .excluidas-vazio strong {
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
     font-size: 16px;
 }
 
 .excluidas-vazio p {
     margin-top: 8px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
 }
 

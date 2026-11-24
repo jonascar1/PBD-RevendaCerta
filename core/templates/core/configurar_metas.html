@@ -1,4 +1,4 @@
 {% extends 'core/gerente_base.html' %}
 {% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/metas.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/metas.css' %}?v=rc4-6394b06689ad">{% endblock %}
 {% block content %}<section class="meta-panel"><a href="{% url 'painel_gerente' %}">← Voltar ao painel</a><h1>Configurar metas mensais</h1><form method="get"><label for="mes">Mês de referência</label><input id="mes" name="mes" type="month" value="{{ mes }}" required><button>Carregar mês</button></form><form method="post" action="?mes={{ mes }}">{% csrf_token %}<p>Deixe a meta individual em branco para utilizar a meta padrão.</p>{{ form.as_p }}<button type="submit">Salvar metas</button></form><h2>Histórico de alterações</h2>{% for h in historico %}<details><summary>{{ h.criado_em|date:'d/m/Y H:i' }} — {{ h.gerente }}</summary><p>Antes: {{ h.anterior }}</p><p>Depois: {{ h.novo }}</p></details>{% empty %}<p>Nenhuma alteração registrada.</p>{% endfor %}</section>{% endblock %}

@@ -6,7 +6,10 @@ from . import views
 from .metas_views import configurar_metas
 from .alcada_views import alcadas_lote
 
+from .preferencias_views import preferencias_view
+
 urlpatterns = [
+    path("painel/configuracoes/", preferencias_view, name="preferencias"),
     path("painel/gerente/veiculos/alcadas/", alcadas_lote, name="alcadas_lote"),
     path("painel/gerente/metas/", configurar_metas, name="configurar_metas"),
     # Autenticação e Painel Geral

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Precisa bater com os breakpoints do CSS: 5 / 4 / 2 cards
         function quantidadeVisivel() {
-            if (window.matchMedia("(max-width: 520px)").matches) return 1;
+            
             if (window.matchMedia("(max-width: 680px)").matches) return 2;
             if (window.matchMedia("(max-width: 1100px)").matches) return 3;
             return 4;

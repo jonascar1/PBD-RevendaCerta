@@ -1707,3 +1707,40 @@ body {font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-ser
 .combo-gatilho > span:last-child {margin-left:auto;}
 .combo-menu {min-width:100%;}
 @media(max-width:700px){.explorar-secao > .container {width:calc(100% - 24px)}.filtros-explorar{padding:16px!important}.explorar-grade{gap:14px}.explorar-grade .card-conteudo{padding:12px}.explorar-grade .card-preco{font-size:18px}.explorar-resultados{align-items:flex-start}.explorar-grade .card-detalhes{grid-template-columns:1fr}}
+/* Animação do banner de venda e troca de veículos */
+
+.vender-painel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #06112b;
+}
+
+.vender-painel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        linear-gradient(90deg, #06112bea, #06112b70),
+        url('../img/carrosel3.jpeg') center / cover no-repeat;
+
+    animation: hero-zoom 8s ease-in-out infinite alternate;
+    transform-origin: center;
+    pointer-events: none;
+}
+
+.vender-painel > div {
+    position: relative;
+    z-index: 1;
+}
+
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+    .vender-painel::before {
+        animation: none;
+    }
+}
+/* RC mobile: revisão dos breakpoints */
+@media(max-width:639px){.banner.banner-carrossel{height:78svh;min-height:520px;max-height:780px}.banner-carrossel .hero-layout{align-items:center;padding-bottom:64px}.hero-acoes{flex-wrap:wrap}.hero-acoes>a{min-height:44px}.hero-rodape{justify-content:flex-start}.filtros .filtros-campos,.filtros .explorar-filtros-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.filtros .filtro-campo{min-width:0}.filtros .filtro-campo :is(input,select,.combo-gatilho){width:100%;min-width:0;font-size:14px}.filtros .filtros-acoes{grid-column:1/-1;display:flex}.explorar-acoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.explorar-acoes>*{min-width:0;padding-inline:8px}.explorar-grade{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.explorar-grade .card-veiculo{min-width:0}.explorar-grade .card-conteudo{padding:10px;min-width:0}.explorar-grade .card-conteudo h3{font-size:14px;white-space:normal;overflow-wrap:anywhere}.explorar-grade .card-preco{font-size:clamp(13px,3.7vw,18px);overflow-wrap:anywhere}.explorar-grade .card-detalhes span{font-size:11px;overflow-wrap:anywhere}.explorar-grade .botao-card{font-size:12px;padding-inline:5px;min-height:44px}.explorar-grade .etiqueta-categoria{display:none}.explorar-grade .etiqueta-marca{max-width:90%;font-size:10px}.explorar-paginacao{flex-wrap:wrap}} @media(min-width:640px) and (max-width:1023px){.explorar-grade{grid-template-columns:repeat(2,minmax(0,1fr))}}

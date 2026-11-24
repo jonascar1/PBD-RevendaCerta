@@ -30,7 +30,7 @@
 }
 
 .neg-table td a:not(.neg-action) {
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
 }
 
@@ -54,10 +54,10 @@
     min-width: 0;
     min-height: 44px;
     padding: 10px 12px;
-    border: 1px solid #dbe2ea;
+    border: 1px solid light-dark(#dbe2ea, #29384e);
     border-radius: 8px;
-    background: #fff;
-    color: #334155;
+    background: light-dark(#fff, #121c2e);
+    color: light-dark(#334155, #eef4fc);
     font: 13px Arial, Helvetica, sans-serif;
 }
 

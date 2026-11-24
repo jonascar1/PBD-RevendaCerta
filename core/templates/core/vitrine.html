@@ -16,8 +16,14 @@
   <span class="banner-etiqueta">SUV compacto • Versatilidade</span><h2>Feito para você<span>ir mais longe.</span></h2><p>Conforto, espaço e liberdade para todos os caminhos.</p>
   <div class="hero-acoes"><a href="{% url 'explorar' %}" class="botao-principal">Explorar veículos <i data-lucide="arrow-right"></i></a><a href="#vender" class="hero-secundario">Vender meu carro</a></div></div></div>
 </div>
+<div class="banner-slide banner-city-hatch" aria-hidden="true" inert>
+  <div class="banner-fundo" role="img" aria-label="Hatch vermelho em avenida da cidade ao anoitecer"></div><div class="container hero-layout"><div class="hero-texto">
+  <span class="banner-etiqueta">Hatch • Dia a dia na cidade</span><h2>Economia e estilo<span>para a sua rotina.</span></h2><p>Carros revisados, prontos para acompanhar você todos os dias.</p>
+  <div class="hero-acoes"><a href="{% url 'explorar' %}" class="botao-principal">Explorar veículos <i data-lucide="arrow-right"></i></a><a href="#vender" class="hero-secundario">Vender meu carro</a></div></div></div>
+</div>
 <div class="container hero-rodape"><a href="#contato" data-whatsapp="contato" class="hero-atendimento"><i data-lucide="message-circle"></i> Atendimento direto pelo WhatsApp</a><div class="hero-controles">
 <button type="button" class="banner-ponto ativo" data-banner-slide="0" aria-label="Primeiro destaque" aria-current="true"></button><button type="button" class="banner-ponto" data-banner-slide="1" aria-label="Segundo destaque"></button>
+<button type="button" class="banner-ponto" data-banner-slide="2" aria-label="Terceiro destaque"></button>
 <button type="button" class="banner-seta" data-banner-prev aria-label="Destaque anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="banner-seta" data-banner-next aria-label="Próximo destaque"><i data-lucide="chevron-right"></i></button><button type="button" class="banner-seta" data-banner-pause aria-label="Pausar carrossel" aria-pressed="false"><span>Ⅱ</span></button></div></div></section>
 
     <!-- ESTOQUE -->
@@ -201,6 +207,6 @@
 {% endblock %}
 {% block extra_js %}
 <script src="{% static 'core/js/vitrine_refinada.js' %}?v=1" defer></script>
-<script src="{% static 'core/js/vitrine_2.js' %}"></script>
+<script src="{% static 'core/js/vitrine_2.js' %}?v=rc-mobile-2"></script>
 <script src="{% static 'core/js/vitrine_banner.js' %}" defer></script>
 {% endblock %}

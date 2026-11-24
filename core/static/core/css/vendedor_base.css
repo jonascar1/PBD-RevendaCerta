@@ -6,8 +6,8 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fb;
-    color: #1f2937;
+    background: light-dark(#f5f7fb, #121c2e);
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 
@@ -39,7 +39,7 @@ body {
 }
 
 .logo span {
-    color: #2864e8;
+    color: light-dark(#2864e8, #78b5ff);
 }
 
 
@@ -72,7 +72,7 @@ body {
 }
 
 .perfil span {
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 12px;
 }
 
@@ -89,7 +89,7 @@ body {
 .menu-inferior a {
     text-decoration: none;
 
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
 
     padding: 12px;
 
@@ -111,7 +111,7 @@ body {
     gap: 12px;
     padding: 12px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
     text-decoration: none;
     font-size: 14px;
     transition: 0.2s;
@@ -152,7 +152,7 @@ body {
     gap: 12px;
     padding: 12px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
     text-decoration: none;
     font-size: 14px;
     transition: 0.2s;

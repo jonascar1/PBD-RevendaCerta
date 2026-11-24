@@ -25,7 +25,7 @@
 }
 
 .clientes-card .contador-clientes strong {
-    color: #1d4ed8;
+    color: light-dark(#1d4ed8, #78b5ff);
     font-size: 20px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -53,7 +53,7 @@
 }
 
 .clientes-tabela td:nth-child(5) strong {
-    color: #15803d;
+    color: light-dark(#15803d, #86efac);
     font-weight: 700;
 }
 
@@ -79,9 +79,9 @@
 
 .clientes-card .sem-registros {
     padding: 16px 20px;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-    color: #6b7280;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
+    background: light-dark(#f9fafb, #121c2e);
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 12px;
     line-height: 1.6;
     overflow-wrap: anywhere;

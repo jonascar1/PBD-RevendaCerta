@@ -1,6 +1,6 @@
 .clientes-pagina {
     width: 100%;
-    color: #111827;
+    color: light-dark(#111827, #eef4fc);
 }
 
 .clientes-cabecalho {
@@ -18,25 +18,25 @@
     gap: 16px;
     padding: 20px;
     margin-bottom: 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .clientes-cabecalho h1 {
     font-size: 28px;
     margin: 0 0 6px;
-    color: #111827;
+    color: light-dark(#111827, #eef4fc);
 }
 
 .clientes-cabecalho p {
     margin: 0;
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 14px;
 }
 
 .contador,
 .contador-clientes {
-    background: #eff6ff;
-    color: #2563eb;
+    background: light-dark(#eff6ff, #1a3455);
+    color: light-dark(#2563eb, #78b5ff);
     padding: 5px 9px;
     border-radius: 6px;
     font-size: 12px;
@@ -81,32 +81,32 @@
 }
 
 .mensagem-cliente.success {
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    color: #047857;
+    background: light-dark(#ecfdf5, #14382d);
+    border: 1px solid light-dark(#a7f3d0, #2d5947);
+    color: light-dark(#047857, #86efac);
 }
 
 .mensagem-cliente.error {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
+    background: light-dark(#fef2f2, #3b2533);
+    border: 1px solid light-dark(#fecaca, #70404f);
+    color: light-dark(#b91c1c, #fda4af);
 }
 
 .mensagem-cliente.warning {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #92400e;
+    background: light-dark(#fffbeb, #392e20);
+    border: 1px solid light-dark(#fde68a, #67502e);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .mensagem-cliente.info {
-    background: #eff6ff;
-    border: 1px solid #dbeafe;
-    color: #2563eb;
+    background: light-dark(#eff6ff, #1a3455);
+    border: 1px solid light-dark(#dbeafe, #385982);
+    color: light-dark(#2563eb, #78b5ff);
 }
 
 .clientes-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 12px;
     overflow: hidden;
 }
@@ -123,7 +123,7 @@
     align-items: center;
     gap: 10px;
     padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .campo-busca-cliente {
@@ -134,9 +134,9 @@
     min-width: 180px;
     height: 42px;
     padding: 0 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid light-dark(#d1d5db, #29384e);
     border-radius: 8px;
-    background: #fff;
+    background: light-dark(#fff, #121c2e);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -148,7 +148,7 @@
 .campo-busca-cliente svg {
     width: 18px;
     height: 18px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     flex-shrink: 0;
 }
 
@@ -158,12 +158,12 @@
     border: none;
     outline: none;
     background: transparent;
-    color: #374151;
+    color: light-dark(#374151, #eef4fc);
     font-size: 13px;
 }
 
 .campo-busca-cliente input::placeholder {
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
 }
 
 .btn-pesquisar-cliente,
@@ -193,12 +193,12 @@
 }
 
 .btn-limpar-busca {
-    background: #f3f4f6;
-    color: #374151;
+    background: light-dark(#f3f4f6, #19263a);
+    color: light-dark(#374151, #eef4fc);
 }
 
 .btn-limpar-busca:hover {
-    background: #e5e7eb;
+    background: light-dark(#e5e7eb, #19263a);
 }
 
 .clientes-tabela-container {
@@ -213,12 +213,12 @@
 }
 
 .clientes-tabela thead {
-    background: #f9fafb;
+    background: light-dark(#f9fafb, #121c2e);
 }
 
 .clientes-tabela th {
     padding: 13px 20px;
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
@@ -228,8 +228,8 @@
 
 .clientes-tabela td {
     padding: 15px 20px;
-    border-top: 1px solid #f0f1f3;
-    color: #374151;
+    border-top: 1px solid light-dark(#f0f1f3, #29384e);
+    color: light-dark(#374151, #eef4fc);
     font-size: 13px;
     vertical-align: middle;
 }
@@ -239,12 +239,12 @@
 }
 
 .clientes-tabela tbody tr:hover {
-    background: #fafcff;
+    background: light-dark(#fafcff, #121c2e);
 }
 
 .clientes-tabela td strong {
     display: block;
-    color: #111827;
+    color: light-dark(#111827, #eef4fc);
     font-size: 13px;
     font-weight: 600;
 }
@@ -252,7 +252,7 @@
 .clientes-tabela td small {
     display: block;
     margin-top: 4px;
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 11px;
 }
 
@@ -260,8 +260,8 @@
     display: inline-block;
     padding: 5px 9px;
     border-radius: 6px;
-    background: #eff6ff;
-    color: #2563eb;
+    background: light-dark(#eff6ff, #1a3455);
+    color: light-dark(#2563eb, #78b5ff);
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
@@ -277,13 +277,13 @@
 }
 
 .status-cliente.ativo {
-    background: #ecfdf5;
-    color: #059669;
+    background: light-dark(#ecfdf5, #14382d);
+    color: light-dark(#059669, #86efac);
 }
 
 .status-cliente.inativo {
-    background: #fef2f2;
-    color: #dc2626;
+    background: light-dark(#fef2f2, #3b2533);
+    color: light-dark(#dc2626, #fda4af);
 }
 
 .clientes-acoes {
@@ -298,17 +298,17 @@
     justify-content: center;
     width: 34px;
     height: 34px;
-    border: 1px solid #dbeafe;
+    border: 1px solid light-dark(#dbeafe, #385982);
     border-radius: 7px;
-    background: #eff6ff;
-    color: #2563eb;
+    background: light-dark(#eff6ff, #1a3455);
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
     transition: background 0.2s, border-color 0.2s;
 }
 
 .acao-cliente:hover {
     border-color: #2563eb;
-    background: #dbeafe;
+    background: light-dark(#dbeafe, #1a3455);
 }
 
 .acao-cliente svg {
@@ -319,14 +319,14 @@
 .clientes-vazio {
     padding: 45px 20px !important;
     text-align: center;
-    color: #9ca3af !important;
+    color: light-dark(#9ca3af, #a0b1c8) !important;
 }
 
 .clientes-vazio > svg {
     width: 35px;
     height: 35px;
     margin-bottom: 12px;
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
 }
 
 .clientes-vazio strong {
@@ -336,15 +336,15 @@
 
 .clientes-vazio p {
     margin: 0;
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 12px;
 }
 
 .clientes-rodape {
     padding: 14px 20px;
-    border-top: 1px solid #e5e7eb;
-    background: #fff;
-    color: #6b7280;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
+    background: light-dark(#fff, #121c2e);
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 12px;
 }
 

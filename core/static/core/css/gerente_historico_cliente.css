@@ -21,8 +21,8 @@
 
 .hist-secao {
     margin-bottom: 24px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 12px;
     padding: 22px;
 }
@@ -31,11 +31,11 @@
     margin: 0 0 22px;
     font-size: 18px;
     line-height: 1.4;
-    color: #1f2937;
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 .hist-vazio {
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 14px;
     line-height: 1.6;
 }
@@ -100,7 +100,7 @@
     overflow-x: auto;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid #e5e7eb;
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 8px;
 }
 
@@ -110,24 +110,24 @@
     border-collapse: collapse;
     text-align: left;
     font-size: 13px;
-    color: #374151;
+    color: light-dark(#374151, #eef4fc);
 }
 
 .hist-tabela th {
     padding: 13px 16px;
-    background: #f9fafb;
-    color: #6b7280;
+    background: light-dark(#f9fafb, #121c2e);
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .3px;
     white-space: nowrap;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .hist-tabela td {
     padding: 13px 16px;
-    border-bottom: 1px solid #f0f1f3;
+    border-bottom: 1px solid light-dark(#f0f1f3, #29384e);
     vertical-align: top;
 }
 
@@ -136,19 +136,19 @@
 }
 
 .hist-tabela tbody tr:hover {
-    background: #f9fafb;
+    background: light-dark(#f9fafb, #121c2e);
 }
 
 .hist-tabela td strong {
     display: block;
-    color: #1f2937;
+    color: light-dark(#1f2937, #eef4fc);
     overflow-wrap: anywhere;
 }
 
 .hist-tabela td small {
     display: block;
     margin-top: 4px;
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
 }
 
 .hist-tabela td a {
@@ -156,7 +156,7 @@
     align-items: center;
     min-height: 44px;
     padding: 0 4px;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
     font-weight: 600;
 }

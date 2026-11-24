@@ -3,7 +3,7 @@
     max-width: 1500px;
     margin: 0 auto;
     min-width: 0;
-    color: #1f2937;
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 .cart-topo {
@@ -24,7 +24,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     margin-bottom: 7px;
 }
 
@@ -37,7 +37,7 @@
 .cart-topo p {
     font-size: 14px;
     line-height: 1.6;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     margin: 0;
     max-width: 740px;
 }
@@ -50,8 +50,8 @@
 }
 
 .cart-indicador {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 12px;
     padding: 20px;
     min-width: 0;
@@ -61,7 +61,7 @@
 .cart-indicador span {
     display: block;
     font-size: 13px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     margin-bottom: 8px;
 }
 
@@ -69,12 +69,12 @@
     display: block;
     font-size: 26px;
     line-height: 1.2;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .cart-painel {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 12px;
     min-width: 0;
     overflow: hidden;
@@ -86,19 +86,19 @@
     justify-content: space-between;
     gap: 12px;
     padding: 20px 22px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .cart-secao-topo h2,
 .cart-formulario h2 {
     font-size: 18px;
     margin: 0;
-    color: #1f2937;
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 .cart-secao-topo > span {
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .cart-tabela-wrap {
@@ -119,8 +119,8 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.025em;
-    background: #f8fafc;
-    color: #475569;
+    background: light-dark(#f8fafc, #121c2e);
+    color: light-dark(#475569, #a0b1c8);
     white-space: nowrap;
 }
 
@@ -129,7 +129,7 @@
     font-size: 13px;
     line-height: 1.5;
     vertical-align: middle;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .cart-tabela td:first-child {
@@ -137,11 +137,11 @@
 }
 
 .cart-tabela tr:hover td {
-    background: #fafcff;
+    background: light-dark(#fafcff, #121c2e);
 }
 
 .cart-link {
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
     overflow-wrap: anywhere;
 }
@@ -152,7 +152,7 @@
 
 .cart-muted {
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .cart-status {
@@ -165,13 +165,13 @@
 }
 
 .cart-status-ok {
-    background: #dcfce7;
-    color: #166534;
+    background: light-dark(#dcfce7, #14382d);
+    color: light-dark(#166534, #86efac);
 }
 
 .cart-status-pendente {
-    background: #fff7ed;
-    color: #9a3412;
+    background: light-dark(#fff7ed, #392e20);
+    color: light-dark(#9a3412, #fda4af);
 }
 
 .cart-botao {
@@ -198,12 +198,12 @@
 }
 
 .cart-botao-secundario {
-    background: #fff;
-    color: #2563eb;
+    background: light-dark(#fff, #121c2e);
+    color: light-dark(#2563eb, #78b5ff);
 }
 
 .cart-botao-secundario:hover {
-    background: #eff6ff;
+    background: light-dark(#eff6ff, #1a3455);
 }
 
 .cart-botao svg {
@@ -218,17 +218,17 @@
 .cart-vazio {
     text-align: center;
     padding: 54px 20px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .cart-vazio svg {
     width: 36px;
     height: 36px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
 }
 
 .cart-vazio h3 {
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
     margin: 14px 0 6px;
     font-size: 17px;
 }
@@ -246,18 +246,18 @@
 
 .cart-mensagem {
     padding: 12px 16px;
-    border: 1px solid #bfdbfe;
-    background: #eff6ff;
-    color: #1e40af;
+    border: 1px solid light-dark(#bfdbfe, #385982);
+    background: light-dark(#eff6ff, #1a3455);
+    color: light-dark(#1e40af, #78b5ff);
     border-radius: 8px;
 }
 
 .cart-nota {
     padding: 12px 20px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
     margin: 0;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
 }
 
 .cart-formulario {
@@ -266,7 +266,7 @@
 }
 
 .cart-formulario > p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     line-height: 1.6;
     font-size: 14px;
     margin: 12px 0 24px;
@@ -287,25 +287,25 @@
 .cart-campo input {
     height: 44px;
     padding: 10px 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 8px;
     width: 100%;
     font-size: 15px;
 }
 
 .cart-campo input:focus {
-    outline: 2px solid #bfdbfe;
+    outline: 2px solid light-dark(#bfdbfe, #385982);
     border-color: #2563eb;
 }
 
 .cart-campo small {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
 }
 
 .cart-campo .cart-erro,
 .cart-erro {
-    color: #b91c1c;
+    color: light-dark(#b91c1c, #fda4af);
 }
 
 .cart-acoes {
@@ -370,16 +370,16 @@
 }
 
 .cart-linha-retorno td {
-    background: #fffbeb;
+    background: light-dark(#fffbeb, #392e20);
 }
 
 .cart-linha-retorno:hover td {
-    background: #fef3c7;
+    background: light-dark(#fef3c7, #392e20);
 }
 
 .cart-status-retorno {
-    background: #fef3c7;
-    color: #92400e;
+    background: light-dark(#fef3c7, #392e20);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .cart-secao-espaco {
