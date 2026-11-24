@@ -11,7 +11,7 @@
 
 <script src="https://unpkg.com/lucide@0.469.0"></script>
 {% block extra_css %}{% endblock %}<style>/* RC alinhamento visual da marca */ .cabecalho .logo {display:inline-flex;align-items:center;} .cabecalho .logo-icone {display:flex;align-items:center;justify-content:center;} .cabecalho .logo-icone img {display:block;} .cabecalho .logo .fonte-marca {display:block;align-self:center;line-height:1;position:relative;top:3px;}</style>
-</head><body data-whatsapp-numero="{{ whatsapp_numero|default:'5587981025012' }}">
+<link rel="stylesheet" href="{% static 'core/css/rodape_rc.css' %}?v=2"></head><body data-whatsapp-numero="{{ whatsapp_numero|default:'5587981025012' }}">
 
 
 
@@ -91,11 +91,7 @@
 
 <main class="pagina-publica">{% block conteudo %}{% endblock %}</main>
 <!-- RODAPÉ -->
-<footer class="rodape">
-    <div class="container rodape-conteudo">
-        <p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p>
-    </div>
-</footer>
+<footer class="rc-footer"><div class="rc-footer-grid"><div><a class="rc-footer-brand fonte-marca" href="{% url 'vitrine' %}">REVENDA <span>CERTA</span></a><p>Encontre seu próximo carro com mais liberdade para pesquisar, comparar e falar direto com a loja.</p></div><div><h2>Navegue</h2><a href="{% url 'explorar' %}">Catálogo completo</a><a href="{% url 'vender_publico' %}">Venda seu carro</a><a href="{% url 'sobre_nos' %}">Sobre nós</a></div><div><h2>Atendimento</h2><a href="https://wa.me/5587981025012" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> WhatsApp</a></div></div><div class="rc-footer-bottom"><p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p></div></footer>
 <script src="{% static 'core/js/vitrine.js' %}"></script>
 <script src="{% static 'core/js/combobox_marcas.js' %}" defer></script>
 {% block extra_js %}{% endblock %}</body></html>
