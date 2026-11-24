@@ -1,7 +1,10 @@
 import json
+from urllib.parse import urlencode
+from django.conf import settings
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -226,6 +229,7 @@ def vitrine_view(request):
             "ano_modelo",
             "cor",
             "combustivel",
+            "cambio",
             "quilometragem",
             "preco_venda",
             "criado_em",
@@ -280,6 +284,7 @@ def vitrine_view(request):
         request,
         "core/vitrine.html",
         {
+            "whatsapp_numero": getattr(settings, "WHATSAPP_NUMERO", ""),
             "veiculos": veiculos,
             "marcas": marcas,
             "anos": anos,
@@ -294,35 +299,96 @@ def vitrine_view(request):
     )
 
 
+
+# Catálogo público em grade, independente do carrossel da página inicial.
+def explorar_view(request):
+    expirar_reservas_vencidas()
+    estoque = Veiculo.objects.filter(
+        situacao=Veiculo.Situacao.DISPONIVEL,
+        status=Veiculo.Status.DISPONIVEL,
+    )
+    campos = {campo.name for campo in Veiculo._meta.fields}
+    filtros = {chave: request.GET.get(chave, "").strip() for chave in (
+        "busca", "marca", "modelo", "preco", "ano", "combustivel", "tipo", "cambio", "ordem"
+    )}
+    veiculos = estoque
+    if filtros["busca"]:
+        veiculos = veiculos.filter(
+            Q(marca__icontains=filtros["busca"]) | Q(modelo__icontains=filtros["busca"])
+        )
+    for chave in ("marca", "modelo", "combustivel", "tipo", "cambio"):
+        if chave in campos and filtros[chave]:
+            veiculos = veiculos.filter(**{f"{chave}__iexact": filtros[chave]})
+    if filtros["preco"]:
+        try:
+            valor = Decimal(filtros["preco"].replace(",", "."))
+            if valor >= 0:
+                veiculos = veiculos.filter(preco_venda__lte=valor)
+        except (InvalidOperation, ValueError):
+            filtros["preco"] = ""
+    if filtros["ano"]:
+        try:
+            ano = int(filtros["ano"])
+            if 1900 <= ano <= 2100:
+                veiculos = veiculos.filter(Q(ano_fabricacao=ano) | Q(ano_modelo=ano))
+        except ValueError:
+            filtros["ano"] = ""
+    ordenacoes = {
+        "ano_novo": ("-ano_modelo", "-pk"),
+        "ano_antigo": ("ano_modelo", "pk"),
+        "menor_km": ("quilometragem", "pk"),
+        "menor_preco": ("preco_venda", "-criado_em", "-pk"),
+        "maior_preco": ("-preco_venda", "-criado_em", "-pk"),
+        "mais_antigos": ("criado_em", "pk"),
+        "recentes": ("-criado_em", "-pk"),
+    }
+    veiculos = veiculos.prefetch_related("fotos").order_by(
+        *ordenacoes.get(filtros["ordem"], ordenacoes["recentes"])
+    )
+    pagina = Paginator(veiculos, 12).get_page(request.GET.get("pagina"))
+    opcoes = {}
+    for campo in ("marca", "modelo", "combustivel", "tipo", "cambio"):
+        if campo in campos:
+            opcoes[campo] = list(
+                estoque.exclude(**{f"{campo}__isnull": True})
+                .exclude(**{campo: ""}).order_by(campo)
+                .values_list(campo, flat=True).distinct()
+            )
+        else:
+            opcoes[campo] = []
+    parametros = request.GET.copy()
+    parametros.pop("pagina", None)
+    return render(request, "core/explorar.html", {
+        "whatsapp_numero": getattr(settings, "WHATSAPP_NUMERO", ""),
+        "anos": sorted({a for a in set(estoque.values_list("ano_fabricacao", flat=True)) | set(estoque.values_list("ano_modelo", flat=True)) if a and a >= 1900}, reverse=True),
+        "pagina": pagina,
+        "filtros": filtros,
+        "opcoes": opcoes,
+        "total": pagina.paginator.count,
+        "parametros": parametros.urlencode(),
+    })
+
+
+def vender_publico_view(request):
+    return render(request, "core/vender.html", {"whatsapp_numero": getattr(settings, "WHATSAPP_NUMERO", "")})
+
+
+def sobre_nos_view(request):
+    return render(request, "core/sobre_nos.html", {"whatsapp_numero": getattr(settings, "WHATSAPP_NUMERO", "")})
+
 def vitrine_veiculo_detalhe_view(request, pk):
     """Exibe apenas os campos públicos de um veículo disponível na vitrine."""
-    campos_publicos = (
-        "id",
-        "marca",
-        "modelo",
-        "ano_fabricacao",
-        "ano_modelo",
-        "cor",
-        "combustivel",
-        "quilometragem",
-        "preco_venda",
-        "opcionais",
-    )
-
-    veiculo = get_object_or_404(
-        Veiculo.objects.filter(
-            situacao=Veiculo.Situacao.DISPONIVEL,
-            status=Veiculo.Status.DISPONIVEL,
-        ).values(*campos_publicos),
-        pk=pk,
-    )
-    fotos = Veiculo.objects.get(pk=veiculo["id"]).fotos.all()
-
-    return render(
-        request,
-        "core/vitrine_veiculo_detalhe.html",
-        {"veiculo": veiculo, "fotos": fotos},
-    )
+    expirar_reservas_vencidas()
+    estoque = _veiculos_disponiveis_para_procura().prefetch_related("fotos")
+    veiculo = get_object_or_404(estoque, pk=pk)
+    outros = estoque.exclude(pk=pk)
+    mesma_marca = list(outros.filter(marca__iexact=veiculo.marca).order_by("-criado_em")[:4])
+    candidatos = outros.exclude(pk__in=[v.pk for v in mesma_marca])
+    recomendados = sorted(candidatos, key=lambda v: (v.tipo != veiculo.tipo, v.combustivel != veiculo.combustivel, abs((v.preco_venda or 0) - (veiculo.preco_venda or 0))))[:4]
+    numero = getattr(settings, "WHATSAPP_NUMERO", "")
+    mensagem = f"Olá! Vim pelo site Revenda Certa e tenho interesse no {veiculo.marca} {veiculo.modelo}, ano {veiculo.ano_modelo}. Gostaria de mais informações.\n{request.build_absolute_uri()}"
+    whatsapp = f"https://wa.me/{numero}?" + urlencode({"text": mensagem})
+    return render(request, "core/vitrine_veiculo_detalhe.html", {"whatsapp_numero": numero, "veiculo": veiculo, "fotos": veiculo.fotos.all(), "mesma_marca": mesma_marca, "recomendados": recomendados, "whatsapp_veiculo": whatsapp})
 
 
 # ==============================================================================

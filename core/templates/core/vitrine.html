@@ -1,123 +1,24 @@
+{% extends 'core/publico_base.html' %}
 {% load static l10n %}
+{% block titulo %}Encontre seu próximo carro | REVENDA CERTA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_refinada.css' %}?v=4">{% endblock %}
+{% block conteudo %}
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Encontre seu próximo carro | REVENDA CERTA</title>
-
-    <link rel="stylesheet" href="{% static 'core/css/vitrine.css' %}">
-    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
-    <script src="https://unpkg.com/lucide@0.469.0"></script>
-    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
-</head>
-<body>
-
-<!-- CABEÇALHO -->
-<header class="cabecalho">
-    <div class="container cabecalho-conteudo">
-
-        <a href="{% url 'vitrine' %}" class="logo">
-            <span class="logo-icone">
-                <img src="{% static 'core/img/logorevendacerta.svg' %}" alt="Logo Revenda Certa">
-            </span>
-            <span class="fonte-marca">REVENDA CERTA</span>
-        </a>
-
-        <!-- Navegação desktop -->
-        <nav class="menu" id="menu-desktop">
-            <a href="#estoque">Estoque</a>
-            <a href="#como-comprar">Como comprar</a>
-            <a href="#contato">Contato</a>
-        </nav>
-
-        <a href="#contato" class="botao-whatsapp">
-            <img src="{% static 'core/img/whatsapp-icon.png' %}" alt="">
-            <span>Fale conosco</span>
-        </a>
-
-        <!-- Botão do menu mobile -->
-        <button
-            class="botao-menu-mobile"
-            id="abrir-menu"
-            type="button"
-            aria-label="Abrir menu"
-            aria-controls="drawer-menu"
-            aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
-    </div>
-</header>
-
-<!-- Fundo escuro do drawer -->
-<div class="drawer-overlay" id="drawer-overlay"></div>
-
-<!-- Menu lateral mobile -->
-<aside
-    class="drawer-menu"
-    id="drawer-menu"
-    aria-label="Menu de navegação"
-    aria-hidden="true"
-    inert>
-
-    <div class="drawer-cabecalho">
-        <span class="drawer-titulo">Menu</span>
-
-        <button
-            class="fechar-menu"
-            id="fechar-menu"
-            type="button"
-            aria-label="Fechar menu">
-            &times;
-        </button>
-    </div>
-
-    <nav class="drawer-links">
-        <a href="#estoque">Estoque</a>
-        <a href="#como-comprar">Como comprar</a>
-        <a href="#contato">Contato</a>
-        <a href="#contato" class="drawer-whatsapp">
-            Fale conosco pelo WhatsApp
-        </a>
-    </nav>
-</aside>
-
-<main>
-
-    <!-- BANNER PRINCIPAL -->
-    <section class="banner">
-
-        <div class="banner-fundo"></div>
-
-        <div class="container banner-conteudo">
-
-            <span class="banner-etiqueta">
-                Seu próximo carro está aqui
-            </span>
-
-            <h1>
-                Encontre o carro certo,
-                <span>sem sair de casa.</span>
-            </h1>
-
-            <p>
-                Confira nosso estoque, compare opções e encontre
-                o veículo ideal para você.
-            </p>
-
-            <a href="#estoque" class="botao-principal">
-                Explorar veículos
-                <span aria-hidden="true">→</span>
-            </a>
-
-        </div>
-
-    </section>
+    <!-- CARROSSEL AUTOMATICO DO BANNER PRINCIPAL -->
+    <section class="banner banner-carrossel" aria-label="Destaques da Revenda Certa" aria-roledescription="carrossel">
+<div class="banner-slide banner-slide-inicial ativo" aria-hidden="false">
+  <div class="banner-fundo"></div><div class="container hero-layout"><div class="hero-texto">
+  <span class="banner-etiqueta">Seu próximo carro está aqui</span><h1>Encontre o carro certo,<span>sem sair de casa.</span></h1><p>Confira nosso estoque, compare opções e encontre o veículo ideal para você.</p>
+  <div class="hero-acoes"><a href="{% url 'explorar' %}" class="botao-principal">Explorar veículos <i data-lucide="arrow-right"></i></a><a href="#vender" class="hero-secundario">Vender meu carro</a></div></div></div>
+</div>
+<div class="banner-slide banner-citroen" aria-hidden="true" inert>
+  <div class="banner-fundo"></div><div class="container hero-layout"><div class="hero-texto">
+  <span class="banner-etiqueta">SUV compacto • Versatilidade</span><h2>Feito para você<span>ir mais longe.</span></h2><p>Conforto, espaço e liberdade para todos os caminhos.</p>
+  <div class="hero-acoes"><a href="{% url 'explorar' %}" class="botao-principal">Explorar veículos <i data-lucide="arrow-right"></i></a><a href="#vender" class="hero-secundario">Vender meu carro</a></div></div></div>
+</div>
+<div class="container hero-rodape"><a href="#contato" data-whatsapp="contato" class="hero-atendimento"><i data-lucide="message-circle"></i> Atendimento direto pelo WhatsApp</a><div class="hero-controles">
+<button type="button" class="banner-ponto ativo" data-banner-slide="0" aria-label="Primeiro destaque" aria-current="true"></button><button type="button" class="banner-ponto" data-banner-slide="1" aria-label="Segundo destaque"></button>
+<button type="button" class="banner-seta" data-banner-prev aria-label="Destaque anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="banner-seta" data-banner-next aria-label="Próximo destaque"><i data-lucide="chevron-right"></i></button><button type="button" class="banner-seta" data-banner-pause aria-label="Pausar carrossel" aria-pressed="false"><span>Ⅱ</span></button></div></div></section>
 
     <!-- ESTOQUE -->
     <section class="estoque secao" id="estoque">
@@ -145,7 +46,7 @@
 
                     <div class="filtro-campo">
                         <label for="marca">Marca</label>
-                        <select id="marca" name="marca">
+                        <select id="marca" name="marca" data-combobox="marca">
                             <option value="">Todas as marcas</option>
                             {% for marca_opcao in marcas %}
                                 <option value="{{ marca_opcao }}"
@@ -170,28 +71,12 @@
 
                     <div class="filtro-campo">
                         <label for="ano">Ano</label>
-                        <input
-                            type="number"
-                            id="ano"
-                            name="ano"
-                            list="lista-anos"
-                            min="1900"
-                            max="2100"
-                            step="1"
-                            placeholder="Ex.: 2020"
-                            value="{{ filtros.ano|unlocalize }}">
-                        <datalist id="lista-anos">
-                            {% for ano_opcao in anos %}
-                                {% if ano_opcao >= 1900 %}
-                                    <option value="{{ ano_opcao|unlocalize }}">
-                                {% endif %}
-                            {% endfor %}
-                        </datalist>
+                        <select id="ano" name="ano" data-combobox="ano"><option value="">Todos os anos</option>{% for opcao in anos %}{% with valor=opcao|unlocalize %}<option value="{{ valor }}" {% if filtros.ano == valor %}selected{% endif %}>{{ valor }}</option>{% endwith %}{% endfor %}</select>
                     </div>
 
                     <div class="filtro-campo">
                         <label for="combustivel">Combustível</label>
-                        <select id="combustivel" name="combustivel">
+                        <select id="combustivel" name="combustivel" data-combobox="combustivel">
                             <option value="">Todos</option>
                             {% for combustivel_opcao in combustiveis %}
                                 <option value="{{ combustivel_opcao }}"
@@ -209,6 +94,7 @@
 
                 </div>
             </form>
+            <div class="estoque-explorar-link"><a href="{% url 'explorar' %}">Ver catálogo completo <span aria-hidden="true">→</span></a></div>
 
             <!-- CARROSSEL DE VEÍCULOS -->
             <div class="carrossel-veiculos" id="carrossel-veiculos">
@@ -224,58 +110,7 @@
 
                         {% for veiculo in veiculos %}
 
-                            <article class="card-veiculo">
-
-                                <a href="{% url 'vitrine_veiculo_detalhe' veiculo.id %}" class="card-foto">
-                                    {% with foto=veiculo.fotos.all|first %}
-                                        {% if foto %}
-                                            <img src="{{ foto.imagem.url }}"
-                                                 alt="{{ veiculo.marca }} {{ veiculo.modelo }}"
-                                                 loading="lazy">
-                                        {% else %}
-                                            <div class="sem-foto">
-                                                <span><i data-lucide="image-off"></i></span>
-                                                <p>Foto indisponível</p>
-                                            </div>
-                                        {% endif %}
-                                    {% endwith %}
-
-                                    <span class="etiqueta-combustivel">
-                                        {{ veiculo.get_combustivel_display|default:veiculo.combustivel|default:"Veículo" }}
-                                    </span>
-                                </a>
-
-                                <div class="card-conteudo">
-
-                                    <span class="card-marca">{{ veiculo.marca }}</span>
-
-                                    <h3>{{ veiculo.modelo }}</h3>
-
-                                    <p class="card-versao">
-                                        {{ veiculo.versao|default:"Confira os detalhes do veículo" }}
-                                    </p>
-
-                                    <strong class="card-preco">
-                                        {% if veiculo.preco_venda %}
-                                            R$ {{ veiculo.preco_venda|floatformat:2 }}
-                                        {% else %}
-                                            Consulte o preço
-                                        {% endif %}
-                                    </strong>
-
-                                    <div class="card-detalhes">
-                                        <span>{{ veiculo.ano_fabricacao|unlocalize }}</span>
-                                        <span>{{ veiculo.get_combustivel_display|default:veiculo.combustivel|default:"—" }}</span>
-                                    </div>
-
-                                    <a href="#contato" class="botao-card">
-                                        Tenho interesse
-                                        <span aria-hidden="true">→</span>
-                                    </a>
-
-                                </div>
-
-                            </article>
+                            {% include "core/card_veiculo.html" %}
 
                         {% empty %}
 
@@ -305,6 +140,8 @@
         </div><!-- fecha .container -->
     </section><!-- fecha .estoque -->
 
+<section class="secao rc-marcas"><div class="container"><h2>Explore por marca</h2><p>Encontre seu próximo veículo pela sua marca favorita.</p><div class="rc-carousel" data-rc-carousel><button type="button" data-prev aria-label="Marcas anteriores">‹</button><div class="rc-strip rc-brand-strip">{% for marca in marcas %}<a class="rc-brand" href="{% url 'explorar' %}?marca={{ marca|urlencode }}"><span class="rc-brand-logo" data-brand="{{ marca }}"></span><strong>{{ marca }}</strong></a>{% endfor %}</div><button type="button" data-next aria-label="Próximas marcas">›</button></div><div class="rc-dots" aria-hidden="true"></div></div></section>
+<section class="secao rc-campanhas rc-editorial"><div class="container"><h2>Mais possibilidades para você</h2><p>Encontre o veículo que combina com seu estilo de vida.</p><div class="rc-editorial-list"><article class="rc-editorial-row"><a class="rc-editorial-image" href="{% url 'explorar' %}?combustivel=El%C3%A9trico"><img src="{% static 'core/img/campanhas/4.webp' %}?v=3" alt="O futuro é elétrico." loading="lazy" width="1200" height="1200"></a><div class="rc-editorial-copy"><span class="subtitulo">TECNOLOGIA E INOVAÇÃO</span><h3>O futuro é elétrico.</h3><p>Conheça nossos veículos elétricos e descubra uma nova experiência ao dirigir.</p><a class="rc-editorial-button" href="{% url 'explorar' %}?combustivel=El%C3%A9trico">Explorar elétricos <span aria-hidden="true">→</span></a></div></article><article class="rc-editorial-row"><a class="rc-editorial-image" href="{% url 'explorar' %}?tipo=SUV"><img src="{% static 'core/img/campanhas/5.webp' %}?v=3" alt="Seu próximo SUV está aqui." loading="lazy" width="1200" height="1200"></a><div class="rc-editorial-copy"><span class="subtitulo">CONFORTO E LIBERDADE</span><h3>Seu próximo SUV está aqui.</h3><p>Mais espaço, conforto e versatilidade para todos os caminhos.</p><a class="rc-editorial-button" href="{% url 'explorar' %}?tipo=SUV">Explorar SUVs <span aria-hidden="true">→</span></a></div></article></div></div></section>
     <!-- COMO COMPRAR -->
     <section class="como-comprar secao" id="como-comprar">
 
@@ -342,6 +179,7 @@
 
     </section>
 
+    <section class="secao vender-vitrine" id="vender"><div class="container"><div class="vender-painel"><div><span class="banner-etiqueta">VENDER</span><h2>Quer vender ou<br> trocar seu carro?</h2><p>Mande as informações do seu veículo pelo WhatsApp e solicite uma avaliação.</p><a href="{% url 'vender_publico' %}" data-whatsapp="vender" class="botao-principal"><i data-lucide="handshake"></i> Quero vender meu carro</a></div></div></div></section>
     <!-- CONTATO -->
     <section class="contato" id="contato">
 
@@ -353,27 +191,16 @@
             </div>
 
             <!-- Substituiremos pelo link real do WhatsApp da loja -->
-            <a href="#" class="botao-contato">
+            <a href="{% url 'vender_publico' %}" data-whatsapp="contato" class="botao-contato">
                 Fale com a equipe →
             </a>
         </div>
 
     </section>
 
-</main>
-
-<!-- RODAPÉ -->
-<footer class="rodape">
-    <div class="container rodape-conteudo">
-        <p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p>
-    </div>
-</footer>
-
-<!-- SCRIPT 1: ícones e menu lateral -->
-<script src="{% static 'core/js/vitrine.js' %}"></script>
-
-<!-- SCRIPT 2: carrossel de veículos -->
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'core/js/vitrine_refinada.js' %}?v=1" defer></script>
 <script src="{% static 'core/js/vitrine_2.js' %}"></script>
-
-</body>
-</html>
+<script src="{% static 'core/js/vitrine_banner.js' %}" defer></script>
+{% endblock %}

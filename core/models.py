@@ -137,7 +137,7 @@ class Veiculo(models.Model):
         SUV = "SUV", "SUV"
         PICAPE = "PICAPE", "Picape"
         UTILITARIO = "UTILITARIO", "Utilitário"
-        MOTO = "MOTO", "Motocicleta",
+        MOTO = "MOTO", "Motocicleta"
         OUTRO = "OUTRO", "Outro"
 
     class Cambio(models.TextChoices):

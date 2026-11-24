@@ -1,0 +1,101 @@
+{% load static l10n %}
+<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
+<title>{% block titulo %}Revenda Certa{% endblock %}</title>
+
+
+<link rel="stylesheet" href="{% static 'core/css/vitrine.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+
+
+<script src="https://unpkg.com/lucide@0.469.0"></script>
+{% block extra_css %}{% endblock %}<style>/* RC alinhamento visual da marca */ .cabecalho .logo {display:inline-flex;align-items:center;} .cabecalho .logo-icone {display:flex;align-items:center;justify-content:center;} .cabecalho .logo-icone img {display:block;} .cabecalho .logo .fonte-marca {display:block;align-self:center;line-height:1;position:relative;top:3px;}</style>
+</head><body data-whatsapp-numero="{{ whatsapp_numero|default:'5587981025012' }}">
+
+
+
+<!-- CABEÇALHO -->
+<header class="cabecalho">
+    <div class="container cabecalho-conteudo">
+
+        <a href="{% url 'vitrine' %}" class="logo">
+            <span class="logo-icone">
+                <img src="{% static 'core/img/logorevendacerta.svg' %}" alt="Logo Revenda Certa">
+            </span>
+            <span class="fonte-marca">REVENDA CERTA</span>
+        </a>
+
+        <!-- Navegação desktop -->
+        <nav class="menu" id="menu-desktop">
+            <a href="{% url 'vitrine' %}#estoque">Estoque</a>
+            <a href="{% url 'explorar' %}">Explorar</a>
+            <a href="{% url 'vender_publico' %}">Vender</a>
+            <a href="{% url 'sobre_nos' %}">Sobre nós</a>
+        </nav>
+
+        <a href="{% url 'vitrine' %}#contato" class="botao-whatsapp" data-whatsapp="contato">
+            <img src="{% static 'core/img/whatsapp-icon.png' %}" alt="">
+            <span>Fale conosco</span>
+        </a>
+
+        <!-- Botão do menu mobile -->
+        <button
+            class="botao-menu-mobile"
+            id="abrir-menu"
+            type="button"
+            aria-label="Abrir menu"
+            aria-controls="drawer-menu"
+            aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+    </div>
+</header>
+
+<!-- Fundo escuro do drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+
+<!-- Menu lateral mobile -->
+<aside
+    class="drawer-menu"
+    id="drawer-menu"
+    aria-label="Menu de navegação"
+    aria-hidden="true"
+    inert>
+
+    <div class="drawer-cabecalho">
+        <span class="drawer-titulo">Menu</span>
+
+        <button
+            class="fechar-menu"
+            id="fechar-menu"
+            type="button"
+            aria-label="Fechar menu">
+            &times;
+        </button>
+    </div>
+
+    <nav class="drawer-links">
+        <a href="{% url 'vitrine' %}#estoque">Estoque</a>
+        <a href="{% url 'explorar' %}">Explorar</a>
+        <a href="{% url 'vender_publico' %}">Vender</a>
+        <a href="{% url 'sobre_nos' %}">Sobre nós</a>
+        <a href="{% url 'vitrine' %}#contato" class="drawer-whatsapp" data-whatsapp="contato">
+            Fale conosco pelo WhatsApp
+        </a>
+    </nav>
+</aside>
+
+<main class="pagina-publica">{% block conteudo %}{% endblock %}</main>
+<!-- RODAPÉ -->
+<footer class="rodape">
+    <div class="container rodape-conteudo">
+        <p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p>
+    </div>
+</footer>
+<script src="{% static 'core/js/vitrine.js' %}"></script>
+<script src="{% static 'core/js/combobox_marcas.js' %}" defer></script>
+{% block extra_js %}{% endblock %}</body></html>
