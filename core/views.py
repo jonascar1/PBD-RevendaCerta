@@ -397,41 +397,12 @@ def vitrine_veiculo_detalhe_view(request, pk):
 
 @perfil_requerido("VENDEDOR")
 def painel_vendedor_view(request):
-    """Painel inicial do vendedor com estoque, propostas, carteira e avisos de procura."""
+    from .dashboard_metrics import seller_metrics
     expirar_reservas_vencidas()
-
     dados = get_object_or_404(PerfilVendedor, usuario=request.user)
-    veiculos = Veiculo.objects.all().order_by("-criado_em")
-    propostas = _propostas_visiveis(request.user).order_by("-criada_em")[:5]
-    propostas_para_atender = (
-        Proposta.objects.filter(
-            vendedor=request.user,
-            situacao=Proposta.Situacao.ATIVA,
-            veiculo__situacao=Veiculo.Situacao.DISPONIVEL,
-        )
-        .select_related("cliente", "veiculo")
-        .order_by("criada_em", "pk")
-    )
-    carteira = calcular_carteira(vendedor=request.user)
-    avisos_procura = (
-        AvisoProcura.objects.filter(vendedor=request.user, lido=False)
-        .select_related("procura__cliente", "veiculo")
-        .order_by("-criado_em")
-    )
-
-    return render(
-        request,
-        "core/vendedor_painel_inicio.html",
-        {
-            "dados": dados,
-            "veiculos": veiculos,
-            "propostas": propostas,
-            "propostas_para_atender": propostas_para_atender,
-            "carteira": carteira,
-            "fila_hoje": carteira["linhas_hoje"][:5],
-            "avisos_procura": avisos_procura,
-        },
-    )
+    return render(request, "core/vendedor_painel_inicio.html", {
+        "dados": dados, "dashboard": seller_metrics(request.user),
+    })
 
 
 @perfil_requerido("VENDEDOR")
