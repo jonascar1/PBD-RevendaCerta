@@ -17,7 +17,6 @@ from .models import (
     EtapaDocumentacao,
     FotoAvaliacaoTroca,
     LancamentoFinanceiro,
-    PerfilVendedor,
     Procura,
     Proposta,
     TelefoneCliente,

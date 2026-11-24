@@ -4,8 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from ..models import (Usuario, Veiculo, Cliente, Proposta, DecisaoProposta,
-                      ReservaVeiculo, Venda, ComposicaoPagamento, PerfilVendedor,
+from ..models import (Usuario, Veiculo, Cliente, Proposta, ReservaVeiculo, Venda, ComposicaoPagamento, PerfilVendedor,
                       LancamentoFinanceiro, EtapaDocumentacao)
 
 D = Decimal

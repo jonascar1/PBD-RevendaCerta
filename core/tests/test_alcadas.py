@@ -1,7 +1,5 @@
 from decimal import Decimal
 from django.test import SimpleTestCase
-from django.urls import reverse
-from django.core.exceptions import ValidationError
 from ..models import Veiculo, Proposta
 from ..alcada_views import LoteForm
 

@@ -3,7 +3,6 @@ from collections import Counter, defaultdict
 from calendar import monthrange
 from datetime import date
 from decimal import Decimal
-from django.conf import settings
 from django.utils import timezone
 from .models import Venda, Veiculo, Proposta, Usuario, MetaMensal, MetaIndividual
 
