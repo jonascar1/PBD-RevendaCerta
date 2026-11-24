@@ -9,23 +9,26 @@
 <div class="propostas-page">
     <header class="prop-cabecalho">
         <div>
-            <h1 class="prop-titulo">{% if object %}Editar proposta{% else %}Nova proposta{% endif %}</h1>
+            <h1 class="prop-titulo">{{ titulo }}</h1>
             <p class="prop-subtitulo">Registre a oferta e todas as formas de pagamento combinadas com o cliente.</p>
         </div>
         <a class="prop-btn" href="{% url 'propostas' %}">Voltar para propostas</a>
     </header>
 
-    <!-- Aviso de reserva: inicia oculto se o JS for controlar, ou renderiza via backend se veiculo_reservado existir -->
-    <div id="aviso-reserva" class="prop-aviso" role="status" style="margin-bottom:18px" {% if not veiculo_reservado %}hidden{% endif %}>
+    <!-- Aviso de reserva controlado via JS -->
+    <div id="aviso-reserva" class="prop-aviso" role="status" style="margin-bottom:18px" hidden>
         <span aria-hidden="true">⚠</span>
         <div>
-            Veículo reservado até <span id="aviso-reserva-prazo">{{ reserva_prazo }}</span>.
+            Veículo reservado até <span id="aviso-reserva-prazo"></span>.
             A proposta ficará aguardando até a reserva vencer.
         </div>
     </div>
 
     <form method="post" enctype="multipart/form-data" novalidate id="proposta-form">
         {% csrf_token %}
+        {% if contato_origem_id %}
+            <input type="hidden" name="contato" value="{{ contato_origem_id }}">
+        {% endif %}
         {{ form.non_field_errors }}
 
         <div class="prop-grid-form">
@@ -88,6 +91,14 @@
                                 </div>
 
                                 <div class="prop-extra-troca campos-troca" data-extra="troca">
+                                    <div class="prop-campo {% if pagamento.avaliacao_troca.errors %}erro{% endif %}">
+                                        <label for="{{ pagamento.avaliacao_troca.id_for_label }}">
+                                            Avaliação do veículo na troca
+                                        </label>
+                                        {{ pagamento.avaliacao_troca }}
+                                        {{ pagamento.avaliacao_troca.errors }}
+                                    </div>
+
                                     <div class="prop-campo {% if pagamento.troca_descricao.errors %}erro{% endif %}">
                                         <label for="{{ pagamento.troca_descricao.id_for_label }}">Descrição do veículo recebido na troca</label>
                                         {{ pagamento.troca_descricao }}
@@ -141,6 +152,13 @@
 
                                 <div class="prop-extra-troca campos-troca" data-extra="troca">
                                     <div class="prop-campo">
+                                        <label for="{{ formset.empty_form.avaliacao_troca.id_for_label }}">
+                                            Avaliação do veículo na troca
+                                        </label>
+                                        {{ formset.empty_form.avaliacao_troca }}
+                                    </div>
+
+                                    <div class="prop-campo">
                                         <label for="{{ formset.empty_form.troca_descricao.id_for_label }}">Descrição do veículo recebido na troca</label>
                                         {{ formset.empty_form.troca_descricao }}
                                     </div>
@@ -190,7 +208,7 @@
                 <h2 class="prop-card-titulo">Resumo financeiro</h2>
                 <div class="prop-resumo-item">
                     <span>Preço de tabela</span>
-                    <strong id="resumo-preco-tabela" data-valor="{{ veiculo_preco_tabela|default:0 }}">R$ {{ veiculo_preco_tabela|default:0|floatformat:2 }}</strong>
+                    <strong id="resumo-preco-tabela">R$ 0,00</strong>
                 </div>
                 <div class="prop-resumo-item">
                     <span>Valor oferecido</span>
@@ -208,24 +226,12 @@
 
     <!-- Dados em formato JSON passados pelo Django (deve ficar DENTRO do block content) -->
     {{ veiculos_info|json_script:"veiculos-info" }}
+    {{ avaliacoes_troca_info|json_script:"avaliacoes-troca-info" }}
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'core/js/proposta_form.js' %}" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Sincronização secundária de aliases para garantir retrocompatibilidade
-    const syncText = (srcId, targetId) => {
-        const src = document.getElementById(srcId);
-        const target = document.getElementById(targetId);
-        if (src && target) {
-            const observer = new MutationObserver(() => target.textContent = src.textContent);
-            observer.observe(src, { childList: true, characterData: true, subtree: true });
-        }
-    };
-    syncText('resumo-valor-oferecido', 'resumo-valor-oferecido-composicao');
-});
-</script>
+<script src="{% static 'core/js/vendedor_painel_proposta_formulario.js' %}"></script>
 {% endblock %}

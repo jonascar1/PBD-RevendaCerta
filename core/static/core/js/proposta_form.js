@@ -1,74 +1,36 @@
-/*
- * Tela de proposta: soma ao vivo, desconto embutido, aviso de reserva e
- * linhas dinâmicas da composição do pagamento.
+/**
+ * Gerenciamento dinâmico do formulário de proposta comercial:
+ * - Adição, remoção e renumeração de linhas do formset de composição;
+ * - Exibição condicional de campos de troca e financiamento;
+ * - Cálculo ao vivo de desconto, soma das parcelas, divergências e alerta de reserva;
+ * - Preenchimento automático e prevenção de duplicidade em avaliações de troca.
  */
 (function () {
     "use strict";
 
-    // 1. Procura o formulário pelos seletores compatíveis (#proposta-form ou #form-proposta)
     var form = document.getElementById("proposta-form") || document.getElementById("form-proposta");
     if (!form) return;
 
-    // ---------- Atalhos ----------
+    // =========================================================================
+    // Utilitários DOM e Carregamento de Dados
+    // =========================================================================
+
     function $(seletor, contexto) {
         return (contexto || document).querySelector(seletor);
     }
+
     function $$(seletor, contexto) {
         return Array.prototype.slice.call((contexto || document).querySelectorAll(seletor));
     }
 
-    // ---------- Mapeamento de Elementos ----------
-    var campoVeiculo = $('[name="veiculo"]', form);
-    var campoValor = $('[name="valor_oferecido"]', form);
-    
-    // Suporte aos IDs do seu HTML e fallbacks
-    var container = document.getElementById("pagamentos-container") || document.getElementById("composicao-linhas");
-    var modelo = document.getElementById("pagamento-empty-form") || document.getElementById("composicao-vazia");
-    var botaoAdicionar = document.getElementById("btn-add-linha");
-
-    // Identifica o prefixo real do Formset (ex: 'pagamentos' ou 'composicao')
-    var prefixoFormset = container ? (container.getAttribute("data-prefix") || "pagamentos") : "pagamentos";
-    var totalForms = $('[name="' + prefixoFormset + '-TOTAL_FORMS"]', form) || $('[name$="-TOTAL_FORMS"]', form);
-
-    // Carregamento do JSON de veículos
-    var infoEl = document.getElementById("veiculos-info");
-    var veiculos = {};
-    try {
-        veiculos = infoEl ? JSON.parse(infoEl.textContent) : {};
-    } catch (e) {
-        veiculos = {};
-    }
-
-    function centavos(valor) {
-    if (valor === null || valor === undefined || valor === "") {
-        return 0;
-    }
-
-    if (typeof valor === "number") {
-        return Number.isFinite(valor)
-            ? Math.round(valor * 100)
-            : 0;
-    }
-
-    var texto = String(valor)
-        .trim()
-        .replace(/[^\d,.-]/g, "");
-
-    if (texto.includes(",")) {
-        texto = texto.replace(/\./g, "").replace(",", ".");
-    } else if ((texto.match(/\./g) || []).length > 1) {
-        texto = texto.replace(/\./g, "");
-    }
-
-    var numero = Number(texto);
-
-    return Number.isFinite(numero)
-        ? Math.round(numero * 100)
-        : 0;
-}
-
-    function brl(c) {
-        return (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    function lerJsonEmbutido(id) {
+        var el = document.getElementById(id);
+        if (!el) return {};
+        try {
+            return JSON.parse(el.textContent) || {};
+        } catch (e) {
+            return {};
+        }
     }
 
     function definirTexto(id, texto) {
@@ -76,35 +38,98 @@
         if (el) el.textContent = texto;
     }
 
-    // ---------- Gerenciamento das Linhas ----------
+    // =========================================================================
+    // Mapeamento de Elementos e Estado Inicial
+    // =========================================================================
+
+    var campoVeiculo = $('[name="veiculo"]', form);
+    var campoValor = $('[name="valor_oferecido"]', form);
+
+    var container = document.getElementById("pagamentos-container") || document.getElementById("composicao-linhas");
+    var modelo = document.getElementById("pagamento-empty-form") || document.getElementById("composicao-vazia");
+    var botaoAdicionar = document.getElementById("btn-add-linha");
+
+    var prefixoFormset = container ? (container.getAttribute("data-prefix") || "pagamentos") : "pagamentos";
+    var totalForms = $('[name="' + prefixoFormset + '-TOTAL_FORMS"]', form) || $('[name$="-TOTAL_FORMS"]', form);
+
+    var veiculos = lerJsonEmbutido("veiculos-info");
+    var avaliacoesTroca = lerJsonEmbutido("avaliacoes-troca-info");
+
+    // =========================================================================
+    // Conversão e Formatação Monetária
+    // =========================================================================
+
+    /** Converte entrada numérica ou monetária BRL/US em inteiro de centavos. */
+    function centavos(valor) {
+        if (valor === null || valor === undefined || valor === "") {
+            return 0;
+        }
+
+        if (typeof valor === "number") {
+            return Number.isFinite(valor) ? Math.round(valor * 100) : 0;
+        }
+
+        var texto = String(valor).trim().replace(/[^\d,.-]/g, "");
+
+        if (texto.includes(",")) {
+            texto = texto.replace(/\./g, "").replace(",", ".");
+        } else if ((texto.match(/\./g) || []).length > 1) {
+            texto = texto.replace(/\./g, "");
+        }
+
+        var numero = Number(texto);
+        return Number.isFinite(numero) ? Math.round(numero * 100) : 0;
+    }
+
+    /** Formata um valor inteiro em centavos para moeda brasileira (ex.: R$ 1.234,56). */
+    function brl(valorEmCentavos) {
+        return (valorEmCentavos / 100).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        });
+    }
+
+    // =========================================================================
+    // Gerenciamento das Linhas do Formset
+    // =========================================================================
+
     function linhaExcluida(linha) {
         var del = $('[name$="-DELETE"]', linha);
         return linha.style.display === "none" || linha.hidden || (del && del.checked);
     }
 
     function linhasAtivas() {
-        return $$("[data-form-row], .composicao-linha", container).filter(function (l) {
-            return !linhaExcluida(l);
+        return $$("[data-form-row], .composicao-linha", container).filter(function (linha) {
+            return !linhaExcluida(linha);
         });
     }
 
+    function renumerarLinhas() {
+        linhasAtivas().forEach(function (linha, indice) {
+            var contador = $("[data-row-number]", linha);
+            if (contador) contador.textContent = indice + 1;
+        });
+    }
+
+    /** Alterna a visibilidade dos blocos extras (troca/financiamento) conforme o tipo selecionado. */
     function atualizarLinha(linha) {
         var seletorTipo = $('[name$="-tipo"]', linha);
         var tipo = seletorTipo ? seletorTipo.value.toUpperCase() : "";
+        var ehTroca = tipo === "TROCA" || tipo === "VEICULO_TROCA";
 
         var troca = $('[data-extra="troca"], .campos-troca', linha);
         var financiamento = $('[data-extra="financiamento"], .campos-financiamento', linha);
 
         if (troca) {
-            troca.style.display = (tipo === "TROCA" || tipo === "VEICULO_TROCA") ? "grid" : "none";
+            troca.style.display = ehTroca ? "grid" : "none";
         }
         if (financiamento) {
-            financiamento.style.display = (tipo === "FINANCIAMENTO") ? "grid" : "none";
+            financiamento.style.display = tipo === "FINANCIAMENTO" ? "grid" : "none";
         }
 
         var rotulo = $(".rotulo-valor", linha);
         if (rotulo) {
-            rotulo.textContent = (tipo === "TROCA" || tipo === "VEICULO_TROCA") ? "Valor estimado (R$)" : "Valor (R$)";
+            rotulo.textContent = ehTroca ? "Valor estimado (R$)" : "Valor (R$)";
         }
     }
 
@@ -139,15 +164,65 @@
         recalcular();
     }
 
-    // ---------- Recálculo dos Valores em Tempo Real ----------
+    // =========================================================================
+    // Avaliações de Troca
+    // =========================================================================
+
+    /** Preenche automaticamente valor e descrição ao selecionar um laudo de avaliação. */
+    function preencherAvaliacaoTroca(linha) {
+        var campoAvaliacao = $('[name$="-avaliacao_troca"]', linha);
+        var campoValorTroca = $('[name$="-valor"]', linha);
+        var campoDescricao = $('[name$="-troca_descricao"]', linha);
+
+        if (!campoAvaliacao || !campoAvaliacao.value) return;
+
+        var avaliacao = avaliacoesTroca[campoAvaliacao.value];
+        if (!avaliacao) return;
+
+        if (campoValorTroca) {
+            campoValorTroca.value = (centavos(avaliacao.valor) / 100)
+                .toFixed(2)
+                .replace(".", ",");
+        }
+        if (campoDescricao) {
+            campoDescricao.value = avaliacao.descricao;
+        }
+
+        recalcular();
+    }
+
+    /** Impede a seleção da mesma avaliação de troca em múltiplas linhas da proposta. */
+    function verificarAvaliacoesDuplicadas() {
+        var usadas = new Set();
+
+        linhasAtivas().forEach(function (linha) {
+            var campo = $('[name$="-avaliacao_troca"]', linha);
+            var tipo = $('[name$="-tipo"]', linha);
+
+            if (!campo || !tipo || tipo.value !== "TROCA" || !campo.value) return;
+
+            campo.setCustomValidity("");
+
+            if (usadas.has(campo.value)) {
+                campo.setCustomValidity("Esta avaliação já foi selecionada em outra linha da proposta.");
+                campo.reportValidity();
+            } else {
+                usadas.add(campo.value);
+            }
+        });
+    }
+
+    // =========================================================================
+    // Recálculo Financeiro e Avisos em Tempo Real
+    // =========================================================================
+
     function recalcular() {
         var idVeiculo = campoVeiculo ? campoVeiculo.value : null;
         var veiculo = idVeiculo ? veiculos[idVeiculo] : null;
 
-        // Leitura do preço de tabela do elemento HTML ou do JSON
         var elemPrecoTabela = document.getElementById("resumo-preco-tabela");
         var precoTabelaAttr = elemPrecoTabela ? elemPrecoTabela.getAttribute("data-valor") : null;
-        
+
         var tabela = null;
         if (veiculo && veiculo.preco) {
             tabela = centavos(veiculo.preco);
@@ -165,9 +240,8 @@
             soma += valor ? centavos(valor.value) : 0;
         });
 
-        var diferenca = soma - oferecido;
+        var diferenca = oferecido - soma;
 
-        // Atualização de Preço de Tabela e Desconto
         definirTexto("resumo-preco-tabela", tabela !== null ? brl(tabela) : "R$ 0,00");
         definirTexto("resumo-valor-oferecido", oferecido ? brl(oferecido) : "R$ 0,00");
         definirTexto("resumo-valor-oferecido-composicao", oferecido ? brl(oferecido) : "R$ 0,00");
@@ -178,18 +252,17 @@
             definirTexto("resumo-desconto", brl(desconto));
             definirTexto(
                 "resumo-desconto-pct",
-                pct.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "% do preço de tabela"
+                pct.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                    "% do preço de tabela"
             );
         } else {
             definirTexto("resumo-desconto", "R$ 0,00");
             definirTexto("resumo-desconto-pct", "0,00% do preço de tabela");
         }
 
-        // Atualização do Resumo de Composição
         definirTexto("resumo-soma", brl(soma));
         definirTexto("resumo-diferenca", brl(diferenca));
 
-        // Alerta de Divergência na Composição
         var aviso = document.getElementById("aviso-composicao");
         var textoAviso = document.getElementById("aviso-composicao-texto");
 
@@ -200,10 +273,11 @@
             } else {
                 aviso.hidden = false;
                 aviso.style.display = "flex";
-                var mensagem = diferenca > 0
-                    ? "A soma das formas de pagamento excede o valor oferecido em " + brl(diferenca) + "."
-                    : "Faltam " + brl(Math.abs(diferenca)) + " na composição para atingir o valor oferecido.";
-                
+                var mensagem =
+                    diferenca < 0
+                        ? "A soma das formas de pagamento excede o valor oferecido em " + brl(Math.abs(diferenca)) + "."
+                        : "Faltam " + brl(diferenca) + " na composição para atingir o valor oferecido.";
+
                 if (textoAviso) {
                     textoAviso.textContent = mensagem;
                 } else {
@@ -212,17 +286,24 @@
             }
         }
 
-        // Alerta de Veículo Reservado
         var avisoReserva = document.getElementById("aviso-reserva");
         if (avisoReserva) {
             var reservado = !!(veiculo && veiculo.reservado);
             avisoReserva.style.display = reservado ? "flex" : "none";
             avisoReserva.hidden = !reservado;
-            definirTexto("aviso-reserva-prazo", reservado ? (veiculo.reserva_prazo || veiculo.reserva_expira || "") : "");
+            definirTexto(
+                "aviso-reserva-prazo",
+                reservado ? (veiculo.reserva_prazo || veiculo.reserva_expira || "") : ""
+            );
         }
+
+        renumerarLinhas();
     }
 
-    // ---------- Eventos ----------
+    // =========================================================================
+    // Eventos e Inicialização
+    // =========================================================================
+
     form.addEventListener("input", recalcular);
 
     form.addEventListener("change", function (evento) {
@@ -231,6 +312,13 @@
             var linha = alvo.closest("[data-form-row], .composicao-linha");
             if (linha) atualizarLinha(linha);
         }
+
+        if (alvo && alvo.name && /-avaliacao_troca$/.test(alvo.name)) {
+            var linhaTroca = alvo.closest("[data-form-row], .composicao-linha");
+            if (linhaTroca) preencherAvaliacaoTroca(linhaTroca);
+        }
+
+        verificarAvaliacoesDuplicadas();
         recalcular();
     });
 
@@ -251,7 +339,6 @@
         });
     }
 
-    // ---------- Inicialização ----------
     $$("[data-form-row], .composicao-linha", container).forEach(function (linha) {
         var del = $('[name$="-DELETE"]', linha);
         if (del && del.checked) {
@@ -259,6 +346,6 @@
         }
         atualizarLinha(linha);
     });
-    
+
     recalcular();
 })();

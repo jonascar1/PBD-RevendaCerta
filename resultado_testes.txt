@@ -1,0 +1,98 @@
+Creating test database for alias 'default' ('test_revendacerta_demo')...
+Found 24 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, rest_framework, staticfiles
+  Apply all migrations: admin, auth, authtoken, contenttypes, core, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying core.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying authtoken.0001_initial... OK
+  Applying authtoken.0002_auto_20160226_1747... OK
+  Applying authtoken.0003_tokenproxy... OK
+  Applying authtoken.0004_alter_tokenproxy_options... OK
+  Applying core.0002_alter_fotoveiculo_id_alter_lancamentofinanceiro_id_and_more... OK
+  Applying core.0003_contatoagendado_proposta... OK
+  Applying core.0002_veiculo_renavam... OK
+  Applying core.0003_alter_veiculo_renavam... OK
+  Applying core.0004_merge_20260921_2349... OK
+  Applying core.0005_remove_proposta_veiculo_remove_proposta_vendedor_and_more... OK
+  Applying core.0006_historicosituacaoveiculo... OK
+  Applying core.0007_veiculo_preco_venda... OK
+  Applying core.0008_lancamentofinanceiro_data_lancamento_and_more... OK
+  Applying core.0009_remove_perfilvendedor_alcada_desconto_and_more... OK
+  Applying core.0010_cliente_telefonecliente... OK
+  Applying core.0011_veiculo_cliente_comprador... OK
+  Applying core.0012_composicaopagamento_historicoproposta_proposta_and_more... OK
+  Applying core.0013_alter_proposta_vendedor... OK
+  Applying core.0014_proposta_uma_proposta_ativa_por_veiculo... OK
+  Applying core.0015_alter_proposta_situacao... OK
+  Applying core.0016_decisaoproposta... OK
+  Applying core.0017_proposta_status_aprovacao... OK
+  Applying core.0018_alter_decisaoproposta_tipo... OK
+  Applying core.0019_alter_lancamentofinanceiro_tipo... OK
+  Applying core.0020_alter_decisaoproposta_tipo... OK
+  Applying core.0021_cliente_email... OK
+  Applying core.0022_reservaveiculo_cancelada_em_and_more... OK
+  Applying core.0023_fotoavaliacaotroca_pagamentovenda_venda_and_more... OK
+  Applying core.0024_lancamentofinanceiro_venda_entregaveiculo_and_more... OK
+  Applying core.0025_configuracaocarteira_contatocarteira... OK
+  Applying core.0026_contatocarteira_canal_contatocarteira_data_retorno... OK
+  Applying core.0027_veiculo_cambio_veiculo_tipo... OK
+  Applying core.0028_procura_avisoprocura_procura_procura_abertas_idx_and_more... OK
+  Applying core.0029_lancamentofinanceiro_categoria_despesa... OK
+  Applying core.0030_contatocarteira_resultado_proposta_contato_origem_and_more... OK
+  Applying core.0031_alter_procura_tipo_alter_veiculo_tipo... OK
+  Applying core.0032_metamensal_historicometa_metaindividual... OK
+  Applying core.0033_alcada_veiculo... OK
+  Applying core.0034_historicoalcada... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+test_contraproposta_aceite (core.tests.test_fluxo_comercial.FluxoComercial.test_contraproposta_aceite) ... ok
+test_contraproposta_invalida (core.tests.test_fluxo_comercial.FluxoComercial.test_contraproposta_invalida) ... ok
+test_contraproposta_recusa (core.tests.test_fluxo_comercial.FluxoComercial.test_contraproposta_recusa) ... ok
+test_dentro_alcada (core.tests.test_fluxo_comercial.FluxoComercial.test_dentro_alcada) ... ok
+test_fora_alcada_pedido_e_aprovacao (core.tests.test_fluxo_comercial.FluxoComercial.test_fora_alcada_pedido_e_aprovacao) ... ok
+test_pendente_nao_reserva (core.tests.test_fluxo_comercial.FluxoComercial.test_pendente_nao_reserva) ... ok
+test_recusa_promove_fila (core.tests.test_fluxo_comercial.FluxoComercial.test_recusa_promove_fila) ... ok
+test_reserva_exclusiva_e_expiracao (core.tests.test_fluxo_comercial.FluxoComercial.test_reserva_exclusiva_e_expiracao) ... ok
+test_venda_composicao_incompleta (core.tests.test_fluxo_comercial.FluxoComercial.test_venda_composicao_incompleta) ... ok
+test_venda_pagamentos_comissao_e_margem (core.tests.test_fluxo_comercial.FluxoComercial.test_venda_pagamentos_comissao_e_margem) ... ok
+test_vendedor_nao_decide (core.tests.test_fluxo_comercial.FluxoComercial.test_vendedor_nao_decide) ... ok
+test_comissao_somente_gerente (core.tests.test_integracao.IntegracaoComercial.test_comissao_somente_gerente) ... ok
+test_lote_auditoria_e_repeticao (core.tests.test_integracao.IntegracaoComercial.test_lote_auditoria_e_repeticao) ... ok
+test_lote_selecao_invalida_nao_altera (core.tests.test_integracao.IntegracaoComercial.test_lote_selecao_invalida_nao_altera) ... ok
+test_lote_valor_acima_preco (core.tests.test_integracao.IntegracaoComercial.test_lote_valor_acima_preco) ... ok
+test_lote_veiculo_vendido (core.tests.test_integracao.IntegracaoComercial.test_lote_veiculo_vendido) ... ok
+test_metas_e_dashboards (core.tests.test_integracao.IntegracaoComercial.test_metas_e_dashboards) ... ok
+test_permissoes (core.tests.test_integracao.IntegracaoComercial.test_permissoes) ... ok
+test_reserva_vencida (core.tests.test_integracao.IntegracaoComercial.test_reserva_vencida) ... ok
+test_alcada_zero (core.tests.test_alcadas.TestAlcadaVeiculo.test_alcada_zero) ... ok
+test_limite_em_reais (core.tests.test_alcadas.TestAlcadaVeiculo.test_limite_em_reais) ... ok
+test_lote_validacao (core.tests.test_alcadas.TestAlcadaVeiculo.test_lote_validacao) ... ok
+test_percentual_limite_exato (core.tests.test_alcadas.TestAlcadaVeiculo.test_percentual_limite_exato) ... ok
+test_texto_historico (core.tests.test_alcadas.TestAlcadaVeiculo.test_texto_historico) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.493s
+
+OK
+Destroying test database for alias 'default' ('test_revendacerta_demo')...

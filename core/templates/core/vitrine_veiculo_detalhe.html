@@ -1,197 +1,65 @@
-{% load static %}
-{% load static l10n %}
+{% extends 'core/publico_base.html' %}{% load static l10n %}
+{% block titulo %}{{ veiculo.marca }} {{ veiculo.modelo }} | Revenda Certa{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}?v=20261124-4">
+<style>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{{ veiculo.marca }} {{ veiculo.modelo }} | VENDACERTA</title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}"
-    >
-    <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}" >
-
-    <script src="https://unpkg.com/lucide@0.469.0"></script>
-</head>
-<body>
-
-    <header class="cabecalho">
-        <div class="container cabecalho-conteudo">
-            <a href="{% url 'vitrine' %}" class="logo">
-                <span class="logo-icone">
-                    <img src="{% static 'core/img/favicon.png' %}" alt="Logo VendaCerta">
-                </span>
-                <span>Venda<span class="logo-destaque">Certa</span></span>
-            </a>
-            <div>
-                <a href="{% url 'vitrine' %}" class="link-voltar">
-                     <i data-lucide="chevron-left"></i>Voltar
-                </a>
-
-                <a href="#contato" class="botao-whatsapp">
-                    <img src="{% static 'core/img/whatsapp-icon.png' %}" alt="">
-                    <span>Fale conosco</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <main class="container pagina-detalhe">
+/* Layout protegido da página de detalhes */
+.vd { width: 100%; min-width: 0; overflow: clip; }
+.vd .vd-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 250px; padding: 38px 0 100px; }
+.vd .vd-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; filter: blur(12px); opacity: .32; transform: scale(1.06); }
+.vd .vd-hero::after { z-index: 0; pointer-events: none; }
+.vd .vd-hero-texto { position: relative; z-index: 1; }
+.vd .vd-grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; margin-top: -66px; align-items: start; }
+.vd .vd-painel { min-width: 0; }
+.vd .vd-foto { position: relative; width: 100%; height: auto; aspect-ratio: 8 / 5; overflow: hidden; }
+.vd .vd-foto > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.vd .vd-miniaturas { display: flex; max-width: 100%; overflow-x: auto; }
+.vd .vd-miniatura { flex: 0 0 100px; height: 74px; }
+.vd .vd-miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.vd .vd-preco { color: #111; }
+.vd .vd-acoes a.vd-interesse { background: var(--gradiente-acao, linear-gradient(115deg,#1958d8,#248ed8)); color: white; }
+@media (max-width: 950px) { .vd .vd-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .vd .vd-miniatura { flex-basis: 82px; height: 60px; } }
 
 
-    <!-- GALERIA DE FOTOS -->
-    <section class="galeria">
-
-        <div class="foto-principal-container">
-            {% if fotos %}
-                <img
-                    id="foto-principal"
-                    src="{{ fotos.0.imagem.url }}"
-                    alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}"
-                >
-            {% else %}
-                <div class="sem-foto">
-                    <p>Nenhuma foto cadastrada</p>
-                </div>
-            {% endif %}
-        </div>
-
-        {% if fotos %}
-            <div class="miniaturas">
-                {% for foto in fotos %}
-                    <button
-                        type="button"
-                        class="miniatura {% if forloop.first %}ativa{% endif %}"
-                        onclick="trocarFoto('{{ foto.imagem.url|escapejs }}', this)"
-                        aria-label="Ver foto {{ forloop.counter }}"
-                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
-                    >
-                        <img
-                            src="{{ foto.imagem.url }}"
-                            alt="Foto {{ forloop.counter }} do veículo"
-                        >
-                    </button>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-    </section>
-
-
-        <section class="informacoes-veiculo">
-
-            <p class="marca-veiculo">{{ veiculo.marca }}</p>
-
-            <h1 class="nome-veiculo">
-                {{ veiculo.modelo }}
-            </h1>
-
-            {% if veiculo.preco_venda %}
-                <p class="preco-veiculo">
-                    R$ {{ veiculo.preco_venda|floatformat:2 }}
-                </p>
-            {% else %}
-                <p class="preco-veiculo">
-                    Consulte o preço
-                </p>
-            {% endif %}
-
-            <div class="detalhes-grid">
-
-                <div class="detalhe-item">
-                    <span class="detalhe-label">Ano de fabricação</span>
-                    <span class="detalhe-valor">
-                        {{ veiculo.ano_fabricacao|unlocalize|default:"Não informado" }}
-                    </span>
-                </div>
-
-                <div class="detalhe-item">
-                    <span class="detalhe-label">Ano do modelo</span>
-                    <span class="detalhe-valor">
-                        {{ veiculo.ano_modelo|unlocalize|default:"Não informado" }}
-                    </span>
-                </div>
-
-                <div class="detalhe-item">
-                    <span class="detalhe-label">Cor</span>
-                    <span class="detalhe-valor">
-                        {{ veiculo.cor|default:"Não informada" }}
-                    </span>
-                </div>
-
-                <div class="detalhe-item">
-                    <span class="detalhe-label">Combustível</span>
-                    <span class="detalhe-valor">
-                        {{ veiculo.combustivel|default:"Não informado" }}
-                    </span>
-                </div>
-
-                <div class="detalhe-item">
-                    <span class="detalhe-label">Quilometragem</span>
-                    <span class="detalhe-valor">
-                        {% if veiculo.quilometragem != None %}
-                            {{ veiculo.quilometragem }} km
-                        {% else %}
-                            Não informada
-                        {% endif %}
-                    </span>
-                </div>
-
-            </div>
-
-            {% if veiculo.opcionais %}
-                <div class="secao-opcionais">
-                    <h2>Opcionais e equipamentos</h2>
-                    <p>{{ veiculo.opcionais|linebreaksbr }}</p>
-                </div>
-            {% endif %}
-
-            <div class="acoes-veiculo">
-                <a href="{% url 'vitrine' %}" class="botao-voltar">
-                    Ver outros veículos
-                </a>
-                <a href="#contato" class="botao-card">
-                    Tenho interesse
-                    <span aria-hidden="true">→</span>
-                </a>
-            </div>
-
-        </section>
-
-    </main>
-
-    <footer class="rodape">
-        <div class="container">
-            <p>
-                &copy; {% now "Y" %} VendaCerta. Todos os direitos reservados.
-            </p>
-        </div>
-    </footer>
-
-</body>
-</html>
-
-<script>
-
-function trocarFoto(url, elemento) {
-
-    const fotoPrincipal = document.getElementById("foto-principal");
-
-    if (fotoPrincipal) {
-        fotoPrincipal.src = url;
-    }
-
-    document.querySelectorAll(".miniatura").forEach(function(miniatura) {
-        miniatura.classList.remove("ativa");
-    });
-
-    elemento.classList.add("ativa");
-}
-
-lucide.createIcons();
-
-</script>
+/* Refinamento exclusivo dos detalhes */
+.vd .container { width: min(1440px, calc(100% - 64px)); }
+.vd .vd-hero { min-height: 310px; padding: 48px 0 115px; }
+.vd .vd-hero > img { opacity: .82; filter: blur(7px); object-position: center 55%; }
+.vd .vd-hero::after { background: linear-gradient(90deg, rgba(7,17,41,.86), rgba(7,17,41,.42) 65%, rgba(7,17,41,.30)); }
+.vd .vd-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; }
+.vd .vd-galeria { padding: 18px; }
+.vd .vd-info { padding: 32px; }
+.vd .vd-info h2 { font-size: 30px; }
+.vd .vd-preco { font-size: clamp(30px, 3vw, 46px); }
+.vd .vd-ficha > div { padding: 16px; }
+.vd .vd-ficha small { font-size: 12px; }
+.vd .vd-ficha strong { font-size: 16px; }
+.vd .vd-ficha > div > svg { width: 40px; height: 40px; }
+.vd .vd-miniatura { flex-basis: 120px; height: 88px; }
+.vd .vd-op-title { font-size: 19px; }
+.vd .vd-opcionais span, .vd .vd-acoes a { font-size: 15px; }
+@media(max-width: 950px) { .vd .vd-grid { grid-template-columns: minmax(0,1fr); } }
+@media(max-width: 680px) { .vd .container { width: calc(100% - 32px); } .vd .vd-info { padding: 18px; } .vd .vd-hero { min-height: 250px; padding: 30px 0 95px; } .vd .vd-miniatura { flex-basis: 82px; height: 60px; } .vd .vd-ficha > div { padding: 9px; gap: 6px; } .vd .vd-ficha small { font-size: 10px; } .vd .vd-ficha strong { font-size: 13px; } .vd .vd-ficha > div > svg { width: 28px; height: 28px; } }
+ .vd .vd-hero h1 span{background:linear-gradient(100deg,#369bff,#a1e0ff);background-clip:text;-webkit-background-clip:text;color:transparent} .vd .vd-hero-texto>*{animation:vd-entrada .7s ease both} .vd .vd-hero-texto p{animation-delay:.08s} .vd .vd-hero-texto h1{animation-delay:.16s} .vd .vd-contador{display:flex;align-items:center;gap:6px} .vd .vd-contador svg{width:15px;height:15px} @media(prefers-reduced-motion:reduce){.vd .vd-hero-texto>*{animation:none}}
+</style>{% endblock %}
+{% block conteudo %}
+<div class="vd">
+<section class="vd-hero">{% if fotos %}<img src="{{ fotos.0.imagem.url }}" alt="" aria-hidden="true">{% endif %}<div class="container vd-hero-texto"><nav aria-label="Localização"><a href="{% url 'vitrine' %}">Início</a> › <a href="{% url 'explorar' %}">Catálogo</a> › {{ veiculo.marca }} {{ veiculo.modelo }}</nav><p>{{ veiculo.get_tipo_display|default:veiculo.tipo }} • {{ veiculo.marca }}</p><h1>{{ veiculo.marca }} <span>{{ veiculo.modelo }}</span></h1></div></section>
+<div class="container vd-grid">
+<section class="vd-painel vd-galeria" aria-label="Galeria de fotos">
+<div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<p>Foto indisponível</p>{% endif %}</div>
+{% if fotos %}<div class="vd-miniaturas">{% for foto in fotos %}<button type="button" class="vd-miniatura{% if forloop.first %} ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}" aria-label="Ver foto {{ forloop.counter }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"><img src="{{ foto.imagem.url }}" alt="" loading="lazy"></button>{% endfor %}</div>{% endif %}</section>
+<section class="vd-painel vd-info"><p class="vd-marca">{{ veiculo.marca }}</p><h2>{{ veiculo.marca }} {{ veiculo.modelo }}</h2><span class="vd-label">Preço</span><p class="vd-preco">{% if veiculo.preco_venda %}R$ {{ veiculo.preco_venda|floatformat:2 }}{% else %}Consulte o preço{% endif %}</p>
+<div class="vd-ficha">
+<div><i data-lucide="calendar"></i><span><small>Ano de fabricação</small><strong>{{ veiculo.ano_fabricacao|unlocalize|default:'Não informado' }}</strong></span></div>
+<div><i data-lucide="calendar-days"></i><span><small>Ano do modelo</small><strong>{{ veiculo.ano_modelo|unlocalize|default:'Não informado' }}</strong></span></div>
+<div><i data-lucide="gauge"></i><span><small>Quilometragem</small><strong>{% if veiculo.quilometragem != None %}{{ veiculo.quilometragem|localize }} km{% else %}Não informada{% endif %}</strong></span></div>
+<div><i data-lucide="fuel"></i><span><small>Combustível</small><strong>{{ veiculo.get_combustivel_display|default:veiculo.combustivel }}</strong></span></div>
+<div><i data-lucide="settings-2"></i><span><small>Câmbio</small><strong>{{ veiculo.get_cambio_display|default:veiculo.cambio }}</strong></span></div>
+<div><i data-lucide="palette"></i><span><small>Cor</small><strong>{{ veiculo.cor|default:'Não informada' }}</strong></span></div></div>
+{% if veiculo.opcionais %}<h3 class="vd-op-title">Opcionais e equipamentos</h3><div class="vd-opcionais">{{ veiculo.opcionais|linebreaksbr }}</div>{% endif %}
+<div class="vd-acoes"><a href="{% url 'explorar' %}"><i data-lucide="arrow-left"></i> Ver outros veículos</a><a class="vd-interesse" href="https://wa.me/5587981025012?text=Ol%C3%A1%21%20Tenho%20interesse%20no%20ve%C3%ADculo%20{{ veiculo.marca|urlencode }}%20{{ veiculo.modelo|urlencode }}.%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> Tenho interesse</a></div><p class="vd-atendimento"><i data-lucide="shield-check"></i> Atendimento direto pelo WhatsApp</p></section></div>
+<div class="container vd-relacionados relacionados">{% if mesma_marca %}<section><h2>Conheça mais da {{ veiculo.marca }}</h2><div class="vd-cards">{% for veiculo in mesma_marca %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div></section>{% endif %}{% if recomendados %}<section><h2>Você também pode gostar</h2><div class="vd-cards">{% for veiculo in recomendados %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div></section>{% endif %}</div></div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'core/js/vitrine_veiculo_detalhe.js' %}?v=20261124-4" defer></script>{% endblock %}

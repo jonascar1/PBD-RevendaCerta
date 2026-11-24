@@ -1,11 +1,8 @@
-"""
-Checagem de permissão por perfil — SEMPRE no servidor.
-Esconder botão no template não é permissão (critério de aceite do T01).
-Estes decorators são a barreira real: qualquer view sensível passa por aqui.
-"""
+"""Decorators de controle de acesso por perfil de usuário."""
 
 from functools import wraps
 
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
@@ -13,12 +10,15 @@ from django.shortcuts import redirect
 
 def perfil_requerido(*perfis_permitidos):
     """
-    Uso: @perfil_requerido("GERENTE")
-         @perfil_requerido("GERENTE", "ADMINISTRATIVO")
+    Restringe o acesso à view aos perfis informados.
 
-    Bloqueia no servidor, não importa como a rota foi acessada
-    (menu, digitando a URL direto, etc.) — resolve o critério
-    "abrir pelo endereço uma rota de outro perfil é recusado no servidor".
+    Exige usuário autenticado e ativo, encerrando a sessão caso o cadastro
+    tenha sido desativado e lançando PermissionDenied se o perfil não for
+    autorizado.
+
+    Exemplo de uso:
+        @perfil_requerido("GERENTE")
+        @perfil_requerido("GERENTE", "ADMINISTRATIVO")
     """
 
     def decorator(view_func):
@@ -27,10 +27,8 @@ def perfil_requerido(*perfis_permitidos):
         def wrapper(request, *args, **kwargs):
             usuario = request.user
 
+            # Encerra a sessão caso o usuário tenha sido desativado após o login.
             if not usuario.ativo:
-                # Vendedor (ou qualquer perfil) desativado não entra,
-                # mesmo que a sessão ainda esteja "logada".
-                from django.contrib.auth import logout
                 logout(request)
                 return redirect("login")
 

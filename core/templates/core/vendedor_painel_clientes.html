@@ -1,7 +1,7 @@
 {% extends "core/vendedor_base.html" %}
 {% load static %}
-
-{% block title %}Clientes | VENDACERTA{% endblock %}
+{% load formatadores %}
+{% block title %}Clientes | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'core/css/vendedor_painel_clientes.css' %}">
@@ -10,12 +10,10 @@
 
 {% block content %}
 
-    
-
         <header class="clientes-cabecalho">
             <div>
                 <h1>Clientes</h1>
-                <p>Consulte e gerencie os clientes cadastrados no VendaCerta.</p>
+                <p>Consulte e gerencie os clientes cadastrados no Revenda Certa.</p>
             </div>
 
             <a href="{% url 'cadastrar_cliente' %}" class="btn-cadastrar-cliente">
@@ -115,15 +113,15 @@
 
                                 <td>
                                     {% if cliente.tipo == "PJ" %}
-                                        {{ cliente.cnpj|default:"—" }}
+                                        {{ cliente.cnpj|cnpj|default:"—" }}
                                     {% else %}
-                                        {{ cliente.cpf|default:"—" }}
+                                         {{ cliente.cpf|cpf|default:"—" }}
                                     {% endif %}
                                 </td>
 
                                 <td>
                                     {% for telefone in cliente.telefones.all %}
-                                        <div>{{ telefone.numero }}</div>
+                                          <div>{{ telefone.numero|telefone }}</div>
                                     {% empty %}
                                         —
                                     {% endfor %}

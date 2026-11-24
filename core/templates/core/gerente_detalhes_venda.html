@@ -1,0 +1,201 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_venda.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo">
+    <div>
+        <h1>Venda #{{ venda.pk }}</h1>
+        <p>
+            {{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} ·
+            {{ venda.cliente.nome_exibicao }}
+        </p>
+    </div>
+
+    <div class="topo-acoes">
+        <a href="{% url 'detalhes_veiculo' venda.veiculo_id %}" class="btn-voltar">
+            <i data-lucide="chevron-left"></i> Voltar ao veículo
+        </a>
+        <a href="{% url 'contrato_venda' venda.pk %}" class="btn-preco" target="_blank">
+            Ver contrato
+        </a>
+                <a href="{% url 'historico_veiculo' venda.veiculo_id %}" class="btn-voltar">Histórico do veículo</a>
+        {% if request.user.is_gerente %}
+            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">Histórico do cliente</a>
+        {% endif %}
+    </div>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="detalhes-container">
+    <div class="informacoes">
+
+        <div class="card-info">
+            <h3>
+                Dados da venda
+                <span class="status {% if venda.esta_fechada %}status-vendido{% else %}status-cancelada{% endif %}">
+                    {{ venda.get_situacao_display }}
+                </span>
+            </h3>
+
+            <div class="info-grid">
+                <div class="info-item"><span>Data da venda</span><strong>{{ venda.data|date:"d/m/Y" }}</strong></div>
+                <div class="info-item"><span>Cliente</span><strong>{{ venda.cliente.nome_exibicao }}</strong></div>
+                <div class="info-item">
+                    <span>Veículo</span>
+                    <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Vendedor</span>
+                    <strong>{{ venda.vendedor.get_full_name|default:venda.vendedor.username }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Fechada por</span>
+                    <strong>{{ venda.fechada_por.get_full_name|default:venda.fechada_por.username }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Proposta de origem</span>
+                    <strong>#{{ venda.proposta_id }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-info">
+            <h3>Valores</h3>
+
+            <div class="info-grid">
+                <div class="info-item"><span>Preço de tabela</span><strong>R$ {{ venda.preco_tabela|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Valor da venda</span><strong>R$ {{ venda.valor_venda|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Desconto</span><strong>R$ {{ venda.desconto|floatformat:2 }}</strong></div>
+            </div>
+        </div>
+                {% if margem %}
+        <div class="card-info">
+            <h3>
+                Margem real
+                {% if margem.negativa %}
+                    <span class="status status-margem-negativa">Margem negativa</span>
+                {% endif %}
+            </h3>
+
+            <div class="info-grid">
+                <div class="info-item"><span>Preço vendido</span><strong>R$ {{ margem.preco_vendido|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Custo de aquisição</span><strong>R$ {{ margem.custo_aquisicao|floatformat:2 }}</strong></div>
+                <div class="info-item">
+                    <span>Despesas</span>
+                    <strong>R$ {{ margem.despesas|floatformat:2 }}</strong>
+                    {% if margem.despesas_apos_venda %}
+                        <small>R$ {{ margem.despesas_apos_venda|floatformat:2 }} lançados após a venda</small>
+                    {% endif %}
+                </div>
+                <div class="info-item"><span>Comissão do vendedor</span><strong>R$ {{ margem.comissao|floatformat:2 }}</strong></div>
+                <div class="info-item">
+                    <span>Margem</span>
+                    <strong {% if margem.negativa %}class="valor-negativo"{% endif %}>
+                        R$ {{ margem.margem|floatformat:2 }} ({{ margem.margem_percentual|floatformat:2 }}%)
+                    </strong>
+                </div>
+            </div>
+
+            <p class="custo-explicacao">
+                Calculada em {{ margem.calculada_em|date:"d/m/Y" }} às {{ margem.calculada_em|date:"H:i:s" }}.
+                Novas despesas mudam este número.
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="card-info">
+            <h3>Composição do pagamento</h3>
+
+            <div class="info-grid">
+                {% for pagamento in pagamentos %}
+                    <div class="info-item">
+                        <span>{{ pagamento.get_tipo_display }}</span>
+                        <strong>R$ {{ pagamento.valor|floatformat:2 }}</strong>
+
+                        {% if pagamento.tipo == "ENTRADA" and pagamento.data_pagamento %}
+                            <small>Registrada em {{ pagamento.data_pagamento|date:"d/m/Y" }}</small>
+                        {% elif pagamento.tipo == "FINANCIAMENTO" %}
+                            <small>
+                                {{ pagamento.financ_banco }} ·
+                                {{ pagamento.financ_parcelas }}x de
+                                R$ {{ pagamento.financ_valor_parcela|floatformat:2 }}
+                            </small>
+                        {% elif pagamento.tipo == "TROCA" %}
+                            <small>{{ pagamento.troca_descricao }}</small>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="sem-informacao">Nenhum pagamento registrado.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if not venda.esta_fechada %}
+        <div class="card-info">
+            <h3>Cancelamento</h3>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>Cancelada em</span>
+                    <strong>{{ venda.cancelada_em|date:"d/m/Y H:i" }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Cancelada por</span>
+                    <strong>{{ venda.cancelada_por.get_full_name|default:venda.cancelada_por.username }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Motivo</span>
+                    <strong>{{ venda.motivo_cancelamento }}</strong>
+                </div>
+            </div>
+        </div>
+
+        {% elif request.user.is_gerente and venda.veiculo.situacao == "VENDIDO" %}
+        <div class="card-info">
+            <h3>Cancelar venda</h3>
+            <p class="custo-explicacao">
+                O veículo volta ao estoque como disponível. Um veículo recebido
+                na troca, se existir, continua no estoque.
+            </p>
+
+            <form
+                method="post"
+                action="{% url 'cancelar_venda' venda.pk %}"
+                class="form-situacao" data-confirmacao="Cancelar esta venda e devolver o veículo ao estoque?"
+            >
+                {% csrf_token %}
+
+                <div class="campo-form">
+                    {{ form_cancelamento.motivo.label_tag }}
+                    {{ form_cancelamento.motivo }}
+                </div>
+
+                <button type="submit" class="btn-situacao btn-liberar">
+                    <i data-lucide="x-circle"></i> Cancelar venda
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock content %}
+{% block extra_js %}
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
+{% endblock %}

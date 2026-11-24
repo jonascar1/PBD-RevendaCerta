@@ -1,22 +1,22 @@
 {% extends "core/vendedor_base.html" %}
 {% load static %}
-{% load static l10n %}
+{% load l10n %}
+{% load formatadores %}
 
 {% block title %}
-    Detalhes de {{ cliente.nome|default:cliente.razao_social }} | VENDACERTA
+    Detalhes de {{ cliente.nome|default:cliente.razao_social }} | REVENDA CERTA
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_detalhes.css' %}">
+{% endblock %}
 
 {% block content %}
 
 <header class="topo-detalhes">
-    
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_detalhes.css' %}">
-{% endblock %}
     <div>
         <h1>Ficha do Cliente</h1>
-        <p>Visualize os dados do cliente, veículos comprados e histórico de reservas/propostas.</p>
+        <p>Visualize os dados do cliente, veículos comprados e propostas.</p>
     </div>
 
     <div class="topo-acoes">
@@ -26,8 +26,23 @@
         <a href="{% url 'editar_cliente' cliente.id %}" class="btn-editar">
             <i data-lucide="square-pen"></i> Editar cliente
         </a>
+        {% if cliente.ativo %}
+            <a href="{% url 'desativar_cliente' cliente.id %}" class="btn-voltar">
+                <i data-lucide="user-x"></i> Desativar
+            </a>
+        {% else %}
+            <a href="{% url 'reativar_cliente' cliente.id %}" class="btn-editar">
+                <i data-lucide="user-check"></i> Reativar
+            </a>
+        {% endif %}
     </div>
 </header>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="mensagem-cliente {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 
 <section class="cliente-container">
 
@@ -59,7 +74,11 @@
                 </div>
                 <div class="info-item">
                     <span>CPF</span>
-                    <strong>{{ cliente.cpf }}</strong>
+                    <strong>{{ cliente.cpf|cpf }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Data de nascimento</span>
+                    <strong>{{ cliente.data_nascimento|date:"d/m/Y"|default:"-" }}</strong>
                 </div>
             {% else %}
                 <div class="info-item">
@@ -72,7 +91,11 @@
                 </div>
                 <div class="info-item">
                     <span>CNPJ</span>
-                    <strong>{{ cliente.cnpj }}</strong>
+                    <strong>{{ cliente.cnpj|cnpj }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Responsável</span>
+                    <strong>{{ cliente.responsavel|default:"-" }}</strong>
                 </div>
             {% endif %}
 
@@ -81,17 +104,51 @@
                 <strong>{{ cliente.email|default:"Não informado" }}</strong>
             </div>
 
-            <div class="info-item">
+            <div class="info-item info-item-largo">
                 <span>Telefones</span>
-                <strong>
-                    {% for tel in cliente.telefones.all %}
-                        {{ tel.numero }}{% if not forloop.last %}, {% endif %}
-                    {% empty %}
-                        Nenhum telefone cadastrado
-                    {% endfor %}
-                </strong>
+                {% for tel in cliente.telefones.all %}
+                    <strong>
+                        {{ tel.numero|telefone }}
+                        <small>({{ tel.get_tipo_display }}){% if tel.principal %} · principal{% endif %}</small>
+                    </strong>
+                {% empty %}
+                    <strong>Nenhum telefone cadastrado</strong>
+                {% endfor %}
             </div>
         </div>
+    </div>
+
+    <!-- ENDEREÇO -->
+    <div class="card-info">
+        <div class="card-cabecalho">
+            <h3><i data-lucide="map-pin"></i> Endereço</h3>
+        </div>
+
+        {% if cliente.logradouro or cliente.cidade or cliente.cep %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>CEP</span>
+                    <strong>{{ cliente.cep|cep|default:"-" }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Logradouro</span>
+                    <strong>
+                        {{ cliente.logradouro|default:"-" }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}
+                        {% if cliente.complemento %} - {{ cliente.complemento }}{% endif %}
+                    </strong>
+                </div>
+                <div class="info-item">
+                    <span>Bairro</span>
+                    <strong>{{ cliente.bairro|default:"-" }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Cidade / UF</span>
+                    <strong>{{ cliente.cidade|default:"-" }}{% if cliente.estado %} / {{ cliente.estado }}{% endif %}</strong>
+                </div>
+            </div>
+        {% else %}
+            <p class="sem-registros">Endereço não informado.</p>
+        {% endif %}
     </div>
 
     <!-- VEÍCULOS COMPRADOS -->
@@ -134,7 +191,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{% url 'detalhes_veiculo' veiculo.id %}" class="btn-link">
+                                    <a href="{% url 'detalhes_veiculo_vendedor' veiculo.id %}" class="btn-link">
                                         <i data-lucide="eye"></i> Ver veículo
                                     </a>
                                 </td>
@@ -148,7 +205,52 @@
         {% endif %}
     </div>
 
-        <!-- PROPOSTAS -->
+    <!-- DOCUMENTAÇÃO DOS VEÍCULOS COMPRADOS -->
+    <div class="card-info">
+        <div class="card-cabecalho">
+            <h3><i data-lucide="file-check"></i> Documentação do veículo comprado</h3>
+            <span class="contador-badge">{{ vendas|length }}</span>
+        </div>
+
+        {% for venda in vendas %}
+            <p>
+                <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</strong>
+                — {{ venda.veiculo.placa }} · venda #{{ venda.pk }}
+                de {{ venda.data|date:"d/m/Y" }}
+            </p>
+
+            <div class="tabela-responsive">
+                <table class="tabela">
+                    <thead>
+                        <tr><th>Etapa</th><th>Situação</th><th>Data</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for etapa in venda.etapas_documentacao.all %}
+                            <tr>
+                                <td>{{ etapa.get_tipo_display }}</td>
+                                <td>{{ etapa.get_situacao_display }}</td>
+                                <td>{{ etapa.data|date:"d/m/Y"|default:"—" }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>Entrega</td>
+                            {% if venda.entrega %}
+                                <td>Entregue</td>
+                                <td>{{ venda.entrega.data_entrega|date:"d/m/Y" }}</td>
+                            {% else %}
+                                <td>Aguardando entrega</td>
+                                <td>—</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% empty %}
+            <p class="sem-registros">Este cliente ainda não comprou nenhum veículo.</p>
+        {% endfor %}
+    </div>
+
+    <!-- PROPOSTAS -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="circle-dollar-sign"></i> Propostas</h3>
@@ -203,4 +305,4 @@
 
 </section>
 
-{% endblock conteudo %}
+{% endblock content %}

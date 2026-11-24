@@ -1,175 +1,22 @@
 {% extends "core/administrativo_base.html" %}
-
 {% load static %}
-{% load static l10n %}
-
-{% block title %}
-Despesas | VENDACERTA
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/administrativo_painel_despesas.css' %}">
-{% endblock %}
-
-
+{% block title %}Despesas | REVENDA CERTA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/administrativo_listagem_despesas.css' %}?v=5">{% endblock %}
 {% block content %}
-
-<header class="topo">
-
-    <div>
-        <h1>Despesas</h1>
-
-        <p>
-            Consulte e acompanhe as despesas relacionadas aos veículos.
-        </p>
-    </div>
-
-    <div class="badge-perfil">
-        Administrativo
-    </div>
-
-</header>
-
-
-<!-- =========================
-     RESUMO
-========================= -->
-
-<section class="secao">
-
-    <div class="titulo-secao">
-
-        <h2>Resumo</h2>
-
-        <p>
-            Visão geral das despesas registradas no sistema.
-        </p>
-
-    </div>
-
-
-    <div class="resumo">
-
-        <div class="resumo-card">
-
-            <span class="resumo-titulo">
-                Total de despesas
-            </span>
-
-            <strong>
-                {{ total_despesas }}
-            </strong>
-
-        </div>
-
-
-        <div class="resumo-card">
-
-            <span class="resumo-titulo">
-                Valor total
-            </span>
-
-            <strong>
-                R$ {{ valor_total|floatformat:2 }}
-            </strong>
-
-        </div>
-
-
-        <div class="resumo-card">
-
-            <span class="resumo-titulo">
-                Veículos com despesas
-            </span>
-
-            <strong>
-                {{ veiculos_com_despesas }}
-            </strong>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     VEÍCULOS
-========================= -->
-
-<section class="secao">
-
-    <div class="titulo-secao">
-
-        <h2>Veículos</h2>
-
-        <p>
-            Selecione um veículo para consultar suas despesas.
-        </p>
-
-    </div>
-
-
-    <div class="cards">
-
-        {% for veiculo in veiculos %}
-
-            <a href="{% url 'despesas_veiculo' veiculo.id %}" class="card">
-
-                <div class="veiculo-icone">
-                    {% if veiculo.fotos.all %}
-                        <img
-                            src="{{ veiculo.fotos.all.0.imagem.url }}"
-                            alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}"
-                        >
-                    {% else %}
-                        <span><i data-lucide="image-off"></i></span>
-                    {% endif %}
-                </div>
-
-
-                <div class="card-texto">
-
-                    <h3>
-                        {{ veiculo.marca }} {{ veiculo.modelo }}
-                    </h3>
-
-                    <p>
-                        Placa: {{ veiculo.placa }}
-                        · {{ veiculo.ano_modelo|unlocalize }}
-                    </p>
-
-                </div>
-
-
-                <div class="seta">
-                    <span><i data-lucide="chevrons-right"></i></span>
-                </div>
-
-            </a>
-
-        {% empty %}
-
-            <div class="vazio">
-
-                <div class="vazio-icone">
-                    <i data-lucide="car "></i>
-                </div>
-
-                <strong>
-                    Nenhum veículo cadastrado
-                </strong>
-
-                <p>
-                    Ainda não existem veículos disponíveis no sistema.
-                </p>
-
-            </div>
-
-        {% endfor %}
-
-    </div>
-
-</section>
-
+<header class="ad-page-header"><div><h1>Despesas</h1><p>Consulte os lançamentos financeiros registrados na loja.</p></div><a class="ad-btn ad-btn-primary" href="#" id="abrir-nova-despesa">+ Nova despesa</a></header>
+<section class="ad-panel"><div class="ad-panel-head"><div><h2>Lançamentos registrados</h2><p class="ad-muted">Despesas ativas, ordenadas pelas mais recentes.</p></div><span class="ad-muted">{{ total_despesas }} lançamento(s)</span></div>
+<form class="ad-filter" method="get"><input type="search" name="busca" value="{{ busca }}" placeholder="Buscar veículo, placa ou descrição"><button type="submit">Buscar</button></form>
+<div class="ad-table-wrap"><table class="ad-table"><thead><tr><th>Descrição</th><th>Veículo</th><th>Data</th><th>Valor</th><th>Ações</th></tr></thead><tbody>
+{% for despesa in despesas %}<tr><td><strong>{{ despesa.descricao }}</strong>{% if despesa.get_categoria_despesa_display %}<small>{{ despesa.get_categoria_despesa_display }}</small>{% endif %}</td><td>{{ despesa.veiculo.marca }} {{ despesa.veiculo.modelo }}<small>{{ despesa.veiculo.placa }}</small></td><td>{{ despesa.data_lancamento|date:'d/m/Y' }}</td><td><strong>R$ {{ despesa.valor|floatformat:2 }}</strong></td><td><a href="{% url 'despesas_veiculo' despesa.veiculo_id %}">Detalhes</a> &nbsp; <a href="{% url 'editar_despesa' despesa.pk %}">Editar</a></td></tr>
+{% empty %}<tr><td colspan="5"><div class="ad-empty">Nenhuma despesa encontrada. Use “Nova despesa” para registrar o primeiro lançamento.</div></td></tr>{% endfor %}
+</tbody></table></div></section>
+<dialog id="dialog-nova-despesa" class="ad-dialog" aria-labelledby="titulo-nova-despesa">
+  <div class="ad-dialog-head"><h2 id="titulo-nova-despesa">Nova despesa</h2><button type="button" id="fechar-nova-despesa" class="ad-dialog-close" aria-label="Fechar">×</button></div>
+  <p>Escolha o veículo ao qual a despesa será vinculada.</p>
+  <label for="veiculo-nova-despesa">Veículo</label>
+  <select id="veiculo-nova-despesa"><option value="">Selecione um veículo</option>{% for veiculo in veiculos %}<option value="{% url 'adicionar_despesa' veiculo.pk %}">{{ veiculo.marca }} {{ veiculo.modelo }} · {{ veiculo.placa }}</option>{% endfor %}</select>
+  <div class="ad-dialog-actions"><button type="button" id="cancelar-nova-despesa" class="ad-btn">Cancelar</button><button type="button" id="continuar-nova-despesa" class="ad-btn ad-btn-primary">Continuar</button></div>
+</dialog>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'core/js/administrativo_nova_despesa.js' %}"></script>{% endblock %}

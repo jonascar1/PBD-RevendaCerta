@@ -4,7 +4,7 @@
 {% load static l10n %}
 
 {% block title %}
-Veículos | VENDACERTA
+Veículos | REVENDA CERTA
 {% endblock %}
 
 
@@ -37,6 +37,7 @@ Veículos | VENDACERTA
         + Cadastrar veículo
     </a>
 
+    <a href="{% url 'alcadas_lote' %}" class="btn-cadastrar">Configurar alçadas em lote</a>
 </header>
 
 
@@ -247,11 +248,21 @@ Veículos | VENDACERTA
 
                     <td>
 
-                        <a
-                            href="{% url 'detalhes_veiculo' v.id %}"
-                            class="btn-ver">
-                            Ver detalhes
-                        </a>
+                        <div class="acoes">
+                            <a
+                                href="{% url 'detalhes_veiculo' v.id %}"
+                                class="btn-ver"
+                            >
+                                Ver detalhes
+                            </a>
+
+                            <a
+                                href="{% url 'editar_veiculo' v.id %}"
+                                class="btn-ver"
+                            >
+                                Editar
+                            </a>
+                        </div>
 
                     </td>
 

@@ -1,0 +1,262 @@
+
+{% extends "core/gerente_base.html" %}
+{% load static %}
+
+{% block title %}
+Cadastrar avaliação de troca | REVENDA CERTA
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_avaliacao_troca.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo">
+    <div>
+        <h1>Cadastrar avaliação de troca</h1>
+        <p>Registre as condições e o valor do veículo oferecido em troca.</p>
+    </div>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- IDENTIFICAÇÃO DO VEÍCULO -->
+    <section class="card">
+        <div class="card-header">
+            <h2>Dados do veículo</h2>
+            <p>Informe os dados do veículo que será recebido em troca.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="campo">
+                <label for="placa">Placa</label>
+                {{ form.placa }}
+                {{ form.placa.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="chassi">Chassi</label>
+                {{ form.chassi }}
+                {{ form.chassi.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="renavam">Renavam</label>
+                {{ form.renavam }}
+                {{ form.renavam.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="marca">Marca</label>
+                {{ form.marca }}
+                {{ form.marca.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="modelo">Modelo</label>
+                {{ form.modelo }}
+                {{ form.modelo.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="ano_fabricacao">Ano de fabricação</label>
+                {{ form.ano_fabricacao }}
+                {{ form.ano_fabricacao.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="ano_modelo">Ano do modelo</label>
+                {{ form.ano_modelo }}
+                {{ form.ano_modelo.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="cor">Cor</label>
+                {{ form.cor }}
+                {{ form.cor.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="combustivel">Combustível</label>
+                {{ form.combustivel }}
+                {{ form.combustivel.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="quilometragem">Quilometragem</label>
+                <div class="input-unidade">
+                    {{ form.quilometragem }}
+                    <span>km</span>
+                </div>
+                {{ form.quilometragem.errors }}
+            </div>
+        </div>
+        
+        <div class="campo-opcionais" >
+            <label for="{{ form.opcionais.id_for_label }}">Opcionais</label>
+            <small>Informe os principais opcionais do veículo.</small>
+            {{ form.opcionais }}
+            {{ form.opcionais.errors }}
+        </div>
+    </section>
+
+
+    <!-- CONDIÇÕES DO VEÍCULO -->
+    <section class="card">
+        <div class="card-header">
+            <h2>Condições e documentação</h2>
+            <p>Registre o estado geral e as pendências identificadas.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="campo">
+                <label for="estado_geral">Estado geral</label>
+                {{ form.estado_geral }}
+                {{ form.estado_geral.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="possui_debitos">Possui débitos?</label>
+                {{ form.possui_debitos }}
+                {{ form.possui_debitos.errors }}
+            </div>
+
+            <div class="campo">
+                <label for="possui_pendencias_documentacao">
+                    Possui pendências na documentação?
+                </label>
+                {{ form.possui_pendencias_documentacao }}
+                {{ form.possui_pendencias_documentacao.errors }}
+            </div>
+        </div>
+
+        <div class="campo">
+            <label for="descricao_debitos">Descrição dos débitos</label>
+            {{ form.descricao_debitos }}
+            {{ form.descricao_debitos.errors }}
+        </div>
+
+        <div class="campo">
+            <label for="descricao_pendencias">Pendências na documentação</label>
+            {{ form.descricao_pendencias }}
+            {{ form.descricao_pendencias.errors }}
+        </div>
+    </section>
+
+    <!-- AVALIAÇÃO FINANCEIRA -->
+    <section class="card">
+        <div class="card-header">
+            <h2>Valor da avaliação</h2>
+            <p>Informe o valor atribuído ao veículo recebido em troca.</p>
+        </div>
+
+        <div class="campo">
+            <label for="valor_avaliado">Valor avaliado</label>
+            <div class="input-moeda">
+                <span>R$</span>
+                {{ form.valor_avaliado }}
+            </div>
+            {{ form.valor_avaliado.errors }}
+        </div>
+
+        <div class="campo">
+            <label for="observacoes">Observações da avaliação</label>
+            {{ form.observacoes }}
+            {{ form.observacoes.errors }}
+        </div>
+    </section>
+
+
+    <!-- FOTOS DO VEÍCULO -->
+    <section class="card">
+
+        <div class="campo fotos-campo">
+
+            <label>Fotos do veículo</label>
+
+            <span class="descricao">
+                Adicione fotos para documentar as condições do veículo avaliado.
+            </span>
+
+            <div class="upload-area" id="area-upload">
+
+                <div class="upload-icon">
+                    <i data-lucide="image"></i>
+                </div>
+
+                <strong>Adicione fotos do veículo</strong>
+
+                <p>
+                    Selecione uma ou várias imagens para enviar.
+                </p>
+
+                <label for="fotos" class="btn-selecionar">
+                    Selecionar fotos
+                </label>
+
+                <input
+                    type="file"
+                    id="fotos"
+                    name="fotos"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    hidden
+                >
+
+                <small>JPG, PNG ou WEBP</small>
+
+            </div>
+
+            {{ form.fotos.errors }}
+
+            <!-- PRÉ-VISUALIZAÇÃO -->
+            <div
+                id="preview-fotos"
+                class="preview-fotos"
+            ></div>
+
+            <div class="aviso-fotos">
+                <i data-lucide="info"></i>
+                <span>
+                    Arraste as fotos para alterar a ordem.
+                    A primeira será considerada a principal.
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- AÇÕES -->
+    <div class="acoes">
+        <a href="{% url 'avaliacoes_troca' %}" class="btn-voltar">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn-salvar">
+            Cadastrar avaliação
+        </button>
+    </div>
+</form>
+
+{% endblock content %}
+
+
+{% block extra_js %}
+<script src="{% static 'core/js/gerente_cadastrar_avaliacao_troca.js' %}"></script>
+{% endblock extra_js %}
+

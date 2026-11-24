@@ -1,0 +1,15 @@
+{% extends "core/vendedor_base.html" %}
+{% load static l10n %}
+{% block title %}Veículos | REVENDA CERTA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculos.css' %}">{% endblock %}
+{% block content %}
+<header class="vv-header"><h1>Veículos</h1><p>Consulte o estoque da loja.</p></header>
+<form method="get" class="vv-search"><div><label for="busca">Buscar por marca, modelo ou placa</label><input id="busca" type="search" name="busca" value="{{ busca }}" placeholder="Buscar veículo"></div><button type="submit">Buscar</button></form>
+<div class="vv-grid">
+{% for veiculo in veiculos %}
+<a class="vv-card" href="{% url 'detalhes_veiculo_vendedor' veiculo.pk %}">
+{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="vv-no-photo">Sem foto</div>{% endif %}{% endwith %}
+<div class="vv-info"><span class="vv-name">{{ veiculo.marca }} {{ veiculo.modelo }}</span><span class="vv-meta">{{ veiculo.ano_modelo|unlocalize }} · {{ veiculo.get_situacao_display }}</span><span class="vv-price">R$ {{ veiculo.preco_venda|floatformat:2 }}</span></div></a>
+{% empty %}<p class="vv-empty">Nenhum veículo encontrado.</p>{% endfor %}
+</div>
+{% endblock %}

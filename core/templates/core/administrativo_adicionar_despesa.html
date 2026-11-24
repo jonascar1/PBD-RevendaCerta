@@ -7,9 +7,7 @@ Adicionar despesa | {{ veiculo.marca }} {{ veiculo.modelo }}
 {% endblock %}
 
 {% block extra_css %}
-<link
-    rel="stylesheet" href="{% static 'core/css/administrativo_adicionar_despesa.css' %}"
->
+<link rel="stylesheet" href="{% static 'core/css/administrativo_adicionar_despesa.css' %}?v=7">
 {% endblock %}
 
 {% block content %}
@@ -32,6 +30,18 @@ Adicionar despesa | {{ veiculo.marca }} {{ veiculo.modelo }}
         {{ form.non_field_errors }}
 
         <div class="campo">
+            <label for="{{ form.categoria_despesa.id_for_label }}">
+                Categoria da despesa
+            </label>
+
+            {{ form.categoria_despesa }}
+
+            {% for erro in form.categoria_despesa.errors %}
+                <span class="erro-campo">{{ erro }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="campo">
             <label for="valor">Valor</label>
             {{ form.valor }}
             {{ form.valor.errors }}
@@ -51,10 +61,7 @@ Adicionar despesa | {{ veiculo.marca }} {{ veiculo.modelo }}
 
         <div class="acoes-formulario">
 
-            <a
-                href="{% url 'despesas_veiculo' veiculo.id %}"
-                class="botao-secundario"
-            >
+            <a href="{% url 'despesas_veiculo' veiculo.id %}" class="botao-secundario">
                 Cancelar
             </a>
 

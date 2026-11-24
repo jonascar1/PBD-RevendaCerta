@@ -1,0 +1,133 @@
+{% extends 'core/gerente_base.html' %}
+{% load static %}
+
+{% block title %}Margens | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_negociacoes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_margens.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topbar">
+    <div>
+        <h1>Margem das vendas</h1>
+        <p>
+            Quanto a loja ganhou de verdade em cada venda.
+            <strong>Calculado em {{ calculada_em|date:"d/m/Y" }} às {{ calculada_em|date:"H:i:s" }}.</strong>
+        </p>
+    </div>
+</header>
+
+<section class="neg-resumo">
+    <a href="{% url 'margens' %}" class="neg-card">
+        <div class="neg-card-icon"><i data-lucide="files"></i></div>
+        <div><span>Vendas fechadas</span><strong>{{ total_vendas }}</strong></div>
+    </a>
+
+    <a href="{% url 'margens' %}?negativas=1" class="neg-card neg-card-pendente">
+        <div class="neg-card-icon"><i data-lucide="triangle-alert"></i></div>
+        <div><span>Margem negativa</span><strong>{{ total_negativas }}</strong></div>
+    </a>
+
+    <a href="{% url 'margens' %}" class="neg-card">
+        <div class="neg-card-icon"><i data-lucide="trending-up"></i></div>
+        <div>
+            <span>Margem total hoje</span>
+            <strong {% if total_margem < 0 %}class="valor-negativo"{% endif %}>R$ {{ total_margem|floatformat:2 }}</strong>
+        </div>
+    </a>
+</section>
+
+<section class="neg-section">
+    <div class="neg-section-header">
+        <div>
+            <h2>{% if somente_negativas %}Vendas com margem negativa{% else %}Todas as vendas{% endif %}</h2>
+            <p>
+                A margem não é um número guardado: despesas lançadas depois da venda,
+                como a transferência, mudam o resultado.
+            </p>
+        </div>
+
+        {% if somente_negativas %}
+            <a class="neg-action" href="{% url 'margens' %}">Mostrar todas</a>
+        {% else %}
+            <a class="neg-action" href="{% url 'margens' %}?negativas=1">Só margem negativa</a>
+        {% endif %}
+    </div>
+
+    <div class="neg-table-container">
+        <table class="neg-table">
+            <thead>
+                <tr>
+                    <th>Venda</th>
+                    <th>Veículo</th>
+                    <th>Preço vendido</th>
+                    <th>Custo de aquisição</th>
+                    <th>Despesas</th>
+                    <th>Comissão</th>
+                    <th>Margem</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for linha in linhas %}
+                <tr {% if linha.margem.negativa %}class="margem-negativa"{% endif %}>
+                    <td>
+                        <strong><a href="{% url 'detalhes_venda' linha.venda.pk %}">#{{ linha.venda.pk }}</a></strong>
+                        <small>{{ linha.venda.data|date:"d/m/Y" }}</small>
+                    </td>
+
+                    <td>
+                        <strong>{{ linha.venda.veiculo.marca }} {{ linha.venda.veiculo.modelo }}</strong>
+                        <small>{{ linha.venda.cliente.nome_exibicao }}</small>
+                    </td>
+
+                    <td class="neg-valor">R$ {{ linha.margem.preco_vendido|floatformat:2 }}</td>
+                    <td class="neg-valor">R$ {{ linha.margem.custo_aquisicao|floatformat:2 }}</td>
+
+                    <td class="neg-valor">
+                        R$ {{ linha.margem.despesas|floatformat:2 }}
+                        {% if linha.margem.despesas_apos_venda %}
+                            <small>
+                                inclui R$ {{ linha.margem.despesas_apos_venda|floatformat:2 }}
+                                lançados após a venda
+                            </small>
+                        {% endif %}
+                    </td>
+
+                    <td class="neg-valor">R$ {{ linha.margem.comissao|floatformat:2 }}</td>
+
+                    <td class="neg-valor">
+                        <strong {% if linha.margem.negativa %}class="valor-negativo"{% endif %}>
+                            R$ {{ linha.margem.margem|floatformat:2 }}
+                        </strong>
+                        <small>{{ linha.margem.margem_percentual|floatformat:2 }}%</small>
+                        {% if linha.margem.negativa %}
+                            <span class="neg-status status-margem-negativa">Margem negativa</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="neg-empty">
+                        <i data-lucide="inbox"></i>
+                        <strong>Nenhuma venda encontrada</strong>
+                        <span>
+                            {% if somente_negativas %}
+                                Nenhuma venda com margem negativa.
+                            {% else %}
+                                Ainda não há vendas fechadas.
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock content %}

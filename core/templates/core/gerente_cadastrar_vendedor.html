@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}Cadastrar vendedor | VENDACERTA{% endblock %}
+{% block title %}Cadastrar vendedor | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_vendedor.css' %}">
@@ -105,75 +105,13 @@
 
                                     <button
                                         type="button"
-                                        class="btn-mostrar-senha"
-                                        onclick="mostrarSenha('senha', this)"
+                                        class="btn-mostrar-senha" data-mostrar-senha="senha"
                                     >
                                         Mostrar
                                     </button>
                                 </div>
                                 {{ form.senha.errors }}
                             </div>
-
-                            <!-- ALÇADA -->
-                            <div class="form-group">
-
-                                <label>
-                                    Tipo de alçada
-                                </label>
-
-                                <div class="radio-alcada">
-
-                                    <label class="radio-opcao">
-                                        <input
-                                            type="radio"
-                                            name="tipo_alcada"
-                                            value="PERCENTUAL"
-                                            {% if form.tipo_alcada.value != "VALOR" %}checked{% endif %}
-                                        >
-                                        <span>Percentual (%)</span>
-                                    </label>
-
-                                    <label class="radio-opcao">
-                                        <input
-                                            type="radio"
-                                            name="tipo_alcada"
-                                            value="VALOR"
-                                            {% if form.tipo_alcada.value == "VALOR" %}checked{% endif %}
-                                        >
-                                        <span>Valor (R$)</span>
-                                    </label>
-
-                                </div>
-
-                                <label
-                                    for="valor_alcada"
-                                    id="label-valor-alcada"
-                                    class="label-limite-alcada"
-                                >
-                                    Limite de desconto (%)
-                                </label>
-
-                                <div class="alcada-valor">
-
-                                    {{ form.valor_alcada }}
-
-                                    <span
-                                        class="alcada-sufixo"
-                                        id="alcada-sufixo"
-                                    >
-                                        %
-                                    </span>
-
-                                </div>
-{{ form.valor_alcada.errors }}
-
-                                <small id="ajuda-alcada">
-                                    Percentual máximo de desconto sem aprovação.
-                                </small>
-                                {{ form.tipo_alcada.errors }}
-
-                            </div>
-
 
                             <!-- COMISSÃO -->
                             <div class="form-group">
@@ -216,69 +154,5 @@
 {% endblock content %}
 
 {% block extra_js %}
-<script>
-function mostrarSenha(id, botao) {
-    const campo = document.getElementById(id);
-
-    if (campo.type === "password") {
-        campo.type = "text";
-        botao.textContent = "Ocultar";
-    } else {
-        campo.type = "password";
-        botao.textContent = "Mostrar";
-    }
-}
-
-const radiosAlcada = document.querySelectorAll(
-    'input[name="tipo_alcada"]'
-);
-
-const labelAlcada = document.getElementById(
-    "label-valor-alcada"
-);
-
-const sufixoAlcada = document.getElementById(
-    "alcada-sufixo"
-);
-
-const ajudaAlcada = document.getElementById(
-    "ajuda-alcada"
-);
-
-function atualizarAlcada(valor) {
-
-        if (valor === "VALOR") {
-
-            labelAlcada.textContent =
-                "Limite de desconto (R$)";
-
-            sufixoAlcada.textContent = "R$";
-
-            ajudaAlcada.textContent =
-                "Valor máximo de desconto sem aprovação.";
-
-        } else {
-
-            labelAlcada.textContent =
-                "Limite de desconto (%)";
-
-            sufixoAlcada.textContent = "%";
-
-            ajudaAlcada.textContent =
-                "Percentual máximo de desconto sem aprovação.";
-        }
-
-    }
-
-radiosAlcada.forEach(function(radio) {
-    radio.addEventListener("change", function() {
-        atualizarAlcada(this.value);
-    });
-});
-
-const marcado = document.querySelector('input[name="tipo_alcada"]:checked');
-if (marcado) {
-    atualizarAlcada(marcado.value);
-}
-</script>
+<script src="{% static 'core/js/gerente_cadastrar_vendedor.js' %}"></script>
 {% endblock extra_js %}

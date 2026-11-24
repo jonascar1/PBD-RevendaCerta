@@ -192,7 +192,7 @@ body {
 
 }
 
-@media (max-width: px) {
+@media (max-width: 650px) {
 
     .sidebar {
         display: none;
@@ -200,5 +200,41 @@ body {
 
     .conteudo {
         margin-left: 0;
+        width: 100%;
+        padding: 20px 16px;
     }
+}
+
+/* Evita que conteúdos internos forcem a largura da página. */
+.conteudo { min-width: 0; }
+
+
+
+/* ==============================
+   SIDEBAR - TELAS BAIXAS
+============================== */
+
+.sidebar {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
+
+.menu-inferior {
+    flex-shrink: 0;
+}
+
+/* Links de conteúdo sem sublinhado padrão do navegador */
+.conteudo a {text-decoration:none;}
+.conteudo a:hover {text-decoration:none;}
+
+/* Remove sublinhado padrão de links dos cards e ações */
+.conteudo a,.conteudo a:visited,.conteudo a:hover,
+.conteudo a *,.conteudo a:hover * {text-decoration:none!important;}
+
+/* Ajuste automatico logo/icone */
+.logo img, .logo-icone img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
 }

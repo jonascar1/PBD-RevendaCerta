@@ -1,7 +1,3 @@
-/* ==============================
-   TOPO
-============================== */
-
 .topo {
     display: flex;
     justify-content: space-between;
@@ -22,13 +18,44 @@
     font-size: 14px;
 }
 
-
-
 .topo-acoes {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 45px;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 20px;
+}
+
+.message {
+    padding: 13px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid transparent;
+}
+
+.message-error {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #9f1239;
+}
+
+.message-success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.message-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
 }
 
 .section-header {
@@ -64,14 +91,8 @@
     white-space: nowrap;
 }
 
-
-
-/* ==============================
-   BOTÃO CADASTRAR
-============================== */
-
 .btn-cadastrar {
-     display: inline-flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -89,11 +110,6 @@
 .btn-cadastrar:hover {
     background: #1d4ed8;
 }
-
-
-/* ==============================
-   CARD
-============================== */
 
 .card {
     background: white;
@@ -119,10 +135,6 @@
     color: #6b7280;
     font-size: 12px;
 }
-
-/* ==============================
-   TABELA
-============================== */
 
 .table-container {
     width: 100%;
@@ -157,11 +169,6 @@ td {
     vertical-align: middle;
 }
 
-
-/* ==============================
-   VEÍCULO
-============================== */
-
 .veiculo {
     display: flex;
     align-items: center;
@@ -174,10 +181,17 @@ td {
     border-radius: 7px;
     overflow: hidden;
     background: #eff6ff;
+    color: #2563eb;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.veiculo-icon svg,
+.veiculo-icon i {
+    width: 20px;
+    height: 20px;
 }
 
 .veiculo-icon img {
@@ -200,11 +214,6 @@ td {
     font-size: 11px;
 }
 
-
-/* ==============================
-   PLACA
-============================== */
-
 .placa {
     display: inline-block;
     padding: 5px 9px;
@@ -214,12 +223,8 @@ td {
     font-size: 12px;
     font-weight: bold;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
-
-
-/* ==============================
-   STATUS
-============================== */
 
 .status {
     display: inline-block;
@@ -227,6 +232,7 @@ td {
     border-radius: 20px;
     font-size: 11px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .status.disponivel {
@@ -254,12 +260,17 @@ td {
     color: #92400e;
 }
 
-
-/* ==============================
-   AÇÃO
-============================== */
+.acoes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
 
 .btn-ver {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: #2563eb;
     text-decoration: none;
     font-size: 12px;
@@ -267,21 +278,14 @@ td {
     background: #eff6ff;
     padding: 6px 10px;
     border-radius: 6px;
-    border: solid 1px #eff6ff;
-    transition: 0.3s;
+    border: 1px solid #eff6ff;
+    transition: border-color 0.2s, background 0.2s;
 }
 
 .btn-ver:hover {
-    border: solid 1px #2563eb;
-    transition: 0.3s;
-    
-    
+    border-color: #2563eb;
+    background: #dbeafe;
 }
-
-
-/* ==============================
-   VAZIO
-============================== */
 
 .empty {
     padding: 50px 20px;
@@ -295,8 +299,21 @@ td {
 }
 
 .empty-icon {
-    font-size: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: #2563eb;
     margin-bottom: 12px;
+}
+
+.empty-icon svg,
+.empty-icon i {
+    width: 26px;
+    height: 26px;
 }
 
 .empty-content strong {
@@ -320,12 +337,12 @@ td {
     text-decoration: none;
     font-size: 12px;
     font-weight: bold;
+    transition: background 0.2s;
 }
 
-/* ==============================
-   Barra Pesquisa
-============================== */
-
+.btn-cadastrar-empty:hover {
+    background: #1d4ed8;
+}
 
 .barra-pesquisa-veiculos {
     display: flex;
@@ -348,7 +365,8 @@ td {
     border-radius: 8px;
 }
 
-.campo-pesquisa svg {
+.campo-pesquisa svg,
+.campo-pesquisa i {
     width: 18px;
     height: 18px;
     color: #64748b;
@@ -377,12 +395,14 @@ td {
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .btn-pesquisar {
     border: none;
     background: #2563eb;
     color: white;
+    transition: background 0.2s;
 }
 
 .btn-pesquisar:hover {
@@ -392,11 +412,12 @@ td {
 .btn-limpar-busca {
     background: #f3f4f6;
     color: #374151;
+    transition: background 0.2s;
 }
 
-/* ==============================
-   FILTROS
-================================= */
+.btn-limpar-busca:hover {
+    background: #e5e7eb;
+}
 
 .barra-pesquisa-veiculos select {
     height: 42px;
@@ -420,10 +441,6 @@ td {
     border-color: #93aeea;
 }
 
-/* ==============================
-   RESPONSIVIDADE
-============================== */
-
 @media (max-width: 900px) {
     .barra-pesquisa-veiculos {
         flex-wrap: wrap;
@@ -439,19 +456,7 @@ td {
     }
 }
 
-@media (max-width: 600px) {
-    .barra-pesquisa-veiculos {
-        flex-wrap: wrap;
-        padding: 12px;
-    }
-
-    .campo-pesquisa {
-        flex-basis: 100%;
-    }
-}
-
 @media (max-width: 700px) {
-
     .topo {
         align-items: flex-start;
         flex-direction: column;
@@ -463,5 +468,36 @@ td {
         gap: 12px;
         flex-direction: column;
     }
+}
 
+@media (max-width: 600px) {
+    .barra-pesquisa-veiculos {
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+
+    .campo-pesquisa {
+        flex-basis: 100%;
+    }
+}
+
+.acoes {
+    flex-wrap: wrap;
+    white-space: normal;
+}
+
+.acoes .btn-ver {
+    min-height: 44px;
+    text-align: center;
+    white-space: normal;
+}
+
+@media (max-width: 700px) {
+    .acoes {
+        align-items: stretch;
+    }
+
+    .acoes .btn-ver {
+        flex: 1 1 110px;
+    }
 }

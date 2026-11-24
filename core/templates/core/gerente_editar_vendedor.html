@@ -4,7 +4,7 @@
 
     {% load l10n %}
 
-    {% block title %}Editar vendedor | VENDACERTA{% endblock %}
+    {% block title %}Editar vendedor | REVENDA CERTA{% endblock %}
 
     {% block extra_css %}
         <link rel="stylesheet" href="{% static 'core/css/gerente_editar_vendedor.css' %}">
@@ -234,7 +234,7 @@
                                 </h3>
 
                                 <p>
-                                    Defina os limites comerciais permitidos para este vendedor.
+                                    Defina a comissão deste vendedor.
                                 </p>
 
                             </div>
@@ -243,41 +243,7 @@
                             <div class="form-grid">
 
 
-                            <!-- TIPO DE ALÇADA -->
-                                <div class="campo">
-
-                                    <label>
-                                        Tipo de alçada
-                                    </label>
-
-                                    <div class="radio-alcada">
-
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tipo_alcada"
-                                                value="PERCENTUAL"
-                                                {% if form.tipo_alcada.value == "PERCENTUAL" %}checked{% endif %}
-                                            >
-                                            Percentual (%)
-                                        </label>
-
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tipo_alcada"
-                                                value="VALOR"
-                                                {% if form.tipo_alcada.value == "VALOR" %}checked{% endif %}
-                                            >
-                                            Valor (R$)
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- COMISSÃO -->
+                            <!-- COMISSÃO -->
                                 <div class="campo">
 
                                     <label for="percentual_comissao">
@@ -304,37 +270,7 @@
                                 </div>
 
 
-                                <!-- LIMITE DE DESCONTO -->
-                                <div class="campo">
-
-                                    <label for="valor_alcada">
-                                        Limite de desconto
-                                    </label>
-
-                                    <span class="descricao" id="descricao-alcada">
-                                        {% if dados.tipo_alcada == "VALOR" %}
-                                            Valor máximo de desconto que o vendedor pode oferecer sem aprovação.
-                                        {% else %}
-                                            Percentual máximo de desconto que o vendedor pode oferecer sem aprovação.
-                                        {% endif %}
-                                    </span>
-
-                                    <div class="input-percentual">
-
-                                        {{ form.valor_alcada }}
-
-                                        <span id="sufixo-alcada">
-                                            {% if dados.tipo_alcada == "VALOR" %}
-                                                R$
-                                            {% else %}
-                                                %
-                                            {% endif %}
-                                        </span>
-
-                                    </div>
-{{ form.valor_alcada.errors }}
-
-                                </div>
+                                
                             </div>
 
 
@@ -377,45 +313,5 @@
     {% endblock content %}
 
     {% block extra_js %}
-    <script>
-    const radiosAlcada = document.querySelectorAll(
-        'input[name="tipo_alcada"]'
-    );
-
-    const sufixoAlcada = document.getElementById(
-        "sufixo-alcada"
-    );
-
-    const descricaoAlcada = document.getElementById(
-        "descricao-alcada"
-    );
-
-    function atualizarAlcada() {
-
-        const tipo = document.querySelector(
-            'input[name="tipo_alcada"]:checked'
-        ).value;
-
-        if (tipo === "VALOR") {
-
-            sufixoAlcada.textContent = "R$";
-
-            descricaoAlcada.textContent =
-                "Valor máximo de desconto que o vendedor pode oferecer sem aprovação.";
-
-        } else {
-
-            sufixoAlcada.textContent = "%";
-
-            descricaoAlcada.textContent =
-                "Percentual máximo de desconto que o vendedor pode oferecer sem aprovação.";
-        }
-    }
-
-    radiosAlcada.forEach(radio => {
-        radio.addEventListener("change", atualizarAlcada);
-    });
-
-    atualizarAlcada();
-    </script>
+    <script src="{% static 'core/js/gerente_editar_vendedor.js' %}"></script>
     {% endblock %}

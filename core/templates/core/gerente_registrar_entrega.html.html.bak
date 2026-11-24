@@ -1,0 +1,126 @@
+{% extends "core/gerente_base.html" %}
+{% load static %}
+
+{% block title %}Entrega da venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_registrar_entrega.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo">
+    <div>
+        <h1>Entrega do veículo</h1>
+        <p>
+            Venda #{{ venda.pk }} · {{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}
+            · {{ venda.cliente.nome_exibicao }}
+        </p>
+    </div>
+
+    <div class="topo-acoes">
+        <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">
+            <i data-lucide="chevron-left"></i> Voltar à venda
+        </a>
+    </div>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<section class="detalhes-container">
+    <div class="informacoes">
+
+        <div class="card-info">
+            <h3>Documentação</h3>
+
+            <div class="info-grid">
+                {% for etapa in etapas %}
+                    <div class="info-item">
+                        <span>{{ etapa.get_tipo_display }}</span>
+                        <strong>{{ etapa.get_situacao_display }}</strong>
+                        <small>desde {{ etapa.data|date:"d/m/Y" }}</small>
+                    </div>
+                {% empty %}
+                    <p class="sem-informacao">Esta venda não possui etapas de documentação.</p>
+                {% endfor %}
+            </div>
+
+            <p class="custo-explicacao">
+                A entrega só pode ser registrada com todas as etapas concluídas.
+            </p>
+        </div>
+
+        {% if entrega %}
+        <div class="card-info">
+            <h3>Entrega registrada</h3>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>Data</span>
+                    <strong>{{ entrega.data_entrega|date:"d/m/Y" }}</strong>
+                </div>
+                <div class="info-item">
+                    <span>Responsável</span>
+                    <strong>{{ entrega.responsavel.get_full_name|default:entrega.responsavel.username }}</strong>
+                </div>
+            </div>
+
+            {% if entrega.observacoes %}
+                <p class="opcionais">{{ entrega.observacoes }}</p>
+            {% endif %}
+        </div>
+
+        {% elif pode_entregar %}
+        <div class="card-info">
+            <h3>Checklist da entrega</h3>
+
+            <form method="post" novalidate class="form-situacao">
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                <div class="campo-form">
+                    {{ form.data_entrega.label_tag }}
+                    {{ form.data_entrega }}
+                    {{ form.data_entrega.errors }}
+                </div>
+
+                <div class="campo-form checklist-entrega">
+                    <label>{{ form.documentos_entregues }} {{ form.documentos_entregues.label }}</label>
+                    <label>{{ form.chaves_entregues }} {{ form.chaves_entregues.label }}</label>
+                    <label>{{ form.manual_entregue }} {{ form.manual_entregue.label }}</label>
+                    <label>{{ form.veiculo_conferido }} {{ form.veiculo_conferido.label }}</label>
+                    <label>{{ form.checklist_assinado }} {{ form.checklist_assinado.label }}</label>
+                </div>
+
+                <div class="campo-form">
+                    {{ form.observacoes.label_tag }}
+                    {{ form.observacoes }}
+                </div>
+
+                <button type="submit" class="btn-situacao btn-entregue">
+                    <i data-lucide="check"></i> Registrar entrega
+                </button>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="card-info">
+            <h3>Entrega indisponível</h3>
+            <p class="sem-informacao">
+                Só é possível registrar a entrega de uma venda fechada cujo veículo esteja como vendido.
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock content %}

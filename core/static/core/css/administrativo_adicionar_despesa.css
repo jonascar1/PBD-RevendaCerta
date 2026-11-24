@@ -199,3 +199,30 @@
     }
 
 }
+/* v6: campo categoria alinhado aos demais campos do formulário */
+.formulario-card .campo { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+.formulario-card .campo label { display: block; font-size: 13px; font-weight: 600; color: #1e293b; }
+.formulario-card .campo select,
+.formulario-card .campo input,
+.formulario-card .campo textarea {
+  display: block; width: 100%; box-sizing: border-box; min-height: 43px;
+  padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 7px;
+  background: #fff; color: #1e293b; font: inherit; font-size: 14px;
+}
+.formulario-card .campo select { appearance: auto; cursor: pointer; }
+.formulario-card .campo select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
+
+/* v7: centralizar o conjunto título + formulário na área principal */
+.titulo-secao,
+.formulario-card {
+    width: min(100%, 700px);
+    max-width: 700px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+.titulo-secao { text-align: center; margin-bottom: 22px; }
+.formulario-card { padding: 24px; }
+@media (max-width: 600px) {
+    .formulario-card { padding: 18px; }
+}

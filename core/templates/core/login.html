@@ -3,11 +3,12 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login | VENDACERTAs</title>
+    <title>Login | REVENDA CERTA</title>
     <link rel="stylesheet" href="{% static 'core/css/login.css' %}">
 
-    <link rel="icon" type="image/png" href="{% static 'core/img/favicon.png' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
     <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
 </head>
 <body>
     <main class="login-container">
@@ -15,7 +16,7 @@
         <section class="login-card">
 
             <div class="logo">
-                <span>VENDA</span>CERTA
+                {% include "core/includes/marca.html" %}
             </div>
 
             <h1>Bem-vindo</h1>

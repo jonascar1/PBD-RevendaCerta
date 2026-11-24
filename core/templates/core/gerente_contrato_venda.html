@@ -1,0 +1,106 @@
+{% load static %}
+{% load formatadores %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato da venda #{{ venda.pk }} | REVENDA CERTA</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; color: #111; max-width: 800px; margin: 0 auto; padding: 32px; line-height: 1.5; }
+        h1 { text-align: center; font-size: 20px; margin-bottom: 4px; }
+        .sub { text-align: center; color: #555; margin-bottom: 24px; }
+        h2 { font-size: 14px; border-bottom: 1px solid #999; padding-bottom: 4px; margin-top: 24px; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { border: 1px solid #bbb; padding: 6px 8px; text-align: left; font-size: 13px; }
+        th { background: #f0f0f0; }
+        p { font-size: 13px; margin: 4px 0; }
+        .cancelada { border: 2px solid #b00; color: #b00; text-align: center; padding: 8px; font-weight: bold; margin-bottom: 16px; }
+        .assinaturas { display: flex; gap: 40px; margin-top: 64px; }
+        .assinatura { flex: 1; text-align: center; border-top: 1px solid #111; padding-top: 6px; font-size: 13px; }
+        .acoes { text-align: right; margin-bottom: 16px; }
+        .acoes button { padding: 8px 16px; font-size: 14px; cursor: pointer; }
+        @media print { .acoes { display: none; } body { padding: 0; } }
+    </style>
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+</head>
+<body>
+
+    <div class="acoes">
+        <button type="button" data-imprimir="true">Imprimir / salvar em PDF</button>
+    </div>
+
+    {% if not venda.esta_fechada %}
+        <div class="cancelada">VENDA CANCELADA — este contrato não tem validade.</div>
+    {% endif %}
+
+    <h1>CONTRATO DE COMPRA E VENDA DE VEÍCULO</h1>
+    <p class="sub">Contrato nº {{ venda.pk }} · {{ venda.data|date:"d/m/Y" }}</p>
+
+    <h2>Vendedora</h2>
+    <p><strong>REVENDA CERTA</strong> — representada pelo vendedor
+        {{ venda.vendedor.get_full_name|default:venda.vendedor.username }}.</p>
+
+    <h2>Comprador</h2>
+    {% if cliente.tipo == "PJ" %}
+        <p><strong>Razão social:</strong> {{ cliente.razao_social }}</p>
+        <p><strong>CNPJ:</strong> {{ cliente.cnpj|cnpj }}</p>
+        <p><strong>Responsável:</strong> {{ cliente.responsavel }}</p>
+    {% else %}
+        <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+        <p><strong>CPF:</strong> {{ cliente.cpf|cpf }}</p>
+    {% endif %}
+    {% if cliente.logradouro %}
+        <p><strong>Endereço:</strong>
+            {{ cliente.logradouro }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}
+            {% if cliente.bairro %} — {{ cliente.bairro }}{% endif %}
+            {% if cliente.cidade %} — {{ cliente.cidade }}{% if cliente.estado %}/{{ cliente.estado }}{% endif %}{% endif %}
+        </p>
+    {% endif %}
+
+    <h2>Veículo</h2>
+    <table>
+        <tr><th>Marca / Modelo</th><td>{{ veiculo.marca }} {{ veiculo.modelo }}</td>
+            <th>Cor</th><td>{{ veiculo.cor }}</td></tr>
+        <tr><th>Placa</th><td>{{ veiculo.placa }}</td>
+            <th>Ano</th><td>{{ veiculo.ano_fabricacao|stringformat:"d" }}/{{ veiculo.ano_modelo|stringformat:"d" }}</td></tr>
+        <tr><th>Chassi</th><td>{{ veiculo.chassi }}</td>
+            <th>Renavam</th><td>{{ veiculo.renavam }}</td></tr>
+        <tr><th>Combustível</th><td>{{ veiculo.combustivel }}</td>
+            <th>Quilometragem</th><td>{{ veiculo.quilometragem }} km</td></tr>
+    </table>
+
+    <h2>Valor e forma de pagamento</h2>
+    <p><strong>Valor da venda:</strong> R$ {{ venda.valor_venda|floatformat:2 }}</p>
+
+    <table>
+        <thead><tr><th>Forma</th><th>Detalhes</th><th>Valor</th></tr></thead>
+        <tbody>
+            {% for pagamento in pagamentos %}
+            <tr>
+                <td>{{ pagamento.get_tipo_display }}</td>
+                <td>
+                    {% if pagamento.tipo == "ENTRADA" and pagamento.data_pagamento %}
+                        Paga em {{ pagamento.data_pagamento|date:"d/m/Y" }}
+                    {% elif pagamento.tipo == "FINANCIAMENTO" %}
+                        {{ pagamento.financ_banco }} — {{ pagamento.financ_parcelas }}x de
+                        R$ {{ pagamento.financ_valor_parcela|floatformat:2 }}
+                    {% elif pagamento.tipo == "TROCA" %}
+                        {{ pagamento.troca_descricao }}
+                    {% else %}—{% endif %}
+                </td>
+                <td>R$ {{ pagamento.valor|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="assinaturas">
+        <div class="assinatura">REVENDA CERTA<br>Vendedora</div>
+        <div class="assinatura">{{ cliente.nome_exibicao }}<br>Comprador</div>
+    </div>
+
+<script src="{% static 'core/js/acoes_comuns.js' %}"></script>
+</body>
+</html>

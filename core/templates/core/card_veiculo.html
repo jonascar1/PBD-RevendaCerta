@@ -1,0 +1,10 @@
+{% load static l10n %}
+<article class="card-veiculo {% if grade %}explorar-card{% endif %}">
+<a class="card-foto" href="{% url 'vitrine_veiculo_detalhe' veiculo.pk %}">
+{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}" loading="lazy">{% else %}<div class="sem-foto">Foto indisponível</div>{% endif %}{% endwith %}
+<span class="etiqueta-marca" data-marca="{{ veiculo.marca }}">{{ veiculo.marca }}</span>
+<span class="etiqueta-categoria">{{ veiculo.get_tipo_display|default:veiculo.tipo }}</span></a>
+<div class="card-conteudo"><h3 title="{{ veiculo.marca }} {{ veiculo.modelo }}">{{ veiculo.marca }} {{ veiculo.modelo }}</h3>
+<div class="card-detalhes"><span><i data-lucide="calendar"></i>{{ veiculo.ano_modelo|unlocalize }}</span><span><i data-lucide="gauge"></i>{{ veiculo.quilometragem|localize }} km</span><span><i data-lucide="settings-2"></i>{{ veiculo.get_cambio_display|default:veiculo.cambio }}</span><span><i data-lucide="fuel"></i>{{ veiculo.get_combustivel_display|default:veiculo.combustivel }}</span></div>
+<div class="card-valor"><small>Preço</small><strong class="card-preco">{% if veiculo.preco_venda %}R$ {{ veiculo.preco_venda|floatformat:2 }}{% else %}Consulte o preço{% endif %}</strong></div>
+<a class="botao-card" href="{% url 'vitrine_veiculo_detalhe' veiculo.pk %}">Ver detalhes <i data-lucide="arrow-right"></i></a></div></article>

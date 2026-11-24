@@ -12,7 +12,6 @@
     --prop-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Área principal: respeita a sidebar definida no template-base. */
 .propostas-page,
 .propostas-page * {
     box-sizing: border-box;
@@ -30,7 +29,6 @@
     font-family: var(--prop-font);
 }
 
-/* Cabeçalho */
 .prop-cabecalho {
     display: flex;
     align-items: center;
@@ -61,7 +59,6 @@
     gap: 0.75rem;
 }
 
-/* Botões */
 .prop-btn {
     min-height: 40px;
     display: inline-flex;
@@ -119,7 +116,6 @@
     font-size: 0.82rem;
 }
 
-/* Seções e cartões */
 .prop-secao {
     display: flex;
     flex-direction: column;
@@ -154,7 +150,6 @@
     line-height: 1.45;
 }
 
-/* Formulário de filtros */
 .prop-filtros {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -217,16 +212,13 @@
     padding-top: 0.25rem;
 }
 
-/* Lista de propostas */
 .prop-lista {
     overflow: hidden;
 }
 
 .prop-linha {
     display: grid;
-    grid-template-columns: minmax(130px, 1.2fr) minmax(150px, 1.35fr)
-                           minmax(125px, 1fr) minmax(130px, 1fr)
-                           minmax(105px, 0.8fr) auto;
+    grid-template-columns: minmax(130px, 1.2fr) minmax(150px, 1.35fr) minmax(125px, 1fr) minmax(130px, 1fr) minmax(105px, 0.8fr) auto;
     align-items: center;
     gap: 1rem;
     padding: 1.1rem 1.25rem;
@@ -304,7 +296,6 @@
     background: #fee2e2;
 }
 
-/* Estado sem resultados */
 .prop-vazio {
     min-height: 190px;
     padding: 3rem 1.25rem;
@@ -328,7 +319,6 @@
     font-size: 0.9rem;
 }
 
-/* Paginação */
 .prop-paginacao {
     display: flex;
     justify-content: center;
@@ -350,7 +340,6 @@
     font-weight: 600;
 }
 
-/* Telas médias */
 @media (max-width: 1100px) {
     .prop-filtros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -365,7 +354,6 @@
     }
 }
 
-/* Celulares */
 @media (max-width: 600px) {
     .propostas-page {
         padding: 1rem;

@@ -1,0 +1,90 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}Minhas comissões | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_clientes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_comissoes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="clientes-cabecalho">
+    <div>
+        <h1>Minhas comissões</h1>
+        <p>
+            Comissão das suas vendas
+            {% if perfil %}(seu percentual atual: {{ perfil.percentual_comissao }}%){% endif %}.
+        </p>
+    </div>
+</header>
+
+<section class="clientes-pagina">
+    <div class="clientes-card">
+
+        <div class="section-header clientes-header">
+            <span class="contador-clientes">
+                Total de comissões: <strong>R$ {{ total_comissao|floatformat:2 }}</strong>
+            </span>
+        </div>
+
+        <div class="clientes-tabela-container">
+            <table class="clientes-tabela">
+                <thead>
+                    <tr>
+                        <th>Venda</th>
+                        <th>Cliente</th>
+                        <th>Veículo</th>
+                        <th>Valor da venda</th>
+                        <th>Minha comissão</th>
+                        <th>Contrato</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for venda in vendas %}
+                    <tr>
+                        <td>
+                            <strong>#{{ venda.pk }}</strong>
+                            <small>{{ venda.data|date:"d/m/Y" }}</small>
+                        </td>
+                        <td>{{ venda.cliente.nome_exibicao }}</td>
+                        <td>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</td>
+                        <td>R$ {{ venda.valor_venda|floatformat:2 }}</td>
+                        <td>
+                            {% if venda.comissao %}
+                                <strong>R$ {{ venda.comissao|floatformat:2 }}</strong>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'contrato_venda' venda.pk %}" class="acao-cliente" target="_blank">
+                                <i data-lucide="file-text"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="clientes-vazio">
+                            <i data-lucide="wallet"></i>
+                            <strong>Nenhuma venda fechada ainda</strong>
+                            <p>As comissões aparecem aqui quando você fechar uma venda.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="sem-registros">
+            A comissão é o percentual do seu perfil sobre a margem da venda no
+            momento do fechamento. Vendas sem margem não geram comissão.
+        </p>
+
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "core/gerente_base.html" %}
+{% load static %}
+
+{% block title %}Carteira de clientes | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gerente_carteira.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-pagina">
+
+    <header class="cart-topo">
+        <div>
+            <span class="cart-sobretitulo">Relacionamento comercial</span>
+            <h1>Carteira de clientes</h1>
+            <p>
+                Clientes ativos cuja última compra na loja ocorreu há pelo menos
+                {{ carteira.anos_configurados }} ano(s).
+            </p>
+        </div>
+
+        <a href="{% url 'configurar_carteira' %}" class="cart-botao cart-botao-secundario">
+            <i data-lucide="settings-2"></i> Configurar prazo
+        </a>
+    </header>
+
+    {% if messages %}
+        <div class="cart-mensagens">
+            {% for message in messages %}
+                <p class="cart-mensagem">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="cart-indicadores">
+        <div class="cart-indicador">
+            <span>Clientes na carteira</span>
+            <strong>{{ carteira.total_clientes }}</strong>
+        </div>
+
+        <div class="cart-indicador">
+            <span>Clientes contatados neste mês</span>
+            <strong>{{ carteira.contatados_mes }}</strong>
+        </div>
+
+        <div class="cart-indicador">
+            <span>Já trocaram em outra loja</span>
+            <strong>{{ carteira.trocaram_outra_loja }}</strong>
+        </div>
+
+        <div class="cart-indicador">
+            <span>Prazo de retorno</span>
+            <strong>{{ carteira.anos_configurados }} ano(s)</strong>
+        </div>
+    </div>
+
+    <section class="cart-painel">
+        <div class="cart-secao-topo">
+            <h2>Fila geral de contato</h2>
+            <span>Ordenada pela compra mais antiga</span>
+        </div>
+
+        {% if carteira.linhas %}
+            <div class="cart-tabela-wrap">
+                <table class="cart-tabela">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
+                            <th>Último veículo</th>
+                            <th>Última compra</th>
+                            <th>Tempo decorrido</th>
+                            <th>Contatado no mês</th>
+                            <th>Vendedores associados</th>
+                            <th>Último contato</th>
+                            <th>Retorno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in carteira.linhas %}
+                            <tr>
+                                <td>{{ item.cliente }}</td>
+                                <td>
+                                    {% if item.telefone %}
+                                        <a href="tel:{{ item.telefone }}" class="cart-link">
+                                            {{ item.telefone }}
+                                        </a>
+                                    {% else %}
+                                        <span class="cart-muted">Não informado</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.veiculo }}</td>
+                                <td>{{ item.data_compra|date:"d/m/Y" }}</td>
+                                <td>
+                                    {{ item.dias_decorridos }} dias
+                                    <span class="cart-muted">(aprox. {{ item.anos_decorridos }} anos)</span>
+                                </td>
+                                <td>
+                                    {% if item.contatado_mes %}
+                                        <span class="cart-status cart-status-ok">Sim</span>
+                                    {% else %}
+                                        <span class="cart-status cart-status-pendente">Não</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.ultimo_contato %}
+                                        {{ item.ultimo_contato.realizado_em|date:"d/m/Y" }}
+                                        <span class="cart-muted">
+                                            ({{ item.ultimo_contato.get_canal_display }} ·
+                                            {{ item.ultimo_contato.vendedor.get_full_name|default:item.ultimo_contato.vendedor.username }})
+                                        </span>
+                                    {% else %}
+                                        <span class="cart-muted">Nunca</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.retorno %}
+                                        {{ item.retorno|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="cart-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% for nome in item.vendedores_nomes %}
+                                        <div>{{ nome }}</div>
+                                    {% empty %}
+                                        <span class="cart-muted">Não informado</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="cart-nota">
+                A quantidade de vendedores considera todos que já realizaram uma venda válida
+                para o cliente. O acompanhamento individual é feito na carteira de cada vendedor.
+            </p>
+        {% else %}
+            <div class="cart-vazio">
+                <i data-lucide="users"></i>
+                <h3>Carteira vazia</h3>
+                <p>Os clientes entrarão automaticamente após atingir o prazo definido.</p>
+            </div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

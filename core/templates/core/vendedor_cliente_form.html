@@ -1,0 +1,214 @@
+{% extends "core/vendedor_base.html" %}
+{% load static %}
+
+{% block title %}{{ titulo }} | REVENDA CERTA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_form.css' %}?v=6">
+<link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<header class="topo-form">
+    <div>
+        <h1>{{ titulo }}</h1>
+        <p>Preencha os dados do cliente e ao menos um telefone de contato.</p>
+    </div>
+
+    <a href="{% if form.instance.pk %}{% url 'detalhes_cliente' form.instance.pk %}{% else %}{% url 'clientes' %}{% endif %}"
+       class="btn-voltar">
+        <i data-lucide="chevron-left"></i> Voltar
+    </a>
+</header>
+
+<form method="post" novalidate id="cliente-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- TIPO DE PESSOA -->
+    <section class="card-form">
+        <h2 class="card-form-titulo">Tipo de cliente</h2>
+        <div class="form-grid">
+            <div class="campo">
+                <label for="{{ form.tipo.id_for_label }}">Tipo de pessoa</label>
+                {{ form.tipo }}
+                {{ form.tipo.errors }}
+            </div>
+        </div>
+    </section>
+
+    <!-- PESSOA FÍSICA -->
+    <section class="card-form" data-tipo="PF">
+        <h2 class="card-form-titulo">Dados da pessoa física</h2>
+        <div class="form-grid">
+            <div class="campo">
+                <label for="{{ form.nome.id_for_label }}">Nome completo</label>
+                {{ form.nome }}
+                {{ form.nome.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.cpf.id_for_label }}">CPF</label>
+                {{ form.cpf }}
+                {{ form.cpf.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.data_nascimento.id_for_label }}">Data de nascimento</label>
+                {{ form.data_nascimento }}
+                {{ form.data_nascimento.errors }}
+            </div>
+        </div>
+    </section>
+
+    <!-- PESSOA JURÍDICA -->
+    <section class="card-form" data-tipo="PJ">
+        <h2 class="card-form-titulo">Dados da pessoa jurídica</h2>
+        <div class="form-grid">
+            <div class="campo">
+                <label for="{{ form.razao_social.id_for_label }}">Razão social</label>
+                {{ form.razao_social }}
+                {{ form.razao_social.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.nome_fantasia.id_for_label }}">Nome fantasia</label>
+                {{ form.nome_fantasia }}
+                {{ form.nome_fantasia.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.cnpj.id_for_label }}">CNPJ</label>
+                {{ form.cnpj }}
+                {{ form.cnpj.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.responsavel.id_for_label }}">Responsável</label>
+                {{ form.responsavel }}
+                {{ form.responsavel.errors }}
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTATO -->
+    <section class="card-form">
+        <h2 class="card-form-titulo">Contato</h2>
+        <div class="form-grid">
+            <div class="campo campo-largo">
+                <label for="{{ form.email.id_for_label }}">E-mail</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+        </div>
+
+        <h3 class="subtitulo-form">Telefones</h3>
+
+        {{ formset.management_form }}
+        {{ formset.non_form_errors }}
+
+        <div id="telefones-container">
+            {% for tel in formset %}
+                <div class="telefone-linha" data-form-row>
+                    {% for hidden in tel.hidden_fields %}{{ hidden }}{% endfor %}
+                    {{ tel.non_field_errors }}
+
+                    <div class="campo">
+                        <label for="{{ tel.numero.id_for_label }}">Número (com DDD)</label>
+                        {{ tel.numero }}
+                        {{ tel.numero.errors }}
+                    </div>
+                    <div class="campo">
+                        <label for="{{ tel.tipo.id_for_label }}">Tipo</label>
+                        {{ tel.tipo }}
+                        {{ tel.tipo.errors }}
+                    </div>
+                    <div class="campo campo-check">
+                        <label>{{ tel.principal }} Principal</label>
+                    </div>
+                    <div class="telefone-acoes">
+                        <span hidden>{{ tel.DELETE }}</span>
+                        <button type="button" class="btn-remover" data-remove-row>Remover</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <template id="telefone-empty-form">
+            <div class="telefone-linha" data-form-row>
+                {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+
+                <div class="campo">
+                    <label>Número (com DDD)</label>
+                    {{ formset.empty_form.numero }}
+                </div>
+                <div class="campo">
+                    <label>Tipo</label>
+                    {{ formset.empty_form.tipo }}
+                </div>
+                <div class="campo campo-check">
+                    <label>{{ formset.empty_form.principal }} Principal</label>
+                </div>
+                <div class="telefone-acoes">
+                    <span hidden>{{ formset.empty_form.DELETE }}</span>
+                    <button type="button" class="btn-remover" data-remove-row>Remover</button>
+                </div>
+            </div>
+        </template>
+
+        <button type="button" class="btn-secundario" id="btn-add-telefone">
+            <i data-lucide="plus"></i> Adicionar telefone
+        </button>
+    </section>
+
+    <!-- ENDEREÇO -->
+    <section class="card-form">
+        <h2 class="card-form-titulo">Endereço</h2>
+        <div class="form-grid">
+            <div class="campo">
+                <label for="{{ form.cep.id_for_label }}">CEP</label>
+                {{ form.cep }}
+                {{ form.cep.errors }}
+            </div>
+            <div class="campo campo-largo">
+                <label for="{{ form.logradouro.id_for_label }}">Logradouro</label>
+                {{ form.logradouro }}
+                {{ form.logradouro.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.numero.id_for_label }}">Número</label>
+                {{ form.numero }}
+                {{ form.numero.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.complemento.id_for_label }}">Complemento</label>
+                {{ form.complemento }}
+                {{ form.complemento.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.bairro.id_for_label }}">Bairro</label>
+                {{ form.bairro }}
+                {{ form.bairro.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.cidade.id_for_label }}">Cidade</label>
+                {{ form.cidade }}
+                {{ form.cidade.errors }}
+            </div>
+            <div class="campo">
+                <label for="{{ form.estado.id_for_label }}">Estado (UF)</label>
+                {{ form.estado }}
+                {{ form.estado.errors }}
+            </div>
+        </div>
+    </section>
+
+    <div class="rodape-form">
+        <a href="{% if form.instance.pk %}{% url 'detalhes_cliente' form.instance.pk %}{% else %}{% url 'clientes' %}{% endif %}"
+           class="btn-voltar">Cancelar</a>
+        <button type="submit" class="btn-salvar">Salvar cliente</button>
+    </div>
+</form>
+
+{% endblock content %}
+
+{% block extra_js %}
+<span data-carteira-tipo-id="{{ form.tipo.id_for_label }}" hidden></span>
+<script src="{% static 'core/js/vendedor_cliente_form.js' %}"></script>
+{% endblock extra_js %}
