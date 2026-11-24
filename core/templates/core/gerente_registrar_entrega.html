@@ -20,8 +20,8 @@
     </div>
 
     <div class="topo-acoes">
-        <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">
-            <i data-lucide="chevron-left"></i> Voltar à venda
+        <a href="{% if request.user.is_administrativo %}{% url 'entregas_administrativo' %}{% else %}{% url 'detalhes_venda' venda.pk %}{% endif %}" class="btn-voltar">
+            <i data-lucide="chevron-left"></i> {% if request.user.is_administrativo %}Voltar às entregas{% else %}Voltar à venda{% endif %}
         </a>
     </div>
 </header>
@@ -115,7 +115,7 @@
         <div class="card-info">
             <h3>Entrega indisponível</h3>
             <p class="sem-informacao">
-                Só é possível registrar a entrega de uma venda fechada cujo veículo esteja como vendido.
+                Só é possível registrar a entrega de uma venda fechada, com veículo vendido e todas as etapas de documentação concluídas. <a href="{% url 'documentacao_pendente' %}">Consultar documentação</a>.
             </p>
         </div>
         {% endif %}

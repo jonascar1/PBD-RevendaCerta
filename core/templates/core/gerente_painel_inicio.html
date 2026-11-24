@@ -1,10 +1,10 @@
 {% extends 'core/gerente_base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block title %}Painel do Gerente | REVENDA CERTA{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
-<header class="rd-intro"><small>PAINEL DO GERENTE</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Veja como a loja está indo em {% now "F" %}: vendas, estoque e equipe em um só lugar.</p></header>
+<header class="rd-intro"><small>PAINEL DO GERENTE</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Veja como a loja está indo em {% language "pt-br" %}{% now "F" %}{% endlanguage %}: vendas, estoque e equipe em um só lugar.</p></header>
 {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
 <div id="rd-kpis" class="rd-grid"></div>
 <div class="rd-grid rd-main">

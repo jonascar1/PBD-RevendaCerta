@@ -1,10 +1,10 @@
 {% extends 'core/vendedor_base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block title %}Painel do Vendedor | REVENDA CERTA{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
-<header class="rd-intro"><small>PAINEL DO VENDEDOR</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Suas vendas de {% now "F" %}, sua meta e os carros que merecem atenção agora.</p></header>
+<header class="rd-intro"><small>PAINEL DO VENDEDOR</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Suas vendas de {% language "pt-br" %}{% now "F" %}{% endlanguage %}, sua meta e os carros que merecem atenção agora.</p></header>
 {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
 <div id="rd-kpis" class="rd-grid"></div>
 <div class="rd-grid rd-main">

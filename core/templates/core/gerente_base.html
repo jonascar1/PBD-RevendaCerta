@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -26,6 +26,10 @@
     <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
     <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}">
 </head>
 
 <body>
@@ -143,6 +147,7 @@
 
         <!-- CONTEÚDO DA PÁGINA -->
         <main class="main-content">
+        <div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% if request.resolver_match.url_name == 'painel_gerente' %}Início{% else %}Área interna{% endif %}</b></span><div class="rc-top-actions"><time class="rc-date" datetime="{% now 'Y-m-d' %}">{% language 'pt-br' %}{% now "l, j \d\e F" %}{% endlanguage %}</time><a class="rc-store-preview" href="{% url 'vitrine' %}"><i data-lucide="store" aria-hidden="true"></i> Ver vitrine</a></div></div>
 
             {% block content %}
             {% endblock %}

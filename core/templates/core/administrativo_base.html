@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -16,7 +16,7 @@
 
     <!-- CSS PADRÃO DO PAINEL -->
     <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}?v=5">
-    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
 
     <!-- CSS ESPECÍFICO DE CADA PÁGINA -->
     {% block extra_css %}
@@ -26,6 +26,9 @@
     <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
     <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/administrativo_dashboard.css' %}">
 </head>
 
 <body>
@@ -66,12 +69,12 @@
                     Despesas
                 </a>
 
-                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
+                <a href="{% url 'documentacao_pendente' %}" class="menu-item {% if request.resolver_match.url_name == 'documentacao_pendente' %}ativo{% endif %}">
                     <span class="icone"><i data-lucide="file-text"></i></span>
                     Documentação
                 </a>
 
-                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
+                <a href="{% url 'entregas_administrativo' %}" class="menu-item {% if request.resolver_match.url_name == 'entregas_administrativo' or request.resolver_match.url_name == 'registrar_entrega' %}ativo{% endif %}">
                     <span class="icone"><i data-lucide="truck"></i></span>
                     Entrega do veículo
                 </a>
@@ -97,7 +100,8 @@
 
 
         <!-- CONTEÚDO DA PÁGINA -->
-        <main class="conteudo">
+        <main class="conteudo rc-admin-main">
+<div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% if request.resolver_match.url_name == 'painel_administrativo' %}Início{% else %}Área interna{% endif %}</b></span><div class="rc-top-actions"><time class="rc-date" datetime="{% now 'Y-m-d' %}">{% language 'pt-br' %}{% now "l, j \d\e F" %}{% endlanguage %}</time><a class="rc-store-preview" href="{% url 'vitrine' %}"><i data-lucide="store"></i> Ver vitrine</a></div></div>
 
             {% block content %}
             {% endblock %}

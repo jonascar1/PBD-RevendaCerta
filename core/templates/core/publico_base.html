@@ -1,7 +1,7 @@
 {% load static l10n %}
 <!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 
-<link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
+<link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
 <title>{% block titulo %}Revenda Certa{% endblock %}</title>
 
 
@@ -10,6 +10,7 @@
 
 
 <script src="https://unpkg.com/lucide@0.469.0"></script>
+<link rel="stylesheet" href="{% static 'core/css/vitrine_painel.css' %}">
 {% block extra_css %}{% endblock %}<style>/* RC alinhamento visual da marca */ .cabecalho .logo {display:inline-flex;align-items:center;} .cabecalho .logo-icone {display:flex;align-items:center;justify-content:center;} .cabecalho .logo-icone img {display:block;} .cabecalho .logo .fonte-marca {display:block;align-self:center;line-height:1;position:relative;top:3px;}</style>
 <link rel="stylesheet" href="{% static 'core/css/rodape_rc.css' %}?v=2"></head><body data-whatsapp-numero="{{ whatsapp_numero|default:'5587981025012' }}">
 
@@ -34,10 +35,17 @@
             <a href="{% url 'sobre_nos' %}">Sobre nós</a>
         </nav>
 
-        <a href="{% url 'vitrine' %}#contato" class="botao-whatsapp" data-whatsapp="contato">
+        <div class="rc-header-actions">
+            {% if request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_gerente or request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_vendedor or request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_administrativo %}
+            <a class="rc-public-panel-link" href="{% url 'painel' %}">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i> Voltar ao painel
+            </a>
+            {% endif %}
+        <a href="{% url 'vitrine' %}#contato" class="botao-whatsapp" aria-label="Fale conosco pelo WhatsApp" data-whatsapp="contato">
             <img src="{% static 'core/img/whatsapp-icon.png' %}" alt="">
             <span>Fale conosco</span>
         </a>
+        </div>
 
         <!-- Botão do menu mobile -->
         <button
@@ -53,6 +61,7 @@
         </button>
 
     </div>
+
 </header>
 
 <!-- Fundo escuro do drawer -->
@@ -83,6 +92,9 @@
         <a href="{% url 'explorar' %}">Explorar</a>
         <a href="{% url 'vender_publico' %}">Vender</a>
         <a href="{% url 'sobre_nos' %}">Sobre nós</a>
+        {% if request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_gerente or request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_vendedor or request.user.is_authenticated and request.user.ativo and request.user.is_active and request.user.is_administrativo %}
+        <a href="{% url 'painel' %}" class="rc-drawer-panel-link">Voltar ao painel</a>
+        {% endif %}
         <a href="{% url 'vitrine' %}#contato" class="drawer-whatsapp" data-whatsapp="contato">
             Fale conosco pelo WhatsApp
         </a>

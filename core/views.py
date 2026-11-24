@@ -1216,20 +1216,8 @@ def marcar_aviso_procura_lido_view(request, aviso_id):
 
 @perfil_requerido("ADMINISTRATIVO")
 def painel_administrativo_view(request):
-    """Visão inicial do administrativo com os veículos e resumo de despesas."""
-    veiculos = Veiculo.objects.prefetch_related("fotos").order_by("marca", "modelo")
-    despesas_ativas = LancamentoFinanceiro.objects.filter(
-        tipo=LancamentoFinanceiro.Tipo.DESPESA, excluido=False
-    )
-    return render(request, "core/administrativo_painel_inicio.html", {
-        "veiculos": veiculos,
-        "total_despesas": despesas_ativas.count(),
-        "valor_total": despesas_ativas.aggregate(total=Sum("valor"))["total"] or 0,
-        "veiculos_com_despesas": Veiculo.objects.filter(
-            lancamentos__tipo=LancamentoFinanceiro.Tipo.DESPESA,
-            lancamentos__excluido=False,
-        ).distinct().count(),
-    })
+    from .administrativo_metrics import contexto_administrativo
+    return render(request, "core/administrativo_painel_inicio.html", contexto_administrativo())
 
 
 @perfil_requerido("ADMINISTRATIVO")
@@ -1246,7 +1234,14 @@ def despesas_view(request):
             | Q(veiculo__modelo__icontains=busca) | Q(veiculo__placa__icontains=busca)
         )
     despesas = despesas.order_by("-data_lancamento", "-criado_em")
+    veiculos = Veiculo.objects.order_by("marca", "modelo", "pk")
+    selecionado = veiculos.filter(pk=request.GET.get("veiculo")).first() if request.GET.get("veiculo", "").isdigit() else veiculos.first()
+    lista = despesas.filter(veiculo=selecionado) if selecionado else despesas.none()
+    gastos = despesas_ativas.filter(veiculo=selecionado).aggregate(total=Sum("valor"))["total"] or 0
     return render(request, "core/administrativo_painel_despesas.html", {
+        "selecionado": selecionado, "lista": lista, "gastos": gastos,
+        "custo_total": (selecionado.custo_aquisicao or 0) + gastos if selecionado else 0,
+        "form": DespesaForm(),
         "despesas": despesas,
         "busca": busca,
         "veiculos": Veiculo.objects.order_by("marca", "modelo"),
@@ -1297,6 +1292,9 @@ def adicionar_despesa_view(request, veiculo_id):
             despesa.tipo = LancamentoFinanceiro.Tipo.DESPESA
             despesa.registrado_por = request.user
             despesa.save()
+            if request.POST.get("origem") == "painel":
+                from django.urls import reverse
+                return redirect(reverse("despesas") + f"?veiculo={veiculo.pk}")
             return redirect("despesas_veiculo", veiculo_id=veiculo.id)
     else:
         form = DespesaForm()
@@ -2732,7 +2730,7 @@ def registrar_entrega_view(request, venda_id):
                 messages.success(
                     request, "Entrega registrada. O veículo foi entregue."
                 )
-                return redirect("detalhes_venda", venda_id=venda.pk)
+                return redirect("entregas_administrativo") if request.user.is_administrativo() else redirect("detalhes_venda", venda_id=venda.pk)
     else:
         form = EntregaVeiculoForm()
 
@@ -2749,9 +2747,33 @@ def registrar_entrega_view(request, venda_id):
                 venda.esta_fechada
                 and venda.veiculo.situacao == Veiculo.Situacao.VENDIDO
                 and entrega_existente is None
+                and set(venda.etapas_documentacao.filter(situacao=EtapaDocumentacao.Situacao.CONCLUIDA).values_list("tipo", flat=True)) == set(EtapaDocumentacao.Tipo.values)
             ),
         },
     )
+
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def entregas_administrativo_view(request):
+    aguardando = Venda.objects.filter(
+        situacao=Venda.Situacao.FECHADA,
+        veiculo__situacao=Veiculo.Situacao.VENDIDO,
+        entrega__isnull=True,
+    ).annotate(concluidas=Count("etapas_documentacao", filter=Q(
+        etapas_documentacao__situacao=EtapaDocumentacao.Situacao.CONCLUIDA
+    ))).select_related("cliente", "veiculo").order_by("data", "pk")
+    total = len(EtapaDocumentacao.Tipo.choices)
+    lista = list(aguardando)
+    selecionada = next((v for v in lista if str(v.pk) == request.GET.get("venda")), lista[0] if lista else None)
+    return render(request, "core/administrativo_painel_entregas.html", {
+        "lista": lista, "selecionada": selecionada,
+        "form": EntregaVeiculoForm(),
+        "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
+        "prontas": aguardando.filter(concluidas=total),
+        "bloqueadas": aguardando.exclude(concluidas=total),
+        "historico": EntregaVeiculo.objects.select_related("venda__veiculo", "venda__cliente", "responsavel").order_by("-data_entrega", "-pk"),
+        "total_etapas": total,
+    })
 
 
 @perfil_requerido("GERENTE", "ADMINISTRATIVO")
@@ -2787,9 +2809,24 @@ def documentacao_pendente_view(request):
         .order_by("data", "pk")
     )
 
+    if request.user.is_administrativo():
+        todas = list(EtapaDocumentacao.objects.filter(venda__situacao=Venda.Situacao.FECHADA).select_related("venda__veiculo", "venda__cliente").order_by("venda__data", "venda_id", "id"))
+        grupos = {}
+        fila = []
+        for etapa in todas:
+            grupo = grupos.setdefault(etapa.venda_id, {"venda": etapa.venda, "etapas": [], "concluidas": 0})
+            grupo["etapas"].append(etapa)
+            grupo["concluidas"] += int(etapa.concluida)
+            if not etapa.concluida:
+                etapa.dias = max(0, (timezone.localdate() - etapa.data).days)
+                fila.append(etapa)
+        fila.sort(key=lambda e: (e.data, e.pk))
+        for grupo in grupos.values():
+            grupo["progresso"] = round(100 * grupo["concluidas"] / len(EtapaDocumentacao.Tipo.choices))
+        return render(request, "core/administrativo_painel_documentacao.html", {"base_template": "core/administrativo_base.html", "grupos": grupos.values(), "fila": fila, "situacoes": EtapaDocumentacao.Situacao.choices})
     return render(
         request,
-        "core/administrativo_painel_documentacao.html",
+        "core/gerente_documentacao_legado.html",
         {
             "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "etapas": etapas,
