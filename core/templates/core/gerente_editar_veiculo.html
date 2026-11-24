@@ -386,6 +386,8 @@ Editar veículo | REVENDA CERTA
     </small>
 </div>
 
+                <div class="campo"><label for="{{ form.tipo_alcada.id_for_label }}">Tipo de alçada do veículo</label>{{ form.tipo_alcada }}{{ form.tipo_alcada.errors }}</div>
+                <div class="campo"><label for="{{ form.valor_alcada.id_for_label }}">Limite de desconto</label>{{ form.valor_alcada }}{{ form.valor_alcada.errors }}<small class="descricao">Em reais ou percentual, conforme o tipo selecionado. Zero exige aprovação para qualquer desconto.</small></div>
                 <small class="descricao" id="descricao-custo">
                     Obrigatório para veículo comprado ou recebido em troca.
                 </small>

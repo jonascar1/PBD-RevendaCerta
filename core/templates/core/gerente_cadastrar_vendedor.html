@@ -113,67 +113,6 @@
                                 {{ form.senha.errors }}
                             </div>
 
-                            <!-- ALÇADA -->
-                            <div class="form-group">
-
-                                <label>
-                                    Tipo de alçada
-                                </label>
-
-                                <div class="radio-alcada">
-
-                                    <label class="radio-opcao">
-                                        <input
-                                            type="radio"
-                                            name="tipo_alcada"
-                                            value="PERCENTUAL"
-                                            {% if form.tipo_alcada.value != "VALOR" %}checked{% endif %}
-                                        >
-                                        <span>Percentual (%)</span>
-                                    </label>
-
-                                    <label class="radio-opcao">
-                                        <input
-                                            type="radio"
-                                            name="tipo_alcada"
-                                            value="VALOR"
-                                            {% if form.tipo_alcada.value == "VALOR" %}checked{% endif %}
-                                        >
-                                        <span>Valor (R$)</span>
-                                    </label>
-
-                                </div>
-
-                                <label
-                                    for="valor_alcada"
-                                    id="label-valor-alcada"
-                                    class="label-limite-alcada"
-                                >
-                                    Limite de desconto (%)
-                                </label>
-
-                                <div class="alcada-valor">
-
-                                    {{ form.valor_alcada }}
-
-                                    <span
-                                        class="alcada-sufixo"
-                                        id="alcada-sufixo"
-                                    >
-                                        %
-                                    </span>
-
-                                </div>
-{{ form.valor_alcada.errors }}
-
-                                <small id="ajuda-alcada">
-                                    Percentual máximo de desconto sem aprovação.
-                                </small>
-                                {{ form.tipo_alcada.errors }}
-
-                            </div>
-
-
                             <!-- COMISSÃO -->
                             <div class="form-group">
 

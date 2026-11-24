@@ -55,28 +55,13 @@ class Usuario(AbstractUser):
 
 
 class PerfilVendedor(models.Model):
-    """Parâmetros comerciais do vendedor (alçada de desconto e percentual de comissão)."""
-
-    class TipoAlcada(models.TextChoices):
-        PERCENTUAL = "PERCENTUAL", "Percentual (%)"
-        VALOR = "VALOR", "Valor (R$)"
+    """Parâmetros comerciais do vendedor (percentual de comissão)."""
 
     usuario = models.OneToOneField(
         Usuario,
         on_delete=models.PROTECT,
         related_name="dados_vendedor",
         limit_choices_to={"perfil": Usuario.Perfil.VENDEDOR},
-    )
-    tipo_alcada = models.CharField(
-        max_length=20,
-        choices=TipoAlcada.choices,
-        default=TipoAlcada.PERCENTUAL,
-    )
-    valor_alcada = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=0,
-        help_text="Limite máximo de desconto permitido ao vendedor.",
     )
     percentual_comissao = models.DecimalField(
         max_digits=5,
@@ -96,13 +81,12 @@ class PerfilVendedor(models.Model):
     def clean(self):
         if self.editado_por_id and not self.editado_por.is_gerente():
             raise ValidationError(
-                "Alçada de desconto e comissão só podem ser editadas por um gerente."
+                "Comissões só podem ser editadas por um gerente."
             )
 
     def __str__(self):
         return (
             f"Vendedor: {self.usuario} — "
-            f"alçada {self.valor_alcada} ({self.get_tipo_alcada_display()}) / "
             f"comissão {self.percentual_comissao}%"
         )
 
@@ -114,6 +98,21 @@ class PerfilVendedor(models.Model):
 class Veiculo(models.Model):
     """Unidade física do estoque, identificada univocamente por placa e chassi enquanto ativa."""
 
+    class TipoAlcada(models.TextChoices):
+        PERCENTUAL = "PERCENTUAL", "Percentual (%)"
+        VALOR = "VALOR", "Valor (R$)"
+
+    tipo_alcada = models.CharField(
+        max_length=20,
+        choices=TipoAlcada.choices,
+        default=TipoAlcada.PERCENTUAL,
+    )
+    valor_alcada = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Limite máximo de desconto permitido para o veículo.",
+    )
     class Origem(models.TextChoices):
         COMPRADO = "COMPRADO", "Comprado de terceiro"
         TROCA = "TROCA", "Recebido em troca"
@@ -238,6 +237,9 @@ class Veiculo(models.Model):
 
     def clean(self):
         erros = {}
+        if self.valor_alcada is not None and (self.valor_alcada < 0 or (self.tipo_alcada == self.TipoAlcada.PERCENTUAL and self.valor_alcada > 100)):
+            erros["valor_alcada"] = "Informe um limite não negativo; percentuais devem ser de até 100%."
+
 
         placa_normalizada = self.placa.upper().replace(" ", "")
         if not PLACA_REGEX.match(placa_normalizada):
@@ -384,6 +386,7 @@ class ReservaVeiculo(models.Model):
         """Encerra a reserva vencida, libera o veículo e ativa a próxima proposta da fila."""
         with transaction.atomic():
             veiculo = Veiculo.objects.select_for_update().get(pk=self.veiculo_id)
+            self.veiculo = veiculo
             reserva = ReservaVeiculo.objects.select_for_update().get(pk=self.pk)
             agora = timezone.now()
 
@@ -792,30 +795,18 @@ class Proposta(models.Model):
         return self.diferenca == 0
 
     @property
-    def alcada_vendedor(self):
-        """Perfil comercial do vendedor da proposta (ou None para gerentes)."""
-        return getattr(self.vendedor, "dados_vendedor", None)
+    def alcada_veiculo(self):
+        return self.veiculo
 
     @property
     def fora_da_alcada(self):
-        """Indica se o desconto solicitado excede o limite configurado para o vendedor."""
-        perfil = self.alcada_vendedor
-
-        if perfil is None:
-            if self.vendedor.is_vendedor():
-                raise ValidationError(
-                    "Este vendedor não possui alçada cadastrada. "
-                    "Solicite ao gerente que configure seu perfil comercial."
-                )
-            return False
-
+        """Compara o desconto com o limite do veículo, sem arredondar o percentual."""
+        veiculo = self.alcada_veiculo
         if self.desconto_embutido <= 0:
             return False
-
-        if perfil.tipo_alcada == PerfilVendedor.TipoAlcada.PERCENTUAL:
-            return self.desconto_percentual > perfil.valor_alcada
-
-        return self.desconto_embutido > perfil.valor_alcada
+        if veiculo.tipo_alcada == Veiculo.TipoAlcada.PERCENTUAL:
+            return self.desconto_embutido * 100 > self.preco_tabela * veiculo.valor_alcada
+        return self.desconto_embutido > veiculo.valor_alcada
 
     def _desconto_percentual_de(self, valor):
         """Calcula o percentual de desconto sobre o preço de tabela para um dado valor."""
@@ -826,11 +817,11 @@ class Proposta(models.Model):
         )
 
     def _alcada_texto(self):
-        """Formata a alçada vigente do vendedor para registro na auditoria."""
-        perfil = self.alcada_vendedor
+        """Formata a alçada vigente do veículo para registro na auditoria."""
+        perfil = self.alcada_veiculo
         if perfil is None:
             return ""
-        if perfil.tipo_alcada == PerfilVendedor.TipoAlcada.PERCENTUAL:
+        if perfil.tipo_alcada == Veiculo.TipoAlcada.PERCENTUAL:
             return f"{perfil.valor_alcada}%"
         return f"R$ {perfil.valor_alcada}"
 
@@ -1650,7 +1641,7 @@ class Venda(models.Model):
             ):
                 raise ValidationError(
                     "A venda só pode ser fechada com proposta aprovada "
-                    "ou dentro da alçada do vendedor."
+                    "ou dentro da alçada do veículo."
                 )
 
             if veiculo.propostas.filter(
@@ -2588,3 +2579,33 @@ class AvisoProcura(models.Model):
 
     def __str__(self):
         return f"Aviso: {self.procura.cliente} — {self.veiculo}"
+
+class MetaMensal(models.Model):
+    mes = models.DateField(unique=True)
+    loja = models.PositiveIntegerField()
+    padrao_vendedor = models.PositiveIntegerField()
+
+class MetaIndividual(models.Model):
+    mensal = models.ForeignKey(MetaMensal, on_delete=models.PROTECT)
+    vendedor = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    quantidade = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = (('mensal', 'vendedor'),)
+
+class HistoricoMeta(models.Model):
+    mensal = models.ForeignKey(MetaMensal, on_delete=models.PROTECT)
+    gerente = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    anterior = models.JSONField(default=dict)
+    novo = models.JSONField(default=dict)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+
+class HistoricoAlcada(models.Model):
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.PROTECT)
+    gerente = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    tipo_anterior = models.CharField(max_length=20)
+    valor_anterior = models.DecimalField(max_digits=12, decimal_places=2)
+    tipo_novo = models.CharField(max_length=20)
+    valor_novo = models.DecimalField(max_digits=12, decimal_places=2)
+    criado_em = models.DateTimeField(auto_now_add=True)

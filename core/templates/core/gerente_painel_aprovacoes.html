@@ -119,11 +119,11 @@
                             <div>
                                 <span>Alçada do vendedor</span>
                                 <strong>
-                                    {% if proposta.alcada_vendedor %}
-                                        {% if proposta.alcada_vendedor.tipo_alcada == "PERCENTUAL" %}
-                                            {{ proposta.alcada_vendedor.valor_alcada|floatformat:2 }}%
+                                    {% if proposta.alcada_veiculo %}
+                                        {% if proposta.alcada_veiculo.tipo_alcada == "PERCENTUAL" %}
+                                            {{ proposta.alcada_veiculo.valor_alcada|floatformat:2 }}%
                                         {% else %}
-                                            R$ {{ proposta.alcada_vendedor.valor_alcada|floatformat:2 }}
+                                            R$ {{ proposta.alcada_veiculo.valor_alcada|floatformat:2 }}
                                         {% endif %}
                                     {% else %}
                                         Não cadastrada

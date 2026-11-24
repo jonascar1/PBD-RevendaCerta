@@ -1439,8 +1439,6 @@ def cadastrar_vendedor_view(request):
 
                     PerfilVendedor.objects.create(
                         usuario=usuario,
-                        tipo_alcada=cd["tipo_alcada"],
-                        valor_alcada=cd["valor_alcada"],
                         percentual_comissao=cd["percentual_comissao"],
                         editado_por=request.user,
                     )
@@ -1478,8 +1476,6 @@ def editar_vendedor_view(request, vendedor_id):
                     usuario.ativo = cd["ativo"]
                     usuario.save()
 
-                    dados.tipo_alcada = cd["tipo_alcada"]
-                    dados.valor_alcada = cd["valor_alcada"]
                     dados.percentual_comissao = cd["percentual_comissao"]
                     dados.editado_por = request.user
                     dados.full_clean()
@@ -1497,8 +1493,6 @@ def editar_vendedor_view(request, vendedor_id):
                 "nome": usuario.first_name,
                 "email": usuario.email,
                 "ativo": "true" if usuario.ativo else "false",
-                "tipo_alcada": dados.tipo_alcada,
-                "valor_alcada": dados.valor_alcada,
                 "percentual_comissao": dados.percentual_comissao,
             }
         )
@@ -1979,7 +1973,7 @@ def decidir_proposta_view(request, proposta_id):
         "core/gerente_decidir_proposta.html",
         {
             "proposta": proposta,
-            "perfil": proposta.alcada_vendedor,
+            "perfil": proposta.alcada_veiculo,
             "decisoes": proposta.decisoes.select_related("feito_por"),
             "historico": proposta.historico.select_related("alterado_por"),
             "form": form,

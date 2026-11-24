@@ -3,8 +3,12 @@ from django.urls import path
 from core import views_exportacao
 
 from . import views
+from .metas_views import configurar_metas
+from .alcada_views import alcadas_lote
 
 urlpatterns = [
+    path("painel/gerente/veiculos/alcadas/", alcadas_lote, name="alcadas_lote"),
+    path("painel/gerente/metas/", configurar_metas, name="configurar_metas"),
     # Autenticação e Painel Geral
     path("accounts/login/", views.login_view, name="login"),
     path("accounts/logout/", views.logout_view, name="logout"),

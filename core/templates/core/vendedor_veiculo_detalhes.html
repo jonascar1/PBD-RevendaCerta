@@ -78,12 +78,12 @@
                 </div>
 
                 <div class="info-item">
-                    <span>Sua alçada de desconto</span>
+                    <span>Alçada de desconto do veículo</span>
                     <strong>
-                        {% if dados.tipo_alcada == "PERCENTUAL" %}
-                            {{ dados.valor_alcada|floatformat:2 }}%
+                        {% if veiculo.tipo_alcada == "PERCENTUAL" %}
+                            {{ veiculo.valor_alcada|floatformat:2 }}%
                         {% else %}
-                            R$ {{ dados.valor_alcada|floatformat:2 }}
+                            R$ {{ veiculo.valor_alcada|floatformat:2 }}
                         {% endif %}
                     </strong>
                 </div>

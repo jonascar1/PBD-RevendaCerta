@@ -234,7 +234,7 @@
                                 </h3>
 
                                 <p>
-                                    Defina os limites comerciais permitidos para este vendedor.
+                                    Defina a comissão deste vendedor.
                                 </p>
 
                             </div>
@@ -243,41 +243,7 @@
                             <div class="form-grid">
 
 
-                            <!-- TIPO DE ALÇADA -->
-                                <div class="campo">
-
-                                    <label>
-                                        Tipo de alçada
-                                    </label>
-
-                                    <div class="radio-alcada">
-
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tipo_alcada"
-                                                value="PERCENTUAL"
-                                                {% if form.tipo_alcada.value == "PERCENTUAL" %}checked{% endif %}
-                                            >
-                                            Percentual (%)
-                                        </label>
-
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tipo_alcada"
-                                                value="VALOR"
-                                                {% if form.tipo_alcada.value == "VALOR" %}checked{% endif %}
-                                            >
-                                            Valor (R$)
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- COMISSÃO -->
+                            <!-- COMISSÃO -->
                                 <div class="campo">
 
                                     <label for="percentual_comissao">
@@ -304,37 +270,7 @@
                                 </div>
 
 
-                                <!-- LIMITE DE DESCONTO -->
-                                <div class="campo">
-
-                                    <label for="valor_alcada">
-                                        Limite de desconto
-                                    </label>
-
-                                    <span class="descricao" id="descricao-alcada">
-                                        {% if dados.tipo_alcada == "VALOR" %}
-                                            Valor máximo de desconto que o vendedor pode oferecer sem aprovação.
-                                        {% else %}
-                                            Percentual máximo de desconto que o vendedor pode oferecer sem aprovação.
-                                        {% endif %}
-                                    </span>
-
-                                    <div class="input-percentual">
-
-                                        {{ form.valor_alcada }}
-
-                                        <span id="sufixo-alcada">
-                                            {% if dados.tipo_alcada == "VALOR" %}
-                                                R$
-                                            {% else %}
-                                                %
-                                            {% endif %}
-                                        </span>
-
-                                    </div>
-{{ form.valor_alcada.errors }}
-
-                                </div>
+                                
                             </div>
 
 

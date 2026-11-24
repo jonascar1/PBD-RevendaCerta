@@ -100,9 +100,7 @@
                                     Usuário
                                 </th>
 
-                                <th>
-                                    Alçada
-                                </th>
+                                
 
                                 <th>
                                     Comissão
@@ -159,20 +157,6 @@
                                 </td>
 
 
-                                <!-- ALÇADA -->
-                                <td>
-
-                                    <span class="percentage">
-                                        {% if v.tipo_alcada == "VALOR" %}
-                                            R$ {{ v.valor_alcada }}
-                                        {% else %}
-                                            {{ v.valor_alcada }}%
-                                        {% endif %}
-                                    </span>
-
-                                </td>
-
-
                                 <!-- COMISSÃO -->
                                 <td>
 
@@ -222,7 +206,7 @@
                             <tr>
 
                                 <td
-                                    colspan="6"
+                                    colspan="5"
                                     class="empty"
                                 >
                                     Nenhum vendedor cadastrado.

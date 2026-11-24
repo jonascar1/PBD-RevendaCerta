@@ -9,7 +9,7 @@
 <div id="rd-kpis" class="rd-grid"></div>
 <div class="rd-grid rd-main">
 <section class="rd-card rd-8"><header><div><h2>Vendas por mês</h2><p>Carros vendidos (barras) e faturamento (linha)</p></div><select id="rd-period" aria-label="Período"><option value="12">12 meses</option><option value="6">6 meses</option><option value="3">3 meses</option></select></header><div id="rd-summary" class="rd-summary"></div><div class="rd-chart"><canvas id="rd-sales"></canvas></div></section>
-<section class="rd-card rd-4"><h2>Meta mensal</h2><p>{{ dashboard.days_left }} dias para fechar o mês</p><div id="rd-goal"></div></section>
+<section class="rd-card rd-4"><h2>Meta mensal</h2><p>{{ dashboard.days_left }} dias para fechar o mês</p><div id="rd-goal"></div><a class="rd-meta-link" href="{% url 'configurar_metas' %}">Ajustar metas</a></section>
 <section class="rd-card rd-5"><h2>Modelos mais vendidos</h2><p>Modelos com mais unidades vendidas nos últimos 12 meses</p><div id="rd-top"></div></section>
 <section class="rd-card rd-7"><h2>Ranking da equipe</h2><p>Carros vendidos por vendedor no mês</p><div class="rd-chart tall"><canvas id="rd-ranking"></canvas></div></section>
 <section class="rd-card rd-12"><h2>Carros parados</h2><p>Tempo de cada carro no estoque — cada ponto é um carro. Parado = mais de 30 dias.</p><div id="rd-aging"></div><div class="rd-stock"><div class="rd-chart tall"><canvas id="rd-scatter"></canvas></div><div><h3>Há mais tempo no estoque</h3><div id="rd-stalled"></div></div></div></section>

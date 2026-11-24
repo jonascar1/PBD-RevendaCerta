@@ -212,29 +212,6 @@ class LoginForm(BaseForm, forms.Form):
 class _VendedorComercialMixin(forms.Form):
     """Campos comerciais compartilhados entre cadastro e edição de vendedor."""
 
-    tipo_alcada = forms.ChoiceField(
-        label="Tipo de alçada",
-        choices=PerfilVendedor.TipoAlcada.choices,
-        initial=PerfilVendedor.TipoAlcada.PERCENTUAL,
-        error_messages={
-            "required": "Selecione o tipo de alçada.",
-            "invalid_choice": "Tipo de alçada inválido.",
-        },
-        widget=forms.RadioSelect,
-    )
-    valor_alcada = forms.DecimalField(
-        label="Limite de desconto",
-        max_digits=12,
-        decimal_places=2,
-        min_value=0,
-        initial=0,
-        error_messages={
-            "required": "Informe o limite de desconto.",
-            "invalid": "Informe um valor válido.",
-            "min_value": "O limite não pode ser negativo.",
-        },
-        widget=forms.NumberInput(attrs={"step": "0.01"}),
-    )
     percentual_comissao = forms.DecimalField(
         label="Percentual de comissão",
         max_digits=5,
@@ -250,21 +227,6 @@ class _VendedorComercialMixin(forms.Form):
         },
         widget=forms.NumberInput(attrs={"step": "0.01"}),
     )
-
-    def clean(self):
-        cleaned = super().clean()
-        tipo = cleaned.get("tipo_alcada")
-        valor = cleaned.get("valor_alcada")
-        if (
-            tipo == PerfilVendedor.TipoAlcada.PERCENTUAL
-            and valor is not None
-            and valor > 100
-        ):
-            self.add_error(
-                "valor_alcada", "O limite em percentual não pode passar de 100%."
-            )
-        return cleaned
-
 
 class VendedorCadastroForm(BaseForm, _VendedorComercialMixin):
     """Cadastro de usuário vendedor e respectivo perfil comercial."""
@@ -365,6 +327,8 @@ class VeiculoForm(BaseForm, forms.ModelForm):
             "origem",
             "custo_aquisicao",
             "preco_venda",
+            "tipo_alcada",
+            "valor_alcada",
             "valor_repasse",
         ]
         labels = {
@@ -951,7 +915,7 @@ ComposicaoFormSet = inlineformset_factory(
 
 
 class DecisaoPropostaForm(BaseForm, forms.Form):
-    """Coleta a decisão do gerente sobre propostas fora da alçada do vendedor."""
+    """Coleta a decisão do gerente sobre propostas fora da alçada do veículo."""
 
     acao = forms.ChoiceField(
         choices=[

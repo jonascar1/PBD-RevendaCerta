@@ -5,7 +5,7 @@ from datetime import date
 from decimal import Decimal
 from django.conf import settings
 from django.utils import timezone
-from .models import Venda, Veiculo, Proposta, Usuario
+from .models import Venda, Veiculo, Proposta, Usuario, MetaMensal, MetaIndividual
 
 MONTHS = ('jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez')
 
@@ -50,7 +50,7 @@ def manager_metrics(today=None):
     aging = Counter(v['band'] for v in stock)
     stalled = sorted((v for v in stock if v['days']>30), key=lambda v:-v['days'])
     now, prev = months[current], months[month_start(today,-1)]
-    goal = getattr(settings,'REVENDA_META_MENSAL',None)
+    goal = MetaMensal.objects.filter(mes=current).values_list('loja', flat=True).first()
     goal = goal if isinstance(goal,int) and not isinstance(goal,bool) and goal>0 else None
     proposals = Proposta.objects.filter(data__range=(current,today)).count()
     def money_rows(rows):
@@ -93,6 +93,8 @@ def seller_metrics(user, today=None):
         days = (today-entered).days
         if days > 30:
             stalled.append({'name':f'{v.marca} {v.modelo}', 'days':days, 'price':float(v.preco_venda) if v.preco_venda is not None else None, 'band':aging_band(days)})
-    goal = getattr(settings,'REVENDA_META_MENSAL_VENDEDOR',None)
+    goal = MetaIndividual.objects.filter(mensal__mes=current, vendedor=user).values_list('quantidade', flat=True).first()
+    if goal is None:
+        goal = MetaMensal.objects.filter(mes=current).values_list('padrao_vendedor', flat=True).first()
     goal = goal if type(goal) is int and goal > 0 else None
     return {'months':[{'label':r['label'],'unidades':r['unidades'],'faturamento':float(r['faturamento']),'media':round(r['team']/len(team),1)} for r in months.values()], 'kpis':{'sales':now['unidades'],'revenue':float(now['faturamento']),'previous_sales':prev['unidades'],'previous_revenue':float(prev['faturamento']),'sales_delta':percent_change(now['unidades'],prev['unidades']),'revenue_delta':percent_change(now['faturamento'],prev['faturamento']),'open':opened,'position':1+sum(counts[i]>counts[user.pk] for i in team),'team_size':len(team)}, 'goal':goal,'goal_progress':round(now['unidades']*100/goal) if goal else None,'days_left':monthrange(today.year,today.month)[1]-today.day,'top':[{'name':n,'unidades':v[0],'faturamento':float(v[1])} for n,v in sorted(models.items(),key=lambda x:(-x[1][0],-x[1][1],x[0]))[:5]],'category':[{'category':k,'unidades':v} for k,v in categories.most_common()],'weekday':[{'label':k,'unidades':v} for k,v in zip(('Dom','Seg','Ter','Qua','Qui','Sex','Sáb'),weekdays)],'stalled':sorted(stalled,key=lambda v:-v['days']),'funnel':[{'stage':'Atendimentos','value':None},{'stage':'Test drives','value':None},{'stage':'Propostas','value':proposals.filter(data__range=(current,today)).count()},{'stage':'Vendas','value':now['unidades']}]}
