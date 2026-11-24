@@ -1409,25 +1409,8 @@ def despesas_excluidas_veiculo_view(request, veiculo_id):
 
 @perfil_requerido("GERENTE")
 def painel_gerente_view(request):
-    vendedores = PerfilVendedor.objects.select_related("usuario").all()
-    veiculos_disponiveis = Veiculo.objects.filter(
-        status=Veiculo.Status.DISPONIVEL
-    ).count()
-    vendas_concluidas = Veiculo.objects.filter(
-        situacao__in=[Veiculo.Situacao.VENDIDO, Veiculo.Situacao.ENTREGUE]
-    ).count()
-    vendedores_ativos = PerfilVendedor.objects.filter(usuario__ativo=True).count()
-
-    return render(
-        request,
-        "core/gerente_painel_inicio.html",
-        {
-            "vendedores": vendedores,
-            "veiculos_disponiveis": veiculos_disponiveis,
-            "vendas_concluidas": vendas_concluidas,
-            "vendedores_ativos": vendedores_ativos,
-        },
-    )
+    from .dashboard_metrics import manager_metrics
+    return render(request, "core/gerente_painel_inicio.html", {"dashboard": manager_metrics()})
 
 
 @perfil_requerido("GERENTE")
