@@ -1756,12 +1756,6 @@ def editar_veiculo_view(request, veiculo_id):
     veiculo = get_object_or_404(Veiculo, pk=veiculo_id)
 
     if request.method == "POST":
-        print("\n========== DEBUG GALERIA ==========")
-        print("Foto principal:", request.POST.get("foto_principal"))
-        print("Fotos para excluir:", request.POST.get("fotos_excluir"))
-        print("Ordem das fotos:", request.POST.get("ordem_fotos"))
-        print("===================================\n")
-
         form = EditarVeiculoForm(request.POST, request.FILES, instance=veiculo)
 
         if form.is_valid():

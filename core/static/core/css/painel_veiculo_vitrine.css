@@ -1,0 +1,356 @@
+.rc-vd-interno .vd-marca{
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #63c3ff;
+    margin: 0 0 8px;
+}
+.rc-vd-interno .vd-painel{
+    background: white;
+    border: 1px solid #dbe4ef;
+    border-radius: 22px;
+    box-shadow: 0 14px 32px #10213a18;
+    min-width: 0;
+    animation: vd-entrada .65s ease both;
+}
+.rc-vd-interno .vd-galeria{
+    padding: 15px;
+}
+.rc-vd-interno .vd-foto{
+    position: relative;
+    aspect-ratio: 8/5;
+    background: #e8eef5;
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+}
+.rc-vd-interno .vd-foto>img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    inset: 0;
+    transition: opacity .2s ease;
+}
+.rc-vd-interno .vd-seta{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid #dbe4ef;
+    background: #fffffff0;
+    color: #17243a;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+.rc-vd-interno .vd-seta:hover{
+    background: white;
+}
+.rc-vd-interno .vd-prev{
+    left: 12px;
+}
+.rc-vd-interno .vd-next{
+    right: 12px;
+}
+.rc-vd-interno .vd-seta svg{
+    width: 19px;
+}
+.rc-vd-interno .vd-contador{
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: #0b1731df;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+}
+.rc-vd-interno .vd-miniaturas{
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 12px 2px 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #aabbd0 transparent;
+}
+.rc-vd-interno .vd-miniatura{
+    flex: 0 0 100px;
+    height: 74px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 0;
+    background: #e8eef5;
+    cursor: pointer;
+    opacity: .7;
+    transition: opacity .2s,border-color .2s;
+}
+.rc-vd-interno .vd-miniatura.ativa, .rc-vd-interno .vd-miniatura:hover{
+    opacity: 1;
+    border-color: #2469e8;
+}
+.rc-vd-interno .vd-miniatura img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.rc-vd-interno .vd-info{
+    padding: clamp(20px,2.5vw,32px);
+    animation-delay: .1s;
+}
+.rc-vd-interno .vd-info .vd-marca{
+    color: #2165df;
+    letter-spacing: 1px;
+}
+.rc-vd-interno .vd-info h2{
+    font-size: 25px;
+    line-height: 1.2;
+    margin: 0 0 20px;
+    color: #111;
+}
+.rc-vd-interno .vd-label{
+    font-size: 13px;
+    color: #526176;
+}
+.rc-vd-interno .vd-preco{
+    font-size: clamp(27px,3vw,40px);
+    font-weight: 800;
+    color: #111;
+    margin: 0 0 22px;
+    line-height: 1.2;
+}
+.rc-vd-interno .vd-ficha{
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 10px;
+}
+.rc-vd-interno .vd-ficha>div{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #e9eff6;
+    border-radius: 14px;
+    min-width: 0;
+}
+.rc-vd-interno .vd-ficha>div>svg{
+    flex: none;
+    width: 34px;
+    height: 34px;
+    padding: 8px;
+    border-radius: 11px;
+    background: white;
+    color: #2165df;
+}
+.rc-vd-interno .vd-ficha small, .rc-vd-interno .vd-ficha strong{
+    display: block;
+    overflow-wrap: anywhere;
+}
+.rc-vd-interno .vd-ficha small{
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #526176;
+    margin-bottom: 4px;
+}
+.rc-vd-interno .vd-ficha strong{
+    font-size: 14px;
+    font-weight: 650;
+}
+.rc-vd-interno .vd-op-title{
+    font-size: 16px;
+    margin: 24px 0 12px;
+}
+.rc-vd-interno .vd-opcionais{
+    font-size: 14px;
+    line-height: 1.6;
+    color: #334155;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+.rc-vd-interno .vd-opcionais span{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #dceafd;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #16396b;
+}
+.rc-vd-interno .vd-opcionais svg{
+    width: 13px;
+    height: 13px;
+}
+@media (max-width:480px) {.rc-vd-interno .vd-ficha>div{
+        padding: 9px;
+        gap: 6px;
+    }
+.rc-vd-interno .vd-ficha>div>svg{
+        width: 28px;
+        height: 28px;
+        padding: 6px;
+    }
+.rc-vd-interno .vd-miniatura{
+        flex-basis: 82px;
+        height: 60px;
+    }}
+@media (prefers-reduced-motion:reduce) {.rc-vd-interno .vd-painel{
+        animation: none;
+    }}
+.rc-vd-interno .vd-painel{
+    min-width: 0;
+}
+.rc-vd-interno .vd-foto{
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 8 / 5;
+    overflow: hidden;
+}
+.rc-vd-interno .vd-foto > img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.rc-vd-interno .vd-miniaturas{
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+}
+.rc-vd-interno .vd-miniatura{
+    flex: 0 0 100px;
+    height: 74px;
+}
+.rc-vd-interno .vd-miniatura img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.rc-vd-interno .vd-preco{
+    color: #111;
+}
+@media  (max-width: 480px) {.rc-vd-interno .vd-miniatura{
+        flex-basis: 82px;
+        height: 60px;
+    }}
+.rc-vd-interno .vd-galeria{
+    padding: 18px;
+}
+.rc-vd-interno .vd-info{
+    padding: 32px;
+}
+.rc-vd-interno .vd-info h2{
+    font-size: 30px;
+}
+.rc-vd-interno .vd-preco{
+    font-size: clamp(30px, 3vw, 46px);
+}
+.rc-vd-interno .vd-ficha > div{
+    padding: 16px;
+}
+.rc-vd-interno .vd-ficha small{
+    font-size: 12px;
+}
+.rc-vd-interno .vd-ficha strong{
+    font-size: 16px;
+}
+.rc-vd-interno .vd-ficha > div > svg{
+    width: 40px;
+    height: 40px;
+}
+.rc-vd-interno .vd-miniatura{
+    flex-basis: 120px;
+    height: 88px;
+}
+.rc-vd-interno .vd-op-title{
+    font-size: 19px;
+}
+.rc-vd-interno .vd-opcionais span{
+    font-size: 15px;
+}
+@media (max-width: 680px) {.rc-vd-interno .vd-info{
+        padding: 18px;
+    }
+.rc-vd-interno .vd-miniatura{
+        flex-basis: 82px;
+        height: 60px;
+    }
+.rc-vd-interno .vd-ficha > div{
+        padding: 9px;
+        gap: 6px;
+    }
+.rc-vd-interno .vd-ficha small{
+        font-size: 10px;
+    }
+.rc-vd-interno .vd-ficha strong{
+        font-size: 13px;
+    }
+.rc-vd-interno .vd-ficha > div > svg{
+        width: 28px;
+        height: 28px;
+    }}
+@media (max-width:639px) {.rc-vd-interno .vd-info{
+        min-width: 0;
+    }
+.rc-vd-interno .vd-ficha>div{
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }}
+.rc-vd-interno {width:100%;min-width:0;margin:0 0 24px;color:light-dark(#102039,#eef4fc);container-type:inline-size;}
+.rc-vd-interno .vd-grid {display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start;margin:0;}
+.rc-vd-interno .vd-painel {animation:none;background:light-dark(#fff,#121c2e);border-color:light-dark(#dbe4ef,#29384e);min-width:0;}
+.rc-vd-interno .vd-info h2,.rc-vd-interno .vd-preco {color:light-dark(#111827,#eef4fc);overflow-wrap:anywhere;}
+.rc-vd-interno .vd-ficha>div,.rc-vd-interno .vd-foto {background:light-dark(#e8eef5,#19263a);}
+.rc-vd-interno .vd-ficha small,.rc-vd-interno .vd-label,.rc-vd-interno .vd-opcionais {color:light-dark(#526176,#a0b1c8);}
+.rc-vd-interno .vd-ficha>div>svg {background:light-dark(white,#263a55);color:light-dark(#2165df,#78b5ff);}
+.rc-vd-interno .vd-opcionais span,.rc-vd-status {background:light-dark(#dceafd,#1a3455);color:light-dark(#16396b,#b7d8ff);}
+.rc-vd-status {display:inline-block;padding:6px 12px;border-radius:20px;margin:0 0 12px;font-weight:700;}
+.rc-vd-interno .vd-label {display:block;}
+.rc-vd-interno .vd-miniaturas {position:relative;min-width:0;}
+.rc-vd-interno .vd-seta[hidden] {display:none;}
+.rc-vd-interno .rc-vd-identificacao {margin-top:16px;}
+.veiculo-container.rc-vd-operacional {display:block;min-width:0;}
+.rc-vd-operacional .informacoes {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+@container (max-width:850px) {.rc-vd-interno .vd-grid {grid-template-columns:minmax(0,1fr);}}
+@media(max-width:680px) {.rc-vd-interno .vd-grid,.rc-vd-operacional .informacoes {grid-template-columns:minmax(0,1fr);} .rc-vd-interno .vd-info,.rc-vd-interno .vd-galeria {padding:12px;} .rc-vd-interno .vd-preco {font-size:28px;} .rc-vd-interno .vd-info h2 {font-size:23px;} }
+@media(max-width:350px) {.rc-vd-interno .vd-ficha {grid-template-columns:minmax(0,1fr);}}
+
+/* Compact internal presentation; public showroom remains unchanged. */
+.rc-vd-interno .vd-grid {gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+.rc-vd-interno .vd-painel {border-radius:16px;box-shadow:0 6px 18px #10213a10;}
+.rc-vd-interno .vd-galeria,.rc-vd-interno .vd-info {padding:14px;}
+.rc-vd-interno .vd-foto {aspect-ratio: 16/10;max-height:340px;}
+.rc-vd-interno .vd-miniatura {flex-basis:76px;height:54px;border-radius:8px;}
+.rc-vd-interno .vd-info h2 {font-size:23px;margin-bottom:10px;}
+.rc-vd-interno .vd-preco {font-size:clamp(24px,2.1vw,32px);margin-bottom:12px;}
+.rc-vd-interno .vd-ficha {gap:7px;}
+.rc-vd-interno .vd-ficha>div {padding:8px;gap:8px;border-radius:10px;}
+.rc-vd-interno .vd-ficha>div>svg {width:30px;height:30px;padding:6px;}
+.rc-vd-interno .vd-ficha small {font-size:10px;}
+.rc-vd-interno .vd-ficha strong {font-size:13px;}
+.rc-vd-interno .vd-op-title {font-size:15px;margin:12px 0 7px;}
+.rc-vd-interno .vd-opcionais span {font-size:12px;}
+.rc-vd-interno .rc-vd-identificacao {margin-top:10px;}
+.rc-vd-gerente.detalhes-container {display:flex;flex-direction:column;gap:14px;}
+.rc-vd-gerente>.galeria,.rc-vd-gerente>.informacoes {width:100%;box-sizing:border-box;min-width:0;}
+.rc-vd-gerente>.galeria {padding:0;background:none;border:0;}
+.rc-vd-gerente .galeria .situacao-card {margin-top:0;}
+.rc-vd-gerente>.informacoes {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px;}
+.rc-vd-gerente .titulo-veiculo {grid-column:1/-1;flex-wrap:wrap;}
+.rc-vd-gerente .acoes-identificacao {flex-wrap:wrap;}
+.rc-vd-gerente .info-grid,.rc-vd-operacional .info-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;}
+.rc-vd-gerente .info-item,.rc-vd-operacional .info-item {display:grid;grid-template-columns:30px minmax(0,1fr);gap:3px 8px;align-items:center;background:light-dark(#e8eef5,#19263a);border-radius:10px;padding:10px;min-width:0;}
+.rc-vd-gerente .info-item>svg,.rc-vd-operacional .info-item>svg {grid-row:1/3;width:30px;height:30px;padding:6px;box-sizing:border-box;border-radius:8px;background:light-dark(#fff,#263a55);color:light-dark(#2165df,#78b5ff);}
+.rc-vd-gerente .info-item>span,.rc-vd-operacional .info-item>span {grid-column:2;font-size:10px;text-transform:uppercase;color:light-dark(#526176,#a0b1c8);}
+.rc-vd-gerente .info-item>strong,.rc-vd-operacional .info-item>strong {grid-column:2;font-size:13px;overflow-wrap:anywhere;}
+.ad-financial-grid .ad-financial-card {border-radius:12px;background:light-dark(#e8eef5,#19263a);}
+@container (max-width:850px) {.rc-vd-interno .vd-grid {grid-template-columns:minmax(0,1fr);}}
+@media(max-width:680px) {.rc-vd-interno .vd-grid,.rc-vd-gerente>.informacoes {grid-template-columns:minmax(0,1fr);} .rc-vd-interno .vd-foto {max-height:260px;} }

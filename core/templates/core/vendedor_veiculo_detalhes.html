@@ -8,6 +8,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/vendedor_veiculo_detalhes.css' %}?v=rc4-f7eaa7a7ace8">
+<link rel="stylesheet" href="{% static 'core/css/painel_veiculo_vitrine.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
@@ -25,58 +26,21 @@
     </div>
 </header>
 
-<section class="veiculo-container">
-
-    <div class="galeria">
-        <div class="foto-principal-container">
-            {% if fotos %}
-                <img id="foto-principal"
-                     src="{{ fotos.0.imagem.url }}"
-                     alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}">
-            {% else %}
-            <div class="sem-foto">
-                    <i data-lucide="image-off"></i>
-                <p>Nenhuma foto cadastrada</p>
-            </div>
-            {% endif %}
-        </div>
-
-        {% if fotos %}
-        <div class="miniaturas">
-                {% for foto in fotos %}
-                    <button type="button"
-                            class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url|escape }}">
-                        <img src="{{ foto.imagem.url }}" alt="Foto {{ forloop.counter }}">
-                    </button>
-                {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+{% include "core/partials/veiculo_apresentacao.html" with fotos=veiculo.fotos.all %}
+<section class="veiculo-container rc-vd-operacional">
 
     <div class="informacoes">
 
         <div class="card-info">
             <div class="card-cabecalho">
-                <h3>Situação e preço</h3>
-                <span class="badge status-{{ veiculo.situacao|lower }}">
-                    {{ veiculo.get_situacao_display }}
-                </span>
+                <h3>Alçada de desconto</h3>
+                
             </div>
 
             <div class="info-grid">
-                <div class="info-item">
-                    <span>Preço de tabela</span>
-                    <strong class="rc-preco-veiculo">
-                        {% if veiculo.preco_venda %}
-                            R$ {{ veiculo.preco_venda|floatformat:2 }}
-                        {% else %}
-                            Ainda não definido
-                        {% endif %}
-                    </strong>
-                </div>
+                
 
-                <div class="info-item">
-                    <span>Alçada de desconto do veículo</span>
+                <div class="info-item"><i data-lucide="percent"></i><span>Alçada de desconto do veículo</span>
                     <strong>
                         {% if veiculo.tipo_alcada == "PERCENTUAL" %}
                             {{ veiculo.valor_alcada|floatformat:2 }}%
@@ -141,48 +105,25 @@
             </div>
 
             <div class="info-grid">
-                <div class="info-item"><span>Placa</span><strong>{{ veiculo.placa }}</strong>
+                
+                <div class="info-item"><i data-lucide="scan-line"></i><span>Chassi</span><strong>{{ veiculo.chassi }}</strong>
                 </div>
-                <div class="info-item"><span>Chassi</span><strong>{{ veiculo.chassi }}</strong>
+                <div class="info-item"><i data-lucide="file-text"></i><span>Renavam</span><strong>{{ veiculo.renavam }}</strong>
                 </div>
-                <div class="info-item"><span>Renavam</span><strong>{{ veiculo.renavam }}</strong>
-                </div>
-                <div class="info-item"><span>Marca</span><strong>{{ veiculo.marca }}</strong>
-                </div>
-                <div class="info-item"><span>Modelo</span><strong>{{ veiculo.modelo }}</strong>
-                </div>
-                <div class="info-item"><span>Ano de fabricação</span><strong>{{ veiculo.ano_fabricacao|unlocalize }}</strong>
-                </div>
-                <div class="info-item"><span>Ano do modelo</span><strong>{{ veiculo.ano_modelo|unlocalize }}</strong>
-                </div>
-                <div class="info-item"><span>Cor</span><strong>{{ veiculo.cor }}</strong>
-                </div>
-                <div class="info-item"><span>Combustível</span><strong>{{ veiculo.combustivel }}</strong>
-                </div>
-                <div class="info-item">
-                    <span>Tipo</span>
-                    <strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong>
-                </div>
+                
+                
+                
+                
+                
+                
+                
 
-                <div class="info-item">
-                    <span>Câmbio</span>
-                    <strong>{{ veiculo.get_cambio_display|default:"Não informado" }}</strong>
-                </div>
-                <div class="info-item"><span>Quilometragem</span><strong>{{ veiculo.quilometragem }} km</strong>
-                </div>
+                
+                
             </div>
         </div>
 
-        <div class="card-info">
-            <div class="card-cabecalho">
-                <h3>Opcionais</h3>
-            </div>
-            {% if veiculo.opcionais %}
-            <p class="opcionais">{{ veiculo.opcionais|linebreaksbr }}</p>
-            {% else %}
-            <p class="sem-registros">Nenhum opcional informado.</p>
-            {% endif %}
-        </div>
+        
 
     </div>
 </section>
@@ -190,5 +131,5 @@
 {% endblock content %}
 
 {% block extra_js %}
-<script src="{% static 'core/js/vendedor_veiculo_detalhes.js' %}"></script>
+<script src="{% static 'core/js/painel_veiculo_vitrine.js' %}?v=1" defer></script>
 {% endblock extra_js %}
