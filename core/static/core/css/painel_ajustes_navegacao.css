@@ -1,0 +1,59 @@
+/* Ajustes restritos aos formulários e ações identificados na revisão. */
+.rc-panel-body main.rc-form-centered {
+    --rc-form-width: 1000px;
+}
+.rc-panel-body main.rc-form-560 { --rc-form-width: 560px; }
+.rc-panel-body main.rc-form-760 { --rc-form-width: 760px; }
+.rc-panel-body main.rc-form-850 { --rc-form-width: 850px; }
+.rc-panel-body main.rc-form-860 { --rc-form-width: 860px; }
+.rc-panel-body main.rc-form-1000 { --rc-form-width: 1000px; }
+.rc-panel-body main.rc-form-1200 { --rc-form-width: 1200px; }
+
+.rc-panel-body main.rc-form-centered > :is(header, section, div, form):not(.rc-topbar) {
+    width: 100%;
+    max-width: var(--rc-form-width);
+    min-width: 0;
+    margin-inline: auto;
+    box-sizing: border-box;
+}
+.rc-panel-body main.rc-form-centered :is(.cart-formulario, .card, .form-container, .confirmar-card, .formulario-card, .acoes, .messages) {
+    margin-inline: auto;
+    box-sizing: border-box;
+}
+.rc-panel-body main.rc-form-centered .cart-pagina {
+    padding-inline: 0;
+}
+.rc-panel-body main.rc-form-centered .cart-formulario {
+    max-width: 100%;
+}
+.rc-panel-body main .rc-action-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid light-dark(#cbd9ec, #355174);
+    border-radius: 10px;
+    background: light-dark(#eaf1ff, #19314e);
+    color: light-dark(#1958d8, #93c5fd);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+.rc-panel-body main .rc-action-secondary:hover {
+    background: light-dark(#dce9ff, #23466c);
+}
+.rc-panel-body main .rc-action-secondary:focus-visible {
+    outline: 2px solid #248ed8;
+    outline-offset: 2px;
+}
+@media (max-width: 680px) {
+    .rc-panel-body main.rc-form-centered > :is(header, section, div, form):not(.rc-topbar) {
+        max-width: 100%;
+    }
+    .rc-panel-body main.rc-form-centered :is(.topo, .topo-form, .cart-topo, .topbar) {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}

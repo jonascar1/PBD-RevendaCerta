@@ -115,7 +115,6 @@
         flex-direction: column;
         align-items: stretch;
     }
-
     .neg-section-header > .neg-action {
         align-self: flex-start;
         white-space: normal;
@@ -127,15 +126,12 @@
         grid-template-columns: minmax(0, 1fr);
         gap: 12px;
     }
-
     .neg-card {
         padding: 16px;
     }
-
     .neg-section-header > .neg-action {
         width: 100%;
     }
-
     .topbar h1 {
         font-size: 24px;
     }

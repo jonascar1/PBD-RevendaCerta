@@ -276,7 +276,6 @@
     .prop-detalhe-grid {
         grid-template-columns: 1fr;
     }
-
     .prop-span-total {
         grid-column: span 1;
     }
@@ -349,11 +348,9 @@
     .prop-detalhe-identificacao {
         flex-wrap: wrap;
     }
-
     .prop-detalhe-topo {
         align-items: flex-start;
     }
-
     .prop-dados-grid {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -363,20 +360,16 @@
     .propostas-page {
         padding: 1rem;
     }
-
     .prop-card-p {
         padding: 1rem;
     }
-
     .prop-acoes {
         width: 100%;
         flex-direction: column;
     }
-
     .prop-acoes .prop-btn {
         width: 100%;
     }
-
     .prop-links-relacionados .prop-btn {
         flex: 1 1 100%;
     }

@@ -36,7 +36,7 @@
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
-        <div class="message message-{{ message.tags }}">{{ message }}</div>
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 </div>
 {% endif %}
@@ -53,8 +53,10 @@
             </h3>
 
             <div class="info-grid">
-                <div class="info-item"><span>Data da venda</span><strong>{{ venda.data|date:"d/m/Y" }}</strong></div>
-                <div class="info-item"><span>Cliente</span><strong>{{ venda.cliente.nome_exibicao }}</strong></div>
+                <div class="info-item"><span>Data da venda</span><strong>{{ venda.data|date:"d/m/Y" }}</strong>
+                </div>
+                <div class="info-item"><span>Cliente</span><strong>{{ venda.cliente.nome_exibicao }}</strong>
+                </div>
                 <div class="info-item">
                     <span>Veículo</span>
                     <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</strong>
@@ -78,9 +80,12 @@
             <h3>Valores</h3>
 
             <div class="info-grid">
-                <div class="info-item"><span>Preço de tabela</span><strong>R$ {{ venda.preco_tabela|floatformat:2 }}</strong></div>
-                <div class="info-item"><span>Valor da venda</span><strong>R$ {{ venda.valor_venda|floatformat:2 }}</strong></div>
-                <div class="info-item"><span>Desconto</span><strong>R$ {{ venda.desconto|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Preço de tabela</span><strong>R$ {{ venda.preco_tabela|floatformat:2 }}</strong>
+                </div>
+                <div class="info-item"><span>Valor da venda</span><strong>R$ {{ venda.valor_venda|floatformat:2 }}</strong>
+                </div>
+                <div class="info-item"><span>Desconto</span><strong>R$ {{ venda.desconto|floatformat:2 }}</strong>
+                </div>
             </div>
         </div>
                 {% if margem %}
@@ -93,8 +98,10 @@
             </h3>
 
             <div class="info-grid">
-                <div class="info-item"><span>Preço vendido</span><strong>R$ {{ margem.preco_vendido|floatformat:2 }}</strong></div>
-                <div class="info-item"><span>Custo de aquisição</span><strong>R$ {{ margem.custo_aquisicao|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Preço vendido</span><strong>R$ {{ margem.preco_vendido|floatformat:2 }}</strong>
+                </div>
+                <div class="info-item"><span>Custo de aquisição</span><strong>R$ {{ margem.custo_aquisicao|floatformat:2 }}</strong>
+                </div>
                 <div class="info-item">
                     <span>Despesas</span>
                     <strong>R$ {{ margem.despesas|floatformat:2 }}</strong>
@@ -102,7 +109,8 @@
                         <small>R$ {{ margem.despesas_apos_venda|floatformat:2 }} lançados após a venda</small>
                     {% endif %}
                 </div>
-                <div class="info-item"><span>Comissão do vendedor</span><strong>R$ {{ margem.comissao|floatformat:2 }}</strong></div>
+                <div class="info-item"><span>Comissão do vendedor</span><strong>R$ {{ margem.comissao|floatformat:2 }}</strong>
+                </div>
                 <div class="info-item">
                     <span>Margem</span>
                     <strong {% if margem.negativa %}class="valor-negativo"{% endif %}>
@@ -123,7 +131,7 @@
 
             <div class="info-grid">
                 {% for pagamento in pagamentos %}
-                    <div class="info-item">
+                <div class="info-item">
                         <span>{{ pagamento.get_tipo_display }}</span>
                         <strong>R$ {{ pagamento.valor|floatformat:2 }}</strong>
 
@@ -138,9 +146,9 @@
                         {% elif pagamento.tipo == "TROCA" %}
                             <small>{{ pagamento.troca_descricao }}</small>
                         {% endif %}
-                    </div>
+                </div>
                 {% empty %}
-                    <p class="sem-informacao">Nenhum pagamento registrado.</p>
+                <p class="sem-informacao">Nenhum pagamento registrado.</p>
                 {% endfor %}
             </div>
         </div>
@@ -180,19 +188,19 @@
             >
                 {% csrf_token %}
 
-                <div class="campo-form">
+            <div class="campo-form">
                     {{ form_cancelamento.motivo.label_tag }}
                     {{ form_cancelamento.motivo }}
-                </div>
+            </div>
 
                 <button type="submit" class="btn-situacao btn-liberar">
                     <i data-lucide="x-circle"></i> Cancelar venda
                 </button>
-            </form>
-        </div>
+        </form>
+    </div>
         {% endif %}
 
-    </div>
+</div>
 </section>
 
 {% endblock content %}

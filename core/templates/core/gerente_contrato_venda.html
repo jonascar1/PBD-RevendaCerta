@@ -27,58 +27,65 @@
 </head>
 <body>
 
-    <div class="acoes">
+<div class="acoes">
         <button type="button" data-imprimir="true">Imprimir / salvar em PDF</button>
-    </div>
+</div>
 
     {% if not venda.esta_fechada %}
-        <div class="cancelada">VENDA CANCELADA — este contrato não tem validade.</div>
+<div class="cancelada">VENDA CANCELADA — este contrato não tem validade.</div>
     {% endif %}
 
-    <h1>CONTRATO DE COMPRA E VENDA DE VEÍCULO</h1>
-    <p class="sub">Contrato nº {{ venda.pk }} · {{ venda.data|date:"d/m/Y" }}</p>
+<h1>CONTRATO DE COMPRA E VENDA DE VEÍCULO</h1>
+<p class="sub">Contrato nº {{ venda.pk }} · {{ venda.data|date:"d/m/Y" }}</p>
 
-    <h2>Vendedora</h2>
-    <p><strong>REVENDA CERTA</strong> — representada pelo vendedor
+<h2>Vendedora</h2>
+<p><strong>REVENDA CERTA</strong> — representada pelo vendedor
         {{ venda.vendedor.get_full_name|default:venda.vendedor.username }}.</p>
 
-    <h2>Comprador</h2>
+<h2>Comprador</h2>
     {% if cliente.tipo == "PJ" %}
-        <p><strong>Razão social:</strong> {{ cliente.razao_social }}</p>
-        <p><strong>CNPJ:</strong> {{ cliente.cnpj|cnpj }}</p>
-        <p><strong>Responsável:</strong> {{ cliente.responsavel }}</p>
+<p><strong>Razão social:</strong> {{ cliente.razao_social }}</p>
+<p><strong>CNPJ:</strong> {{ cliente.cnpj|cnpj }}</p>
+<p><strong>Responsável:</strong> {{ cliente.responsavel }}</p>
     {% else %}
-        <p><strong>Nome:</strong> {{ cliente.nome }}</p>
-        <p><strong>CPF:</strong> {{ cliente.cpf|cpf }}</p>
+<p><strong>Nome:</strong> {{ cliente.nome }}</p>
+<p><strong>CPF:</strong> {{ cliente.cpf|cpf }}</p>
     {% endif %}
     {% if cliente.logradouro %}
-        <p><strong>Endereço:</strong>
+<p><strong>Endereço:</strong>
             {{ cliente.logradouro }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}
             {% if cliente.bairro %} — {{ cliente.bairro }}{% endif %}
             {% if cliente.cidade %} — {{ cliente.cidade }}{% if cliente.estado %}/{{ cliente.estado }}{% endif %}{% endif %}
-        </p>
+</p>
     {% endif %}
 
-    <h2>Veículo</h2>
-    <table>
-        <tr><th>Marca / Modelo</th><td>{{ veiculo.marca }} {{ veiculo.modelo }}</td>
-            <th>Cor</th><td>{{ veiculo.cor }}</td></tr>
-        <tr><th>Placa</th><td>{{ veiculo.placa }}</td>
-            <th>Ano</th><td>{{ veiculo.ano_fabricacao|stringformat:"d" }}/{{ veiculo.ano_modelo|stringformat:"d" }}</td></tr>
-        <tr><th>Chassi</th><td>{{ veiculo.chassi }}</td>
-            <th>Renavam</th><td>{{ veiculo.renavam }}</td></tr>
-        <tr><th>Combustível</th><td>{{ veiculo.combustivel }}</td>
-            <th>Quilometragem</th><td>{{ veiculo.quilometragem }} km</td></tr>
-    </table>
+<h2>Veículo</h2>
+<table>
+    <tr><th>Marca / Modelo</th><td>{{ veiculo.marca }} {{ veiculo.modelo }}</td>
+            <th>Cor</th><td>{{ veiculo.cor }}</td>
+    </tr>
+    <tr><th>Placa</th><td>{{ veiculo.placa }}</td>
+            <th>Ano</th><td>{{ veiculo.ano_fabricacao|stringformat:"d" }}/{{ veiculo.ano_modelo|stringformat:"d" }}</td>
+    </tr>
+    <tr><th>Chassi</th><td>{{ veiculo.chassi }}</td>
+            <th>Renavam</th><td>{{ veiculo.renavam }}</td>
+    </tr>
+    <tr><th>Combustível</th><td>{{ veiculo.combustivel }}</td>
+            <th>Quilometragem</th><td>{{ veiculo.quilometragem }} km</td>
+    </tr>
+</table>
 
-    <h2>Valor e forma de pagamento</h2>
-    <p><strong>Valor da venda:</strong> R$ {{ venda.valor_venda|floatformat:2 }}</p>
+<h2>Valor e forma de pagamento</h2>
+<p><strong>Valor da venda:</strong> R$ {{ venda.valor_venda|floatformat:2 }}</p>
 
-    <table>
-        <thead><tr><th>Forma</th><th>Detalhes</th><th>Valor</th></tr></thead>
-        <tbody>
+<table>
+    <thead>
+        <tr><th>Forma</th><th>Detalhes</th><th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
             {% for pagamento in pagamentos %}
-            <tr>
+        <tr>
                 <td>{{ pagamento.get_tipo_display }}</td>
                 <td>
                     {% if pagamento.tipo == "ENTRADA" and pagamento.data_pagamento %}
@@ -91,15 +98,15 @@
                     {% else %}—{% endif %}
                 </td>
                 <td>R$ {{ pagamento.valor|floatformat:2 }}</td>
-            </tr>
+        </tr>
             {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <div class="assinaturas">
-        <div class="assinatura">REVENDA CERTA<br>Vendedora</div>
-        <div class="assinatura">{{ cliente.nome_exibicao }}<br>Comprador</div>
-    </div>
+<div class="assinaturas">
+    <div class="assinatura">REVENDA CERTA<br>Vendedora</div>
+    <div class="assinatura">{{ cliente.nome_exibicao }}<br>Comprador</div>
+</div>
 
 <script src="{% static 'core/js/acoes_comuns.js' %}"></script>
 </body>

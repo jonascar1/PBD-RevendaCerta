@@ -9,38 +9,36 @@
 {% endblock extra_css %}
 
 {% block content %}
-<!-- CABEÇALHO -->
-            <header class="topbar">
-                <div>
-                    <h1>Vendedores</h1>
-                    <p>Gerencie os vendedores da revenda.</p>
-                </div>
+<header class="topbar">
+    <div>
+        <h1>Vendedores</h1>
+        <p>Gerencie os vendedores da revenda.</p>
+    </div>
 
                 <a href="{% url 'cadastrar_vendedor' %}" class="add-button">
                     <i data-lucide="user-plus"></i>
                     Cadastrar vendedor
                 </a>
-            </header>
+</header>
 
             {% if messages %}
-                    <div class="messages">
+<div class="messages">
                         {% for message in messages %}
-                            <div class="message message-success">
+    <div class="message message-success">
                                 {{ message }}
-                            </div>
+    </div>
                         {% endfor %}
-                    </div>
+</div>
                 {% endif %}
 
-            
 
 
-            <!-- SEÇÃO -->
-            <section class="section">
 
-                <div class="card vendedores-card">
+<section class="section">
 
-                    <div class="section-header vendedores-header">
+    <div class="card vendedores-card">
+
+        <div class="section-header vendedores-header">
                         <span class="contador-vendedores">
                             {{ vendedores|length }}
                             {% if vendedores|length == 1 %}
@@ -49,10 +47,10 @@
                                 vendedores encontrados
                             {% endif %}
                         </span>
-                    </div>
+        </div>
 
-                <form method="GET" class="barra-pesquisa-vendedores">
-                    <div class="campo-pesquisa-vendedores">
+        <form method="GET" class="barra-pesquisa-vendedores">
+            <div class="campo-pesquisa-vendedores">
                         <i data-lucide="search"></i>
                         <input
                             type="search"
@@ -60,17 +58,17 @@
                             placeholder="Pesquisar por nome, usuário ou e-mail..."
                             value="{{ busca }}"
                         >
-                    </div>
+            </div>
 
-                    <select name="status">
-                        <option value="">Todos os status</option>
-                        <option value="ativo" {% if status_selecionado == "ativo" %}selected{% endif %}>
+            <select name="status">
+                <option value="">Todos os status</option>
+                <option value="ativo" {% if status_selecionado == "ativo" %}selected{% endif %}>
                             Ativos
-                        </option>
-                        <option value="inativo" {% if status_selecionado == "inativo" %}selected{% endif %}>
+                </option>
+                <option value="inativo" {% if status_selecionado == "inativo" %}selected{% endif %}>
                             Inativos
-                        </option>
-                    </select>
+                </option>
+            </select>
 
                     <button type="submit" class="btn-pesquisar-vendedores">
                         Pesquisar
@@ -81,16 +79,15 @@
                             Limpar
                         </a>
                     {% endif %}
-                </form>
+        </form>
 
-                <!-- TABELA -->
-                <div class="table-container">
+        <div class="table-container">
 
-                    <table class="vendedores-tabela">
+            <table class="vendedores-tabela">
 
-                        <thead>
+                <thead>
 
-                            <tr>
+                    <tr>
 
                                 <th>
                                     Nome
@@ -100,7 +97,7 @@
                                     Usuário
                                 </th>
 
-                                
+
 
                                 <th>
                                     Comissão
@@ -114,40 +111,38 @@
                                     Ação
                                 </th>
 
-                            </tr>
+                    </tr>
 
-                        </thead>
+                </thead>
 
 
-                        <tbody>
+                <tbody>
 
                             {% for v in vendedores %}
 
-                            <tr>
+                    <tr>
 
-                                <!-- NOME -->
                                 <td>
 
-                                    <div class="seller">
+                        <div class="seller">
 
-                                        <div class="seller-icon">
+                            <div class="seller-icon">
                                             {{ v.usuario.first_name|first|upper }}
-                                        </div>
+                            </div>
 
-                                        <div>
+                            <div>
 
                                             <strong>
                                                 {{ v.usuario.get_full_name|default:v.usuario.username }}
                                             </strong>
 
-                                        </div>
+                            </div>
 
-                                    </div>
+                        </div>
 
                                 </td>
 
 
-                                <!-- USUÁRIO -->
                                 <td>
 
                                     <span class="seller-username">
@@ -157,7 +152,6 @@
                                 </td>
 
 
-                                <!-- COMISSÃO -->
                                 <td>
 
                                     <span class="percentage">
@@ -167,7 +161,6 @@
                                 </td>
 
 
-                                <!-- STATUS -->
                                 <td>
 
                                     {% if v.usuario.ativo %}
@@ -187,7 +180,6 @@
                                 </td>
 
 
-                                <!-- AÇÃO -->
                                 <td>
 
                                     <a
@@ -199,11 +191,11 @@
 
                                 </td>
 
-                            </tr>
+                    </tr>
 
                             {% empty %}
 
-                            <tr>
+                    <tr>
 
                                 <td
                                     colspan="5"
@@ -212,15 +204,15 @@
                                     Nenhum vendedor cadastrado.
                                 </td>
 
-                            </tr>
+                    </tr>
 
                             {% endfor %}
 
-                        </tbody>
+                </tbody>
 
-                    </table>
+            </table>
 
-                </div>
+        </div>
 
-            </section>
+    </section>
 {% endblock content %}

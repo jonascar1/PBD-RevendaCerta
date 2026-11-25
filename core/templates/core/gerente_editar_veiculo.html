@@ -60,7 +60,6 @@ Editar veículo | REVENDA CERTA
     {{ form.non_field_errors }}
 
 
-    <!-- DADOS DO VEÍCULO -->
 
     <section class="card">
 
@@ -242,7 +241,6 @@ Editar veículo | REVENDA CERTA
     </section>
 
 
-    <!-- ORIGEM -->
 
     <section class="card">
 
@@ -282,7 +280,7 @@ Editar veículo | REVENDA CERTA
                         disabled
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Comprado de terceiro
@@ -292,7 +290,7 @@ Editar veículo | REVENDA CERTA
                             Veículo adquirido de um terceiro.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -307,7 +305,7 @@ Editar veículo | REVENDA CERTA
                         disabled
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Recebido em troca
@@ -317,7 +315,7 @@ Editar veículo | REVENDA CERTA
                             Veículo recebido em uma negociação.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -332,7 +330,7 @@ Editar veículo | REVENDA CERTA
                         disabled
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Consignado
@@ -342,7 +340,7 @@ Editar veículo | REVENDA CERTA
                             Veículo recebido para venda em consignação.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -384,10 +382,11 @@ Editar veículo | REVENDA CERTA
     <small class="descricao">
         Preço pelo qual o veículo será anunciado para venda.
     </small>
-</div>
+                </div>
 
                 <div class="campo"><label for="{{ form.tipo_alcada.id_for_label }}">Tipo de alçada do veículo</label>{{ form.tipo_alcada }}{{ form.tipo_alcada.errors }}</div>
-                <div class="campo"><label for="{{ form.valor_alcada.id_for_label }}">Limite de desconto</label>{{ form.valor_alcada }}{{ form.valor_alcada.errors }}<small class="descricao">Em reais ou percentual, conforme o tipo selecionado. Zero exige aprovação para qualquer desconto.</small></div>
+                <div class="campo"><label for="{{ form.valor_alcada.id_for_label }}">Limite de desconto</label>{{ form.valor_alcada }}{{ form.valor_alcada.errors }}<small class="descricao">Em reais ou percentual, conforme o tipo selecionado. Zero exige aprovação para qualquer desconto.</small>
+                </div>
                 <small class="descricao" id="descricao-custo">
                     Obrigatório para veículo comprado ou recebido em troca.
                 </small>
@@ -492,22 +491,22 @@ Editar veículo | REVENDA CERTA
             <div
                 id="preview-fotos"
                 class="preview-fotos"
-            ></div>
+            >
+        </div>
 
             {{ form.fotos.errors }}
 
-            <div class="aviso-fotos">
+        <div class="aviso-fotos">
                 <i data-lucide="info"></i><span>Arraste para reordenar ou clique em “Definir principal”. Se a principal for excluída, a primeira foto restante será usada.</span>
-            </div>
-
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- BOTÕES -->
 
-    <div class="acoes">
+<div class="acoes">
 
         <a
             href="{% url 'veiculos' %}"
@@ -523,7 +522,7 @@ Editar veículo | REVENDA CERTA
             Salvar alterações
         </button>
 
-    </div>
+</div>
 
 
 </form>

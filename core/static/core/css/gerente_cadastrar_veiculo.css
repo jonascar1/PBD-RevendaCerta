@@ -533,7 +533,6 @@
     .form-grid {
         grid-template-columns: 1fr;
     }
-
     .fotos-preview {
         grid-template-columns: 1fr 1fr;
     }
@@ -545,19 +544,15 @@
         flex-direction: column;
         gap: 15px;
     }
-
     .card {
         padding: 20px;
     }
-
     .fotos-preview {
         grid-template-columns: 1fr;
     }
-
     .acoes {
         justify-content: stretch;
     }
-
     .btn-voltar,
     .btn-salvar {
         flex: 1;

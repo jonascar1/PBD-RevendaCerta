@@ -359,21 +359,17 @@
     .clientes-cabecalho h1 {
         font-size: 24px;
     }
-
     .clientes-busca {
         flex-wrap: wrap;
         padding: 12px;
     }
-
     .campo-busca-cliente {
         flex-basis: 100%;
     }
-
     .btn-pesquisar-cliente,
     .btn-limpar-busca {
         flex: 1;
     }
-
     .clientes-tabela th,
     .clientes-tabela td {
         padding: 12px;
@@ -384,7 +380,6 @@
     .clientes-cabecalho {
         flex-direction: column;
     }
-
     .btn-cadastrar-cliente {
         width: 100%;
         box-sizing: border-box;

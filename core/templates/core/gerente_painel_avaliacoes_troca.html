@@ -11,7 +11,6 @@
 
 {% block content %}
 
-<!-- CABEÇALHO -->
 <header class="topbar">
     <div>
         <h1>Avaliações de troca</h1>
@@ -34,7 +33,6 @@
 </div>
 {% endif %}
 
-<!-- LISTAGEM -->
 <section class="section">
     <div class="card avaliacoes-card">
 
@@ -49,7 +47,6 @@
             </span>
         </div>
 
-        <!-- PESQUISA -->
         <form method="GET" class="barra-pesquisa-avaliacoes">
             <div class="campo-pesquisa-avaliacoes">
                 <i data-lucide="search"></i>
@@ -73,7 +70,6 @@
             {% endif %}
         </form>
 
-        <!-- TABELA -->
         <div class="table-container">
             <table class="avaliacoes-tabela">
                 <thead>
@@ -92,8 +88,8 @@
                     {% for avaliacao in avaliacoes %}
                     <tr>
                         <td>
-                            <div class="veiculo-info">
-                                <div class="veiculo-icon">
+                        <div class="veiculo-info">
+                            <div class="veiculo-icon">
                                     {% with foto_principal=avaliacao.fotos.all|first %}
                                         {% if foto_principal %}
                                             <img
@@ -101,23 +97,23 @@
                                                 alt="Foto de {{ avaliacao.marca }} {{ avaliacao.modelo }}"
                                                 class="foto-veiculo-troca"
                                             >
-                                        {% else %}  
-                                            <div class="icone-veiculo-troca">
+                                        {% else %}
+                                <div class="icone-veiculo-troca">
                                                 <i data-lucide="car-front"></i>
-                                            </div>
+                                </div>
                                         {% endif %}
                                     {% endwith %}
-                                </div>
+                            </div>
 
-                                <div class="veiculo-texto">
+                            <div class="veiculo-texto">
                                     <strong>
                                         {{ avaliacao.marca }} {{ avaliacao.modelo }}
                                     </strong>
                                     <small>
                                         {{ avaliacao.ano_fabricacao | unlocalize }}/{{ avaliacao.ano_modelo | unlocalize }}
                                     </small>
-                                </div>
                             </div>
+                        </div>
                         </td>
 
                         <td>

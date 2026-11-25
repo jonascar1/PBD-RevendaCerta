@@ -13,190 +13,186 @@
 
     {% block content %}
 
-    <header class="topo">
-        <div>
-            <h1>Editar avaliação de troca</h1>
-            <p>Atualize as informações e as condições do veículo avaliado.</p>
-        </div>
-    </header>
+<header class="topo">
+    <div>
+        <h1>Editar avaliação de troca</h1>
+        <p>Atualize as informações e as condições do veículo avaliado.</p>
+    </div>
+</header>
 
     {% if messages %}
-    <div class="messages">
+<div class="messages">
         {% for message in messages %}
-        <div class="message message-{{ message.tags }}">
+    <div class="message message-{{ message.tags }}">
             {{ message }}
-        </div>
-        {% endfor %}
     </div>
+        {% endfor %}
+</div>
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" novalidate>
+<form method="POST" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         {{ form.non_field_errors }}
 
-        <!-- IDENTIFICAÇÃO DO VEÍCULO -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Dados do veículo</h2>
-                <p>Confira ou atualize os dados do veículo recebido em troca.</p>
-            </div>
+    <section class="card">
+        <div class="card-header">
+            <h2>Dados do veículo</h2>
+            <p>Confira ou atualize os dados do veículo recebido em troca.</p>
+        </div>
 
-            <div class="form-grid">
-                <div class="campo">
+        <div class="form-grid">
+            <div class="campo">
                     <label for="placa">Placa</label>
                     {{ form.placa }}
                     {{ form.placa.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="chassi">Chassi</label>
                     {{ form.chassi }}
                     {{ form.chassi.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="renavam">Renavam</label>
                     {{ form.renavam }}
                     {{ form.renavam.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="marca">Marca</label>
                     {{ form.marca }}
                     {{ form.marca.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="modelo">Modelo</label>
                     {{ form.modelo }}
                     {{ form.modelo.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="ano_fabricacao">Ano de fabricação</label>
                     {{ form.ano_fabricacao | unlocalize }}
                     {{ form.ano_fabricacao.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="ano_modelo">Ano do modelo</label>
                     {{ form.ano_modelo | unlocalize }}
                     {{ form.ano_modelo.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="cor">Cor</label>
                     {{ form.cor }}
                     {{ form.cor.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="combustivel">Combustível</label>
                     {{ form.combustivel }}
                     {{ form.combustivel.errors }}
-                </div>
-
-                <div class="campo">
-                    <label for="quilometragem">Quilometragem</label>
-                    <div class="input-unidade">
-                        {{ form.quilometragem }}
-                        <span>km</span>
-                    </div>
-                    {{ form.quilometragem.errors }}
-                </div>
             </div>
 
-            <div class="campo-opcionais" >
+            <div class="campo">
+                    <label for="quilometragem">Quilometragem</label>
+                <div class="input-unidade">
+                        {{ form.quilometragem }}
+                        <span>km</span>
+                </div>
+                    {{ form.quilometragem.errors }}
+            </div>
+        </div>
+
+        <div class="campo-opcionais" >
                 <label for="{{ form.opcionais.id_for_label }}">Opcionais</label>
                 <small>Informe os principais opcionais do veículo.</small>
                 {{ form.opcionais }}
                 {{ form.opcionais.errors }}
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- CONDIÇÕES DO VEÍCULO -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Condições e documentação</h2>
-                <p>Atualize o estado geral e as pendências identificadas.</p>
-            </div>
+    <section class="card">
+        <div class="card-header">
+            <h2>Condições e documentação</h2>
+            <p>Atualize o estado geral e as pendências identificadas.</p>
+        </div>
 
-            <div class="form-grid">
-                <div class="campo">
+        <div class="form-grid">
+            <div class="campo">
                     <label for="estado_geral">Estado geral</label>
                     {{ form.estado_geral }}
                     {{ form.estado_geral.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="possui_debitos">Possui débitos?</label>
                     {{ form.possui_debitos }}
                     {{ form.possui_debitos.errors }}
-                </div>
+            </div>
 
-                <div class="campo">
+            <div class="campo">
                     <label for="possui_pendencias_documentacao">
                         Possui pendências na documentação?
                     </label>
                     {{ form.possui_pendencias_documentacao }}
                     {{ form.possui_pendencias_documentacao.errors }}
-                </div>
             </div>
+        </div>
 
-            <div class="campo">
+        <div class="campo">
                 <label for="descricao_debitos">Descrição dos débitos</label>
                 {{ form.descricao_debitos }}
                 {{ form.descricao_debitos.errors }}
-            </div>
+        </div>
 
-            <div class="campo">
+        <div class="campo">
                 <label for="descricao_pendencias">
                     Pendências na documentação
                 </label>
                 {{ form.descricao_pendencias }}
                 {{ form.descricao_pendencias.errors }}
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- AVALIAÇÃO FINANCEIRA -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Valor da avaliação</h2>
-                <p>Atualize o valor atribuído ao veículo recebido em troca.</p>
-            </div>
+    <section class="card">
+        <div class="card-header">
+            <h2>Valor da avaliação</h2>
+            <p>Atualize o valor atribuído ao veículo recebido em troca.</p>
+        </div>
 
-            <div class="campo">
+        <div class="campo">
                 <label for="valor_avaliado">Valor avaliado</label>
-                <div class="input-moeda">
+            <div class="input-moeda">
                     <span>R$</span>
                     {{ form.valor_avaliado }}
-                </div>
-                {{ form.valor_avaliado.errors }}
             </div>
+                {{ form.valor_avaliado.errors }}
+        </div>
 
-            <div class="campo">
+        <div class="campo">
                 <label for="observacoes">Observações da avaliação</label>
                 {{ form.observacoes }}
                 {{ form.observacoes.errors }}
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- FOTOS DO VEÍCULO -->
-        <section class="card">
-            <div class="card-header">
-                <h2>Fotos do veículo</h2>
-                <p>Consulte as fotos cadastradas e selecione novas imagens.</p>
-            </div>
+    <section class="card">
+        <div class="card-header">
+            <h2>Fotos do veículo</h2>
+            <p>Consulte as fotos cadastradas e selecione novas imagens.</p>
+        </div>
 
-            <div class="campo fotos-campo">
+        <div class="campo fotos-campo">
 
                 {% if avaliacao.fotos.all %}
-                <div class="fotos-existentes">
-                    <h3>Fotos cadastradas</h3>
+            <div class="fotos-existentes">
+                <h3>Fotos cadastradas</h3>
 
-                    <div class="preview-fotos">
+                <div class="preview-fotos">
                         {% for foto in avaliacao.fotos.all %}
-                        <div
+                    <div
                             class="foto-preview foto-existente"
                             data-foto-id="{{ foto.id }}"
                             draggable="true"
@@ -218,9 +214,9 @@
                             >
                                 &times;
                             </button>
-                        </div>
+                </div>
                         {% endfor %}
-                    </div>
+            </div>
 
                     <input
                         type="hidden"
@@ -229,10 +225,10 @@
                         value=""
                     >
 
-                    <p class="descricao-fotos">
+            <p class="descricao-fotos">
                         Estas fotos já estão salvas na avaliação.
-                    </p>
-                </div>
+            </p>
+        </div>
                 {% endif %}
 
                 <label>Adicionar novas fotos</label>
@@ -241,14 +237,14 @@
                     Selecione imagens adicionais para documentar o veículo.
                 </span>
 
-                <div class="upload-area" id="area-upload">
-                    <div class="upload-icon">
+        <div class="upload-area" id="area-upload">
+            <div class="upload-icon">
                         <i data-lucide="image"></i>
-                    </div>
+            </div>
 
                     <strong>Adicione fotos do veículo</strong>
 
-                    <p>Selecione uma ou várias imagens para enviar.</p>
+            <p>Selecione uma ou várias imagens para enviar.</p>
 
                     <label for="fotos" class="btn-selecionar">
                         Selecionar fotos
@@ -264,21 +260,22 @@
                     >
 
                     <small>JPG, PNG ou WEBP — máximo de 5 MB por foto</small>
-                </div>
+        </div>
 
                 {{ form.fotos.errors }}
 
-                <div id="preview-fotos" class="preview-fotos"></div>
+        <div id="preview-fotos" class="preview-fotos">
+        </div>
 
-                <div class="aviso-fotos">
+        <div class="aviso-fotos">
                     <i data-lucide="info"></i>
                     <span>
                         Arraste as novas fotos para alterar a ordem antes de salvar.
                         As fotos já cadastradas permanecem na avaliação.
                     </span>
-                </div>
-            </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <input
             type="hidden"
@@ -287,8 +284,7 @@
             value=""
         >
 
-        <!-- AÇÕES -->
-        <div class="acoes">
+<div class="acoes">
             <a href="{% url 'avaliacoes_troca' %}" class="btn-voltar">
                 Cancelar
             </a>
@@ -296,8 +292,8 @@
             <button type="submit" class="btn-salvar">
                 Salvar alterações
             </button>
-        </div>
-    </form>
+</div>
+</form>
 
     {% endblock content %}
 

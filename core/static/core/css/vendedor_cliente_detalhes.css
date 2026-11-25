@@ -230,18 +230,15 @@
         align-items: flex-start;
         gap: 16px;
     }
-
     .topo-acoes {
         width: 100%;
         flex-wrap: wrap;
     }
-
     .topo-acoes .btn-voltar,
     .topo-acoes .btn-editar {
         min-height: 44px;
         justify-content: center;
     }
-
     .card-cabecalho {
         flex-wrap: wrap;
         gap: 10px;
@@ -252,11 +249,9 @@
     .info-grid {
         grid-template-columns: minmax(0, 1fr);
     }
-
     .topo-acoes {
         flex-direction: column;
     }
-
     .topo-acoes .btn-voltar,
     .topo-acoes .btn-editar {
         width: 100%;

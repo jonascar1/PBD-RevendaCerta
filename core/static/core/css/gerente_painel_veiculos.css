@@ -445,11 +445,9 @@ td {
     .barra-pesquisa-veiculos {
         flex-wrap: wrap;
     }
-
     .barra-pesquisa-veiculos .campo-pesquisa {
         flex-basis: 100%;
     }
-
     .barra-pesquisa-veiculos select {
         flex: 1;
         min-width: 140px;
@@ -462,7 +460,6 @@ td {
         flex-direction: column;
         gap: 15px;
     }
-
     .card-header {
         align-items: flex-start;
         gap: 12px;
@@ -475,7 +472,6 @@ td {
         flex-wrap: wrap;
         padding: 12px;
     }
-
     .campo-pesquisa {
         flex-basis: 100%;
     }
@@ -496,7 +492,6 @@ td {
     .acoes {
         align-items: stretch;
     }
-
     .acoes .btn-ver {
         flex: 1 1 110px;
     }

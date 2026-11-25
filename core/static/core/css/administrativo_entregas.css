@@ -1,1 +1,30 @@
-.rc-entregas .ra-card{margin-bottom:20px}.rc-entregas .rc-entrega-btn{background:#2563eb;color:white;padding:10px 16px;border-radius:12px;white-space:nowrap}.rc-entregas .ra-item{flex-wrap:wrap}.rc-entregas .ra-item>div{flex:1;min-width:180px}@media(max-width:600px){.rc-entregas .ra-card{padding:16px}.rc-entregas .rc-entrega-btn{width:100%;text-align:center}}
+.rc-entregas .ra-card {
+    margin-bottom: 20px;
+}
+
+.rc-entregas .rc-entrega-btn {
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.rc-entregas .ra-item {
+    flex-wrap: wrap;
+}
+
+.rc-entregas .ra-item>div {
+    flex: 1;
+    min-width: 180px;
+}
+
+@media(max-width:600px) {
+    .rc-entregas .ra-card {
+        padding: 16px;
+    }
+    .rc-entregas .rc-entrega-btn {
+        width: 100%;
+        text-align: center;
+    }
+}

@@ -353,11 +353,9 @@ td {
         flex-wrap: wrap;
         padding: 12px;
     }
-
     .campo-pesquisa-vendedores {
         flex-basis: 100%;
     }
-
     .barra-pesquisa-vendedores select {
         flex: 1;
     }

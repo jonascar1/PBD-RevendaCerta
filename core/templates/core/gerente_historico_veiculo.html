@@ -54,18 +54,18 @@
 
     <ol class="hist-linha">
         {% for evento in eventos %}
-            <li class="hist-evento hist-{{ evento.categoria }}">
-                <div class="hist-data">
+        <li class="hist-evento hist-{{ evento.categoria }}">
+            <div class="hist-data">
                     <strong>{{ evento.data|date:"d/m/Y" }}</strong>
                     <small>{{ evento.data|date:"H:i" }}</small>
-                </div>
+            </div>
 
-                <div class="hist-corpo">
+            <div class="hist-corpo">
                     <span class="hist-categoria">{{ evento.categoria_rotulo }}</span>
                     <strong class="hist-titulo">{{ evento.titulo }}</strong>
 
                     {% if evento.detalhe %}
-                        <p class="hist-detalhe">{{ evento.detalhe }}</p>
+                <p class="hist-detalhe">{{ evento.detalhe }}</p>
                     {% endif %}
 
                     <small class="hist-autor">
@@ -77,10 +77,10 @@
                             · <a href="{% url 'detalhes_venda' evento.venda_id %}">ver venda</a>
                         {% endif %}
                     </small>
-                </div>
-            </li>
+            </div>
+        </li>
         {% empty %}
-            <li class="hist-vazio">Nenhum evento registrado para este veículo.</li>
+        <li class="hist-vazio">Nenhum evento registrado para este veículo.</li>
         {% endfor %}
     </ol>
 </section>

@@ -27,7 +27,7 @@ Despesas excluídas | REVENDA CERTA
             </p>
         </div>
 
-         
+
 
         <a
             href="{% url 'despesas_veiculo' veiculo.id %}"
@@ -35,21 +35,21 @@ Despesas excluídas | REVENDA CERTA
                 Voltar para despesas
         </a>
 
-        
+
 
     </div>
 
-   
+
 
     {% if despesas %}
 
-        <div class="excluidas-lista">
+    <div class="excluidas-lista">
 
             {% for despesa in despesas %}
 
-                <div class="excluida-item">
+        <div class="excluida-item">
 
-                    <div class="excluida-info">
+            <div class="excluida-info">
 
                         <strong>
                             {{ despesa.descricao|default:"Despesa sem descrição" }}
@@ -72,36 +72,36 @@ Despesas excluídas | REVENDA CERTA
                             </span>
                         {% endif %}
 
-                    </div>
+            </div>
 
-                    <div class="excluida-valor">
+            <div class="excluida-valor">
                         R$ {{ despesa.valor|floatformat:2 }}
-                    </div>
+            </div>
 
-                </div>
+        </div>
 
             {% endfor %}
 
-        </div>
+    </div>
 
     {% else %}
 
-        <div class="excluidas-vazio">
+    <div class="excluidas-vazio">
 
             <strong>Nenhuma despesa excluída</strong>
 
-            <p>
+        <p>
                 Este veículo ainda não possui despesas excluídas.
-            </p>
+        </p>
 
-        </div>
+    </div>
 
     {% endif %}
 
-   
+
 
 </div>
 
- 
+
 
 {% endblock %}

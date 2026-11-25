@@ -281,12 +281,10 @@
     .neg-resumo {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .neg-section-header {
         align-items: stretch;
         flex-direction: column;
     }
-
     .neg-filter {
         width: 100%;
     }

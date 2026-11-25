@@ -88,34 +88,34 @@ Veículos | REVENDA CERTA
             <option value="">Todas as situações</option>
 
             {% for valor, texto in situacoes %}
-                <option value="{{ valor }}"
+            <option value="{{ valor }}"
                     {% if situacao_selecionada == valor %}selected{% endif %}>
                     {{ texto }}
-                </option>
+        </option>
             {% endfor %}
-        </select>
+    </select>
 
-        <select name="origem">
-            <option value="">Todas as origens</option>
+    <select name="origem">
+        <option value="">Todas as origens</option>
 
             {% for valor, texto in origens %}
-                <option value="{{ valor }}"
+        <option value="{{ valor }}"
                     {% if origem_selecionada == valor %}selected{% endif %}>
                     {{ texto }}
-                </option>
+    </option>
             {% endfor %}
-        </select>
+</select>
 
-        <select name="ano_fabricacao">
-            <option value="">Todos os anos</option>
+<select name="ano_fabricacao">
+    <option value="">Todos os anos</option>
 
             {% for ano in anos %}
-                <option value="{{ ano|unlocalize }}"
+    <option value="{{ ano|unlocalize }}"
                     {% if ano_fabricacao_selecionado == ano|stringformat:"s" %}selected{% endif %}>
                     {{ ano|unlocalize }}
-                </option>
+</option>
             {% endfor %}
-        </select>
+</select>
 
         <button type="submit" class="btn-pesquisar">
             Pesquisar
@@ -129,37 +129,37 @@ Veículos | REVENDA CERTA
                 Limpar
             </a>
         {% endif %}
-    </form>
+</form>
 
-    <div class="table-container">
+<div class="table-container">
 
-        <table>
+    <table>
 
-            <thead>
+        <thead>
 
-                <tr>
+            <tr>
                     <th>Veículo</th>
                     <th>Placa</th>
                     <th>Ano</th>
                     <th>Origem</th>
                     <th>Status</th>
                     <th>Ação</th>
-                </tr>
+            </tr>
 
-            </thead>
+        </thead>
 
 
-            <tbody>
+        <tbody>
 
                 {% for v in veiculos %}
 
-                <tr>
+            <tr>
 
                     <td>
 
-                        <div class="veiculo">
+                <div class="veiculo">
 
-                            <div class="veiculo-icon">
+                    <div class="veiculo-icon">
                                 {% for foto in v.fotos.all %}
                                     {% if foto.principal %}
                                         <img src="{{ foto.imagem.url }}" alt="{{ v.marca }} {{ v.modelo }}">
@@ -167,9 +167,9 @@ Veículos | REVENDA CERTA
                                 {% empty %}
                                     <i data-lucide="image-off"></i>
                                 {% endfor %}
-                            </div>
+                    </div>
 
-                            <div>
+                    <div>
 
                                 <strong>
                                     {{ v.marca }} {{ v.modelo }}
@@ -179,9 +179,9 @@ Veículos | REVENDA CERTA
                                     {{ v.cor }} · {{ v.combustivel }}
                                 </small>
 
-                            </div>
+                    </div>
 
-                        </div>
+                </div>
 
                     </td>
 
@@ -248,7 +248,7 @@ Veículos | REVENDA CERTA
 
                     <td>
 
-                        <div class="acoes">
+                <div class="acoes">
                             <a
                                 href="{% url 'detalhes_veiculo' v.id %}"
                                 class="btn-ver"
@@ -262,35 +262,35 @@ Veículos | REVENDA CERTA
                             >
                                 Editar
                             </a>
-                        </div>
+                </div>
 
                     </td>
 
-                </tr>
+            </tr>
 
 
                 {% empty %}
 
-                <tr>
+            <tr>
 
                     <td
                         colspan="6"
                         class="empty"
                     >
 
-                        <div class="empty-content">
+                <div class="empty-content">
 
-                            <div class="empty-icon">
+                    <div class="empty-icon">
                                 <i data-lucide="car-front"></i>
-                            </div>
+                    </div>
 
                             <strong>
                                 Nenhum veículo cadastrado
                             </strong>
 
-                            <p>
+                    <p>
                                 Cadastre um veículo para começar a montar seu estoque.
-                            </p>
+                    </p>
 
                             <a
                                 href="{% url 'cadastrar_veiculo' %}"
@@ -299,19 +299,19 @@ Veículos | REVENDA CERTA
                                 Cadastrar veículo
                             </a>
 
-                        </div>
+                </div>
 
                     </td>
 
-                </tr>
+            </tr>
 
                 {% endfor %}
 
-            </tbody>
+        </tbody>
 
-        </table>
+    </table>
 
-    </div>
+</div>
 
 </section>
 

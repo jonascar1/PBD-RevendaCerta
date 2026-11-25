@@ -27,7 +27,6 @@
 
 <section class="veiculo-container">
 
-    <!-- GALERIA -->
     <div class="galeria">
         <div class="foto-principal-container">
             {% if fotos %}
@@ -35,28 +34,27 @@
                      src="{{ fotos.0.imagem.url }}"
                      alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}">
             {% else %}
-                <div class="sem-foto">
+            <div class="sem-foto">
                     <i data-lucide="image-off"></i>
-                    <p>Nenhuma foto cadastrada</p>
-                </div>
+                <p>Nenhuma foto cadastrada</p>
+            </div>
             {% endif %}
         </div>
 
         {% if fotos %}
-            <div class="miniaturas">
+        <div class="miniaturas">
                 {% for foto in fotos %}
                     <button type="button"
                             class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url|escape }}">
                         <img src="{{ foto.imagem.url }}" alt="Foto {{ forloop.counter }}">
                     </button>
                 {% endfor %}
-            </div>
+        </div>
         {% endif %}
     </div>
 
     <div class="informacoes">
 
-        <!-- SITUAÇÃO E PREÇO -->
         <div class="card-info">
             <div class="card-cabecalho">
                 <h3>Situação e preço</h3>
@@ -90,18 +88,17 @@
             </div>
         </div>
 
-        <!-- FILA DE PROPOSTAS -->
         <div class="card-info">
             <div class="card-cabecalho">
                 <h3>Fila de propostas</h3>
             </div>
 
             {% for proposta in fila %}
-                <div class="fila-item">
+            <div class="fila-item">
                     <strong>{{ forloop.counter }}º na fila</strong>
 
-                    <div>
-                        <p>{{ proposta.cliente.nome_exibicao }}</p>
+                <div>
+                    <p>{{ proposta.cliente.nome_exibicao }}</p>
 
                         <small>
                             {% if proposta.vendedor_id == request.user.id %}
@@ -110,16 +107,16 @@
                                 {{ proposta.vendedor.get_full_name|default:proposta.vendedor.username }}
                             {% endif %}
                         </small>
-                    </div>
+                </div>
 
                     <span>
                         {{ proposta.criada_em|date:"d/m/Y H:i" }}
                     </span>
-                </div>
+            </div>
             {% empty %}
-                <p class="sem-registros">
+            <p class="sem-registros">
                     Não há propostas aguardando.
-                </p>
+            </p>
             {% endfor %}
         </div>
         <div class="card-info">
@@ -128,32 +125,40 @@
             </div>
 
             {% for procura in procuras_compativeis %}
-                <div class="fila-item">
-                    <div>
-                        <p>{{ procura.cliente.nome_exibicao }}</p>
+            <div class="fila-item">
+                <div>
+                    <p>{{ procura.cliente.nome_exibicao }}</p>
                         <small>{{ procura.resumo }}</small>
-                    </div>
                 </div>
+            </div>
             {% empty %}
-                <p class="sem-registros">Nenhuma procura sua combina com este veículo.</p>
+            <p class="sem-registros">Nenhuma procura sua combina com este veículo.</p>
             {% endfor %}
         </div>
-        <!-- DADOS DO VEÍCULO -->
         <div class="card-info">
             <div class="card-cabecalho">
                 <h3>Informações do veículo</h3>
             </div>
 
             <div class="info-grid">
-                <div class="info-item"><span>Placa</span><strong>{{ veiculo.placa }}</strong></div>
-                <div class="info-item"><span>Chassi</span><strong>{{ veiculo.chassi }}</strong></div>
-                <div class="info-item"><span>Renavam</span><strong>{{ veiculo.renavam }}</strong></div>
-                <div class="info-item"><span>Marca</span><strong>{{ veiculo.marca }}</strong></div>
-                <div class="info-item"><span>Modelo</span><strong>{{ veiculo.modelo }}</strong></div>
-                <div class="info-item"><span>Ano de fabricação</span><strong>{{ veiculo.ano_fabricacao|unlocalize }}</strong></div>
-                <div class="info-item"><span>Ano do modelo</span><strong>{{ veiculo.ano_modelo|unlocalize }}</strong></div>
-                <div class="info-item"><span>Cor</span><strong>{{ veiculo.cor }}</strong></div>
-                <div class="info-item"><span>Combustível</span><strong>{{ veiculo.combustivel }}</strong></div>
+                <div class="info-item"><span>Placa</span><strong>{{ veiculo.placa }}</strong>
+                </div>
+                <div class="info-item"><span>Chassi</span><strong>{{ veiculo.chassi }}</strong>
+                </div>
+                <div class="info-item"><span>Renavam</span><strong>{{ veiculo.renavam }}</strong>
+                </div>
+                <div class="info-item"><span>Marca</span><strong>{{ veiculo.marca }}</strong>
+                </div>
+                <div class="info-item"><span>Modelo</span><strong>{{ veiculo.modelo }}</strong>
+                </div>
+                <div class="info-item"><span>Ano de fabricação</span><strong>{{ veiculo.ano_fabricacao|unlocalize }}</strong>
+                </div>
+                <div class="info-item"><span>Ano do modelo</span><strong>{{ veiculo.ano_modelo|unlocalize }}</strong>
+                </div>
+                <div class="info-item"><span>Cor</span><strong>{{ veiculo.cor }}</strong>
+                </div>
+                <div class="info-item"><span>Combustível</span><strong>{{ veiculo.combustivel }}</strong>
+                </div>
                 <div class="info-item">
                     <span>Tipo</span>
                     <strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong>
@@ -163,19 +168,19 @@
                     <span>Câmbio</span>
                     <strong>{{ veiculo.get_cambio_display|default:"Não informado" }}</strong>
                 </div>
-                <div class="info-item"><span>Quilometragem</span><strong>{{ veiculo.quilometragem }} km</strong></div>
+                <div class="info-item"><span>Quilometragem</span><strong>{{ veiculo.quilometragem }} km</strong>
+                </div>
             </div>
         </div>
 
-        <!-- OPCIONAIS -->
         <div class="card-info">
             <div class="card-cabecalho">
                 <h3>Opcionais</h3>
             </div>
             {% if veiculo.opcionais %}
-                <p class="opcionais">{{ veiculo.opcionais|linebreaksbr }}</p>
+            <p class="opcionais">{{ veiculo.opcionais|linebreaksbr }}</p>
             {% else %}
-                <p class="sem-registros">Nenhum opcional informado.</p>
+            <p class="sem-registros">Nenhum opcional informado.</p>
             {% endif %}
         </div>
 

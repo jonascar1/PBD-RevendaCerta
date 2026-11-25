@@ -857,7 +857,6 @@
     .detalhes-container {
         grid-template-columns: 1fr;
     }
-
     .foto-principal-container {
         height: 420px;
     }
@@ -868,40 +867,31 @@
         flex-direction: column;
         gap: 12px;
     }
-
     .topo-acoes {
         align-items: flex-start;
     }
-
     .titulo-veiculo {
         flex-direction: column;
     }
-
     .info-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .foto-principal-container {
         height: 300px;
     }
-
     .situacao-cabecalho {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .form-situacao .form-linha {
         flex-direction: column;
     }
-
     .btn-situacao {
         width: 100%;
     }
-
     .historico-reservas {
         padding: 16px;
     }
-
     .historico-reservas__dados {
         grid-template-columns: 1fr;
     }
@@ -911,21 +901,17 @@
     .info-grid {
         grid-template-columns: 1fr;
     }
-
     .foto-principal-container {
         height: 250px;
     }
-
     .galeria,
     .card-info,
     .titulo-veiculo {
         padding: 16px;
     }
-
     .acoes-situacao .form-situacao {
         padding: 14px;
     }
-
     .situacao-conteudo {
         padding: 16px;
     }
@@ -953,6 +939,7 @@ a.btn-preco svg {
 }
 
 /* Ações de gerenciamento junto à identificação do veículo. */
+
 .titulo-veiculo .acoes-identificacao {
     display: flex;
     flex-wrap: wrap;
@@ -960,6 +947,7 @@ a.btn-preco svg {
     align-items: center;
     gap: 8px;
 }
+
 .titulo-veiculo .acoes-identificacao .btn-preco,
 .titulo-veiculo .acoes-identificacao .btn-voltar {
     margin: 0;
@@ -968,11 +956,17 @@ a.btn-preco svg {
     gap: 6px;
     text-decoration: none;
 }
+
 .titulo-veiculo .acoes-identificacao svg {
     width: 15px;
     height: 15px;
 }
+
 @media (max-width: 1100px) {
-    .titulo-veiculo { flex-wrap: wrap; }
-    .titulo-veiculo .acoes-identificacao { justify-content: flex-start; }
+    .titulo-veiculo {
+        flex-wrap: wrap;
+    }
+    .titulo-veiculo .acoes-identificacao {
+        justify-content: flex-start;
+    }
 }

@@ -29,7 +29,7 @@
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
-        <div class="message message-{{ message.tags }}">{{ message }}</div>
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 </div>
 {% endif %}
@@ -42,13 +42,13 @@
 
             <div class="info-grid">
                 {% for etapa in etapas %}
-                    <div class="info-item">
+                <div class="info-item">
                         <span>{{ etapa.get_tipo_display }}</span>
                         <strong>{{ etapa.get_situacao_display }}</strong>
                         <small>desde {{ etapa.data|date:"d/m/Y" }}</small>
-                    </div>
+                </div>
                 {% empty %}
-                    <p class="sem-informacao">Esta venda não possui etapas de documentação.</p>
+                <p class="sem-informacao">Esta venda não possui etapas de documentação.</p>
                 {% endfor %}
             </div>
 
@@ -73,7 +73,7 @@
             </div>
 
             {% if entrega.observacoes %}
-                <p class="opcionais">{{ entrega.observacoes }}</p>
+            <p class="opcionais">{{ entrega.observacoes }}</p>
             {% endif %}
         </div>
 

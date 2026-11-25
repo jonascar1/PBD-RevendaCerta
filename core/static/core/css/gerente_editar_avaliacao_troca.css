@@ -529,25 +529,20 @@
     .topo h1 {
         font-size: 21px;
     }
-
     .card {
         padding: 20px;
     }
-
     .form-grid {
         grid-template-columns: 1fr;
         gap: 18px;
     }
-
     .campo:has(input[type="checkbox"]) {
         min-height: 32px;
     }
-
     .acoes {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .btn-voltar,
     .btn-salvar {
         width: 100%;
@@ -558,16 +553,13 @@
     .card {
         padding: 16px;
     }
-
     .upload-area {
         padding: 22px 14px;
     }
-
     .foto-preview {
         width: 130px;
         height: 95px;
     }
-
     .topo h1 {
         font-size: 19px;
     }

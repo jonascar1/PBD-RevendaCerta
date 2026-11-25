@@ -491,7 +491,6 @@
     .upload-area {
         padding: 22px 14px;
     }
-
     .foto-preview {
         width: 130px;
         height: 95px;
@@ -502,19 +501,15 @@
     .form-grid {
         grid-template-columns: 1fr;
     }
-
     .card {
         padding: 18px;
     }
-
     .topo h1 {
         font-size: 24px;
     }
-
     .acoes {
         flex-wrap: wrap;
     }
-
     .btn-voltar,
     .btn-salvar {
         flex: 1;

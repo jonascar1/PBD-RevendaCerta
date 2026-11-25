@@ -153,11 +153,9 @@
     .excluir-despesa-card {
         padding: 20px;
     }
-
     .excluir-despesa-acoes {
         flex-direction: column-reverse;
     }
-
     .btn-confirmar-exclusao,
     .btn-cancelar-exclusao {
         width: 100%;

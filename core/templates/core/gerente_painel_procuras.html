@@ -20,11 +20,11 @@
     </header>
 
     {% if messages %}
-        <div class="cart-mensagens">
+    <div class="cart-mensagens">
             {% for message in messages %}
-                <p class="cart-mensagem">{{ message }}</p>
+        <p class="cart-mensagem">{{ message }}</p>
             {% endfor %}
-        </div>
+    </div>
     {% endif %}
 
     <div class="cart-indicadores">
@@ -41,30 +41,30 @@
         </div>
 
         {% if procuras_sem_estoque %}
-            <div class="cart-tabela-wrap">
-                <table class="cart-tabela proc-tabela">
-                    <thead>
-                        <tr>
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela proc-tabela">
+                <thead>
+                    <tr>
                             <th>O que procuram</th>
                             <th>Procuras abertas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for item in procuras_sem_estoque %}
-                            <tr>
+                    <tr>
                                 <td>{{ item.resumo }}</td>
                                 <td>{{ item.quantidade }}</td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="cart-vazio">
+        <div class="cart-vazio">
                 <i data-lucide="check-circle"></i>
-                <h3>Tudo o que é procurado existe no pátio</h3>
-                <p>Nenhuma procura aberta está sem veículo compatível.</p>
-            </div>
+            <h3>Tudo o que é procurado existe no pátio</h3>
+            <p>Nenhuma procura aberta está sem veículo compatível.</p>
+        </div>
         {% endif %}
     </section>
 
@@ -76,30 +76,30 @@
                 <select name="situacao" data-auto-submit="true" aria-label="Filtrar por situação">
                     <option value="">Todas as situações</option>
                     {% for valor, rotulo in situacoes %}
-                        <option value="{{ valor }}" {% if situacao_selecionada == valor %}selected{% endif %}>
+                    <option value="{{ valor }}" {% if situacao_selecionada == valor %}selected{% endif %}>
                             {{ rotulo }}
-                        </option>
+                    </option>
                     {% endfor %}
                 </select>
             </form>
         </div>
 
         {% if procuras %}
-            <div class="cart-tabela-wrap">
-                <table class="cart-tabela proc-tabela">
-                    <thead>
-                        <tr>
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela proc-tabela">
+                <thead>
+                    <tr>
                             <th>Cliente</th>
                             <th>O que procura</th>
                             <th>Vendedor</th>
                             <th>Válida até</th>
                             <th>Situação</th>
                             <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for procura in procuras %}
-                            <tr>
+                    <tr>
                                 <td>
                                     <a href="{% url 'historico_cliente' procura.cliente_id %}" class="cart-link">
                                         {{ procura.cliente }}
@@ -115,30 +115,30 @@
                                 </td>
                                 <td>
                                     {% if procura.esta_aberta %}
-                                        <form method="post"
+                        <form method="post"
                                               action="{% url 'encerrar_procura' procura.pk %}" data-confirmacao="Encerrar esta procura?">
                                             {% csrf_token %}
                                             <button type="submit" class="cart-botao cart-botao-secundario">
                                                 Encerrar
                                             </button>
-                                        </form>
+                    </form>
                                     {% else %}
                                         <span class="cart-muted">—</span>
                                     {% endif %}
                                 </td>
-                            </tr>
+                </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            </tbody>
+        </table>
+    </div>
         {% else %}
-            <div class="cart-vazio">
+    <div class="cart-vazio">
                 <i data-lucide="search-x"></i>
-                <h3>Nenhuma procura encontrada</h3>
-                <p>Não há procuras para esse filtro.</p>
-            </div>
+        <h3>Nenhuma procura encontrada</h3>
+        <p>Não há procuras para esse filtro.</p>
+    </div>
         {% endif %}
-    </section>
+</section>
 
 </div>
 {% endblock %}

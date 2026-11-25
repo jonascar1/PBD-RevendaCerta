@@ -118,16 +118,13 @@
         align-items: stretch;
         flex-direction: column;
     }
-
     .btn-voltar-excluidas {
         width: fit-content;
     }
-
     .excluida-item {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .excluida-valor {
         font-size: 16px;
     }

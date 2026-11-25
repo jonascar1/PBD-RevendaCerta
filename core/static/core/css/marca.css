@@ -1,4 +1,5 @@
 /* Identidade visual compartilhada — Revenda Certa. */
+
 @font-face {
     font-family: "RevendaCerta";
     src: url("../fonts/Ethnocentric-Regular.otf") format("opentype");
@@ -15,6 +16,7 @@
 }
 
 /* Evita que a tipografia decorativa ultrapasse o menu lateral. */
+
 .logo .fonte-marca {
     display: inline-block;
     max-width: 100%;
@@ -23,6 +25,7 @@
 }
 
 /* Marca lateral: ícone original à esquerda, nome em duas linhas. */
+
 .rc-panel-body .sidebar .logo {
     display: flex;
     align-items: center;
@@ -31,6 +34,7 @@
     margin-right: 4px;
     min-width: 0;
 }
+
 .rc-panel-body .sidebar .logo img.rc-panel-brand-mark {
     display: block;
     width: 44px;
@@ -39,6 +43,7 @@
     object-fit: contain;
     border-radius: 12px;
 }
+
 .rc-panel-body .sidebar .logo .rc-panel-brand-name {
     display: block;
     min-width: 0;
@@ -47,11 +52,15 @@
     letter-spacing: 0;
     font-weight: 400;
 }
+
 .rc-panel-body .sidebar .logo .rc-panel-brand-name > span {
     display: block;
     white-space: nowrap;
     color: inherit;
 }
+
 @media (max-width: 900px) {
-    .rc-panel-body .sidebar .logo .rc-panel-brand-name { font-size: 15px; }
+    .rc-panel-body .sidebar .logo .rc-panel-brand-name {
+        font-size: 15px;
+    }
 }

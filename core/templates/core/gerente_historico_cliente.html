@@ -28,7 +28,6 @@
     </div>
 </header>
 
-<!-- RESUMO -->
 <section class="hist-resumo">
     <div class="card-info">
         <div class="info-grid">
@@ -73,7 +72,6 @@
     </div>
 </section>
 
-<!-- COMPRAS -->
 <section class="hist-secao">
     <h2>Compras</h2>
 
@@ -99,14 +97,14 @@
                     <td><a href="{% url 'detalhes_venda' venda.pk %}">#{{ venda.pk }}</a></td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="hist-vazio">Este cliente ainda não comprou nenhum veículo.</td></tr>
+                <tr><td colspan="4" class="hist-vazio">Este cliente ainda não comprou nenhum veículo.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
 
-<!-- TROCAS -->
 <section class="hist-secao">
     <h2>Veículos entregues na troca</h2>
 
@@ -134,14 +132,14 @@
                     <td><a href="{% url 'detalhes_venda' troca.venda_id %}">#{{ troca.venda_id }}</a></td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="hist-vazio">Este cliente nunca entregou um veículo na troca.</td></tr>
+                <tr><td colspan="4" class="hist-vazio">Este cliente nunca entregou um veículo na troca.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
 
-<!-- PROPOSTAS QUE NÃO FECHARAM -->
 <section class="hist-secao">
     <h2>Propostas que não fecharam</h2>
 
@@ -169,14 +167,14 @@
                     <td class="hist-motivo">{{ item.motivo }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="hist-vazio">Nenhuma proposta deixou de fechar.</td></tr>
+                <tr><td colspan="5" class="hist-vazio">Nenhuma proposta deixou de fechar.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
 
-<!-- EM ANDAMENTO -->
 {% if resumo.em_andamento %}
 <section class="hist-secao">
     <h2>Propostas em andamento</h2>
@@ -184,7 +182,8 @@
     <div class="hist-tabela-wrap">
         <table class="hist-tabela">
             <thead>
-                <tr><th>Proposta</th><th>Veículo</th><th>Valor oferecido</th><th>Situação</th></tr>
+                <tr><th>Proposta</th><th>Veículo</th><th>Valor oferecido</th><th>Situação</th>
+                </tr>
             </thead>
             <tbody>
                 {% for proposta in resumo.em_andamento %}
@@ -201,7 +200,6 @@
 </section>
 {% endif %}
 
-<!-- CONTATOS DA CARTEIRA -->
 <section class="hist-secao">
     <h2>Contatos realizados</h2>
 
@@ -237,13 +235,13 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="hist-vazio">Nenhum contato registrado na carteira.</td></tr>
+                <tr><td colspan="6" class="hist-vazio">Nenhum contato registrado na carteira.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
-<!-- PROCURAS -->
 <section class="hist-secao">
     <h2>Procuras registradas</h2>
 
@@ -279,7 +277,8 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="hist-vazio">Este cliente não tem procuras registradas.</td></tr>
+                <tr><td colspan="5" class="hist-vazio">Este cliente não tem procuras registradas.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

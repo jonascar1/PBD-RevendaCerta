@@ -81,22 +81,18 @@
     .detalhes-container .info-grid {
         grid-template-columns: minmax(0, 1fr);
     }
-
     .topo-acoes {
         flex-direction: column;
         align-items: stretch;
     }
-
     .topo-acoes .btn-voltar, .topo-acoes .btn-preco {
         width: 100%;
         justify-content: center;
         text-align: center;
     }
-
     .detalhes-container .card-info {
         padding: 16px;
     }
-
     .detalhes-container .form-situacao .btn-liberar {
         width: 100%;
     }

@@ -344,11 +344,9 @@
     .prop-filtros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .prop-linha {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-
     .prop-detalhes-col {
         justify-content: flex-start;
     }
@@ -359,45 +357,36 @@
         padding: 1rem;
         gap: 1.25rem;
     }
-
     .prop-cabecalho {
         align-items: flex-start;
     }
-
     .prop-acoes,
     .prop-acoes .prop-btn {
         width: 100%;
     }
-
     .prop-filtros {
         grid-template-columns: 1fr;
         padding: 1rem;
     }
-
     .prop-acoes-filtro {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .prop-acoes-filtro .prop-btn {
         width: 100%;
     }
-
     .prop-linha {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.9rem;
         padding: 1rem;
     }
-
     .prop-status-col,
     .prop-detalhes-col {
         grid-column: 1 / -1;
     }
-
     .prop-detalhes-col .prop-btn {
         width: 100%;
     }
-
     .prop-vazio {
         padding: 2.25rem 1rem;
     }

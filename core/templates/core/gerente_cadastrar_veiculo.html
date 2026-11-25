@@ -59,7 +59,6 @@ Cadastrar veículo | REVENDA CERTA
     {{ form.non_field_errors }}
 
 
-    <!-- DADOS DO VEÍCULO -->
 
     <section class="card">
 
@@ -241,7 +240,6 @@ Cadastrar veículo | REVENDA CERTA
     </section>
 
 
-    <!-- ORIGEM -->
 
     <section class="card">
 
@@ -274,7 +272,7 @@ Cadastrar veículo | REVENDA CERTA
                         {% if form.origem.value != "TROCA" and form.origem.value != "CONSIGNADO" %}checked{% endif %}
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Comprado de terceiro
@@ -284,7 +282,7 @@ Cadastrar veículo | REVENDA CERTA
                             Veículo adquirido de um terceiro.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -298,7 +296,7 @@ Cadastrar veículo | REVENDA CERTA
                         {% if form.origem.value == "TROCA" %}checked{% endif %}
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Recebido em troca
@@ -308,7 +306,7 @@ Cadastrar veículo | REVENDA CERTA
                             Veículo recebido em uma negociação.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -322,7 +320,7 @@ Cadastrar veículo | REVENDA CERTA
                         {% if form.origem.value == "CONSIGNADO" %}checked{% endif %}
                     >
 
-                    <div>
+                <div>
 
                         <strong>
                             Consignado
@@ -332,7 +330,7 @@ Cadastrar veículo | REVENDA CERTA
                             Veículo recebido para venda em consignação.
                         </span>
 
-                    </div>
+                </div>
 
                 </label>
 
@@ -372,10 +370,11 @@ Cadastrar veículo | REVENDA CERTA
     <small class="descricao">
         Preço pelo qual o veículo será anunciado para venda.
     </small>
-</div>
+                </div>
 
                 <div class="campo"><label for="{{ form.tipo_alcada.id_for_label }}">Tipo de alçada do veículo</label>{{ form.tipo_alcada }}{{ form.tipo_alcada.errors }}</div>
-                <div class="campo"><label for="{{ form.valor_alcada.id_for_label }}">Limite de desconto</label>{{ form.valor_alcada }}{{ form.valor_alcada.errors }}<small class="descricao">Em reais ou percentual, conforme o tipo selecionado. Zero exige aprovação para qualquer desconto.</small></div>
+                <div class="campo"><label for="{{ form.valor_alcada.id_for_label }}">Limite de desconto</label>{{ form.valor_alcada }}{{ form.valor_alcada.errors }}<small class="descricao">Em reais ou percentual, conforme o tipo selecionado. Zero exige aprovação para qualquer desconto.</small>
+                </div>
                 <small class="descricao" id="descricao-custo">
                     Obrigatório para veículo comprado ou recebido em troca.
                 </small>
@@ -454,22 +453,22 @@ Cadastrar veículo | REVENDA CERTA
             <div
                 id="preview-fotos"
                 class="preview-fotos"
-            ></div>
+            >
+        </div>
 
             {{ form.fotos.errors }}
 
-            <div class="aviso-fotos">
+        <div class="aviso-fotos">
                 <i data-lucide="info"></i><span>A primeira foto será utilizada como foto principal.</span>
-            </div>
-
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- BOTÕES -->
 
-    <div class="acoes">
+<div class="acoes">
 
         <a
             href="{% url 'veiculos' %}"
@@ -485,7 +484,7 @@ Cadastrar veículo | REVENDA CERTA
             Cadastrar veículo
         </button>
 
-    </div>
+</div>
 
 
 </form>

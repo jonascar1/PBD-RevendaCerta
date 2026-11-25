@@ -2,35 +2,82 @@
 {% load static l10n %}
 {% block titulo %}Explorar veículos | Revenda Certa{% endblock %}
 {% block conteudo %}
-<section class="explorar-hero"><div class="container">
-<span class="subtitulo">CATÁLOGO COMPLETO</span><h1>Explore nossos veículos</h1>
-<p>Encontre seu próximo carro com mais liberdade para pesquisar e comparar.</p>
-</div></section>
-<section class="explorar-secao" id="catalogo"><div class="container">
-<form class="filtros filtros-explorar" action="{% url 'explorar' %}" method="get">
-<h2 class="filtros-titulo">Encontre o carro ideal</h2><p class="filtros-ajuda">Combine os filtros para encontrar veículos que combinam com você.</p>
-<div class="explorar-busca"><label for="busca">Buscar por marca ou modelo</label><input type="search" id="busca" name="busca" placeholder="Ex.: Corolla, Onix, Toyota..." value="{{ filtros.busca }}"></div>
-<button type="button" class="rc-filter-toggle" aria-expanded="false" aria-controls="rc-filter-fields" hidden>Filtros e ordenação <span aria-hidden="true">⌄</span></button><div id="rc-filter-fields" class="filtros-campos explorar-filtros-grid">
-<div class="filtro-campo"><label for="marca">Marca</label><select id="marca" name="marca" data-combobox="marca"><option value="">Todas as marcas</option>{% for opcao in opcoes.marca %}<option value="{{ opcao }}" {% if filtros.marca == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select></div>
-<div class="filtro-campo"><label for="modelo">Modelo</label><select id="modelo" name="modelo" data-combobox="modelo"><option value="">Todos os modelos</option>{% for opcao in opcoes.modelo %}<option value="{{ opcao }}" {% if filtros.modelo == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select></div>
-<div class="filtro-campo"><label for="preco">Preço máximo</label><input id="preco" type="number" min="0" step="0.01" name="preco" placeholder="Até R$" value="{{ filtros.preco }}"></div>
-<div class="filtro-campo"><label for="ano">Ano</label><select id="ano" name="ano" data-combobox="ano"><option value="">Todos os anos</option>{% for opcao in anos %}{% with valor=opcao|unlocalize %}<option value="{{ valor }}" {% if filtros.ano == valor %}selected{% endif %}>{{ valor }}</option>{% endwith %}{% endfor %}</select></div>
-<div class="filtro-campo"><label for="combustivel">Combustível</label><select id="combustivel" name="combustivel" data-combobox="combustivel"><option value="">Todos</option>{% for opcao in opcoes.combustivel %}<option value="{{ opcao }}" {% if filtros.combustivel == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select></div>
-<div class="filtro-campo"><label for="tipo">Categoria</label><select id="tipo" name="tipo"><option value="">Todas</option>{% for opcao in opcoes.tipo %}<option value="{{ opcao }}" {% if filtros.tipo == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select></div>
-<div class="filtro-campo"><label for="cambio">Câmbio</label><select id="cambio" name="cambio"><option value="">Todos</option>{% for opcao in opcoes.cambio %}<option value="{{ opcao }}" {% if filtros.cambio == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select></div>
-<div class="filtro-campo"><label for="ordem">Ordenar por</label><select id="ordem" name="ordem" data-combobox="ordem"><option value="recentes" {% if filtros.ordem == 'recentes' %}selected{% endif %}>Mais recentes</option><option value="menor_preco" {% if filtros.ordem == 'menor_preco' %}selected{% endif %}>Menor preço</option><option value="maior_preco" {% if filtros.ordem == 'maior_preco' %}selected{% endif %}>Maior preço</option><option value="mais_antigos" {% if filtros.ordem == 'mais_antigos' %}selected{% endif %}>Mais antigos no estoque</option><option value="ano_novo" {% if filtros.ordem == 'ano_novo' %}selected{% endif %}>Ano mais novo</option><option value="ano_antigo" {% if filtros.ordem == 'ano_antigo' %}selected{% endif %}>Ano mais antigo</option><option value="menor_km" {% if filtros.ordem == 'menor_km' %}selected{% endif %}>Menor quilometragem</option></select></div>
-</div><div class="explorar-acoes"><a class="botao-limpar" href="{% url 'explorar' %}">Limpar filtros</a><button class="botao-filtrar" type="submit"><i data-lucide="search"></i> Buscar veículos</button></div>
-</form>
-<div class="explorar-resultados"><div><h2>Veículos disponíveis</h2><p>{{ total }} resultado{{ total|pluralize }}</p></div><span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span></div>
-<div class="explorar-grade">
-{% for veiculo in pagina %}{% include "core/card_veiculo.html" with grade=True %}{% empty %}<div class="explorar-vazio"><h3>Nenhum veículo encontrado</h3><p>Tente alterar os filtros.</p><a href="{% url 'explorar' %}">Limpar filtros</a></div>{% endfor %}
-</div>
+<section class="explorar-hero">
+    <div class="container">
+<span class="subtitulo">CATÁLOGO COMPLETO</span>
+        <h1>Explore nossos veículos</h1>
+        <p>Encontre seu próximo carro com mais liberdade para pesquisar e comparar.</p>
+    </div>
+</section>
+<section class="explorar-secao" id="catalogo">
+    <div class="container">
+        <form class="filtros filtros-explorar" action="{% url 'explorar' %}" method="get">
+            <h2 class="filtros-titulo">Encontre o carro ideal</h2>
+            <p class="filtros-ajuda">Combine os filtros para encontrar veículos que combinam com você.</p>
+            <div class="explorar-busca"><label for="busca">Buscar por marca ou modelo</label><input type="search" id="busca" name="busca" placeholder="Ex.: Corolla, Onix, Toyota..." value="{{ filtros.busca }}">
+            </div>
+<button type="button" class="rc-filter-toggle" aria-expanded="false" aria-controls="rc-filter-fields" hidden>Filtros e ordenação <span aria-hidden="true">⌄</span></button>
+            <div id="rc-filter-fields" class="filtros-campos explorar-filtros-grid">
+                <div class="filtro-campo"><label for="marca">Marca</label>
+                    <select id="marca" name="marca" data-combobox="marca">
+                        <option value="">Todas as marcas</option>{% for opcao in opcoes.marca %}<option value="{{ opcao }}" {% if filtros.marca == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select>
+                    </div>
+                    <div class="filtro-campo"><label for="modelo">Modelo</label>
+                        <select id="modelo" name="modelo" data-combobox="modelo">
+                            <option value="">Todos os modelos</option>{% for opcao in opcoes.modelo %}<option value="{{ opcao }}" {% if filtros.modelo == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select>
+                        </div>
+                        <div class="filtro-campo"><label for="preco">Preço máximo</label><input id="preco" type="number" min="0" step="0.01" name="preco" placeholder="Até R$" value="{{ filtros.preco }}">
+                        </div>
+                        <div class="filtro-campo"><label for="ano">Ano</label>
+                            <select id="ano" name="ano" data-combobox="ano">
+                                <option value="">Todos os anos</option>{% for opcao in anos %}{% with valor=opcao|unlocalize %}<option value="{{ valor }}" {% if filtros.ano == valor %}selected{% endif %}>{{ valor }}</option>{% endwith %}{% endfor %}</select>
+                            </div>
+                            <div class="filtro-campo"><label for="combustivel">Combustível</label>
+                                <select id="combustivel" name="combustivel" data-combobox="combustivel">
+                                    <option value="">Todos</option>{% for opcao in opcoes.combustivel %}<option value="{{ opcao }}" {% if filtros.combustivel == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select>
+                                </div>
+                                <div class="filtro-campo"><label for="tipo">Categoria</label>
+                                    <select id="tipo" name="tipo">
+                                        <option value="">Todas</option>{% for opcao in opcoes.tipo %}<option value="{{ opcao }}" {% if filtros.tipo == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select>
+                                    </div>
+                                    <div class="filtro-campo"><label for="cambio">Câmbio</label>
+                                        <select id="cambio" name="cambio">
+                                            <option value="">Todos</option>{% for opcao in opcoes.cambio %}<option value="{{ opcao }}" {% if filtros.cambio == opcao %}selected{% endif %}>{{ opcao }}</option>{% endfor %}</select>
+                                        </div>
+                                        <div class="filtro-campo"><label for="ordem">Ordenar por</label>
+                                            <select id="ordem" name="ordem" data-combobox="ordem">
+                                                <option value="recentes" {% if filtros.ordem == 'recentes' %}selected{% endif %}>Mais recentes</option>
+                                                <option value="menor_preco" {% if filtros.ordem == 'menor_preco' %}selected{% endif %}>Menor preço</option>
+                                                <option value="maior_preco" {% if filtros.ordem == 'maior_preco' %}selected{% endif %}>Maior preço</option>
+                                                <option value="mais_antigos" {% if filtros.ordem == 'mais_antigos' %}selected{% endif %}>Mais antigos no estoque</option>
+                                                <option value="ano_novo" {% if filtros.ordem == 'ano_novo' %}selected{% endif %}>Ano mais novo</option>
+                                                <option value="ano_antigo" {% if filtros.ordem == 'ano_antigo' %}selected{% endif %}>Ano mais antigo</option>
+                                                <option value="menor_km" {% if filtros.ordem == 'menor_km' %}selected{% endif %}>Menor quilometragem</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="explorar-acoes"><a class="botao-limpar" href="{% url 'explorar' %}">Limpar filtros</a><button class="botao-filtrar" type="submit"><i data-lucide="search"></i> Buscar veículos</button>
+                                    </div>
+                                </form>
+                                <div class="explorar-resultados">
+                                    <div>
+                                        <h2>Veículos disponíveis</h2>
+                                        <p>{{ total }} resultado{{ total|pluralize }}</p>
+                                    </div><span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+                                </div>
+                                <div class="explorar-grade">
+{% for veiculo in pagina %}{% include "core/card_veiculo.html" with grade=True %}{% empty %}<div class="explorar-vazio">
+                                    <h3>Nenhum veículo encontrado</h3>
+                                    <p>Tente alterar os filtros.</p><a href="{% url 'explorar' %}">Limpar filtros</a>
+                                </div>{% endfor %}
+                            </div>
 {% if pagina.paginator.num_pages > 1 %}<nav class="explorar-paginacao" aria-label="Paginação do catálogo">
 {% if pagina.has_previous %}<a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}#catalogo">← Anterior</a>{% endif %}
 {% for numero in pagina.paginator.page_range %}{% if numero == pagina.number %}<span class="pagina-atual" aria-current="page">{{ numero }}</span>{% elif numero >= pagina.number|add:'-2' and numero <= pagina.number|add:'2' %}<a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ numero }}#catalogo">{{ numero }}</a>{% endif %}{% endfor %}
 {% if pagina.has_next %}<a href="?{% if parametros %}{{ parametros }}&amp;{% endif %}pagina={{ pagina.next_page_number }}#catalogo">Próxima →</a>{% endif %}
-</nav>{% endif %}
-</div></section>
+                        </nav>{% endif %}
+                    </div>
+                </section>
 {% endblock %}
 
 {% block extra_js %}<script src="{% static 'core/js/explorar_mobile.js' %}?v=1" defer></script>{% endblock %}

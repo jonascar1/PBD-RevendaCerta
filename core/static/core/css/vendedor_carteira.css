@@ -326,34 +326,27 @@
         flex-direction: column;
         align-items: stretch;
     }
-
     .cart-topo > .cart-botao {
         align-self: flex-start;
     }
-
     .cart-indicadores {
         grid-template-columns: 1fr;
         gap: 10px;
     }
-
     .cart-indicador {
         padding: 16px;
     }
-
     .cart-secao-topo {
         padding: 16px;
         align-items: flex-start;
         flex-direction: column;
     }
-
     .cart-formulario {
         padding: 18px;
     }
-
     .cart-acoes > .cart-botao {
         flex: 1;
     }
-
     .cart-tabela {
         min-width: 920px;
     }
@@ -363,7 +356,6 @@
     .cart-acoes {
         flex-direction: column;
     }
-
     .cart-acoes > .cart-botao {
         width: 100%;
     }

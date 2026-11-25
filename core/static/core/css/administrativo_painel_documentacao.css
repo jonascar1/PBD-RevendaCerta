@@ -98,23 +98,19 @@
         align-items: flex-start;
         flex-direction: column;
     }
-
     .neg-section-header > .neg-action {
         max-width: 100%;
         white-space: normal;
     }
-
     .neg-form-etapa {
         flex-direction: column;
         align-items: stretch;
         min-width: 220px;
     }
-
     .neg-form-etapa select, .neg-form-etapa input[type="date"], .neg-form-etapa input[type="text"] {
         width: 100%;
         flex: 0 0 auto;
     }
-
     .neg-form-etapa .neg-action {
         width: 100%;
     }
@@ -124,11 +120,9 @@
     .topbar h1 {
         font-size: 24px;
     }
-
     .neg-section-header > .neg-action {
         width: 100%;
     }
-
     .neg-table th, .neg-table td {
         padding: 12px;
     }

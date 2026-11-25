@@ -269,31 +269,25 @@
     .aprovacoes-page {
         padding: 18px 12px;
     }
-
     .aprovacoes-header {
         align-items: flex-start;
     }
-
     .aprovacoes-header h1 {
         font-size: 23px;
     }
-
     .aprovacoes-contador {
         min-width: 90px;
         padding: 12px;
     }
-
     .aprovacao-card-topo,
     .aprovacao-card-footer {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .aprovacao-informacoes {
         grid-template-columns: 1fr 1fr;
         gap: 16px 10px;
     }
-
     .btn-analisar {
         width: 100%;
         box-sizing: border-box;

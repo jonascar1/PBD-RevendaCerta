@@ -317,16 +317,13 @@
     .form-grid {
         grid-template-columns: 1fr;
     }
-
     .senha-info {
         align-items: flex-start;
         flex-direction: column;
     }
-
     .btn-alterar-senha {
         width: 100%;
     }
-
     .status {
         margin-left: auto;
     }
@@ -336,7 +333,6 @@
     .sidebar {
         width: 210px;
     }
-
     .content {
         margin-left: 210px;
         width: calc(100% - 210px);
@@ -350,35 +346,28 @@
         width: 100%;
         min-height: auto;
     }
-
     .layout {
         flex-direction: column;
     }
-
     .content {
         margin-left: 0;
         width: 100%;
         padding: 25px 18px;
     }
-
     .topo {
         align-items: flex-start;
         gap: 15px;
         flex-direction: column;
     }
-
     .card {
         max-width: 100%;
     }
-
     .input-percentual {
         width: 100%;
     }
-
     .acoes {
         justify-content: stretch;
     }
-
     .btn-voltar,
     .btn-salvar {
         flex: 1;

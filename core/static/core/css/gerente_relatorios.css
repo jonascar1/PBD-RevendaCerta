@@ -1,4 +1,3 @@
-
 /* T19 — Relatórios gerenciais */
 
 .relatorios {
@@ -230,11 +229,9 @@
     .indicadores-relatorios {
         grid-template-columns: 1fr;
     }
-
     .relatorios {
         padding: 20px;
     }
-
     .relatorios section {
         padding: 16px;
     }
@@ -244,23 +241,28 @@
     .relatorios {
         padding: 12px;
     }
-
     .filtros-relatorios {
         padding: 16px;
     }
-
     .filtros-relatorios > div {
         min-width: 100%;
     }
-
     .filtros-relatorios button {
         width: 100%;
     }
-
     .indicador strong {
         font-size: 22px;
     }
 }
 
 /* RC mobile: revisão dos breakpoints */
-@media(max-width:639px){.indicadores-relatorios{grid-template-columns:minmax(0,1fr)}.indicadores-relatorios>*{min-width:0;overflow-wrap:anywhere}}
+
+@media(max-width:639px) {
+    .indicadores-relatorios {
+        grid-template-columns: minmax(0,1fr);
+    }
+    .indicadores-relatorios>* {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}

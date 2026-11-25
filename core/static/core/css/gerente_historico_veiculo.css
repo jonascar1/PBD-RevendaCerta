@@ -72,16 +72,13 @@
         flex-direction: column;
         align-items: stretch;
     }
-
     .topo-acoes {
         justify-content: flex-start;
         flex-wrap: wrap;
     }
-
     .hist-secao {
         padding: 16px;
     }
-
     .hist-resumo .card-info {
         padding: 16px;
     }
@@ -277,7 +274,6 @@
         gap: 8px;
         padding-bottom: 20px;
     }
-
     .hist-data {
         flex-direction: row;
         align-items: baseline;
@@ -291,19 +287,15 @@
     .hist-linha {
         padding-left: 17px;
     }
-
     .hist-linha::before {
         left: 5px;
     }
-
     .hist-evento {
         padding-left: 9px;
     }
-
     .hist-evento::before {
         left: -17px;
     }
-
     .hist-corpo {
         padding: 12px;
     }

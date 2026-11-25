@@ -10,7 +10,6 @@ body {
     color: light-dark(#1f2937, #eef4fc);
 }
 
-
 /* SIDEBAR */
 
 .sidebar {
@@ -26,7 +25,6 @@ body {
     left: 0;
 }
 
-
 /* LOGO */
 
 .logo {
@@ -41,7 +39,6 @@ body {
 .logo span {
     color: light-dark(#2864e8, #78b5ff);
 }
-
 
 /* PERFIL */
 
@@ -76,7 +73,6 @@ body {
     font-size: 12px;
 }
 
-
 /* MENU */
 
 .menu {
@@ -88,20 +84,13 @@ body {
 .menu a,
 .menu-inferior a {
     text-decoration: none;
-
     color: light-dark(#d1d5db, #bac9dc);
-
     padding: 12px;
-
     border-radius: 8px;
-
     font-size: 14px;
-
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     transition: 0.2s;
 }
 
@@ -131,7 +120,6 @@ body {
     background: #2563eb;
     color: white;
 }
-
 
 /* MENU INFERIOR */
 
@@ -163,7 +151,6 @@ body {
     color: white;
 }
 
-
 /* CONTEÚDO */
 
 .conteudo {
@@ -175,29 +162,22 @@ body {
 /* RESPONSIVO */
 
 @media (max-width: 900px) {
-
     .sidebar {
         width: 210px;
     }
-
     .conteudo {
         margin-left: 210px;
-
         padding: 25px;
     }
-
     .dados-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
 @media (max-width: 650px) {
-
     .sidebar {
         display: none;
     }
-
     .conteudo {
         margin-left: 0;
         width: 100%;
@@ -206,9 +186,10 @@ body {
 }
 
 /* Evita que conteúdos internos forcem a largura da página. */
-.conteudo { min-width: 0; }
 
-
+.conteudo {
+    min-width: 0;
+}
 
 /* ==============================
    SIDEBAR - TELAS BAIXAS
@@ -224,14 +205,24 @@ body {
 }
 
 /* Links de conteúdo sem sublinhado padrão do navegador */
-.conteudo a {text-decoration:none;}
-.conteudo a:hover {text-decoration:none;}
+
+.conteudo a {
+    text-decoration: none;
+}
+
+.conteudo a:hover {
+    text-decoration: none;
+}
 
 /* Remove sublinhado padrão de links dos cards e ações */
+
 .conteudo a,.conteudo a:visited,.conteudo a:hover,
-.conteudo a *,.conteudo a:hover * {text-decoration:none!important;}
+.conteudo a *,.conteudo a:hover * {
+    text-decoration: none!important;
+}
 
 /* Ajuste automatico logo/icone */
+
 .logo img, .logo-icone img {
     display: block;
     max-width: 100%;

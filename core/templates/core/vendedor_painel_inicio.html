@@ -4,18 +4,73 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc4-a2ce074a721e">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
-<header class="rd-intro"><small>PAINEL DO VENDEDOR</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Suas vendas de {% language "pt-br" %}{% now "F" %}{% endlanguage %}, sua meta e os carros que merecem atenção agora.</p></header>
+    <header class="rd-intro"><small>PAINEL DO VENDEDOR</small>
+        <h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        <p>Suas vendas de {% language "pt-br" %}{% now "F" %}{% endlanguage %}, sua meta e os carros que merecem atenção agora.</p>
+    </header>
 {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
-<div id="rd-kpis" class="rd-grid"></div>
-<div class="rd-grid rd-main">
-<section class="rd-card rd-8"><header><div><h2>Minhas vendas × média da equipe</h2><p>Seu desempenho mensal comparado à média da equipe</p></div><select id="rd-period" aria-label="Período"><option value="12">12 meses</option><option value="6">6 meses</option><option value="3">3 meses</option></select></header><div id="rd-summary" class="rd-summary"></div><div class="rd-chart"><canvas id="rd-sales"></canvas></div></section>
-<section class="rd-card rd-4"><h2>Minha meta do mês</h2><p>{{ dashboard.days_left }} dias para fechar o mês</p><div id="rd-goal"></div></section>
-<section class="rd-card rd-5"><h2>Minhas negociações</h2><p>Do primeiro atendimento à venda, neste mês</p><div id="rd-funnel"></div></section>
-<section class="rd-card rd-7"><h2>Carros para priorizar</h2><p>Disponíveis há mais de 30 dias no estoque</p><div id="rd-stalled"></div></section>
-<section class="rd-card rd-4"><h2>Meus mais vendidos</h2><p>Modelos que você mais vendeu em 12 meses</p><div id="rd-top"></div></section>
-<section class="rd-card rd-4"><h2>Minhas vendas por categoria</h2><p>Carros vendidos por tipo nos últimos 12 meses</p><div class="rd-donut"><canvas id="rd-category"></canvas><div id="rd-total"></div></div><div id="rd-legend"></div></section>
-<section class="rd-card rd-4"><h2>Meus melhores dias</h2><p>Em que dias saem mais vendas</p><div id="rd-week"></div></section>
-</div></div>
+    <div id="rd-kpis" class="rd-grid">
+    </div>
+    <div class="rd-grid rd-main">
+        <section class="rd-card rd-8">
+            <header>
+                <div>
+                    <h2>Minhas vendas × média da equipe</h2>
+                    <p>Seu desempenho mensal comparado à média da equipe</p>
+                </div>
+                <select id="rd-period" aria-label="Período">
+                    <option value="12">12 meses</option>
+                    <option value="6">6 meses</option>
+                    <option value="3">3 meses</option>
+                </select>
+            </header>
+            <div id="rd-summary" class="rd-summary">
+            </div>
+            <div class="rd-chart"><canvas id="rd-sales"></canvas>
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Minha meta do mês</h2>
+            <p>{{ dashboard.days_left }} dias para fechar o mês</p>
+            <div id="rd-goal">
+            </div>
+        </section>
+        <section class="rd-card rd-5">
+            <h2>Minhas negociações</h2>
+            <p>Do primeiro atendimento à venda, neste mês</p>
+            <div id="rd-funnel">
+            </div>
+        </section>
+        <section class="rd-card rd-7">
+            <h2>Carros para priorizar</h2>
+            <p>Disponíveis há mais de 30 dias no estoque</p>
+            <div id="rd-stalled">
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Meus mais vendidos</h2>
+            <p>Modelos que você mais vendeu em 12 meses</p>
+            <div id="rd-top">
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Minhas vendas por categoria</h2>
+            <p>Carros vendidos por tipo nos últimos 12 meses</p>
+            <div class="rd-donut"><canvas id="rd-category"></canvas>
+                <div id="rd-total">
+                </div>
+            </div>
+            <div id="rd-legend">
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Meus melhores dias</h2>
+            <p>Em que dias saem mais vendas</p>
+            <div id="rd-week">
+            </div>
+        </section>
+    </div>
+</div>
 {{ dashboard|json_script:'rd-data' }}
 {% endblock %}
 {% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard_vendedor.js' %}?v=rc4-1320511b3781"></script>{% endblock %}

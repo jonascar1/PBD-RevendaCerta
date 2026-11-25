@@ -107,7 +107,6 @@
     .topo-acoes {
         width: 100%;
     }
-
     .form-situacao .btn-entregue {
         width: 100%;
     }
@@ -117,16 +116,13 @@
     .detalhes-container .info-grid {
         grid-template-columns: minmax(0, 1fr);
     }
-
     .topo-acoes .btn-voltar {
         width: 100%;
         justify-content: center;
     }
-
     .detalhes-container .card-info {
         padding: 16px;
     }
-
     .checklist-entrega > label {
         padding: 14px 12px;
     }

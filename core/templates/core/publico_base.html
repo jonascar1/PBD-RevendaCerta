@@ -16,7 +16,6 @@
 
 
 
-<!-- CABEÇALHO -->
 <header class="cabecalho">
     <div class="container cabecalho-conteudo">
 
@@ -72,7 +71,8 @@
 </header>
 
 <!-- Fundo escuro do drawer -->
-<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer-overlay" id="drawer-overlay">
+</div>
 
 <!-- Menu lateral mobile -->
 <aside
@@ -82,7 +82,7 @@
     aria-hidden="true"
     inert>
 
-    <div class="drawer-cabecalho">
+<div class="drawer-cabecalho">
         <span class="drawer-titulo">Menu</span>
 
         <button
@@ -92,9 +92,9 @@
             aria-label="Fechar menu">
             &times;
         </button>
-    </div>
+</div>
 
-    <nav class="drawer-links">
+<nav class="drawer-links">
         <a href="{% url 'vitrine' %}#estoque">Estoque</a>
         <a href="{% url 'explorar' %}">Explorar</a>
         <a href="{% url 'vender_publico' %}">Vender</a>
@@ -107,12 +107,26 @@
         <a href="{% url 'vitrine' %}#contato" class="drawer-whatsapp" data-whatsapp="contato">
             Fale conosco pelo WhatsApp
         </a>
-    </nav>
+</nav>
 </aside>
 
 <main class="pagina-publica">{% block conteudo %}{% endblock %}</main>
-<!-- RODAPÉ -->
-<footer class="rc-footer"><div class="rc-footer-grid"><div><a class="rc-footer-brand fonte-marca" href="{% url 'vitrine' %}">REVENDA <span>CERTA</span></a><p>Encontre seu próximo carro com mais liberdade para pesquisar, comparar e falar direto com a loja.</p></div><div><h2>Navegue</h2><a href="{% url 'explorar' %}">Catálogo completo</a><a href="{% url 'vender_publico' %}">Venda seu carro</a><a href="{% url 'sobre_nos' %}">Sobre nós</a></div><div><h2>Atendimento</h2><a href="https://wa.me/5587981025012" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> WhatsApp</a></div></div><div class="rc-footer-bottom"><p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p></div></footer>
+<footer class="rc-footer">
+    <div class="rc-footer-grid">
+        <div><a class="rc-footer-brand fonte-marca" href="{% url 'vitrine' %}">REVENDA <span>CERTA</span></a>
+            <p>Encontre seu próximo carro com mais liberdade para pesquisar, comparar e falar direto com a loja.</p>
+        </div>
+        <div>
+            <h2>Navegue</h2><a href="{% url 'explorar' %}">Catálogo completo</a><a href="{% url 'vender_publico' %}">Venda seu carro</a><a href="{% url 'sobre_nos' %}">Sobre nós</a>
+        </div>
+        <div>
+            <h2>Atendimento</h2><a href="https://wa.me/5587981025012" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> WhatsApp</a>
+        </div>
+    </div>
+    <div class="rc-footer-bottom">
+        <p>© {% now "Y" %} Revenda Certa. Todos os direitos reservados.</p>
+    </div>
+</footer>
 <script src="{% static 'core/js/vitrine.js' %}"></script>
 <script src="{% static 'core/js/combobox_marcas.js' %}" defer></script>
 {% block extra_js %}{% endblock %}</body></html>

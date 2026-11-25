@@ -1,6 +1,26 @@
 {% load static %}
 <!DOCTYPE html><html lang="pt-br" data-rc-theme-scope="login"><head><script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar | Revenda Certa</title>
 <link rel="icon" href="{% static 'core/img/favicon.svg' %}"><link rel="stylesheet" href="{% static 'core/css/marca.css' %}"><link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}"><link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-mobile-1"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1"></head>
-<body><div class="login-layout"><aside class="login-showroom"><div class="login-copy"><small>ÁREA DA EQUIPE</small><h2>Acompanhe estoque, vendas e metas em um só lugar.</h2><p><i data-lucide="shield-check"></i> Acesso restrito à equipe da loja.</p></div></aside><main class="login-main"><a class="login-back" href="{% url 'vitrine' %}"><i data-lucide="arrow-left"></i> Voltar para o site</a><section class="login-card"><a class="login-brand" href="{% url 'vitrine' %}"><img src="{% static 'core/img/logorevendacerta.svg' %}" alt=""><span class="fonte-marca">REVENDA CERTA</span></a><h1>Bem-vindo de volta</h1><p class="subtitle">Entre com seu usuário para acessar o painel.</p>
+<body>
+<div class="login-layout">
+    <aside class="login-showroom">
+        <div class="login-copy"><small>ÁREA DA EQUIPE</small>
+            <h2>Acompanhe estoque, vendas e metas em um só lugar.</h2>
+            <p><i data-lucide="shield-check"></i> Acesso restrito à equipe da loja.</p>
+        </div>
+    </aside>
+    <main class="login-main"><a class="login-back" href="{% url 'vitrine' %}"><i data-lucide="arrow-left"></i> Voltar para o site</a>
+        <section class="login-card"><a class="login-brand" href="{% url 'vitrine' %}"><img src="{% static 'core/img/logorevendacerta.svg' %}" alt=""><span class="fonte-marca">REVENDA CERTA</span></a>
+            <h1>Bem-vindo de volta</h1>
+            <p class="subtitle">Entre com seu usuário para acessar o painel.</p>
 {% if messages %}<div class="messages" role="alert">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
-<form method="post" id="loginForm" novalidate>{% csrf_token %}{{ form.non_field_errors }}<div class="input-group"><label for="{{ form.username.id_for_label }}">Usuário</label><div class="login-field"><i data-lucide="user"></i>{{ form.username }}</div>{{ form.username.errors }}</div><div class="input-group"><label for="{{ form.password.id_for_label }}">Senha</label><div class="login-field"><i data-lucide="lock"></i>{{ form.password }}<button type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false"><i data-lucide="eye"></i></button></div>{{ form.password.errors }}</div><button type="submit" class="login-button"><i data-lucide="log-in"></i> Entrar</button></form><p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p></section></main></div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=4"></script></body></html>
+            <form method="post" id="loginForm" novalidate>{% csrf_token %}{{ form.non_field_errors }}<div class="input-group"><label for="{{ form.username.id_for_label }}">Usuário</label>
+                <div class="login-field"><i data-lucide="user"></i>{{ form.username }}</div>{{ form.username.errors }}</div>
+                <div class="input-group"><label for="{{ form.password.id_for_label }}">Senha</label>
+                    <div class="login-field"><i data-lucide="lock"></i>{{ form.password }}<button type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false"><i data-lucide="eye"></i></button>
+                    </div>{{ form.password.errors }}</div><button type="submit" class="login-button"><i data-lucide="log-in"></i> Entrar</button>
+                </form>
+                <p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>
+            </section>
+        </main>
+    </div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=4"></script></body></html>

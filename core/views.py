@@ -70,9 +70,7 @@ from .models import (
 )
 
 
-# ==============================================================================
 # Funções Auxiliares
-# ==============================================================================
 
 def adicionar_erros_de_validacao(form, erro, renomear=None):
     """Converte um ValidationError do model em erros vinculados aos campos do form."""
@@ -154,9 +152,7 @@ def _veiculos_disponiveis_para_procura():
     )
 
 
-# ==============================================================================
 # Autenticação, Painel Geral e Vitrine Pública
-# ==============================================================================
 
 def login_view(request):
     """Autentica o usuário e valida se o cadastro está ativo."""
@@ -391,9 +387,7 @@ def vitrine_veiculo_detalhe_view(request, pk):
     return render(request, "core/vitrine_veiculo_detalhe.html", {"whatsapp_numero": numero, "veiculo": veiculo, "fotos": veiculo.fotos.all(), "mesma_marca": mesma_marca, "recomendados": recomendados, "whatsapp_veiculo": whatsapp})
 
 
-# ==============================================================================
 # Vendedor
-# ==============================================================================
 
 @perfil_requerido("VENDEDOR")
 def painel_vendedor_view(request):
@@ -1288,9 +1282,7 @@ def marcar_aviso_procura_lido_view(request, aviso_id):
     return redirect("painel_vendedor")
 
 
-# ==============================================================================
 # Administrativo
-# ==============================================================================
 
 @perfil_requerido("ADMINISTRATIVO")
 def painel_administrativo_view(request):
@@ -1450,9 +1442,7 @@ def despesas_excluidas_veiculo_view(request, veiculo_id):
     )
 
 
-# ==============================================================================
 # Gerente
-# ==============================================================================
 
 @perfil_requerido("GERENTE")
 def painel_gerente_view(request):
@@ -2487,9 +2477,7 @@ def procuras_gerente_view(request):
     )
 
 
-# ==============================================================================
 # Operações Compartilhadas
-# ==============================================================================
 
 @perfil_requerido("GERENTE")
 def reservar_veiculo_view(request, veiculo_id):

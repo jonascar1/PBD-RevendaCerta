@@ -24,11 +24,11 @@
     </header>
 
     {% if messages %}
-        <div class="cart-mensagens">
+    <div class="cart-mensagens">
             {% for message in messages %}
-                <p class="cart-mensagem">{{ message }}</p>
+        <p class="cart-mensagem">{{ message }}</p>
             {% endfor %}
-        </div>
+    </div>
     {% endif %}
 
     <section class="cart-painel">
@@ -38,20 +38,20 @@
         </div>
 
         {% if abertas %}
-            <div class="cart-tabela-wrap">
-                <table class="cart-tabela proc-tabela">
-                    <thead>
-                        <tr>
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela proc-tabela">
+                <thead>
+                    <tr>
                             <th>Cliente</th>
                             <th>O que procura</th>
                             <th>No estoque hoje</th>
                             <th>Válida até</th>
                             <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for procura in abertas %}
-                            <tr>
+                    <tr>
                                 <td>
                                     <a href="{% url 'detalhes_cliente' procura.cliente_id %}" class="cart-link">
                                         {{ procura.cliente }}
@@ -60,59 +60,59 @@
                                 <td>{{ procura.resumo }}</td>
                                 <td>
                                     {% for veiculo in procura.compativeis %}
-                                        <div>
+                        <div>
                                             <a href="{% url 'detalhes_veiculo_vendedor' veiculo.pk %}" class="cart-link">
                                                 {{ veiculo.marca }} {{ veiculo.modelo }} · {{ veiculo.placa }}
                                             </a>
-                                        </div>
+                        </div>
                                     {% empty %}
                                         <span class="cart-muted">Nenhum veículo combina</span>
                                     {% endfor %}
                                 </td>
                                 <td>{{ procura.valido_ate|date:"d/m/Y" }}</td>
                                 <td>
-                                    <form method="post"
+                        <form method="post"
                                           action="{% url 'encerrar_procura' procura.pk %}" data-confirmacao="Encerrar esta procura?">
                                         {% csrf_token %}
                                         <button type="submit" class="cart-botao cart-botao-secundario">
                                             Encerrar
                                         </button>
-                                    </form>
+                    </form>
                                 </td>
-                            </tr>
+                </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            </tbody>
+        </table>
+    </div>
         {% else %}
-            <div class="cart-vazio">
+    <div class="cart-vazio">
                 <i data-lucide="search-x"></i>
-                <h3>Nenhuma procura aberta</h3>
-                <p>Quando um cliente pedir um carro que não temos, registre aqui.</p>
-            </div>
+        <h3>Nenhuma procura aberta</h3>
+        <p>Quando um cliente pedir um carro que não temos, registre aqui.</p>
+    </div>
         {% endif %}
-    </section>
+</section>
 
     {% if encerradas %}
-    <section class="cart-painel cart-secao-espaco">
-        <div class="cart-secao-topo">
-            <h2>Procuras encerradas</h2>
+<section class="cart-painel cart-secao-espaco">
+    <div class="cart-secao-topo">
+        <h2>Procuras encerradas</h2>
             <span>Atendidas, vencidas ou encerradas por você</span>
-        </div>
+    </div>
 
-        <div class="cart-tabela-wrap">
-            <table class="cart-tabela proc-tabela">
-                <thead>
-                    <tr>
+    <div class="cart-tabela-wrap">
+        <table class="cart-tabela proc-tabela">
+            <thead>
+                <tr>
                         <th>Cliente</th>
                         <th>O que procurava</th>
                         <th>Situação</th>
                         <th>Encerrada em</th>
-                    </tr>
-                </thead>
-                <tbody>
+                </tr>
+            </thead>
+            <tbody>
                     {% for procura in encerradas %}
-                        <tr>
+                <tr>
                             <td>{{ procura.cliente }}</td>
                             <td>{{ procura.resumo }}</td>
                             <td>
@@ -121,12 +121,12 @@
                                 </span>
                             </td>
                             <td>{{ procura.encerrada_em|date:"d/m/Y"|default:"—" }}</td>
-                        </tr>
+                </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+            </tbody>
+        </table>
+    </div>
+</section>
     {% endif %}
 
 </div>

@@ -3,19 +3,69 @@
 {% block title %}Início administrativo | REVENDA CERTA{% endblock %}
 {% block content %}
 <div class="ra-dashboard">
-<header class="ra-intro"><small>PAINEL ADMINISTRATIVO</small><h1>Olá, {{ request.user.first_name|default:request.user.username }}!</h1><p>Documentos pendentes, carros para entregar e despesas do mês.</p></header>
-<div class="ra-kpis">
-<article class="ra-card ra-kpi"><span class="ra-icon"><i data-lucide="receipt"></i></span>{% if delta != None %}<span class="ra-delta">{{ delta }}%</span>{% endif %}<p>Despesas no mês</p><strong>R$ {{ atual|floatformat:2 }}</strong><small>R$ {{ anterior|floatformat:2 }} no mês passado</small><svg id="ra-spark" viewBox="0 0 300 45" preserveAspectRatio="none" aria-hidden="true"></svg></article>
-<article class="ra-card ra-kpi"><span class="ra-icon red"><i data-lucide="file-clock"></i></span><p>Documentos pendentes</p><strong>{{ pendentes }}</strong><small>Etapas não concluídas</small></article>
-<article class="ra-card ra-kpi"><span class="ra-icon teal"><i data-lucide="truck"></i></span><p>Aguardando entrega</p><strong>{{ aguardando }}</strong><small>Vendidos e ainda não entregues</small></article>
-<article class="ra-card ra-kpi"><span class="ra-icon sky"><i data-lucide="car-front"></i></span><p>Veículos com despesas</p><strong>{{ veiculos_com_despesas }}</strong><small>{{ total_despesas }} lançamentos no total</small></article>
+    <header class="ra-intro"><small>PAINEL ADMINISTRATIVO</small>
+        <h1>Olá, {{ request.user.first_name|default:request.user.username }}!</h1>
+        <p>Documentos pendentes, carros para entregar e despesas do mês.</p>
+    </header>
+    <div class="ra-kpis">
+        <article class="ra-card ra-kpi"><span class="ra-icon"><i data-lucide="receipt"></i></span>{% if delta != None %}<span class="ra-delta">{{ delta }}%</span>{% endif %}<p>Despesas no mês</p><strong>R$ {{ atual|floatformat:2 }}</strong><small>R$ {{ anterior|floatformat:2 }} no mês passado</small><svg id="ra-spark" viewBox="0 0 300 45" preserveAspectRatio="none" aria-hidden="true"></svg>
+    </article>
+    <article class="ra-card ra-kpi"><span class="ra-icon red"><i data-lucide="file-clock"></i></span>
+        <p>Documentos pendentes</p><strong>{{ pendentes }}</strong><small>Etapas não concluídas</small>
+    </article>
+    <article class="ra-card ra-kpi"><span class="ra-icon teal"><i data-lucide="truck"></i></span>
+        <p>Aguardando entrega</p><strong>{{ aguardando }}</strong><small>Vendidos e ainda não entregues</small>
+    </article>
+    <article class="ra-card ra-kpi"><span class="ra-icon sky"><i data-lucide="car-front"></i></span>
+        <p>Veículos com despesas</p><strong>{{ veiculos_com_despesas }}</strong><small>{{ total_despesas }} lançamentos no total</small>
+    </article>
 </div>
 <div class="ra-grid">
-<section class="ra-card"><header><div><h2>Pendências de documentação</h2><p>Do mais antigo para o mais novo</p></div><a href="{% url 'documentacao_pendente' %}">Ver tudo →</a></header>{% for etapa in etapas %}<div class="ra-item"><div><b>{{ etapa.venda.veiculo.marca }} {{ etapa.venda.veiculo.modelo }}</b><small>{{ etapa.get_tipo_display }} · {{ etapa.data|date:'d/m/Y' }}</small></div><span class="ra-pill">{{ etapa.get_situacao_display }}</span></div>{% empty %}<p class="ra-empty">Nenhuma pendência.</p>{% endfor %}</section>
-<section class="ra-card"><header><div><h2>Prontos para entregar</h2><p>Documentação concluída</p></div><a href="{% url 'entregas_administrativo' %}">Ver tudo →</a></header>{% for venda in prontas %}<a class="ra-item ra-delivery" href="{% url 'registrar_entrega' venda.pk %}"><div><b>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</b><small>{{ venda.cliente.nome_exibicao }} · {{ venda.data|date:'d/m/Y' }}</small></div><span>{{ venda.veiculo.placa }}</span></a>{% empty %}<p class="ra-empty">Nenhum veículo pronto para entrega.</p>{% endfor %}</section>
-<section class="ra-card"><header><div><h2>Despesas por mês</h2><p>Últimos seis meses</p></div><a href="{% url 'despesas' %}">Ver despesas →</a></header><div id="ra-bars" class="ra-bars"></div></section>
-<section class="ra-card"><header><div><h2>Para onde vai o dinheiro</h2><p>Despesas por categoria · histórico total</p></div></header><div class="ra-pie-layout"><div id="ra-pie" class="ra-pie"></div><div id="ra-legend"></div></div></section>
-</div></div>
+    <section class="ra-card">
+        <header>
+            <div>
+                <h2>Pendências de documentação</h2>
+                <p>Do mais antigo para o mais novo</p>
+            </div><a href="{% url 'documentacao_pendente' %}">Ver tudo →</a>
+        </header>{% for etapa in etapas %}<div class="ra-item">
+        <div><b>{{ etapa.venda.veiculo.marca }} {{ etapa.venda.veiculo.modelo }}</b><small>{{ etapa.get_tipo_display }} · {{ etapa.data|date:'d/m/Y' }}</small>
+        </div><span class="ra-pill">{{ etapa.get_situacao_display }}</span>
+    </div>{% empty %}<p class="ra-empty">Nenhuma pendência.</p>{% endfor %}</section>
+    <section class="ra-card">
+        <header>
+            <div>
+                <h2>Prontos para entregar</h2>
+                <p>Documentação concluída</p>
+            </div><a href="{% url 'entregas_administrativo' %}">Ver tudo →</a>
+        </header>{% for venda in prontas %}<a class="ra-item ra-delivery" href="{% url 'registrar_entrega' venda.pk %}">
+        <div><b>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</b><small>{{ venda.cliente.nome_exibicao }} · {{ venda.data|date:'d/m/Y' }}</small>
+        </div><span>{{ venda.veiculo.placa }}</span></a>{% empty %}<p class="ra-empty">Nenhum veículo pronto para entrega.</p>{% endfor %}</section>
+        <section class="ra-card">
+            <header>
+                <div>
+                    <h2>Despesas por mês</h2>
+                    <p>Últimos seis meses</p>
+                </div><a href="{% url 'despesas' %}">Ver despesas →</a>
+            </header>
+            <div id="ra-bars" class="ra-bars">
+            </div>
+        </section>
+        <section class="ra-card">
+            <header>
+                <div>
+                    <h2>Para onde vai o dinheiro</h2>
+                    <p>Despesas por categoria · histórico total</p>
+                </div>
+            </header>
+            <div class="ra-pie-layout">
+                <div id="ra-pie" class="ra-pie">
+                </div>
+                <div id="ra-legend">
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 {{ meses|json_script:'ra-month-data' }}{{ tipos|json_script:'ra-type-data' }}
 {% endblock %}
 {% block extra_js %}<script src="{% static 'core/js/administrativo_dashboard.js' %}?v=rc4-8f3fec1b6634"></script>{% endblock %}

@@ -68,18 +68,18 @@
             {% csrf_token %}
 
             {% if custo_total %}
-                <div class="custo-atual">
+            <div class="custo-atual">
                     <span>Custo total acumulado</span>
                     <strong>
                         R$ {{ custo_total|floatformat:2 }}
                     </strong>
-                </div>
+            </div>
             {% endif %}
 
             {% if erro_preco %}
-                <div class="alerta-preco">
+            <div class="alerta-preco">
                     {{ erro_preco }}
-                </div>
+            </div>
             {% endif %}
 
             {{ form.non_field_errors }}

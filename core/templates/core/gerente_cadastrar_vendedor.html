@@ -9,52 +9,48 @@
 {% endblock extra_css %}
 
 {% block content %}
-<!-- CABEÇALHO -->
-            <header class="topbar">
+<header class="topbar">
 
-                <div>
-                    <h1>Cadastrar vendedor</h1>
-                    <p>Cadastre um novo vendedor na revenda.</p>
-                </div>
-            </header>
+    <div>
+        <h1>Cadastrar vendedor</h1>
+        <p>Cadastre um novo vendedor na revenda.</p>
+    </div>
+</header>
 
 
-            <!-- MENSAGENS -->
             {% if messages %}
-                <div class="messages">
+<div class="messages">
 
                     {% for message in messages %}
-                        <p>{{ message }}</p>
+    <p>{{ message }}</p>
                     {% endfor %}
 
-                </div>
+</div>
             {% endif %}
 
 
-            <!-- FORMULÁRIO -->
-            <section class="section">
+<section class="section">
 
-                <div class="form-container">
+    <div class="form-container">
 
-                    <div class="section-header">
-                        <div>
-                            <h2>Dados do vendedor</h2>
-                            <p>Preencha as informações para criar o acesso do vendedor.</p>
-                        </div>
-                    </div>
+        <div class="section-header">
+            <div>
+                <h2>Dados do vendedor</h2>
+                <p>Preencha as informações para criar o acesso do vendedor.</p>
+            </div>
+        </div>
 
 
-                    <form method="post" novalidate>
+        <form method="post" novalidate>
 
                         {% csrf_token %}
 
                         {{ form.non_field_errors }}
 
 
-                        <div class="form-grid">
+            <div class="form-grid">
 
-                            <!-- NOME -->
-                            <div class="form-group">
+                <div class="form-group">
 
                                 <label for="nome">
                                     Nome completo
@@ -63,11 +59,10 @@
                                 {{ form.nome }}
 {{ form.nome.errors }}
 
-                            </div>
+                </div>
 
 
-                            <!-- USUÁRIO -->
-                            <div class="form-group">
+                <div class="form-group">
 
                                 <label for="username">
                                     Usuário
@@ -80,11 +75,10 @@
                                     Usado pelo vendedor para entrar no sistema.
                                 </small>
 
-                            </div>
+                </div>
 
 
-                            <!-- EMAIL -->
-                            <div class="form-group">
+                <div class="form-group">
 
                                 <label for="email">
                                     E-mail
@@ -93,14 +87,13 @@
                                 {{ form.email }}
 {{ form.email.errors }}
 
-                            </div>
+                </div>
 
 
-                            <!-- SENHA -->
-                            <div class="form-group">
+                <div class="form-group">
                                 <label for="senha">Senha</label>
 
-                                <div class="senha-container">
+                    <div class="senha-container">
                                     {{ form.senha }}
 
                                     <button
@@ -109,12 +102,11 @@
                                     >
                                         Mostrar
                                     </button>
-                                </div>
+                    </div>
                                 {{ form.senha.errors }}
-                            </div>
+                </div>
 
-                            <!-- COMISSÃO -->
-                            <div class="form-group">
+                <div class="form-group">
 
                                 <label for="percentual_comissao">
                                     Percentual de comissão (%)
@@ -123,13 +115,12 @@
                                 {{ form.percentual_comissao }}
                                 {{ form.percentual_comissao.errors }}
 
-                            </div>
+                </div>
 
-                        </div>
+            </div>
 
 
-                        <!-- BOTÕES -->
-                        <div class="form-actions">
+            <div class="form-actions">
 
                             <a class="voltar-button"
                                 href="{% url 'vendedores' %}"
@@ -139,18 +130,18 @@
 
                             <button class="cadastrar-button"
                                 type="submit"
-                                
+
                             >
                                 Cadastrar vendedor
                             </button>
 
-                        </div>
+            </div>
 
-                    </form>
+        </form>
 
-                </div>
+    </div>
 
-            </section>
+</section>
 {% endblock content %}
 
 {% block extra_js %}

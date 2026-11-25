@@ -45,21 +45,49 @@
 </style>{% endblock %}
 {% block conteudo %}
 <div class="vd">
-<section class="vd-hero">{% if fotos %}<img src="{{ fotos.0.imagem.url }}" alt="" aria-hidden="true">{% endif %}<div class="container vd-hero-texto"><nav aria-label="Localização"><a href="{% url 'vitrine' %}">Início</a> › <a href="{% url 'explorar' %}">Catálogo</a> › {{ veiculo.marca }} {{ veiculo.modelo }}</nav><p>{{ veiculo.get_tipo_display|default:veiculo.tipo }} • {{ veiculo.marca }}</p><h1>{{ veiculo.marca }} <span>{{ veiculo.modelo }}</span></h1></div></section>
+    <section class="vd-hero">{% if fotos %}<img src="{{ fotos.0.imagem.url }}" alt="" aria-hidden="true">{% endif %}<div class="container vd-hero-texto">
+        <nav aria-label="Localização"><a href="{% url 'vitrine' %}">Início</a> › <a href="{% url 'explorar' %}">Catálogo</a> › {{ veiculo.marca }} {{ veiculo.modelo }}</nav>
+        <p>{{ veiculo.get_tipo_display|default:veiculo.tipo }} • {{ veiculo.marca }}</p>
+        <h1>{{ veiculo.marca }} <span>{{ veiculo.modelo }}</span>
+        </h1>
+    </div>
+</section>
 <div class="container vd-grid">
-<section class="vd-painel vd-galeria" aria-label="Galeria de fotos">
-<div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<p>Foto indisponível</p>{% endif %}</div>
+    <section class="vd-painel vd-galeria" aria-label="Galeria de fotos">
+        <div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<p>Foto indisponível</p>{% endif %}</div>
 {% if fotos %}<div class="vd-miniaturas">{% for foto in fotos %}<button type="button" class="vd-miniatura{% if forloop.first %} ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}" aria-label="Ver foto {{ forloop.counter }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"><img src="{{ foto.imagem.url }}" alt="" loading="lazy"></button>{% endfor %}</div>{% endif %}</section>
-<section class="vd-painel vd-info"><p class="vd-marca">{{ veiculo.marca }}</p><h2>{{ veiculo.marca }} {{ veiculo.modelo }}</h2><span class="vd-label">Preço</span><p class="vd-preco">{% if veiculo.preco_venda %}R$ {{ veiculo.preco_venda|floatformat:2 }}{% else %}Consulte o preço{% endif %}</p>
-<div class="vd-ficha">
-<div><i data-lucide="calendar"></i><span><small>Ano de fabricação</small><strong>{{ veiculo.ano_fabricacao|unlocalize|default:'Não informado' }}</strong></span></div>
-<div><i data-lucide="calendar-days"></i><span><small>Ano do modelo</small><strong>{{ veiculo.ano_modelo|unlocalize|default:'Não informado' }}</strong></span></div>
-<div><i data-lucide="gauge"></i><span><small>Quilometragem</small><strong>{% if veiculo.quilometragem != None %}{{ veiculo.quilometragem|localize }} km{% else %}Não informada{% endif %}</strong></span></div>
-<div><i data-lucide="fuel"></i><span><small>Combustível</small><strong>{{ veiculo.get_combustivel_display|default:veiculo.combustivel }}</strong></span></div>
-<div><i data-lucide="settings-2"></i><span><small>Câmbio</small><strong>{{ veiculo.get_cambio_display|default:veiculo.cambio }}</strong></span></div>
-<div><i data-lucide="palette"></i><span><small>Cor</small><strong>{{ veiculo.cor|default:'Não informada' }}</strong></span></div></div>
-{% if veiculo.opcionais %}<h3 class="vd-op-title">Opcionais e equipamentos</h3><div class="vd-opcionais">{{ veiculo.opcionais|linebreaksbr }}</div>{% endif %}
-<div class="vd-acoes"><a href="{% url 'explorar' %}"><i data-lucide="arrow-left"></i> Ver outros veículos</a><a class="vd-interesse" href="https://wa.me/5587981025012?text=Ol%C3%A1%21%20Tenho%20interesse%20no%20ve%C3%ADculo%20{{ veiculo.marca|urlencode }}%20{{ veiculo.modelo|urlencode }}.%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> Tenho interesse</a></div><p class="vd-atendimento"><i data-lucide="shield-check"></i> Atendimento direto pelo WhatsApp</p></section></div>
-<div class="container vd-relacionados relacionados">{% if mesma_marca %}<section><h2>Conheça mais da {{ veiculo.marca }}</h2><div class="vd-cards">{% for veiculo in mesma_marca %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div></section>{% endif %}{% if recomendados %}<section><h2>Você também pode gostar</h2><div class="vd-cards">{% for veiculo in recomendados %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div></section>{% endif %}</div></div>
+        <section class="vd-painel vd-info">
+            <p class="vd-marca">{{ veiculo.marca }}</p>
+            <h2>{{ veiculo.marca }} {{ veiculo.modelo }}</h2><span class="vd-label">Preço</span>
+            <p class="vd-preco">{% if veiculo.preco_venda %}R$ {{ veiculo.preco_venda|floatformat:2 }}{% else %}Consulte o preço{% endif %}</p>
+            <div class="vd-ficha">
+                <div><i data-lucide="calendar"></i><span><small>Ano de fabricação</small><strong>{{ veiculo.ano_fabricacao|unlocalize|default:'Não informado' }}</strong></span>
+                </div>
+                <div><i data-lucide="calendar-days"></i><span><small>Ano do modelo</small><strong>{{ veiculo.ano_modelo|unlocalize|default:'Não informado' }}</strong></span>
+                </div>
+                <div><i data-lucide="gauge"></i><span><small>Quilometragem</small><strong>{% if veiculo.quilometragem != None %}{{ veiculo.quilometragem|localize }} km{% else %}Não informada{% endif %}</strong></span>
+                </div>
+                <div><i data-lucide="fuel"></i><span><small>Combustível</small><strong>{{ veiculo.get_combustivel_display|default:veiculo.combustivel }}</strong></span>
+                </div>
+                <div><i data-lucide="settings-2"></i><span><small>Câmbio</small><strong>{{ veiculo.get_cambio_display|default:veiculo.cambio }}</strong></span>
+                </div>
+                <div><i data-lucide="palette"></i><span><small>Cor</small><strong>{{ veiculo.cor|default:'Não informada' }}</strong></span>
+                </div>
+            </div>
+{% if veiculo.opcionais %}<h3 class="vd-op-title">Opcionais e equipamentos</h3>
+            <div class="vd-opcionais">{{ veiculo.opcionais|linebreaksbr }}</div>{% endif %}
+            <div class="vd-acoes"><a href="{% url 'explorar' %}"><i data-lucide="arrow-left"></i> Ver outros veículos</a><a class="vd-interesse" href="https://wa.me/5587981025012?text=Ol%C3%A1%21%20Tenho%20interesse%20no%20ve%C3%ADculo%20{{ veiculo.marca|urlencode }}%20{{ veiculo.modelo|urlencode }}.%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i> Tenho interesse</a>
+            </div>
+            <p class="vd-atendimento"><i data-lucide="shield-check"></i> Atendimento direto pelo WhatsApp</p>
+        </section>
+    </div>
+    <div class="container vd-relacionados relacionados">{% if mesma_marca %}<section>
+        <h2>Conheça mais da {{ veiculo.marca }}</h2>
+        <div class="vd-cards">{% for veiculo in mesma_marca %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div>
+    </section>{% endif %}{% if recomendados %}<section>
+    <h2>Você também pode gostar</h2>
+    <div class="vd-cards">{% for veiculo in recomendados %}{% include 'core/card_veiculo.html' with grade=True %}{% endfor %}</div>
+</section>{% endif %}</div>
+</div>
 {% endblock %}
 {% block extra_js %}<script src="{% static 'core/js/vitrine_veiculo_detalhe.js' %}?v=20261124-4" defer></script>{% endblock %}

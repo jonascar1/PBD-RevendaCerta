@@ -23,11 +23,11 @@
     </header>
 
     {% if messages %}
-        <div class="cart-mensagens">
+    <div class="cart-mensagens">
             {% for message in messages %}
-                <p class="cart-mensagem">{{ message }}</p>
+        <p class="cart-mensagem">{{ message }}</p>
             {% endfor %}
-        </div>
+    </div>
     {% endif %}
 
     <section class="cart-painel cart-formulario">
@@ -42,7 +42,7 @@
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-                <div class="cart-erro">{{ form.non_field_errors }}</div>
+            <div class="cart-erro">{{ form.non_field_errors }}</div>
             {% endif %}
 
             <div class="cart-campo">

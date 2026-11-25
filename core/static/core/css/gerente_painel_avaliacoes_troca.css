@@ -313,7 +313,6 @@
         flex-wrap: wrap;
         padding: 12px;
     }
-
     .campo-pesquisa-avaliacoes {
         flex-basis: 100%;
     }
@@ -323,7 +322,6 @@
     .topbar h1 {
         font-size: 24px;
     }
-
     .add-button {
         width: 100%;
     }

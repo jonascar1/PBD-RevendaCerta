@@ -22,21 +22,26 @@
 
 <section class="neg-resumo">
     <a href="{% url 'margens' %}" class="neg-card">
-        <div class="neg-card-icon"><i data-lucide="files"></i></div>
-        <div><span>Vendas fechadas</span><strong>{{ total_vendas }}</strong></div>
+    <div class="neg-card-icon"><i data-lucide="files"></i>
+    </div>
+    <div><span>Vendas fechadas</span><strong>{{ total_vendas }}</strong>
+    </div>
     </a>
 
     <a href="{% url 'margens' %}?negativas=1" class="neg-card neg-card-pendente">
-        <div class="neg-card-icon"><i data-lucide="triangle-alert"></i></div>
-        <div><span>Margem negativa</span><strong>{{ total_negativas }}</strong></div>
+    <div class="neg-card-icon"><i data-lucide="triangle-alert"></i>
+    </div>
+    <div><span>Margem negativa</span><strong>{{ total_negativas }}</strong>
+    </div>
     </a>
 
     <a href="{% url 'margens' %}" class="neg-card">
-        <div class="neg-card-icon"><i data-lucide="trending-up"></i></div>
-        <div>
+    <div class="neg-card-icon"><i data-lucide="trending-up"></i>
+    </div>
+    <div>
             <span>Margem total hoje</span>
             <strong {% if total_margem < 0 %}class="valor-negativo"{% endif %}>R$ {{ total_margem|floatformat:2 }}</strong>
-        </div>
+    </div>
     </a>
 </section>
 

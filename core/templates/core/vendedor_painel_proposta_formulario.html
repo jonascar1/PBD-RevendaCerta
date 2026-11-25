@@ -126,7 +126,7 @@
                                     </div>
                                 </div>
                                 {% if pagamento.DELETE %}
-                                    <div class="prop-campo prop-delete-field" hidden>{{ pagamento.DELETE }}</div>
+                                <div class="prop-campo prop-delete-field" hidden>{{ pagamento.DELETE }}</div>
                                 {% endif %}
                             </div>
                         </article>
@@ -135,53 +135,53 @@
 
                     <!-- Template/Molde oficial Django para novas linhas -->
                     <template id="pagamento-empty-form">
-                        <article class="prop-pagamento-linha composicao-linha" data-form-row>
-                            <div class="prop-pagamento-topo">
+                    <article class="prop-pagamento-linha composicao-linha" data-form-row>
+                        <div class="prop-pagamento-topo">
                                 <span class="prop-pagamento-titulo">Forma de pagamento <span data-row-number>__prefix__</span></span>
                                 <button type="button" class="prop-btn prop-btn-perigo prop-btn-pequeno btn-remover-linha" data-remove-row>Remover</button>
-                            </div>
-                            <div class="prop-pagamento-grid">
-                                <div class="prop-campo">
+                        </div>
+                        <div class="prop-pagamento-grid">
+                            <div class="prop-campo">
                                     <label for="{{ formset.empty_form.tipo.id_for_label }}">Tipo</label>
                                     {{ formset.empty_form.tipo }}
-                                </div>
-                                <div class="prop-campo">
+                            </div>
+                            <div class="prop-campo">
                                     <label for="{{ formset.empty_form.valor.id_for_label }}"><span class="rotulo-valor">Valor (R$)</span></label>
                                     {{ formset.empty_form.valor }}
-                                </div>
+                            </div>
 
-                                <div class="prop-extra-troca campos-troca" data-extra="troca">
-                                    <div class="prop-campo">
+                            <div class="prop-extra-troca campos-troca" data-extra="troca">
+                                <div class="prop-campo">
                                         <label for="{{ formset.empty_form.avaliacao_troca.id_for_label }}">
                                             Avaliação do veículo na troca
                                         </label>
                                         {{ formset.empty_form.avaliacao_troca }}
-                                    </div>
+                                </div>
 
-                                    <div class="prop-campo">
+                                <div class="prop-campo">
                                         <label for="{{ formset.empty_form.troca_descricao.id_for_label }}">Descrição do veículo recebido na troca</label>
                                         {{ formset.empty_form.troca_descricao }}
-                                    </div>
-                                </div>
-
-                                <div class="prop-extra-financiamento campos-financiamento" data-extra="financiamento">
-                                    <div class="prop-campo">
-                                        <label for="{{ formset.empty_form.financ_banco.id_for_label }}">Banco</label>
-                                        {{ formset.empty_form.financ_banco }}
-                                    </div>
-
-                                    <div class="prop-campo">
-                                        <label for="{{ formset.empty_form.financ_parcelas.id_for_label }}">Número de parcelas</label>
-                                        {{ formset.empty_form.financ_parcelas }}
-                                    </div>
-
-                                    <div class="prop-campo">
-                                        <label for="{{ formset.empty_form.financ_valor_parcela.id_for_label }}">Valor da parcela</label>
-                                        {{ formset.empty_form.financ_valor_parcela }}
-                                    </div>
                                 </div>
                             </div>
-                        </article>
+
+                            <div class="prop-extra-financiamento campos-financiamento" data-extra="financiamento">
+                                <div class="prop-campo">
+                                        <label for="{{ formset.empty_form.financ_banco.id_for_label }}">Banco</label>
+                                        {{ formset.empty_form.financ_banco }}
+                                </div>
+
+                                <div class="prop-campo">
+                                        <label for="{{ formset.empty_form.financ_parcelas.id_for_label }}">Número de parcelas</label>
+                                        {{ formset.empty_form.financ_parcelas }}
+                                </div>
+
+                                <div class="prop-campo">
+                                        <label for="{{ formset.empty_form.financ_valor_parcela.id_for_label }}">Valor da parcela</label>
+                                        {{ formset.empty_form.financ_valor_parcela }}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                     </template>
 
                     <div style="margin-top:14px">
@@ -189,9 +189,12 @@
                     </div>
 
                     <div class="prop-composicao-resumo">
-                        <div><span>Soma da composição</span><strong id="resumo-soma">R$ 0,00</strong></div>
-                        <div><span>Valor oferecido</span><strong id="resumo-valor-oferecido-composicao">R$ 0,00</strong></div>
-                        <div><span>Diferença</span><strong id="resumo-diferenca">R$ 0,00</strong></div>
+                        <div><span>Soma da composição</span><strong id="resumo-soma">R$ 0,00</strong>
+                        </div>
+                        <div><span>Valor oferecido</span><strong id="resumo-valor-oferecido-composicao">R$ 0,00</strong>
+                        </div>
+                        <div><span>Diferença</span><strong id="resumo-diferenca">R$ 0,00</strong>
+                        </div>
                     </div>
                     <div class="prop-aviso prop-composicao-alerta" id="aviso-composicao" role="alert" hidden>
                         <span id="aviso-composicao-texto"></span>

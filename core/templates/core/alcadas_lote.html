@@ -5,18 +5,48 @@
 {% block content %}
 <div class="al-lote">
 <a href="{% url 'veiculos' %}">← Voltar ao estoque</a>
-<h1>Alçadas em lote</h1><p>Defina o desconto máximo autorizado para os veículos selecionados.</p>
+    <h1>Alçadas em lote</h1>
+    <p>Defina o desconto máximo autorizado para os veículos selecionados.</p>
 {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
-<form method="get" class="al-card al-row">
-<label>Marca<select name="marca"><option value="">Todas</option>{% for m in marcas %}<option {% if m == marca %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
-<label>Categoria<select name="categoria"><option value="">Todas</option>{% for k,v in categorias %}<option value="{{ k }}" {% if k == categoria %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></label>
-<label><input type="checkbox" name="zero" value="1" {% if zero %}checked{% endif %}> Apenas alçada zero</label><button>Filtrar</button></form>
-<form method="post" id="al-form" class="al-card">{% csrf_token %}
-{{ form.non_field_errors }}<div class="al-row">{{ form.tipo.label_tag }}{{ form.tipo }}{{ form.tipo.errors }}{{ form.valor.label_tag }}{{ form.valor }}{{ form.valor.errors }}<button type="submit">Aplicar alçada</button></div>
+    <form method="get" class="al-card al-row">
+<label>Marca<select name="marca">
+        <option value="">Todas</option>{% for m in marcas %}<option {% if m == marca %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
+<label>Categoria<select name="categoria">
+        <option value="">Todas</option>{% for k,v in categorias %}<option value="{{ k }}" {% if k == categoria %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></label>
+<label><input type="checkbox" name="zero" value="1" {% if zero %}checked{% endif %}> Apenas alçada zero</label><button>Filtrar</button>
+    </form>
+    <form method="post" id="al-form" class="al-card">{% csrf_token %}
+{{ form.non_field_errors }}<div class="al-row">{{ form.tipo.label_tag }}{{ form.tipo }}{{ form.tipo.errors }}{{ form.valor.label_tag }}{{ form.valor }}{{ form.valor.errors }}<button type="submit">Aplicar alçada</button>
+</div>
 <p id="al-count" aria-live="polite">0 selecionados</p>
-<div class="al-scroll"><table><thead><tr><th><input type="checkbox" id="al-all" aria-label="Selecionar todos os resultados"></th><th>Veículo</th><th>Placa</th><th>Preço (R$)</th><th>Alçada atual</th></tr></thead><tbody>
-{% for v in veiculos %}<tr><td><input type="checkbox" name="veiculos" value="{{ v.pk }}" aria-label="Selecionar {{ v.placa }}"></td><td>{{ v.marca }} {{ v.modelo }}</td><td>{{ v.placa }}</td><td>{{ v.preco_venda|default_if_none:'—' }}</td><td>{{ v.valor_alcada }} {{ v.get_tipo_alcada_display }}</td></tr>{% empty %}<tr><td colspan="5">Nenhum veículo elegível.</td></tr>{% endfor %}
-</tbody></table></div></form>
-<section class="al-card"><h2>Histórico de alterações em lote</h2><div class="al-scroll"><table><thead><tr><th>Data</th><th>Veículo</th><th>Gerente</th><th>Anterior</th><th>Novo</th></tr></thead><tbody>{% for h in historico %}<tr><td>{{ h.criado_em|date:'d/m/Y H:i' }}</td><td>{{ h.veiculo.placa }}</td><td>{{ h.gerente }}</td><td>{{ h.valor_anterior }} {{ h.tipo_anterior }}</td><td>{{ h.valor_novo }} {{ h.tipo_novo }}</td></tr>{% empty %}<tr><td colspan="5">Sem alterações registradas.</td></tr>{% endfor %}</tbody></table></div></section></div>
+<div class="al-scroll">
+    <table>
+        <thead>
+            <tr><th><input type="checkbox" id="al-all" aria-label="Selecionar todos os resultados"></th><th>Veículo</th><th>Placa</th><th>Preço (R$)</th><th>Alçada atual</th>
+            </tr>
+        </thead>
+        <tbody>
+{% for v in veiculos %}<tr><td><input type="checkbox" name="veiculos" value="{{ v.pk }}" aria-label="Selecionar {{ v.placa }}"></td><td>{{ v.marca }} {{ v.modelo }}</td><td>{{ v.placa }}</td><td>{{ v.preco_venda|default_if_none:'—' }}</td><td>{{ v.valor_alcada }} {{ v.get_tipo_alcada_display }}</td>
+        </tr>{% empty %}<tr><td colspan="5">Nenhum veículo elegível.</td>
+    </tr>{% endfor %}
+</tbody>
+</table>
+</div>
+</form>
+<section class="al-card">
+    <h2>Histórico de alterações em lote</h2>
+    <div class="al-scroll">
+        <table>
+            <thead>
+                <tr><th>Data</th><th>Veículo</th><th>Gerente</th><th>Anterior</th><th>Novo</th>
+                </tr>
+            </thead>
+            <tbody>{% for h in historico %}<tr><td>{{ h.criado_em|date:'d/m/Y H:i' }}</td><td>{{ h.veiculo.placa }}</td><td>{{ h.gerente }}</td><td>{{ h.valor_anterior }} {{ h.tipo_anterior }}</td><td>{{ h.valor_novo }} {{ h.tipo_novo }}</td>
+            </tr>{% empty %}<tr><td colspan="5">Sem alterações registradas.</td>
+        </tr>{% endfor %}</tbody>
+    </table>
+</div>
+</section>
+</div>
 <script src="{% static 'core/js/alcadas_lote.js' %}" defer></script>
 {% endblock %}

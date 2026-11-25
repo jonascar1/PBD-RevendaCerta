@@ -21,12 +21,11 @@
 {% if messages %}
 <section class="neg-messages">
     {% for message in messages %}
-        <div class="neg-message">{{ message }}</div>
+    <div class="neg-message">{{ message }}</div>
     {% endfor %}
 </section>
 {% endif %}
 
-<!-- PRONTAS PARA ENTREGA -->
 {% if prontas and not request.user.is_administrativo %}
 <section class="neg-section">
     <div class="neg-section-header">
@@ -39,7 +38,8 @@
     <div class="neg-table-container">
         <table class="neg-table">
             <thead>
-                <tr><th>Venda</th><th>Cliente</th><th>Veículo</th><th>Ação</th></tr>
+                <tr><th>Venda</th><th>Cliente</th><th>Veículo</th><th>Ação</th>
+                </tr>
             </thead>
             <tbody>
                 {% for venda in prontas %}
@@ -60,7 +60,6 @@
 </section>
 {% endif %}
 
-<!-- ETAPAS -->
 <section class="neg-section">
     <div class="neg-section-header">
         <div>
@@ -112,16 +111,16 @@
                     </td>
 
                     <td>
-                        <form class="neg-form-etapa" method="post" action="{% url 'atualizar_etapa_documentacao' etapa.pk %}">
+                    <form class="neg-form-etapa" method="post" action="{% url 'atualizar_etapa_documentacao' etapa.pk %}">
                             {% csrf_token %}
 
-                            <select name="situacao">
+                        <select name="situacao">
                                 {% for valor, rotulo in situacoes %}
-                                    <option value="{{ valor }}" {% if etapa.situacao == valor %}selected{% endif %}>
+                            <option value="{{ valor }}" {% if etapa.situacao == valor %}selected{% endif %}>
                                         {{ rotulo }}
-                                    </option>
+                            </option>
                                 {% endfor %}
-                            </select>
+                        </select>
 
                             <input type="date" name="data" title="Data (vazio = hoje)">
 
@@ -129,7 +128,7 @@
                                    placeholder="Observação" value="{{ etapa.observacao }}">
 
                             <button type="submit" class="neg-action">Salvar</button>
-                        </form>
+                    </form>
                     </td>
                 </tr>
 
