@@ -22,13 +22,7 @@
         </a>
     </header>
 
-    {% if messages %}
-    <div class="cart-mensagens">
-            {% for message in messages %}
-        <p class="cart-mensagem">{{ message }}</p>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <section class="cart-painel cart-formulario">
         <h2>Prazo sem comprar</h2>

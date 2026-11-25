@@ -23,13 +23,7 @@
         </a>
     </header>
 
-    {% if messages %}
-    <div class="cart-mensagens">
-            {% for message in messages %}
-        <p class="cart-mensagem">{{ message }}</p>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <section class="cart-painel">
         <div class="cart-secao-topo">

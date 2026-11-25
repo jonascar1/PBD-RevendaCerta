@@ -18,13 +18,7 @@
     </div>
 </header>
 
-{% if messages %}
-<section class="neg-messages">
-    {% for message in messages %}
-    <div class="neg-message">{{ message }}</div>
-    {% endfor %}
-</section>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 {% if prontas and not request.user.is_administrativo %}
 <section class="neg-section">
@@ -48,7 +42,7 @@
                     <td>{{ venda.cliente.nome_exibicao }}</td>
                     <td>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</td>
                     <td>
-                        <a class="neg-action" href="{% url 'registrar_entrega' venda.pk %}">
+                        <a class="neg-action" href="{% url 'registrar_entrega' venda.pk %}?origem=documentacao">
                             Registrar entrega <i data-lucide="arrow-right"></i>
                         </a>
                     </td>
@@ -91,7 +85,7 @@
                 <tr>
                     <td>
                         <strong>
-                            <a href="{% url 'detalhes_venda' etapa.venda_id %}">#{{ etapa.venda_id }}</a>
+                            <a class="rc-inline-link" href="{% url 'detalhes_venda' etapa.venda_id %}">#{{ etapa.venda_id }}</a>
                         </strong>
                         <small>{{ etapa.venda.data|date:"d/m/Y" }}</small>
                     </td>

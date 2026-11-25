@@ -6,9 +6,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_venda.css' %}?v=rc4-84c85f416331">
+<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-font-1">
 {% endblock %}
 
 {% block content %}
+<div class="rc-consulta rc-consulta-detalhe">
 
 <header class="topo">
     <div>
@@ -20,26 +22,19 @@
     </div>
 
     <div class="topo-acoes">
-        <a href="{% url 'detalhes_veiculo' venda.veiculo_id %}" class="btn-voltar">
-            <i data-lucide="chevron-left"></i> Voltar ao veículo
-        </a>
-        <a href="{% url 'contrato_venda' venda.pk %}" class="btn-preco" target="_blank">
-            Ver contrato
-        </a>
-                <a href="{% url 'historico_veiculo' venda.veiculo_id %}" class="btn-voltar">Histórico do veículo</a>
+        <a href="{% url 'vendas_painel' %}" class="btn-voltar">Voltar às vendas</a>
+        <a href="{% url 'contrato_venda' venda.pk %}" class="btn-preco" target="_blank">Ver contrato</a>
         {% if request.user.is_gerente %}
-            <a href="{% url 'historico_cliente' venda.cliente_id %}" class="btn-voltar">Histórico do cliente</a>
+            <a href="{% url 'historico_veiculo' venda.veiculo_id %}" class="btn-voltar">Histórico do veículo</a>
+            <a href="{% url 'historico_cliente' venda.cliente_id %}?origem=vendas" class="btn-voltar">Histórico do cliente</a>
+        {% endif %}
+        {% if venda.esta_fechada %}
+            <a href="{% url 'registrar_entrega' venda.pk %}?origem=vendas" class="btn-voltar">Consultar entrega</a>
         {% endif %}
     </div>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message message-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="detalhes-container">
     <div class="informacoes">
@@ -153,6 +148,14 @@
             </div>
         </div>
 
+        <div class="card-info">
+            <h3>Documentação</h3>
+            <div class="info-grid">
+                {% for etapa in venda.etapas_documentacao.all %}
+                    <div class="info-item"><span>{{ etapa.get_tipo_display }}</span><strong>{{ etapa.get_situacao_display }}</strong><small>{{ etapa.data|date:"d/m/Y" }}</small></div>
+                {% empty %}<p>Nenhuma etapa registrada.</p>{% endfor %}
+            </div>
+        </div>
         {% if not venda.esta_fechada %}
         <div class="card-info">
             <h3>Cancelamento</h3>
@@ -203,6 +206,7 @@
 </div>
 </section>
 
+</div>
 {% endblock content %}
 {% block extra_js %}
 <script src="{% static 'core/js/acoes_comuns.js' %}"></script>

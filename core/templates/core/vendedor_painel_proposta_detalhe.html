@@ -8,15 +8,7 @@
 
 {% block content %}
 <div class="propostas-page">
-    {% if messages %}
-    <div class="prop-mensagens">
-            {% for message in messages %}
-        <div class="prop-mensagem prop-mensagem-{{ message.tags }}">
-                    {{ message }}
-        </div>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     {% if proposta.status_aprovacao == "PENDENTE" %}
     <div class="prop-card prop-card-p prop-aviso-aprovacao">

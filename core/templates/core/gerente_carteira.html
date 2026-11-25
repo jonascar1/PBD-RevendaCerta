@@ -25,13 +25,7 @@
         </a>
     </header>
 
-    {% if messages %}
-    <div class="cart-mensagens">
-            {% for message in messages %}
-        <p class="cart-mensagem">{{ message }}</p>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">
@@ -72,9 +66,9 @@
                             <th>Última compra</th>
                             <th>Tempo decorrido</th>
                             <th>Contatado no mês</th>
-                            <th>Vendedores associados</th>
                             <th>Último contato</th>
                             <th>Retorno</th>
+                            <th>Vendedores associados</th>
                     </tr>
                 </thead>
                 <tbody>

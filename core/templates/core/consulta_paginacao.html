@@ -1,0 +1,5 @@
+<nav class="rc-consulta-paginacao" aria-label="Paginação">
+    {% if pagina.has_previous %}<a class="rc-consulta-btn rc-secondary" href="?q={{ busca|urlencode }}&amp;situacao={{ situacao|urlencode }}&amp;page={{ pagina.previous_page_number }}">Anterior</a>{% endif %}
+    <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }} · {{ pagina.paginator.count }} registros</span>
+    {% if pagina.has_next %}<a class="rc-consulta-btn rc-secondary" href="?q={{ busca|urlencode }}&amp;situacao={{ situacao|urlencode }}&amp;page={{ pagina.next_page_number }}">Próxima</a>{% endif %}
+</nav>

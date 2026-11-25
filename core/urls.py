@@ -8,7 +8,11 @@ from .alcada_views import alcadas_lote
 
 from .preferencias_views import preferencias_view
 
+from .consultas_views import clientes_gerente, vendas_painel
+
 urlpatterns = [
+    path("painel/gerente/clientes/", clientes_gerente, name="clientes_gerente"),
+    path("painel/vendas/", vendas_painel, name="vendas_painel"),
     path("painel/configuracoes/", preferencias_view, name="preferencias"),
     path("painel/gerente/veiculos/alcadas/", alcadas_lote, name="alcadas_lote"),
     path("painel/gerente/metas/", configurar_metas, name="configurar_metas"),

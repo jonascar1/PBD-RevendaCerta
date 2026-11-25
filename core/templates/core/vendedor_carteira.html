@@ -14,15 +14,7 @@
         </div>
     </header>
 
-    {% if messages %}
-    <div class="cart-mensagens">
-            {% for message in messages %}
-        <div class="cart-alerta cart-alerta-{{ message.tags }}">
-                    {{ message }}
-        </div>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">

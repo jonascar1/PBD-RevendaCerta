@@ -20,13 +20,7 @@
     </a>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message message-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="decisao-grid">
 

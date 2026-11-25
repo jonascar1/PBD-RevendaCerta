@@ -1,0 +1,47 @@
+.ao-documentacao .ao-doc-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+.ao-documentacao .ao-doc-heading > div { min-width: 0; }
+.ao-documentacao .ao-doc-heading p { margin-bottom: 8px; }
+.ao-documentacao .ao-doc-status {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    background: light-dark(#e4edff, #203858);
+    color: light-dark(#1958d8, #a4c8ff);
+}
+.ao-documentacao .ao-doc-status.entregue,
+.ao-documentacao .ao-doc-status.concluida {
+    background: light-dark(#def3e9, #153e34);
+    color: light-dark(#08764d, #86efac);
+}
+.ao-documentacao .ao-doc-status.pendente {
+    background: light-dark(#fce5e7, #49252e);
+    color: light-dark(#b42332, #fda4af);
+}
+.ao-documentacao .ao-doc-status.em_andamento {
+    background: light-dark(#f9ecd3, #49391f);
+    color: light-dark(#86540b, #fcd38b);
+}
+.ao-documentacao .ao-tile-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.ao-documentacao .ao-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 130px); padding: 10px 12px; gap: 4px 10px; }
+.ao-documentacao .ao-stage select { font-size: 12px; padding: 7px 9px; background: light-dark(#f4f7fb, #121c2e); }
+.ao-documentacao .ao-stage strong { font-size: 13px; }
+.ao-documentacao .ao-stage details { grid-column: 1 / -1; }
+.ao-documentacao .ao-stage summary { cursor: pointer; color: light-dark(#64748b, #a0b1c8); }
+.ao-documentacao .ao-stage details[open] label { display: block; margin-top: 8px; }
+.ao-documentacao .ao-stage details button { margin-top: 8px; background: linear-gradient(115deg, #1958d8, #248ed8); }
+.ao-documentacao .ao-feedback { padding: 12px 16px; }
+.ao-documentacao .ao-feedback.error { color: light-dark(#b42332, #fda4af); }
+.ao-documentacao .ao-feedback.success { color: light-dark(#08764d, #86efac); }
+@media (max-width: 380px) {
+    .ao-documentacao .ao-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 110px); }
+    .ao-documentacao .ao-stage select { padding: 6px 4px; }
+}

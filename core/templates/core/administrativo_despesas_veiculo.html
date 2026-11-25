@@ -48,7 +48,7 @@
                 <tr><th>Descrição</th><th>Data</th><th>Valor</th><th>Ações</th>
                 </tr>
             </thead>
-            <tbody>{% for despesa in despesas %}<tr><td><strong>{{ despesa.descricao }}</strong></td><td>{{ despesa.data_lancamento|date:'d/m/Y' }}</td><td>R$ {{ despesa.valor|floatformat:2 }}</td><td><a class="rc-action-secondary" href="{% url 'editar_despesa' despesa.pk %}">Editar</a> &nbsp; <a href="{% url 'excluir_despesa' despesa.pk %}">Excluir</a></td>
+            <tbody>{% for despesa in despesas %}<tr><td><strong>{{ despesa.descricao }}</strong></td><td>{{ despesa.data_lancamento|date:'d/m/Y' }}</td><td>R$ {{ despesa.valor|floatformat:2 }}</td><td><a class="rc-action-secondary" href="{% url 'editar_despesa' despesa.pk %}">Editar</a> &nbsp; <a class="rc-action-secondary rc-action-danger" href="{% url 'excluir_despesa' despesa.pk %}">Excluir</a></td>
             </tr>{% empty %}<tr><td colspan="4">
             <div class="ad-empty">Nenhuma despesa registrada para este veículo.</div></td>
         </tr>{% endfor %}</tbody>

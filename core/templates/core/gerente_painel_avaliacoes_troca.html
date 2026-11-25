@@ -6,7 +6,7 @@
 {% block title %}Avaliações de troca | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_painel_avaliacoes_troca.css' %}?v=rc4-fbe3ee58780c">
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_avaliacoes_troca.css' %}?v=rc-font-1">
 {% endblock extra_css %}
 
 {% block content %}
@@ -23,15 +23,7 @@
     </a>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message message-{{ message.tags }}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="section">
     <div class="card avaliacoes-card">

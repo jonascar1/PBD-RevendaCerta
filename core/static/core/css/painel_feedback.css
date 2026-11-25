@@ -1,0 +1,12 @@
+/* Isolated feedback and destructive actions; no global element overrides. */
+.rc-panel-body main .rc-feedback-list { display: grid; gap: 10px; margin: 0 0 20px; }
+.rc-panel-body main .rc-feedback { padding: 12px 16px; border: 1px solid light-dark(#cbd5e1,#475569); border-radius: 10px; background: light-dark(#f8fafc,#1e293b); color: light-dark(#334155,#e2e8f0); font: inherit; line-height: 1.5; overflow-wrap: anywhere; }
+.rc-panel-body main .rc-feedback.success { background: light-dark(#ecfdf5,#14382d); border-color: light-dark(#a7f3d0,#2d5947); color: light-dark(#065f46,#86efac); }
+.rc-panel-body main .rc-feedback.error { background: light-dark(#fef2f2,#3b2533); border-color: light-dark(#fecaca,#70404f); color: light-dark(#991b1b,#fda4af); }
+.rc-panel-body main .rc-feedback.warning { background: light-dark(#fffbeb,#392e20); border-color: light-dark(#fde68a,#67502e); color: light-dark(#92400e,#fcd38b); }
+.rc-panel-body main .rc-feedback.info { background: light-dark(#eff6ff,#1a3455); border-color: light-dark(#bfdbfe,#385982); color: light-dark(#1e40af,#93c5fd); }
+.rc-panel-body main .rc-action-secondary.rc-action-danger { background: light-dark(#fef2f2,#3b2533); border-color: light-dark(#fecaca,#70404f); color: light-dark(#b91c1c,#fda4af); }
+.rc-panel-body main .rc-action-secondary.rc-action-danger:hover { background: light-dark(#fee2e2,#542b39); }
+
+.rc-panel-body main a.rc-inline-link { color: light-dark(#1958d8,#93c5fd); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.rc-panel-body main a.rc-inline-link:focus-visible { outline: 2px solid #248ed8; outline-offset: 3px; }

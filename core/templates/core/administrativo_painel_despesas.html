@@ -1,4 +1,4 @@
-{% extends "core/administrativo_base.html" %}{% load static %}{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/admin_operacoes.css' %}?v=rc-mobile-1">{% endblock %}{% block content %}<div class="ao">{% for message in messages %}<p role="status" class="ao-card">{{ message }}</p>{% endfor %}<header><small>ADMINISTRATIVO</small>
+{% extends "core/administrativo_base.html" %}{% load static %}{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/admin_operacoes.css' %}?v=rc-mobile-1">{% endblock %}{% block content %}<div class="ao">{% include "core/partials/painel_mensagens.html" %}<header><small>ADMINISTRATIVO</small>
 <h1>Despesas</h1>
 <p>Lance cada gasto no veículo e acompanhe seu custo total.</p>
 </header>
@@ -49,7 +49,7 @@
                 <tr><th>Descrição</th><th>Data</th><th>Valor</th><th>Ações</th>
                 </tr>
             </thead>
-            <tbody>{% for despesa in lista %}<tr><td>{{ despesa.descricao }}<small>{{ despesa.get_categoria_despesa_display }}</small></td><td>{{ despesa.data_lancamento|date:"d/m/Y" }}</td><td>R$ {{ despesa.valor|floatformat:2 }}</td><td><a class="rc-action-secondary" href="{% url 'editar_despesa' despesa.pk %}">Editar</a> · <a href="{% url 'excluir_despesa' despesa.pk %}">Excluir</a></td>
+            <tbody>{% for despesa in lista %}<tr><td>{{ despesa.descricao }}<small>{{ despesa.get_categoria_despesa_display }}</small></td><td>{{ despesa.data_lancamento|date:"d/m/Y" }}</td><td>R$ {{ despesa.valor|floatformat:2 }}</td><td><a class="rc-action-secondary" href="{% url 'editar_despesa' despesa.pk %}">Editar</a> · <a class="rc-action-secondary rc-action-danger" href="{% url 'excluir_despesa' despesa.pk %}">Excluir</a></td>
             </tr>{% empty %}<tr><td colspan="4">Nenhuma despesa registrada.</td>
         </tr>{% endfor %}</tbody>
     </table>

@@ -4,10 +4,10 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/alcadas_lote.css' %}?v=rc4-355125a8eabc">{% endblock %}
 {% block content %}
 <div class="al-lote">
-<a href="{% url 'veiculos' %}">← Voltar ao estoque</a>
+<a class="rc-action-secondary" href="{% url 'veiculos' %}">← Voltar ao estoque</a>
     <h1>Alçadas em lote</h1>
     <p>Defina o desconto máximo autorizado para os veículos selecionados.</p>
-{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+{% include "core/partials/painel_mensagens.html" %}
     <form method="get" class="al-card al-row">
 <label>Marca<select name="marca">
         <option value="">Todas</option>{% for m in marcas %}<option {% if m == marca %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>

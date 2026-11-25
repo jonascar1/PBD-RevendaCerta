@@ -7,9 +7,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
 <link rel="stylesheet" href="{% static 'core/css/gerente_historico_cliente.css' %}?v=rc4-5c9836a3d498">
+<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-font-1">
 {% endblock %}
 
 {% block content %}
+<div class="rc-consulta rc-consulta-detalhe">
 
 <header class="topo">
     <div>
@@ -22,8 +24,8 @@
     </div>
 
     <div class="topo-acoes">
-        <a href="{% url 'negociacoes_gerente' %}" class="btn-voltar">
-            <i data-lucide="chevron-left"></i> Voltar às negociações
+        <a href="{% if request.GET.origem == 'veiculos' %}{% url 'veiculos' %}{% elif request.GET.origem == 'negociacoes' %}{% url 'negociacoes_gerente' %}{% elif request.GET.origem == 'procuras' %}{% url 'procuras_gerente' %}{% elif request.GET.origem == 'vendas' %}{% url 'vendas_painel' %}{% else %}{% url 'clientes_gerente' %}{% endif %}" class="btn-voltar">
+            <i data-lucide="chevron-left"></i> Voltar
         </a>
     </div>
 </header>
@@ -284,4 +286,5 @@
         </table>
     </div>
 </section>
+</div>
 {% endblock content %}

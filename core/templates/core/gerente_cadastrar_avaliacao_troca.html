@@ -7,7 +7,7 @@ Cadastrar avaliação de troca | REVENDA CERTA
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_avaliacao_troca.css' %}?v=rc4-0d14f924e8cb">
+<link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_avaliacao_troca.css' %}?v=rc-font-1">
 {% endblock %}
 
 {% block content %}
@@ -19,15 +19,7 @@ Cadastrar avaliação de troca | REVENDA CERTA
     </div>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message message-{{ message.tags }}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <form method="POST" enctype="multipart/form-data" novalidate>
     {% csrf_token %}

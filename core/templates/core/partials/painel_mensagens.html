@@ -1,0 +1,7 @@
+{% if messages %}
+<div class="rc-feedback-list" aria-live="polite">
+    {% for message in messages %}
+    <div class="rc-feedback {{ message.tags }}" role="{% if message.level >= 40 %}alert{% else %}status{% endif %}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}

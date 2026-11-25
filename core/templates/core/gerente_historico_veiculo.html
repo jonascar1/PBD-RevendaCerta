@@ -71,7 +71,7 @@
                     <small class="hist-autor">
                         por {{ evento.autor }}
                         {% if evento.cliente_id %}
-                            · <a href="{% url 'historico_cliente' evento.cliente_id %}">ver cliente</a>
+                            · <a href="{% url 'historico_cliente' evento.cliente_id %}?origem=veiculos">ver cliente</a>
                         {% endif %}
                         {% if evento.venda_id %}
                             · <a href="{% url 'detalhes_venda' evento.venda_id %}">ver venda</a>

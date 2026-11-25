@@ -38,11 +38,7 @@
     </div>
 </header>
 
-{% if messages %}
-    {% for message in messages %}
-<div class="mensagem-cliente {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="cliente-container">
 

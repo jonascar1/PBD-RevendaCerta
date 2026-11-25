@@ -19,13 +19,7 @@
         </div>
     </header>
 
-    {% if messages %}
-    <div class="cart-mensagens">
-            {% for message in messages %}
-        <p class="cart-mensagem">{{ message }}</p>
-            {% endfor %}
-    </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">
@@ -101,7 +95,7 @@
                         {% for procura in procuras %}
                     <tr>
                                 <td>
-                                    <a href="{% url 'historico_cliente' procura.cliente_id %}" class="cart-link">
+                                    <a href="{% url 'historico_cliente' procura.cliente_id %}?origem=procuras" class="cart-link">
                                         {{ procura.cliente }}
                                     </a>
                                 </td>

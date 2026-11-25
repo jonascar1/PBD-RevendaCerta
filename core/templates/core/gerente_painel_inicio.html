@@ -8,7 +8,7 @@
         <h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1>
         <p>Veja como a loja está indo em {% language "pt-br" %}{% now "F" %}{% endlanguage %}: vendas, estoque e equipe em um só lugar.</p>
     </header>
-{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+{% include "core/partials/painel_mensagens.html" %}
     <div id="rd-kpis" class="rd-grid">
     </div>
     <div class="rd-grid rd-main">

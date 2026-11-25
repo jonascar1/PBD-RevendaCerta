@@ -17,15 +17,7 @@
     </div>
 </header>
 
-{% if messages %}
-<section class="neg-messages">
-    {% for message in messages %}
-    <div class="neg-message">
-            {{ message }}
-    </div>
-    {% endfor %}
-</section>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="neg-resumo">
 
@@ -131,7 +123,7 @@
                         <small>{{ proposta.criada_em|date:"d/m/Y" }}</small>
                                        <td>
                         <strong>
-                            <a href="{% url 'historico_cliente' proposta.cliente_id %}">{{ proposta.cliente }}</a>
+                            <a class="rc-inline-link" href="{% url 'historico_cliente' proposta.cliente_id %}?origem=negociacoes">{{ proposta.cliente }}</a>
                         </strong>
                     </td>
                         <strong>

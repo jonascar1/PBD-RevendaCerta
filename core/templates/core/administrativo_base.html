@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="{% static 'core/css/administrativo_dashboard.css' %}?v=rc4-e6aeb6ec7c53">
 <link rel="stylesheet" href="{% static 'core/css/painel_responsivo.css' %}?v=rc-mobile-1">
     <link rel="stylesheet" href="{% static 'core/css/painel_ajustes_navegacao.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'core/css/painel_feedback.css' %}?v=2">
 </head>
 
 <body class="rc-panel-body" data-pref-user="{{ request.user.pk|stringformat:'s' }}">
@@ -64,6 +65,11 @@
                     Início
                 </a>
 
+
+                <a href="{% url 'vendas_painel' %}" class="menu-item {% if request.resolver_match.url_name == 'vendas_painel' or request.resolver_match.url_name == 'detalhes_venda' or request.resolver_match.url_name == 'contrato_venda' %}active ativo{% endif %}">
+                    <span><i data-lucide="shopping-bag"></i></span>
+                    Vendas
+                </a>
                 <a href="{% url 'despesas' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'despesas' or request.resolver_match.url_name == 'adicionar_despesa' or request.resolver_match.url_name == 'despesas_veiculo' or request.resolver_match.url_name == 'excluir_despesa' or request.resolver_match.url_name == 'editar_despesa' or request.resolver_match.url_name == 'despesas_excluidas_veiculo' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="circle-dollar-sign"></i></span>
@@ -75,7 +81,7 @@
                     Documentação
                 </a>
 
-                <a href="{% url 'entregas_administrativo' %}" class="menu-item {% if request.resolver_match.url_name == 'entregas_administrativo' or request.resolver_match.url_name == 'registrar_entrega' or request.resolver_match.url_name == 'detalhes_venda' or request.resolver_match.url_name == 'contrato_venda' %}ativo active{% endif %}">
+                <a href="{% url 'entregas_administrativo' %}" class="menu-item {% if request.resolver_match.url_name == 'entregas_administrativo' or request.resolver_match.url_name == 'registrar_entrega' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="truck"></i></span>
                     Entrega do veículo
                 </a>
@@ -100,7 +106,7 @@
 
 
     <main class="conteudo rc-admin-main{% if request.resolver_match.url_name == 'adicionar_despesa' or request.resolver_match.url_name == 'editar_despesa' or request.resolver_match.url_name == 'excluir_despesa' %} rc-form-centered rc-form-760{% elif request.resolver_match.url_name == 'registrar_entrega' %} rc-form-centered rc-form-1000{% endif %}">
-        <div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% with n=request.resolver_match.url_name %}{% if n == 'painel_administrativo' %}Início{% elif n == 'despesas' or n == 'adicionar_despesa' or n == 'despesas_veiculo' or n == 'excluir_despesa' or n == 'editar_despesa' or n == 'despesas_excluidas_veiculo' %}Despesas{% elif n == 'documentacao_pendente' or n == 'atualizar_etapa_documentacao' %}Documentação{% elif n == 'entregas_administrativo' or n == 'registrar_entrega' or n == 'detalhes_venda' or n == 'contrato_venda' %}Entregas{% elif n == 'preferencias' %}Configurações{% else %}Área interna{% endif %}{% endwith %}</b></span>
+        <div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% with n=request.resolver_match.url_name %}{% if n == 'painel_administrativo' %}Início{% elif n == 'despesas' or n == 'adicionar_despesa' or n == 'despesas_veiculo' or n == 'excluir_despesa' or n == 'editar_despesa' or n == 'despesas_excluidas_veiculo' %}Despesas{% elif n == 'documentacao_pendente' or n == 'atualizar_etapa_documentacao' %}Documentação{% elif n == 'entregas_administrativo' or n == 'registrar_entrega' %}Entregas{% elif n == 'vendas_painel' or n == 'detalhes_venda' or n == 'contrato_venda' %}Vendas{% elif n == 'preferencias' %}Configurações{% else %}Área interna{% endif %}{% endwith %}</b></span>
             <div class="rc-top-actions"><time class="rc-date" datetime="{% now 'Y-m-d' %}">{% language 'pt-br' %}{% now "l, j \d\e F" %}{% endlanguage %}</time><a class="rc-store-preview" href="{% url 'vitrine' %}"><i data-lucide="store"></i> Ver vitrine</a>
             </div>
         </div>

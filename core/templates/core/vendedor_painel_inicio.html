@@ -8,7 +8,7 @@
         <h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1>
         <p>Suas vendas de {% language "pt-br" %}{% now "F" %}{% endlanguage %}, sua meta e os carros que merecem atenção agora.</p>
     </header>
-{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+{% include "core/partials/painel_mensagens.html" %}
     <div id="rd-kpis" class="rd-grid">
     </div>
     <div class="rd-grid rd-main">
@@ -73,4 +73,5 @@
 </div>
 {{ dashboard|json_script:'rd-data' }}
 {% endblock %}
-{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard_vendedor.js' %}?v=rc4-1320511b3781"></script>{% endblock %}
+{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script src="{% static 'core/js/dashboard_vendedor.js' %}?v=rc4-1320511b3781"></script>{% endblock %}
