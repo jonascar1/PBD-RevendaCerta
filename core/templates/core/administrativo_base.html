@@ -1,9 +1,11 @@
-{% load static %}
+{% load static i18n %}
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-rc-theme-scope="panel" data-rc-theme-user="{{ request.user.pk|stringformat:'s' }}">
 
 <head>
+    <script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script>
+
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,74 +16,82 @@
         {% endblock %}
     </title>
 
-    <!-- CSS PADRÃO DO PAINEL -->
-    <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}?v=5">
-    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
+    <link rel="stylesheet" href="{% static 'core/css/administrativo_base.css' %}?v=rc4-6abd5ce58788">
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
 
-    <!-- CSS ESPECÍFICO DE CADA PÁGINA -->
     {% block extra_css %}
     {% endblock %}
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
-    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}?v=rc4-cdb90c846034">
+    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=rc4-3c558988acdf">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}?v=rc-marca-1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}?v=rc4-4044a89494c9">
+<link rel="stylesheet" href="{% static 'core/css/administrativo_dashboard.css' %}?v=rc4-e6aeb6ec7c53">
+<link rel="stylesheet" href="{% static 'core/css/painel_responsivo.css' %}?v=rc-mobile-1">
+    <link rel="stylesheet" href="{% static 'core/css/painel_ajustes_navegacao.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'core/css/painel_feedback.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'core/css/painel_mobile_compacto.css' %}?v=4">
 </head>
 
-<body>
+<body class="rc-panel-body" data-pref-user="{{ request.user.pk|stringformat:'s' }}">
+<script>window.RCTheme?.apply();</script>
+<button type="button" class="rc-mobile-toggle" aria-controls="rc-sidebar" aria-expanded="false">☰ <span>Menu</span></button><button type="button" class="rc-mobile-backdrop" aria-label="Fechar menu" hidden></button>
 
-    <div class="layout">
+<div class="layout">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
+    <aside class="sidebar" id="rc-sidebar">
 
-            <div class="logo">
+        <div class="logo">
                 {% include "core/includes/marca.html" %}
+        </div>
+
+        <div class="perfil">
+            <div class="perfil-avatar">
+                    {{ request.user.first_name|first|upper }}
             </div>
 
-            <!-- PERFIL -->
-            <div class="perfil">
-                <div class="perfil-avatar">
-                    {{ request.user.first_name|first|upper }}
-                </div>
-
-                <div class="perfil-info">
+            <div class="perfil-info">
                     <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
                     <span>Administrativo</span>
-                </div>
             </div>
+        </div>
 
-            <!-- MENU -->
-            <nav class="menu">
+        <nav class="menu">
 
                 <a href="{% url 'painel_administrativo' %}" class="menu-item
-                {% if request.resolver_match.url_name == 'painel_administrativo' %}ativo{% endif %}">
+                {% if request.resolver_match.url_name == 'painel_administrativo' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="home"></i></span>
                     Início
                 </a>
 
+
+                <a href="{% url 'vendas_painel' %}" class="menu-item {% if request.resolver_match.url_name == 'vendas_painel' or request.resolver_match.url_name == 'detalhes_venda' or request.resolver_match.url_name == 'contrato_venda' %}active ativo{% endif %}">
+                    <span><i data-lucide="shopping-bag"></i></span>
+                    Vendas
+                </a>
                 <a href="{% url 'despesas' %}" class="menu-item
-                {% if request.resolver_match.url_name == 'despesas' or request.resolver_match.url_name == 'adicionar_despesa' or request.resolver_match.url_name == 'despesas_veiculo' or request.resolver_match.url_name == 'excluir_despesa' or request.resolver_match.url_name == 'editar_despesa' or request.resolver_match.url_name == 'despesas_excluidas_veiculo' %}ativo{% endif %}">
+                {% if request.resolver_match.url_name == 'despesas' or request.resolver_match.url_name == 'adicionar_despesa' or request.resolver_match.url_name == 'despesas_veiculo' or request.resolver_match.url_name == 'excluir_despesa' or request.resolver_match.url_name == 'editar_despesa' or request.resolver_match.url_name == 'despesas_excluidas_veiculo' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="circle-dollar-sign"></i></span>
                     Despesas
                 </a>
 
-                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
+                <a href="{% url 'documentacao_pendente' %}" class="menu-item {% if request.resolver_match.url_name == 'documentacao_pendente' or request.resolver_match.url_name == 'atualizar_etapa_documentacao' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="file-text"></i></span>
                     Documentação
                 </a>
 
-                <a href="{% url 'documentacao_pendente' %}" class="menu-item">
+                <a href="{% url 'entregas_administrativo' %}" class="menu-item {% if request.resolver_match.url_name == 'entregas_administrativo' or request.resolver_match.url_name == 'registrar_entrega' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="truck"></i></span>
                     Entrega do veículo
                 </a>
 
-            </nav>
+        </nav>
 
-            <!-- RODAPÉ SIDEBAR -->
-            <div class="sidebar-bottom">
+        <div class="sidebar-bottom">
 
-                <a href="#" class="menu-item">
+                <a href="{% url 'preferencias' %}" class="menu-item {% if request.resolver_match.url_name == 'preferencias' %}ativo active{% endif %}">
                     <span class="icone"><i data-lucide="settings"></i></span>
                     Configurações
                 </a>
@@ -91,29 +101,33 @@
                     Sair
                 </a>
 
+        </div>
+
+    </aside>
+
+
+    <main class="conteudo rc-admin-main{% if request.resolver_match.url_name == 'adicionar_despesa' or request.resolver_match.url_name == 'editar_despesa' or request.resolver_match.url_name == 'excluir_despesa' %} rc-form-centered rc-form-760{% elif request.resolver_match.url_name == 'registrar_entrega' %} rc-form-centered rc-form-1000{% endif %}">
+        <div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% with n=request.resolver_match.url_name %}{% if n == 'painel_administrativo' %}Início{% elif n == 'despesas' or n == 'adicionar_despesa' or n == 'despesas_veiculo' or n == 'excluir_despesa' or n == 'editar_despesa' or n == 'despesas_excluidas_veiculo' %}Despesas{% elif n == 'documentacao_pendente' or n == 'atualizar_etapa_documentacao' %}Documentação{% elif n == 'entregas_administrativo' or n == 'registrar_entrega' %}Entregas{% elif n == 'vendas_painel' or n == 'detalhes_venda' or n == 'contrato_venda' %}Vendas{% elif n == 'preferencias' %}Configurações{% else %}Área interna{% endif %}{% endwith %}</b></span>
+            <div class="rc-top-actions"><time class="rc-date" datetime="{% now 'Y-m-d' %}">{% language 'pt-br' %}{% now "l, j \d\e F" %}{% endlanguage %}</time><a class="rc-store-preview" href="{% url 'vitrine' %}"><i data-lucide="store"></i> Ver vitrine</a>
             </div>
-
-        </aside>
-
-
-        <!-- CONTEÚDO DA PÁGINA -->
-        <main class="conteudo">
+        </div>
 
             {% block content %}
             {% endblock %}
 
-        </main>
+    </main>
 
-    </div>
+</div>
 
 
-    <!-- JAVASCRIPT ESPECÍFICO DA PÁGINA -->
 
     <script src="{% static 'core/js/administrativo_base.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}
 
+<script src="{% static 'core/js/painel_preferencias.js' %}?v=rc6-3"></script>
+<script src="{% static 'core/js/painel_drawer.js' %}?v=1"></script>
 </body>
 
 </html>

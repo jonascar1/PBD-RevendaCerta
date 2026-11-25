@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_detalhes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_detalhes.css' %}?v=rc4-7e95f233bd2c">
 {% endblock %}
 
 {% block content %}
@@ -38,15 +38,10 @@
     </div>
 </header>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="mensagem-cliente {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="cliente-container">
 
-    <!-- DADOS DO CLIENTE -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="user"></i> Informações do Cliente</h3>
@@ -68,35 +63,35 @@
             </div>
 
             {% if cliente.tipo == "PF" %}
-                <div class="info-item">
+            <div class="info-item">
                     <span>Nome Completo</span>
                     <strong>{{ cliente.nome }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>CPF</span>
                     <strong>{{ cliente.cpf|cpf }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Data de nascimento</span>
                     <strong>{{ cliente.data_nascimento|date:"d/m/Y"|default:"-" }}</strong>
-                </div>
+            </div>
             {% else %}
-                <div class="info-item">
+            <div class="info-item">
                     <span>Razão Social</span>
                     <strong>{{ cliente.razao_social }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Nome Fantasia</span>
                     <strong>{{ cliente.nome_fantasia|default:"-" }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>CNPJ</span>
                     <strong>{{ cliente.cnpj|cnpj }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Responsável</span>
                     <strong>{{ cliente.responsavel|default:"-" }}</strong>
-                </div>
+            </div>
             {% endif %}
 
             <div class="info-item">
@@ -118,40 +113,38 @@
         </div>
     </div>
 
-    <!-- ENDEREÇO -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="map-pin"></i> Endereço</h3>
         </div>
 
         {% if cliente.logradouro or cliente.cidade or cliente.cep %}
-            <div class="info-grid">
-                <div class="info-item">
+        <div class="info-grid">
+            <div class="info-item">
                     <span>CEP</span>
                     <strong>{{ cliente.cep|cep|default:"-" }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Logradouro</span>
                     <strong>
                         {{ cliente.logradouro|default:"-" }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}
                         {% if cliente.complemento %} - {{ cliente.complemento }}{% endif %}
                     </strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Bairro</span>
                     <strong>{{ cliente.bairro|default:"-" }}</strong>
-                </div>
-                <div class="info-item">
+            </div>
+            <div class="info-item">
                     <span>Cidade / UF</span>
                     <strong>{{ cliente.cidade|default:"-" }}{% if cliente.estado %} / {{ cliente.estado }}{% endif %}</strong>
-                </div>
             </div>
+        </div>
         {% else %}
-            <p class="sem-registros">Endereço não informado.</p>
+        <p class="sem-registros">Endereço não informado.</p>
         {% endif %}
     </div>
 
-    <!-- VEÍCULOS COMPRADOS -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="shopping-bag"></i> Veículos Comprados</h3>
@@ -159,20 +152,20 @@
         </div>
 
         {% if veiculos_comprados %}
-            <div class="tabela-responsive">
-                <table class="tabela">
-                    <thead>
-                        <tr>
+        <div class="tabela-responsive">
+            <table class="tabela">
+                <thead>
+                    <tr>
                             <th>Veículo</th>
                             <th>Placa</th>
                             <th>Preço de Venda</th>
                             <th>Situação</th>
                             <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for veiculo in veiculos_comprados %}
-                            <tr>
+                    <tr>
                                 <td>
                                     <strong>{{ veiculo.marca }} {{ veiculo.modelo }}</strong>
                                     <span class="sub-info">{{ veiculo.ano_fabricacao|unlocalize }}/{{ veiculo.ano_modelo|unlocalize }}</span>
@@ -195,17 +188,16 @@
                                         <i data-lucide="eye"></i> Ver veículo
                                     </a>
                                 </td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <p class="sem-registros">Nenhum veículo comprado por este cliente até o momento.</p>
+        <p class="sem-registros">Nenhum veículo comprado por este cliente até o momento.</p>
         {% endif %}
     </div>
 
-    <!-- DOCUMENTAÇÃO DOS VEÍCULOS COMPRADOS -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="file-check"></i> Documentação do veículo comprado</h3>
@@ -213,26 +205,27 @@
         </div>
 
         {% for venda in vendas %}
-            <p>
+        <p>
                 <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</strong>
                 — {{ venda.veiculo.placa }} · venda #{{ venda.pk }}
                 de {{ venda.data|date:"d/m/Y" }}
-            </p>
+        </p>
 
-            <div class="tabela-responsive">
-                <table class="tabela">
-                    <thead>
-                        <tr><th>Etapa</th><th>Situação</th><th>Data</th></tr>
-                    </thead>
-                    <tbody>
+        <div class="tabela-responsive">
+            <table class="tabela">
+                <thead>
+                    <tr><th>Etapa</th><th>Situação</th><th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for etapa in venda.etapas_documentacao.all %}
-                            <tr>
+                    <tr>
                                 <td>{{ etapa.get_tipo_display }}</td>
                                 <td>{{ etapa.get_situacao_display }}</td>
                                 <td>{{ etapa.data|date:"d/m/Y"|default:"—" }}</td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                        <tr>
+                    <tr>
                             <td>Entrega</td>
                             {% if venda.entrega %}
                                 <td>Entregue</td>
@@ -241,16 +234,15 @@
                                 <td>Aguardando entrega</td>
                                 <td>—</td>
                             {% endif %}
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         {% empty %}
-            <p class="sem-registros">Este cliente ainda não comprou nenhum veículo.</p>
+        <p class="sem-registros">Este cliente ainda não comprou nenhum veículo.</p>
         {% endfor %}
     </div>
 
-    <!-- PROPOSTAS -->
     <div class="card-info">
         <div class="card-cabecalho">
             <h3><i data-lucide="circle-dollar-sign"></i> Propostas</h3>
@@ -264,21 +256,21 @@
         </div>
 
         {% if propostas %}
-            <div class="tabela-responsive">
-                <table class="tabela">
-                    <thead>
-                        <tr>
+        <div class="tabela-responsive">
+            <table class="tabela">
+                <thead>
+                    <tr>
                             <th>Veículo</th>
                             <th>Data</th>
                             <th>Valor oferecido</th>
                             <th>Desconto</th>
                             <th>Situação</th>
                             <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for proposta in propostas %}
-                            <tr>
+                    <tr>
                                 <td><strong>{{ proposta.veiculo.marca }} {{ proposta.veiculo.modelo }}</strong></td>
                                 <td>{{ proposta.data|date:"d/m/Y" }}</td>
                                 <td>R$ {{ proposta.valor_oferecido|floatformat:"2g" }}</td>
@@ -293,13 +285,13 @@
                                         <i data-lucide="eye"></i> Detalhes
                                     </a>
                                 </td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <p class="sem-registros">Nenhuma proposta registrada para este cliente.</p>
+        <p class="sem-registros">Nenhuma proposta registrada para este cliente.</p>
         {% endif %}
     </div>
 

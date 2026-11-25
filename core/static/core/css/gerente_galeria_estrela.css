@@ -1,9 +1,11 @@
 /* Galeria de fotos: controles discretos nos cantos superiores. */
+
 #fotos-existentes-container {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
     gap: 12px !important;
 }
+
 #fotos-existentes-container .foto-existente {
     position: relative !important;
     display: block !important;
@@ -13,20 +15,24 @@
     padding: 0 !important;
     border: 2px solid transparent !important;
     border-radius: 10px !important;
-    background: #eef2f7 !important;
+    background: light-dark(#eef2f7, #19263a) !important;
 }
+
 #fotos-existentes-container .foto-existente[hidden] {
     display: none !important;
 }
+
 #fotos-existentes-container .foto-existente.is-principal {
     border-color: #2563eb !important;
 }
+
 #fotos-existentes-container .foto-existente > img {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
 }
+
 #fotos-existentes-container .foto-existente .selecionar-principal,
 #fotos-existentes-container .foto-existente .remover-foto-existente {
     position: absolute !important;
@@ -46,12 +52,14 @@
     visibility: visible !important;
     transform: none !important;
 }
+
 #fotos-existentes-container .foto-existente .selecionar-principal {
     left: 7px !important;
     right: auto !important;
-    border: 1px solid #d4dce8 !important;
-    color: #64748b !important;
+    border: 1px solid light-dark(#d4dce8, #29384e) !important;
+    color: light-dark(#64748b, #a0b1c8) !important;
 }
+
 #fotos-existentes-container .foto-existente .selecionar-principal svg {
     width: 17px !important;
     height: 17px !important;
@@ -60,56 +68,68 @@
     fill: none !important;
     pointer-events: none !important;
 }
+
 #fotos-existentes-container .foto-existente.is-principal .selecionar-principal {
-    color: #2563eb !important;
-    border-color: #93c5fd !important;
+    color: light-dark(#2563eb, #78b5ff) !important;
+    border-color: light-dark(#93c5fd, #385982) !important;
 }
+
 #fotos-existentes-container .foto-existente.is-principal .selecionar-principal svg {
-    fill: #2563eb !important;
+    fill: light-dark(#2563eb, #78b5ff) !important;
 }
+
 #fotos-existentes-container .foto-existente .remover-foto-existente {
     right: 7px !important;
     left: auto !important;
-    border: 1px solid #fecaca !important;
-    color: #dc2626 !important;
+    border: 1px solid light-dark(#fecaca, #70404f) !important;
+    color: light-dark(#dc2626, #fda4af) !important;
 }
+
 #fotos-existentes-container .foto-existente .selecionar-principal:hover {
-    background: #eff6ff !important;
+    background: light-dark(#eff6ff, #1a3455) !important;
 }
+
 #fotos-existentes-container .foto-existente .foto-principal,
 #fotos-existentes-container .foto-existente .foto-acoes {
     display: none !important;
 }
 
 /* Exclusão reversível até salvar o formulário. */
+
 #fotos-existentes-container .foto-existente.pendente-exclusao > img {
     opacity: .28 !important;
     filter: grayscale(1) !important;
 }
+
 #fotos-existentes-container .foto-existente.pendente-exclusao {
-    border: 2px dashed #94a3b8 !important;
-    background: #e2e8f0 !important;
+    border: 2px dashed light-dark(#94a3b8, #29384e) !important;
+    background: light-dark(#e2e8f0, #19263a) !important;
 }
+
 #fotos-existentes-container .foto-existente.pendente-exclusao .remover-foto-existente {
-    color: #15803d !important;
-    border-color: #86efac !important;
-    background: #dcfce7 !important;
+    color: light-dark(#15803d, #86efac) !important;
+    border-color: light-dark(#86efac, #2d5947) !important;
+    background: light-dark(#dcfce7, #14382d) !important;
     font-size: 19px !important;
     font-weight: 800 !important;
 }
+
 #fotos-existentes-container .foto-existente.pendente-exclusao .selecionar-principal {
     opacity: .45 !important;
     cursor: not-allowed !important;
 }
 
 /* Ordenação manual das fotos existentes. */
+
 #fotos-existentes-container .foto-existente:not(.pendente-exclusao) {
     cursor: grab;
 }
+
 #fotos-existentes-container .foto-existente.foto-arrastando {
     opacity: .45 !important;
     cursor: grabbing;
 }
+
 #fotos-existentes-container .foto-existente button {
     cursor: pointer;
 }

@@ -1,22 +1,91 @@
 {% extends 'core/gerente_base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block title %}Painel do Gerente | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc4-a2ce074a721e">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
-<header class="rd-intro"><small>PAINEL DO GERENTE</small><h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1><p>Veja como a loja está indo em {% now "F" %}: vendas, estoque e equipe em um só lugar.</p></header>
-{% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
-<div id="rd-kpis" class="rd-grid"></div>
-<div class="rd-grid rd-main">
-<section class="rd-card rd-8"><header><div><h2>Vendas por mês</h2><p>Carros vendidos (barras) e faturamento (linha)</p></div><select id="rd-period" aria-label="Período"><option value="12">12 meses</option><option value="6">6 meses</option><option value="3">3 meses</option></select></header><div id="rd-summary" class="rd-summary"></div><div class="rd-chart"><canvas id="rd-sales"></canvas></div></section>
-<section class="rd-card rd-4"><h2>Meta mensal</h2><p>{{ dashboard.days_left }} dias para fechar o mês</p><div id="rd-goal"></div><a class="rd-meta-link" href="{% url 'configurar_metas' %}">Ajustar metas</a></section>
-<section class="rd-card rd-5"><h2>Modelos mais vendidos</h2><p>Modelos com mais unidades vendidas nos últimos 12 meses</p><div id="rd-top"></div></section>
-<section class="rd-card rd-7"><h2>Ranking da equipe</h2><p>Carros vendidos por vendedor no mês</p><div class="rd-chart tall"><canvas id="rd-ranking"></canvas></div></section>
-<section class="rd-card rd-12"><h2>Carros parados</h2><p>Tempo de cada carro no estoque — cada ponto é um carro. Parado = mais de 30 dias.</p><div id="rd-aging"></div><div class="rd-stock"><div class="rd-chart tall"><canvas id="rd-scatter"></canvas></div><div><h3>Há mais tempo no estoque</h3><div id="rd-stalled"></div></div></div></section>
-<section class="rd-card rd-4"><h2>Vendas por categoria</h2><p>Carros vendidos por tipo nos últimos 12 meses</p><div class="rd-donut"><canvas id="rd-category"></canvas><div id="rd-total"></div></div><div id="rd-legend"></div></section>
-<section class="rd-card rd-4"><h2>Funil de negociações</h2><p>Do primeiro atendimento à venda, neste mês</p><div id="rd-funnel"></div></section>
-<section class="rd-card rd-4"><h2>Movimento por dia da semana</h2><p>Em que dias saem mais vendas</p><div id="rd-week"></div></section>
-</div></div>
+    <header class="rd-intro"><small>PAINEL DO GERENTE</small>
+        <h1>Olá, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+        <p>Veja como a loja está indo em {% language "pt-br" %}{% now "F" %}{% endlanguage %}: vendas, estoque e equipe em um só lugar.</p>
+    </header>
+{% include "core/partials/painel_mensagens.html" %}
+    <div id="rd-kpis" class="rd-grid">
+    </div>
+    <div class="rd-grid rd-main">
+        <section class="rd-card rd-8">
+            <header>
+                <div>
+                    <h2>Vendas por mês</h2>
+                    <p>Carros vendidos (barras) e faturamento (linha)</p>
+                </div>
+                <select id="rd-period" aria-label="Período">
+                    <option value="12">12 meses</option>
+                    <option value="6">6 meses</option>
+                    <option value="3">3 meses</option>
+                </select>
+            </header>
+            <div id="rd-summary" class="rd-summary">
+            </div>
+            <div class="rd-chart"><canvas id="rd-sales"></canvas>
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Meta mensal</h2>
+            <p>{{ dashboard.days_left }} dias para fechar o mês</p>
+            <div id="rd-goal">
+            </div><a class="rd-meta-link" href="{% url 'configurar_metas' %}">Ajustar metas</a>
+        </section>
+        <section class="rd-card rd-5">
+            <h2>Modelos mais vendidos</h2>
+            <p>Modelos com mais unidades vendidas nos últimos 12 meses</p>
+            <div id="rd-top">
+            </div>
+        </section>
+        <section class="rd-card rd-7">
+            <h2>Ranking da equipe</h2>
+            <p>Carros vendidos por vendedor no mês</p>
+            <div class="rd-chart tall"><canvas id="rd-ranking"></canvas>
+            </div>
+        </section>
+        <section class="rd-card rd-12">
+            <h2>Carros parados</h2>
+            <p>Tempo de cada carro no estoque — cada ponto é um carro. Parado = mais de 30 dias.</p>
+            <div id="rd-aging">
+            </div>
+            <div class="rd-stock">
+                <div class="rd-chart tall"><canvas id="rd-scatter"></canvas>
+                </div>
+                <div>
+                    <h3>Há mais tempo no estoque</h3>
+                    <div id="rd-stalled">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Vendas por categoria</h2>
+            <p>Carros vendidos por tipo nos últimos 12 meses</p>
+            <div class="rd-donut"><canvas id="rd-category"></canvas>
+                <div id="rd-total">
+                </div>
+            </div>
+            <div id="rd-legend">
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Funil de negociações</h2>
+            <p>Do primeiro atendimento à venda, neste mês</p>
+            <div id="rd-funnel">
+            </div>
+        </section>
+        <section class="rd-card rd-4">
+            <h2>Movimento por dia da semana</h2>
+            <p>Em que dias saem mais vendas</p>
+            <div id="rd-week">
+            </div>
+        </section>
+    </div>
+</div>
 {{ dashboard|json_script:'rd-data' }}
 {% endblock %}
-{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard.js' %}?v=rc4-294e4c221334"></script>{% endblock %}

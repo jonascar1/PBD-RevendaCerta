@@ -1,54 +1,66 @@
-{% load static %}
+{% load static i18n %}
 {% load static l10n %}
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-rc-theme-scope="panel" data-rc-theme-user="{{ request.user.pk|stringformat:'s' }}">
 
 <head>
+    <script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% block title %}Painel do Vendedor | REVENDA CERTA{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'core/css/vendedor_base.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/mensagens.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/vendedor_base.css' %}?v=rc4-d7ef0d8f5590">
+    <link rel="stylesheet" href="{% static 'core/css/mensagens.css' %}?v=rc4-f8206d0612f0">
     {% block extra_css %}{% endblock %}
-    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/logorevendacerta.svg' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=6">
-    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/paineis_padronizacao.css' %}?v=rc4-3c558988acdf">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}?v=rc-marca-1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/painel_visual.css' %}?v=rc4-4044a89494c9">
+<link rel="stylesheet" href="{% static 'core/css/painel_responsivo.css' %}?v=rc-mobile-1">
+    <link rel="stylesheet" href="{% static 'core/css/painel_ajustes_navegacao.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'core/css/painel_feedback.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'core/css/painel_mobile_compacto.css' %}?v=4">
 </head>
 
-<body>
+<body class="rc-panel-body" data-pref-user="{{ request.user.pk|stringformat:'s' }}">
+<script>window.RCTheme?.apply();</script>
+<button type="button" class="rc-mobile-toggle" aria-controls="rc-sidebar" aria-expanded="false">☰ <span>Menu</span></button><button type="button" class="rc-mobile-backdrop" aria-label="Fechar menu" hidden></button>
 
-    <aside class="sidebar">
+<aside class="sidebar" id="rc-sidebar">
 
-        <div class="logo">
+    <div class="logo">
             {% include "core/includes/marca.html" %}
+    </div>
+
+    <div class="perfil">
+        <div class="avatar">
+                {{ request.user.first_name|first|upper }}
         </div>
 
-        <div class="perfil">
-            <div class="avatar">
-                {{ request.user.first_name|first|upper }}
-            </div>
-
-            <div>
+        <div>
                 <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
                 <span>Vendedor</span>
-            </div>
         </div>
+    </div>
 
-        <nav class="menu">
+    <nav class="menu">
 
-            <a href="{% url 'painel_vendedor' %}" class="menu-item 
+            <a href="{% url 'painel_vendedor' %}" class="menu-item
                 {% if request.resolver_match.url_name == 'painel_vendedor' %}active{% endif %}">
                 <span><i data-lucide="house"></i></span>
                 Início
             </a>
 
-            <a href="{% url 'clientes' %}" class="menu-item 
-                {% if request.resolver_match.url_name == 'clientes' or request.resolver_match.url_name == 'cadastrar_cliente' or request.resolver_match.url_name == 'editar_cliente' or request.resolver_match.url_name == 'detalhes_cliente' %}active{% endif %}">
+            <a href="{% url 'clientes' %}" class="menu-item
+                {% if request.resolver_match.url_name == 'clientes' or request.resolver_match.url_name == 'cadastrar_cliente' or request.resolver_match.url_name == 'editar_cliente' or request.resolver_match.url_name == 'detalhes_cliente' or request.resolver_match.url_name == 'desativar_cliente' or request.resolver_match.url_name == 'reativar_cliente' %}active{% endif %}">
                 <span><i data-lucide="user"></i></span>
                 Clientes
             </a>
@@ -59,7 +71,7 @@
             </a>
 
             <a href="{% url 'propostas' %}" class="menu-item
-                {% if request.resolver_match.url_name == 'propostas' or request.resolver_match.url_name == 'nova_proposta' or request.resolver_match.url_name == 'editar_proposta' or request.resolver_match.url_name == 'detalhes_proposta' %}active{% endif %}">
+                {% if request.resolver_match.url_name == 'propostas' or request.resolver_match.url_name == 'nova_proposta' or request.resolver_match.url_name == 'editar_proposta' or request.resolver_match.url_name == 'detalhes_proposta' or request.resolver_match.url_name == 'confirmar_proposta' or request.resolver_match.url_name == 'aceitar_contraproposta' or request.resolver_match.url_name == 'recusar_contraproposta' or request.resolver_match.url_name == 'fechar_venda' %}active{% endif %}">
                 <span><i data-lucide="circle-dollar-sign"></i></span>
                 Negociações
             </a>
@@ -71,7 +83,7 @@
             </a>
 
             <a href="{% url 'procuras_vendedor' %}" class="menu-item
-                {% if request.resolver_match.url_name == 'procuras_vendedor' or request.resolver_match.url_name == 'nova_procura' %}active{% endif %}">
+                {% if request.resolver_match.url_name == 'procuras_vendedor' or request.resolver_match.url_name == 'nova_procura' or request.resolver_match.url_name == 'encerrar_procura' or request.resolver_match.url_name == 'marcar_aviso_procura_lido' %}active{% endif %}">
                 <span><i data-lucide="search"></i></span>
                 Procuras
             </a>
@@ -81,14 +93,14 @@
                 <span><i data-lucide="wallet"></i></span>
                 Minhas comissões
             </a>
-            
+
             <!-- Registrar troca: exige rota própria de registro, distinta da avaliação gerencial. -->
 
-        </nav>
+    </nav>
 
-        <div class="menu-inferior">
+    <div class="menu-inferior">
 
-            <a href="#" class="menu-item">
+            <a href="{% url 'preferencias' %}" class="menu-item {% if request.resolver_match.url_name == 'preferencias' %}active{% endif %}">
                 <span><i data-lucide="settings"></i></span>
                 Configurações
             </a>
@@ -98,21 +110,25 @@
                 Sair
             </a>
 
+    </div>
+
+</aside>
+
+<main class="conteudo{% if request.resolver_match.url_name == 'nova_procura' or request.resolver_match.url_name == 'registrar_contato_carteira' or request.resolver_match.url_name == 'cadastrar_cliente' or request.resolver_match.url_name == 'editar_cliente' %} rc-form-centered rc-form-860{% elif request.resolver_match.url_name == 'nova_proposta' or request.resolver_match.url_name == 'editar_proposta' %} rc-form-centered rc-form-1200{% elif request.resolver_match.url_name == 'desativar_cliente' or request.resolver_match.url_name == 'reativar_cliente' %} rc-form-centered rc-form-560{% endif %}">
+    <div class="rc-topbar"><span class="rc-crumb">Painel <span>/</span> <b>{% with n=request.resolver_match.url_name %}{% if n == 'painel_vendedor' %}Início{% elif n == 'clientes' or n == 'cadastrar_cliente' or n == 'editar_cliente' or n == 'detalhes_cliente' or n == 'desativar_cliente' or n == 'reativar_cliente' %}Clientes{% elif n == 'veiculos_vendedor' or n == 'detalhes_veiculo_vendedor' %}Veículos{% elif n == 'propostas' or n == 'nova_proposta' or n == 'editar_proposta' or n == 'detalhes_proposta' or n == 'confirmar_proposta' or n == 'aceitar_contraproposta' or n == 'recusar_contraproposta' or n == 'fechar_venda' %}Propostas{% elif n == 'carteira_vendedor' or n == 'registrar_contato_carteira' %}Carteira de clientes{% elif n == 'procuras_vendedor' or n == 'nova_procura' or n == 'encerrar_procura' or n == 'marcar_aviso_procura_lido' %}Procuras{% elif n == 'minhas_comissoes' %}Comissões{% elif n == 'preferencias' %}Configurações{% else %}Área interna{% endif %}{% endwith %}</b></span>
+        <div class="rc-top-actions"><time class="rc-date" datetime="{% now 'Y-m-d' %}">{% language 'pt-br' %}{% now "l, j \d\e F" %}{% endlanguage %}</time><a class="rc-store-preview" href="{% url 'vitrine' %}"><i data-lucide="store" aria-hidden="true"></i> Ver vitrine</a>
         </div>
-
-    </aside>
-
-    <!-- CONTEÚDO DA PÁGINA -->
-    <main class="conteudo">
+    </div>
         {% block content %}
         {% endblock %}
-    </main>
+</main>
 
-    <!-- JAVASCRIPT ESPECÍFICO DA PÁGINA E ÍCONES -->
     <script src="{% static 'core/js/vendedor_base.js' %}"></script>
 
     {% block extra_js %}
     {% endblock %}
 
+<script src="{% static 'core/js/painel_preferencias.js' %}?v=rc6-3"></script>
+<script src="{% static 'core/js/painel_drawer.js' %}?v=1"></script>
 </body>
 </html>

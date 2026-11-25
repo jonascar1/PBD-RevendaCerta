@@ -1,0 +1,627 @@
+/* =========================================================
+   REVENDA CERTA — Visual unificado das telas do gerente
+   Aplica-se a todas as abas, exceto Início (body.rc-gp).
+   Mesma linguagem do dashboard: cartões 20px, Sora nos títulos,
+   azul #2563eb, fundo pontilhado, tabelas limpas e status em pílula.
+   ========================================================= */
+
+body.rc-gp {
+    --gp-blue: #2563eb;
+    --gp-blue-soft: light-dark(#e8f0ff, #1a2c4d);
+    --gp-blue-text: light-dark(#1d4ed8, #8bbcff);
+    --gp-text: light-dark(#172033, #eef4fc);
+    --gp-muted: light-dark(#64748b, #a0b1c8);
+    --gp-card: light-dark(#ffffff, #121c2e);
+    --gp-surface: light-dark(#f4f7fb, #19263a);
+    --gp-border: light-dark(#e2e8f0, #29384e);
+    --gp-green: light-dark(#047857, #5fe0ac);
+    --gp-green-soft: light-dark(#e3f8ef, #123628);
+    --gp-amber: light-dark(#b45309, #f7c56b);
+    --gp-amber-soft: light-dark(#fff4dd, #3a2c12);
+    --gp-red: light-dark(#b91c1c, #ff8f8f);
+    --gp-red-soft: light-dark(#fde8e8, #3d1a1e);
+    --gp-shadow: 0 3px 12px #17203308;
+    --gp-shadow-hover: 0 10px 26px #17203314;
+    background-color: light-dark(#edf2f8, #0e1726);
+    background-image: radial-gradient(light-dark(#ccd8e6, #223047) .8px, transparent .8px);
+    background-size: 18px 18px;
+    color: var(--gp-text);
+}
+
+body.rc-gp .main-content { font-family: Manrope, Arial, sans-serif; }
+body.rc-gp .main-content * { box-sizing: border-box; }
+
+/* ---------- Cabeçalho das páginas ---------- */
+body.rc-gp .main-content > .topo,
+body.rc-gp .main-content > header.topbar,
+body.rc-gp .main-content header.topbar,
+body.rc-gp .cart-topo,
+body.rc-gp .ao > header,
+body.rc-gp .relatorios > header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    margin: 0 0 24px;
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    animation: gp-in .45s both;
+}
+
+body.rc-gp .main-content > .topo > div:first-child,
+body.rc-gp header.topbar > div:first-child,
+body.rc-gp .cart-topo > div:first-child { flex: 1 1 320px; min-width: 0; }
+
+body.rc-gp .main-content h1 {
+    font-family: Sora, Manrope, sans-serif;
+    font-size: clamp(24px, 2.4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    margin: 6px 0 6px;
+    color: var(--gp-text);
+}
+
+body.rc-gp .main-content h1 + p,
+body.rc-gp .topo p,
+body.rc-gp header.topbar p,
+body.rc-gp .cart-topo p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gp-muted);
+    max-width: 62ch;
+}
+
+body.rc-gp .cart-sobretitulo,
+body.rc-gp .ao > header small {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--gp-blue-text);
+}
+
+body.rc-gp .main-content h2 {
+    font-family: Sora, Manrope, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--gp-text);
+}
+
+/* ---------- Cartões / seções ---------- */
+body.rc-gp .main-content > .card,
+body.rc-gp .main-content .section,
+body.rc-gp .neg-section,
+body.rc-gp .cart-painel,
+body.rc-gp .ao-card,
+body.rc-gp .relatorios > section,
+body.rc-gp .relatorios > div:not(.indicadores-relatorios):not(.acoes-exportacao),
+body.rc-gp .filtros-relatorios {
+    background: var(--gp-card);
+    border: 1px solid var(--gp-border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: var(--gp-shadow);
+    margin-bottom: 20px;
+    animation: gp-in .5s both;
+    transition: box-shadow .25s;
+}
+body.rc-gp .neg-section:hover,
+body.rc-gp .cart-painel:hover,
+body.rc-gp .main-content > .card:hover { box-shadow: var(--gp-shadow-hover); }
+
+body.rc-gp .section-header,
+body.rc-gp .neg-section-header,
+body.rc-gp .cart-secao-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0;
+    border: 0;
+}
+
+body.rc-gp .contador-veiculos,
+body.rc-gp .contador-vendedores,
+body.rc-gp .contador-avaliacoes {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--gp-blue-soft);
+    color: var(--gp-blue-text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ---------- Indicadores (KPIs) ---------- */
+body.rc-gp .neg-resumo,
+body.rc-gp .cart-indicadores,
+body.rc-gp .indicadores-relatorios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 0 0 20px;
+}
+
+body.rc-gp .neg-card,
+body.rc-gp .cart-indicador,
+body.rc-gp .indicador {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--gp-card);
+    border: 1px solid var(--gp-border);
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: var(--gp-shadow);
+    animation: gp-in .5s both;
+    transition: transform .2s, box-shadow .2s;
+}
+body.rc-gp .neg-card::before,
+body.rc-gp .cart-indicador::before,
+body.rc-gp .indicador::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--gp-blue);
+    opacity: .85;
+}
+body.rc-gp .neg-card:hover,
+body.rc-gp .cart-indicador:hover,
+body.rc-gp .indicador:hover { transform: translateY(-2px); box-shadow: var(--gp-shadow-hover); }
+body.rc-gp .neg-card-pendente::before { background: #f59e0b; }
+
+body.rc-gp .neg-card strong,
+body.rc-gp .cart-indicador strong,
+body.rc-gp .indicador strong {
+    font-family: Sora, Manrope, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gp-text);
+    line-height: 1.1;
+}
+body.rc-gp .neg-card span,
+body.rc-gp .neg-card p,
+body.rc-gp .cart-indicador span,
+body.rc-gp .indicador span { font-size: 12.5px; color: var(--gp-muted); font-weight: 600; }
+
+body.rc-gp .neg-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--gp-blue-soft);
+    color: var(--gp-blue-text);
+}
+body.rc-gp .neg-card-pendente .neg-card-icon { background: var(--gp-amber-soft); color: var(--gp-amber); }
+body.rc-gp .neg-card-icon svg { width: 19px; height: 19px; }
+
+/* ---------- Busca e filtros ---------- */
+body.rc-gp .barra-pesquisa-veiculos,
+body.rc-gp .barra-pesquisa-vendedores,
+body.rc-gp .barra-pesquisa-avaliacoes,
+body.rc-gp .neg-filter,
+body.rc-gp .proc-filtro,
+body.rc-gp .filtros-relatorios,
+body.rc-gp .relatorio-carros-parados form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 12px;
+    background: var(--gp-surface);
+    border: 1px solid var(--gp-border);
+    border-radius: 16px;
+}
+body.rc-gp .filtros-relatorios { padding: 18px; background: var(--gp-card); }
+
+body.rc-gp .campo-pesquisa,
+body.rc-gp .campo-pesquisa-vendedores,
+body.rc-gp .campo-pesquisa-avaliacoes {
+    flex: 1 1 260px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 14px;
+    background: var(--gp-card);
+    border: 1px solid var(--gp-border);
+    border-radius: 12px;
+    transition: border-color .2s, box-shadow .2s;
+}
+body.rc-gp .campo-pesquisa:focus-within,
+body.rc-gp .campo-pesquisa-vendedores:focus-within,
+body.rc-gp .campo-pesquisa-avaliacoes:focus-within {
+    border-color: var(--gp-blue);
+    box-shadow: 0 0 0 4px #2563eb22;
+}
+body.rc-gp .campo-pesquisa svg,
+body.rc-gp .campo-pesquisa-vendedores svg,
+body.rc-gp .campo-pesquisa-avaliacoes svg { width: 17px; height: 17px; color: var(--gp-muted); flex: none; }
+body.rc-gp .campo-pesquisa input,
+body.rc-gp .campo-pesquisa-vendedores input,
+body.rc-gp .campo-pesquisa-avaliacoes input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0 !important;
+    outline: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    font: inherit;
+    font-size: 14px;
+    color: var(--gp-text);
+}
+
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) select,
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input[type="text"],
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input[type="date"],
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input[type="number"],
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input[type="search"]:not(.campo-pesquisa input),
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input:not([type]) {
+    height: 42px;
+    padding: 0 12px;
+    background: var(--gp-card);
+    color: var(--gp-text);
+    border: 1px solid var(--gp-border);
+    border-radius: 12px;
+    font: 500 14px Manrope, Arial, sans-serif;
+    outline: 0;
+    transition: border-color .2s, box-shadow .2s;
+}
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) select:focus,
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) input:focus { border-color: var(--gp-blue); box-shadow: 0 0 0 4px #2563eb22; }
+body.rc-gp :is(.barra-pesquisa-veiculos, .barra-pesquisa-vendedores, .barra-pesquisa-avaliacoes, .neg-filter, .proc-filtro, .filtros-relatorios, .relatorio-carros-parados form) label { font-size: 12px; font-weight: 700; color: var(--gp-muted); display: inline-flex; flex-direction: column; gap: 5px; }
+
+/* ---------- Botões ---------- */
+body.rc-gp .btn-cadastrar,
+body.rc-gp .add-button,
+body.rc-gp .btn-pesquisar,
+body.rc-gp .btn-pesquisar-vendedores,
+body.rc-gp .btn-pesquisar-avaliacoes,
+body.rc-gp .btn-cadastrar-empty,
+body.rc-gp .filtros-relatorios button,
+body.rc-gp .relatorios form button,
+body.rc-gp .ao-stage button,
+body.rc-gp .neg-filter button,
+body.rc-gp .proc-filtro button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 42px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(115deg, #1958d8, #248ed8);
+    color: #fff;
+    font: 700 14px Manrope, Arial, sans-serif;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 6px 16px #2563eb33, inset 0 1px 0 #ffffff30;
+    transition: transform .15s, box-shadow .2s, filter .2s;
+}
+body.rc-gp .btn-cadastrar:hover,
+body.rc-gp .add-button:hover,
+body.rc-gp .btn-pesquisar:hover,
+body.rc-gp .btn-pesquisar-vendedores:hover,
+body.rc-gp .btn-pesquisar-avaliacoes:hover,
+body.rc-gp .filtros-relatorios button:hover,
+body.rc-gp .ao-stage button:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 10px 22px #2563eb40; }
+
+/* Segundo botão do cabeçalho de veículos fica secundário */
+body.rc-gp .topo .btn-cadastrar + .btn-cadastrar,
+body.rc-gp .btn-limpar-busca,
+body.rc-gp .btn-limpar-vendedores,
+body.rc-gp .btn-limpar-avaliacoes,
+body.rc-gp .cart-botao,
+body.rc-gp .cart-botao-secundario,
+body.rc-gp .acoes-exportacao a,
+body.rc-gp .acoes-exportacao button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: var(--gp-card);
+    color: var(--gp-text);
+    border: 1px solid var(--gp-border);
+    font: 700 14px Manrope, Arial, sans-serif;
+    text-decoration: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+}
+body.rc-gp .topo .btn-cadastrar + .btn-cadastrar:hover,
+body.rc-gp .btn-limpar-busca:hover,
+body.rc-gp .btn-limpar-vendedores:hover,
+body.rc-gp .btn-limpar-avaliacoes:hover,
+body.rc-gp .cart-botao:hover,
+body.rc-gp .acoes-exportacao a:hover { border-color: var(--gp-blue); color: var(--gp-blue-text); background: var(--gp-blue-soft); transform: none; filter: none; }
+body.rc-gp .tabela-responsiva .cart-botao,
+body.rc-gp .cart-tabela .cart-botao { height: 34px; padding: 0 12px; font-size: 13px; }
+
+body.rc-gp .acoes-exportacao { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+
+/* Ações dentro das tabelas */
+body.rc-gp .btn-ver,
+body.rc-gp .edit-button,
+body.rc-gp .neg-action,
+body.rc-gp .cart-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 10px;
+    background: var(--gp-blue-soft);
+    color: var(--gp-blue-text);
+    border: 1px solid transparent;
+    font: 700 13px Manrope, Arial, sans-serif;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .2s, color .2s, border-color .2s;
+}
+body.rc-gp .btn-ver:hover,
+body.rc-gp .edit-button:hover,
+body.rc-gp .neg-action:hover,
+body.rc-gp .cart-link:hover { background: var(--gp-blue); color: #fff; }
+body.rc-gp .btn-ver svg, body.rc-gp .edit-button svg, body.rc-gp .neg-action svg { width: 15px; height: 15px; }
+body.rc-gp .neg-sem-acao { color: var(--gp-muted); font-size: 13px; }
+body.rc-gp .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ---------- Tabelas ---------- */
+body.rc-gp .table-container,
+body.rc-gp .neg-table-container,
+body.rc-gp .cart-tabela-wrap,
+body.rc-gp .tabela-responsiva {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--gp-border);
+    border-radius: 14px;
+    background: var(--gp-card);
+    box-shadow: none;
+    margin: 0;
+}
+
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    background: transparent;
+    min-width: 640px;
+}
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--gp-surface);
+    color: var(--gp-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gp-border);
+    white-space: nowrap;
+}
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gp-border);
+    color: var(--gp-text);
+    vertical-align: middle;
+    background: transparent;
+}
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) tbody tr:last-child td { border-bottom: 0; }
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) tbody tr { transition: background .15s; }
+body.rc-gp :is(.table-container, .neg-table-container, .cart-tabela-wrap, .tabela-responsiva) tbody tr:hover td { background: light-dark(#f7faff, #172338); }
+
+/* Célula do veículo/vendedor com ícone */
+body.rc-gp div.veiculo,
+body.rc-gp div.seller,
+body.rc-gp div.veiculo-info { display: flex; align-items: center; gap: 12px; }
+body.rc-gp .veiculo-icon,
+body.rc-gp .seller-icon,
+body.rc-gp .icone-veiculo-troca {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--gp-blue-soft);
+    color: var(--gp-blue-text);
+    font-weight: 800;
+}
+body.rc-gp .veiculo-icon svg, body.rc-gp .icone-veiculo-troca svg { width: 20px; height: 20px; }
+body.rc-gp .foto-veiculo-troca { width: 56px; height: 40px; object-fit: cover; border-radius: 10px; border: 1px solid var(--gp-border); }
+body.rc-gp .seller-username,
+body.rc-gp .cart-muted { display: block; font-size: 12px; color: var(--gp-muted); }
+
+body.rc-gp .placa,
+body.rc-gp .placa-veiculo {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 7px;
+    border: 1px solid var(--gp-border);
+    background: var(--gp-surface);
+    font: 700 12px ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+body.rc-gp .neg-valor,
+body.rc-gp .valor-avaliado,
+body.rc-gp .percentage { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.rc-gp .valor-negativo,
+body.rc-gp .margem-negativa { color: var(--gp-red) !important; }
+
+/* ---------- Status (pílulas) ---------- */
+body.rc-gp .status,
+body.rc-gp .neg-status,
+body.rc-gp .cart-status,
+body.rc-gp .status-active,
+body.rc-gp .status-inactive,
+body.rc-gp .estado-geral {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    background: var(--gp-surface);
+    color: var(--gp-muted);
+    border: 0;
+}
+body.rc-gp .status::before,
+body.rc-gp .neg-status::before,
+body.rc-gp .cart-status::before,
+body.rc-gp .status-active::before,
+body.rc-gp .status-inactive::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+body.rc-gp .status.disponivel,
+body.rc-gp .status.entregue,
+body.rc-gp .status-active,
+body.rc-gp .cart-status-ok { background: var(--gp-green-soft); color: var(--gp-green); }
+body.rc-gp .status.reservado,
+body.rc-gp .status.preparacao,
+body.rc-gp .cart-status-pendente { background: var(--gp-amber-soft); color: var(--gp-amber); }
+body.rc-gp .status.vendido { background: var(--gp-blue-soft); color: var(--gp-blue-text); }
+body.rc-gp .status-inactive,
+body.rc-gp .status-margem-negativa { background: var(--gp-red-soft); color: var(--gp-red); }
+
+/* ---------- Mensagens ---------- */
+body.rc-gp .messages,
+body.rc-gp .neg-messages,
+body.rc-gp .cart-mensagens { display: grid; gap: 8px; margin: 0 0 18px; }
+body.rc-gp .message,
+body.rc-gp .neg-message,
+body.rc-gp .cart-mensagem,
+body.rc-gp .ao > p[role="status"] {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid light-dark(#bfdbfe, #24406b);
+    background: var(--gp-blue-soft);
+    color: var(--gp-blue-text);
+    font-size: 14px;
+    font-weight: 600;
+}
+body.rc-gp .message-success { border-color: light-dark(#a7f3d0, #1e5a43); background: var(--gp-green-soft); color: var(--gp-green); }
+body.rc-gp .message-error,
+body.rc-gp .erro-relatorio { border: 1px solid light-dark(#fecaca, #6b2a2f); background: var(--gp-red-soft); color: var(--gp-red); padding: 12px 16px; border-radius: 14px; }
+body.rc-gp .message-warning { border-color: light-dark(#fde68a, #6b5321); background: var(--gp-amber-soft); color: var(--gp-amber); }
+
+/* ---------- Estados vazios ---------- */
+body.rc-gp .empty,
+body.rc-gp .neg-empty,
+body.rc-gp .cart-vazio {
+    text-align: center;
+    padding: 44px 20px !important;
+    color: var(--gp-muted);
+    font-size: 14px;
+}
+body.rc-gp .empty-content { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+body.rc-gp .empty-icon {
+    width: 56px; height: 56px; border-radius: 18px;
+    display: grid; place-items: center;
+    background: var(--gp-blue-soft); color: var(--gp-blue-text);
+}
+
+/* ---------- Documentação ---------- */
+body.rc-gp .ao-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin-top: 14px; }
+body.rc-gp .ao-tile {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 14px 16px; border-radius: 14px;
+    background: var(--gp-surface); border: 1px solid var(--gp-border);
+    color: var(--gp-text); text-decoration: none;
+    transition: border-color .2s, transform .2s;
+}
+body.rc-gp .ao-tile:hover { border-color: var(--gp-blue); transform: translateY(-2px); }
+body.rc-gp .ao-tile small { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--gp-blue-text); }
+body.rc-gp .ao-tile span { font-size: 12.5px; color: var(--gp-muted); }
+body.rc-gp .ao-card > p { color: var(--gp-muted); font-size: 13px; margin: 4px 0 12px; }
+body.rc-gp .ao-card progress {
+    width: 100%; height: 8px; margin: 4px 0 14px;
+    appearance: none; border: 0; border-radius: 999px; overflow: hidden;
+    background: var(--gp-surface);
+}
+body.rc-gp .ao-card progress::-webkit-progress-bar { background: var(--gp-surface); border-radius: 999px; }
+body.rc-gp .ao-card progress::-webkit-progress-value { background: linear-gradient(90deg, #3b82f6, #22c55e); border-radius: 999px; }
+body.rc-gp .ao-card progress::-moz-progress-bar { background: linear-gradient(90deg, #3b82f6, #22c55e); border-radius: 999px; }
+body.rc-gp .ao-stage {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    padding: 12px 0; border-top: 1px solid var(--gp-border);
+}
+body.rc-gp .ao-stage > div:first-child { flex: 1 1 200px; display: flex; flex-direction: column; }
+body.rc-gp .ao-stage small { font-size: 12px; color: var(--gp-muted); }
+body.rc-gp .ao-stage button { height: 38px; }
+body.rc-gp .ao-stage summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--gp-blue-text); }
+
+/* ---------- Relatórios ---------- */
+body.rc-gp .relatorios h2 { margin-bottom: 14px; }
+
+/* ---------- Animação ---------- */
+@keyframes gp-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+    body.rc-gp * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 760px) {
+    body.rc-gp .main-content > .topo,
+    body.rc-gp header.topbar,
+    body.rc-gp .cart-topo { align-items: stretch; }
+    body.rc-gp .btn-cadastrar,
+    body.rc-gp .add-button { flex: 1 1 100%; }
+    body.rc-gp .neg-section,
+    body.rc-gp .cart-painel,
+    body.rc-gp .main-content > .card,
+    body.rc-gp .ao-card { padding: 16px; border-radius: 16px; }
+    body.rc-gp .barra-pesquisa-veiculos > *,
+    body.rc-gp .barra-pesquisa-vendedores > *,
+    body.rc-gp .barra-pesquisa-avaliacoes > *,
+    body.rc-gp .neg-filter > *,
+    body.rc-gp .proc-filtro > * { flex: 1 1 100%; }
+}
+
+/* Preserve semantic states and the layout of the margin indicators. */
+body.rc-gp .neg-status.status-pendente { background: var(--gp-amber-soft); color: var(--gp-amber); }
+body.rc-gp .neg-status.status-aprovada { background: var(--gp-green-soft); color: var(--gp-green); }
+body.rc-gp .neg-status.status-recusada { background: var(--gp-red-soft); color: var(--gp-red); }
+body.rc-gp .neg-status.status-contraproposta { background: light-dark(#f3e8ff, #302849); color: light-dark(#6b21a8, #c4b5fd); }
+body.rc-gp .neg-card.neg-selected { border-color: var(--gp-blue); }
+body.rc-gp-margens .neg-resumo { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+body.rc-gp-margens .neg-card { align-items: center; justify-content: center; text-align: center; }
+body.rc-gp-margens .neg-card > div:last-child { width: 100%; min-width: 0; }
+body.rc-gp-margens .neg-card strong { display: block; text-align: center; font-variant-numeric: tabular-nums; }
+body.rc-gp .topo > .topo-acoes { flex: 0 1 auto; margin-left: auto; justify-content: flex-end; }
+@media (max-width: 760px) {
+    body.rc-gp-margens .neg-resumo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.rc-gp-margens .neg-card:last-child { grid-column: 1 / -1; }
+    body.rc-gp .topo > .topo-acoes { width: 100%; }
+}

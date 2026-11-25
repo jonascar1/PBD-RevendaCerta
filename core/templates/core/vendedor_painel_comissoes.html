@@ -4,8 +4,8 @@
 {% block title %}Minhas comissões | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_clientes.css' %}">
-<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_comissoes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_clientes.css' %}?v=rc4-603f3119b01a">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_comissoes.css' %}?v=rc4-7833a74cc5cd">
 {% endblock %}
 
 {% block content %}
@@ -71,7 +71,7 @@
                         <td colspan="6" class="clientes-vazio">
                             <i data-lucide="wallet"></i>
                             <strong>Nenhuma venda fechada ainda</strong>
-                            <p>As comissões aparecem aqui quando você fechar uma venda.</p>
+                        <p>As comissões aparecem aqui quando você fechar uma venda.</p>
                         </td>
                     </tr>
                     {% endfor %}

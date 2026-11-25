@@ -1,27 +1,34 @@
 /* Valores monetários padronizados nos três painéis. Não afeta botões ou menu. */
+
 .conteudo .valor, .conteudo .valor-monetario, .conteudo .preco,
 .conteudo .preco-veiculo, .conteudo .valor-venda, .conteudo .valor-total,
 .conteudo .valor-destaque, .conteudo .metric-value,
 .conteudo .kpi-valor, .conteudo .stat-value,
 .conteudo [class*="preco"], .conteudo [class*="valor-monetario"],
 .conteudo [class*="valor_total"], .conteudo [class*="valor-total"] {
- color: #111827 !important;
+    color: light-dark(#111827, #eef4fc) !important;
 }
+
 /* Links de cards de veículos sem decoração azul ou sublinhado. */
+
 .conteudo .veiculos-grid a, .conteudo .veiculos-grid a *,
 .conteudo .veiculos-grid .dado, .conteudo .veiculos-grid .dado *,
 .conteudo .veiculo-card a, .conteudo .veiculo-card a *,
 .conteudo a.card-veiculo, .conteudo a.card-veiculo *,
 .conteudo a.dado, .conteudo a.dado * {
- text-decoration: none !important;
- text-decoration-line: none !important;
+    text-decoration: none !important;
+    text-decoration-line: none !important;
 }
+
 .conteudo .veiculos-grid .dado strong,
 .conteudo .veiculos-grid .dado span,
 .conteudo .veiculo-card .preco,
-.conteudo .veiculo-card .valor { color: #111827 !important; }
+.conteudo .veiculo-card .valor {
+    color: light-dark(#111827, #eef4fc) !important;
+}
 
 /* v6: texto de preços e valores monetários, em todas as áreas */
+
 .conteudo .veiculos-grid .dado strong,
 .conteudo .veiculos-grid .dado .preco,
 .conteudo .veiculos-grid .dado [class*="valor"],
@@ -41,8 +48,9 @@
 .main-content .veiculos-grid .dado strong,
 .main-content .veiculo-card .preco,
 .main-content .veiculo-card .valor {
-    color: #111827 !important;
+    color: light-dark(#111827, #eef4fc) !important;
 }
+
 .conteudo .veiculos-grid .dado,
 .conteudo .veiculos-grid .dado *,
 .conteudo .veiculo-card,
@@ -50,4 +58,18 @@
 .main-content .veiculos-grid .dado,
 .main-content .veiculos-grid .dado * {
     text-decoration: none !important;
+}
+
+/* Preço de venda: preto no claro, branco no escuro (inclusive no hover). */
+
+.rc-panel-body .vv-card .vv-price,
+.rc-panel-body .vv-card:hover .vv-price,
+.rc-panel-body .info-item .rc-preco-veiculo {
+    color: #000 !important;
+}
+
+.rc-panel-body.rc-dark .vv-card .vv-price,
+.rc-panel-body.rc-dark .vv-card:hover .vv-price,
+.rc-panel-body.rc-dark .info-item .rc-preco-veiculo {
+    color: #fff !important;
 }

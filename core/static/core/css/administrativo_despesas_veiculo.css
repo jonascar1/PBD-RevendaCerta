@@ -15,26 +15,19 @@
 }
 
 .veiculo-identificacao {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
 }
 
 .badge-perfil {
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 8px;
-
     padding: 10px 16px;
-
     font-size: 12px;
-
     font-weight: bold;
-
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }
-
 
 /* =========================
    RESUMO DO VEÍCULO
@@ -48,15 +41,15 @@
 }
 
 .despesa-resumo-card {
-    background: #fff;
-    border: 1px solid #e1e5eb;
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
     padding: 20px;
 }
 
 .despesa-resumo-card span {
     display: block;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
     margin-bottom: 8px;
 }
@@ -64,7 +57,6 @@
 .despesa-resumo-card strong {
     font-size: 24px;
 }
-
 
 /* =========================
    SEÇÃO DE DESPESAS
@@ -84,27 +76,26 @@
 }
 
 .despesas-titulo p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
 .despesa-resumo-card small {
     display: block;
     margin-top: 6px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
     font-size: 11px;
 }
 
 .despesa-resumo-card.custo-total {
-    border-color: #bfdbfe;
-    background: #f8fbff;
+    border-color: light-dark(#bfdbfe, #385982);
+    background: light-dark(#f8fbff, #121c2e);
 }
 
 .despesa-resumo-card.custo-total strong {
     font-size: 24px;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
 }
-
 
 /* =========================
    BOTÃO ADICIONAR
@@ -120,19 +111,13 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-
     background: #2864e8;
     color: white;
-
     padding: 10px 15px;
-
     border-radius: 7px;
-
     text-decoration: none;
-
     font-size: 13px;
     font-weight: 600;
-
     transition: 0.2s;
 }
 
@@ -145,18 +130,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     padding: 9px 14px;
     border-radius: 8px;
-
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-
+    background: light-dark(#f1f5f9, #19263a);
+    color: light-dark(#475569, #a0b1c8);
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-
     transition: 0.2s ease;
     margin-right: 10px;
 }
@@ -165,12 +146,11 @@
     width: 18px;
     height: 18px;
     margin-right: 8px;
-
 }
 
 .btn-excluidas-despesas:hover {
-    background: #e2e8f0;
-    color: #334155;
+    background: light-dark(#e2e8f0, #19263a);
+    color: light-dark(#334155, #eef4fc);
 }
 
 /* ================================
@@ -194,37 +174,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     padding: 8px 14px;
     border-radius: 8px;
-
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-
     transition: 0.2s ease;
 }
 
 .btn-editar-despesa {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
+    background: light-dark(#eff6ff, #1a3455);
+    color: light-dark(#2563eb, #78b5ff);
+    border: 1px solid light-dark(#bfdbfe, #385982);
 }
 
 .btn-editar-despesa:hover {
-    background: #dbeafe;
+    background: light-dark(#dbeafe, #1a3455);
 }
 
 .btn-excluir-despesa {
-    background: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
+    background: light-dark(#fef2f2, #3b2533);
+    color: light-dark(#dc2626, #fda4af);
+    border: 1px solid light-dark(#fecaca, #70404f);
 }
 
 .btn-excluir-despesa:hover {
-    background: #fee2e2;
+    background: light-dark(#fee2e2, #3b2533);
 }
-
 
 /* =========================
    LISTA DE DESPESAS
@@ -237,23 +213,18 @@
 }
 
 .despesa-item {
-    background: #fff;
-
-    border: 1px solid #e1e5eb;
-
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
-
     padding: 17px 20px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     transition: 0.2s;
 }
 
 .despesa-item:hover {
-    border-color: #cbd5e1;
+    border-color: light-dark(#cbd5e1, #29384e);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
@@ -269,7 +240,7 @@
 }
 
 .despesa-meta {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
 }
 
@@ -278,37 +249,28 @@
     font-weight: 700;
 }
 
-
 /* =========================
    ESTADO VAZIO
 ========================= */
 
 .despesas-vazio {
-    background: #fff;
-
-    border: 1px solid #e1e5eb;
-
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
-
     padding: 35px 20px;
-
     text-align: center;
 }
 
 .despesas-vazio strong {
     display: block;
-
     font-size: 15px;
-
     margin-bottom: 6px;
 }
 
 .despesas-vazio p {
-    color: #64748b;
-
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
-
 
 /* =========================
    RESPONSIVIDADE
@@ -318,24 +280,157 @@
     .despesa-resumo {
         grid-template-columns: 1fr;
     }
-
     .despesa-item {
         gap: 15px;
     }
 }
-.ad-car-details{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px;margin:20px 0}.ad-car-details h2{font-size:19px;margin-bottom:16px}.ad-car-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.ad-car-fields span{display:block;color:#64748b;font-size:12px;margin-bottom:5px}.ad-car-fields strong{font-size:14px;color:#1e293b}
+
+.ad-car-details {
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
+    border-radius: 12px;
+    padding: 22px;
+    margin: 20px 0;
+}
+
+.ad-car-details h2 {
+    font-size: 19px;
+    margin-bottom: 16px;
+}
+
+.ad-car-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 16px;
+}
+
+.ad-car-fields span {
+    display: block;
+    color: light-dark(#64748b, #a0b1c8);
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.ad-car-fields strong {
+    font-size: 14px;
+    color: light-dark(#1e293b, #eef4fc);
+}
 
 /* Ficha completa do veículo */
-.ad-back{display:inline-block;color:#2563eb;font-size:12px;font-weight:700;margin-bottom:12px;text-decoration:none!important}
-.ad-vehicle-detail{display:grid;grid-template-columns:minmax(230px,420px) minmax(280px,1fr);gap:20px;align-items:stretch;margin:18px 0 22px}
-.ad-photo,.ad-vehicle-facts{background:#fff;border:1px solid #e0e6ef;border-radius:12px;overflow:hidden}
-.ad-photo{min-height:260px}.ad-photo img{display:block;width:100%;height:100%;min-height:260px;max-height:340px;object-fit:cover}
-.ad-photo-empty{height:100%;min-height:260px;display:flex;align-items:center;justify-content:center;color:#7b8aa0;background:#edf2f7}
-.ad-vehicle-facts{padding:22px}.ad-vehicle-facts h2{font-size:18px;margin:0 0 20px;color:#17263e}
-.ad-vehicle-facts dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0}
-.ad-vehicle-facts dt{font-size:12px;color:#74839a;margin-bottom:5px}.ad-vehicle-facts dd{font-size:14px;font-weight:700;color:#14233b;margin:0}
-.ad-financial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.ad-financial-card{background:#fff;border:1px solid #e0e6ef;border-radius:11px;padding:20px}
-.ad-financial-card span{display:block;color:#72819a;font-size:12px;margin-bottom:10px}.ad-financial-card strong{color:#15243d;font-size:23px}
-@media(max-width:1000px){.ad-vehicle-detail{grid-template-columns:1fr}.ad-financial-grid{grid-template-columns:1fr}}
-@media(max-width:650px){.ad-vehicle-facts dl{grid-template-columns:1fr}}
+
+.ad-back {
+    display: inline-block;
+    color: light-dark(#2563eb, #78b5ff);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-decoration: none!important;
+}
+
+.ad-vehicle-detail {
+    display: grid;
+    grid-template-columns: minmax(230px,420px) minmax(280px,1fr);
+    gap: 20px;
+    align-items: stretch;
+    margin: 18px 0 22px;
+}
+
+.ad-photo,.ad-vehicle-facts {
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e0e6ef, #29384e);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ad-photo {
+    min-height: 260px;
+}
+
+.ad-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 260px;
+    max-height: 340px;
+    object-fit: cover;
+}
+
+.ad-photo-empty {
+    height: 100%;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: light-dark(#7b8aa0, #a0b1c8);
+    background: light-dark(#edf2f7, #19263a);
+}
+
+.ad-vehicle-facts {
+    padding: 22px;
+}
+
+.ad-vehicle-facts h2 {
+    font-size: 18px;
+    margin: 0 0 20px;
+    color: light-dark(#17263e, #eef4fc);
+}
+
+.ad-vehicle-facts dl {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 18px;
+    margin: 0;
+}
+
+.ad-vehicle-facts dt {
+    font-size: 12px;
+    color: light-dark(#74839a, #a0b1c8);
+    margin-bottom: 5px;
+}
+
+.ad-vehicle-facts dd {
+    font-size: 14px;
+    font-weight: 700;
+    color: light-dark(#14233b, #eef4fc);
+    margin: 0;
+}
+
+.ad-financial-grid {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 14px;
+}
+
+.ad-financial-card {
+    background: light-dark(#fff, #121c2e);
+    border: 1px solid light-dark(#e0e6ef, #29384e);
+    border-radius: 11px;
+    padding: 20px;
+}
+
+.ad-financial-card span {
+    display: block;
+    color: light-dark(#72819a, #a0b1c8);
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.ad-financial-card strong {
+    color: light-dark(#15243d, #eef4fc);
+    font-size: 23px;
+}
+
+@media(max-width:1000px) {
+    .ad-vehicle-detail {
+        grid-template-columns: 1fr;
+    }
+    .ad-financial-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:650px) {
+    .ad-vehicle-facts dl {
+        grid-template-columns: 1fr;
+    }
+}

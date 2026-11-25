@@ -1,0 +1,144 @@
+.rc-filter-toggle {
+    display: none;
+}
+
+.ri #ri-status:empty,.ri .ri-phone-error:empty,.ri #ri-actions[hidden],.ri #ri-share[hidden] {
+    display: none!important;
+}
+
+.ri #ri-status {
+    margin: 14px 0 0;
+    padding: 12px;
+    border: 1px solid #b8c9df;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.45;
+    background: var(--rc-site-soft,#eef4fb);
+    color: var(--rc-site-text,#17263b);
+}
+
+.ri #ri-status[data-kind=success] {
+    border-color: #40966a;
+    color: light-dark(#17643d,#91e0b1);
+}
+
+.ri #ri-status[data-kind=error],.ri .ri-phone-error {
+    color: light-dark(#b42318,#ffaaa5);
+}
+
+.ri .ri-phone-error {
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.ri input[aria-invalid=true] {
+    border-color: #dc4545!important;
+    outline: 1px solid #dc4545;
+}
+
+.ri #ri-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.ri #ri-actions .ri-button {
+    font-size: 13px;
+    min-height: 44px;
+    padding: 10px 14px;
+    justify-content: center;
+    flex: 1 1 auto;
+}
+
+.ri #ri-actions #ri-share {
+    background: #167344;
+    flex-basis: 100%;
+}
+
+.ri #ri-actions #ri-download {
+    background: var(--rc-site-card,#fff);
+    color: var(--rc-site-link,#175dc0);
+    border: 1px solid currentColor;
+}
+
+.ri #ri-actions p {
+    flex-basis: 100%;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--rc-site-muted,#53647b);
+    margin: 2px 0;
+}
+
+@media(max-width:700px) {
+    .filtros-explorar.rc-filter-ready .rc-filter-toggle {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 44px;
+        border: 1px solid var(--borda,#d7e0eb);
+        border-radius: 9px;
+        padding: 8px 12px;
+        background: var(--rc-site-card,#fff);
+        color: var(--rc-site-text,#17263b);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+    .filtros-explorar.rc-filter-ready:not(.rc-filter-open) #rc-filter-fields {
+        display: none;
+    }
+    .filtros-explorar .filtros-ajuda {
+        display: none;
+    }
+    .filtros-explorar .explorar-acoes {
+        margin-top: 6px;
+    }
+    body .card-veiculo .card-detalhes,body .explorar-grade .card-detalhes,body #estoque .trilho-veiculos .card-veiculo .card-detalhes,body .vd .vd-cards .card-veiculo .card-detalhes {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 5px 4px;
+        min-height: 0;
+    }
+    body .card-veiculo .card-detalhes span {
+        min-width: 0;
+        font-size: 10px;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+        align-items: flex-start;
+        gap: 3px;
+    }
+    body .card-veiculo .card-detalhes svg {
+        width: 11px;
+        height: 11px;
+        flex: none;
+    }
+    body .explorar-grade .card-foto {
+        aspect-ratio: 16/10;
+        height: auto;
+    }
+    body .explorar-grade .card-conteudo {
+        padding: 9px;
+        gap: 7px;
+    }
+    body .explorar-grade .card-valor {
+        padding-top: 6px;
+    }
+    body .vd .vd-cards {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+    body .vd .vd-cards>* {
+        flex: 0 0 calc((100% - 10px)/2);
+        scroll-snap-align: start;
+    }
+}

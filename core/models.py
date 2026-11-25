@@ -18,17 +18,13 @@ from django.db.models.aggregates import Sum
 from django.utils import timezone
 
 
-# ==============================================================================
 # Constantes e Expressões Regulares
-# ==============================================================================
 
 PLACA_REGEX = re.compile(r"^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$")  # Antiga e Mercosul
 CHASSI_REGEX = re.compile(r"^[A-HJ-NPR-Z0-9]{17}$")  # Padrão VIN (17 chars, sem I, O ou Q)
 
 
-# ==============================================================================
 # Usuários e Perfis
-# ==============================================================================
 
 class Usuario(AbstractUser):
     """Usuário do sistema com controle de perfil e desativação lógica (soft delete)."""
@@ -91,9 +87,7 @@ class PerfilVendedor(models.Model):
         )
 
 
-# ==============================================================================
 # Veículos, Estoque e Reservas
-# ==============================================================================
 
 class Veiculo(models.Model):
     """Unidade física do estoque, identificada univocamente por placa e chassi enquanto ativa."""
@@ -437,9 +431,7 @@ class ReservaVeiculo(models.Model):
             )
 
 
-# ==============================================================================
 # Financeiro e Histórico de Preços
-# ==============================================================================
 
 class LancamentoFinanceiro(models.Model):
     """Movimentações financeiras vinculadas ao veículo (custo, despesas, venda e comissão)."""
@@ -517,9 +509,7 @@ class HistoricoPrecoVeiculo(models.Model):
         return f"{self.veiculo} — R$ {self.valor_anterior} → R$ {self.valor_novo}"
 
 
-# ==============================================================================
 # Clientes
-# ==============================================================================
 
 class Cliente(models.Model):
     """Cadastro unificado de Pessoa Física (PF) e Pessoa Jurídica (PJ)."""
@@ -662,9 +652,7 @@ class TelefoneCliente(models.Model):
         return self.numero
 
 
-# ==============================================================================
 # Negociações e Propostas
-# ==============================================================================
 
 class Proposta(models.Model):
     """
@@ -1328,9 +1316,7 @@ class DecisaoProposta(models.Model):
         return f"{self.proposta} — {self.get_tipo_display()} — R$ {self.valor_referencia}"
 
 
-# ==============================================================================
 # Avaliação de Troca
-# ==============================================================================
 
 class AvaliacaoTroca(models.Model):
     """Laudo técnico e financeiro de veículo oferecido como parte do pagamento."""
@@ -1418,9 +1404,7 @@ class FotoAvaliacaoTroca(models.Model):
         return f"Foto da avaliação #{self.avaliacao_id}"
 
 
-# ==============================================================================
 # Vendas, Pagamentos, Documentação e Entrega
-# ==============================================================================
 
 class Venda(models.Model):
     """
@@ -2142,9 +2126,7 @@ class EntregaVeiculo(models.Model):
         return f"Entrega da venda #{self.venda_id} em {self.data_entrega:%d/%m/%Y}"
 
 
-# ==============================================================================
 # Carteira de Clientes e Relacionamento
-# ==============================================================================
 
 class ConfiguracaoCarteira(models.Model):
     """Registro singleton com o prazo de recompra para acionamento da carteira."""
@@ -2288,9 +2270,7 @@ class Oportunidade(models.Model):
         return f"Oportunidade #{self.pk} — {self.cliente} — {self.vendedor}"
 
 
-# ==============================================================================
 # Procuras de Veículos e Avisos
-# ==============================================================================
 
 class Procura(models.Model):
     """
@@ -2494,6 +2474,9 @@ class Procura(models.Model):
     @classmethod
     def cruzar_com_veiculo(cls, veiculo):
         """Gera avisos para vendedores cujas procuras abertas combinam com o veículo."""
+        if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+            return 0
+
         cls.encerrar_vencidas()
 
         criados = 0

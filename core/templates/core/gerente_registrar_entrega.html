@@ -4,8 +4,8 @@
 {% block title %}Entrega da venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}">
-<link rel="stylesheet" href="{% static 'core/css/gerente_registrar_entrega.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
+<link rel="stylesheet" href="{% static 'core/css/gerente_registrar_entrega.css' %}?v=rc4-b7e91a2aede3">
 {% endblock %}
 
 {% block content %}
@@ -20,19 +20,13 @@
     </div>
 
     <div class="topo-acoes">
-        <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">
-            <i data-lucide="chevron-left"></i> Voltar à venda
+        <a href="{% if request.user.is_administrativo %}{% url 'entregas_administrativo' %}{% elif request.GET.origem == 'veiculos' %}{% url 'detalhes_veiculo' venda.veiculo_id %}{% elif request.GET.origem == 'vendas' %}{% url 'detalhes_venda' venda.pk %}{% else %}{% url 'documentacao_pendente' %}{% endif %}" class="btn-voltar">
+            <i data-lucide="chevron-left"></i> {% if request.user.is_administrativo %}Voltar às entregas{% else %}Voltar{% endif %}
         </a>
     </div>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-        <div class="message message-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <section class="detalhes-container">
     <div class="informacoes">
@@ -42,13 +36,13 @@
 
             <div class="info-grid">
                 {% for etapa in etapas %}
-                    <div class="info-item">
+                <div class="info-item">
                         <span>{{ etapa.get_tipo_display }}</span>
                         <strong>{{ etapa.get_situacao_display }}</strong>
                         <small>desde {{ etapa.data|date:"d/m/Y" }}</small>
-                    </div>
+                </div>
                 {% empty %}
-                    <p class="sem-informacao">Esta venda não possui etapas de documentação.</p>
+                <p class="sem-informacao">Esta venda não possui etapas de documentação.</p>
                 {% endfor %}
             </div>
 
@@ -73,7 +67,7 @@
             </div>
 
             {% if entrega.observacoes %}
-                <p class="opcionais">{{ entrega.observacoes }}</p>
+            <p class="opcionais">{{ entrega.observacoes }}</p>
             {% endif %}
         </div>
 
@@ -115,7 +109,7 @@
         <div class="card-info">
             <h3>Entrega indisponível</h3>
             <p class="sem-informacao">
-                Só é possível registrar a entrega de uma venda fechada cujo veículo esteja como vendido.
+                Só é possível registrar a entrega de uma venda fechada, com veículo vendido e todas as etapas de documentação concluídas. <a class="rc-inline-link" href="{% url 'documentacao_pendente' %}">Consultar documentação</a>.
             </p>
         </div>
         {% endif %}

@@ -4,12 +4,14 @@ document.querySelectorAll("[data-auto-submit]").forEach((campo) => {
 });
 document.querySelectorAll("form[data-confirmacao]").forEach((formulario) => {
     formulario.addEventListener("submit", (evento) => {
-        if (!window.confirm(formulario.dataset.confirmacao)) evento.preventDefault();
+        if (!window.confirm(formulario.dataset.confirmacao))
+            evento.preventDefault();
     });
 });
 document.querySelectorAll("[data-confirmacao-clique]").forEach((elemento) => {
     elemento.addEventListener("click", (evento) => {
-        if (!window.confirm(elemento.dataset.confirmacaoClique)) evento.preventDefault();
+        if (!window.confirm(elemento.dataset.confirmacaoClique))
+            evento.preventDefault();
     });
 });
 document.querySelectorAll("[data-imprimir]").forEach((botao) => {

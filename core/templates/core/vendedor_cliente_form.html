@@ -4,8 +4,8 @@
 {% block title %}{{ titulo }} | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_form.css' %}?v=6">
-<link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_cliente_form.css' %}?v=rc4-fb46757f65f5">
+<link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}?v=rc4-cdb90c846034">
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,6 @@
     {% csrf_token %}
     {{ form.non_field_errors }}
 
-    <!-- TIPO DE PESSOA -->
     <section class="card-form">
         <h2 class="card-form-titulo">Tipo de cliente</h2>
         <div class="form-grid">
@@ -38,7 +37,6 @@
         </div>
     </section>
 
-    <!-- PESSOA FÍSICA -->
     <section class="card-form" data-tipo="PF">
         <h2 class="card-form-titulo">Dados da pessoa física</h2>
         <div class="form-grid">
@@ -60,7 +58,6 @@
         </div>
     </section>
 
-    <!-- PESSOA JURÍDICA -->
     <section class="card-form" data-tipo="PJ">
         <h2 class="card-form-titulo">Dados da pessoa jurídica</h2>
         <div class="form-grid">
@@ -87,7 +84,6 @@
         </div>
     </section>
 
-    <!-- CONTATO -->
     <section class="card-form">
         <h2 class="card-form-titulo">Contato</h2>
         <div class="form-grid">
@@ -105,51 +101,51 @@
 
         <div id="telefones-container">
             {% for tel in formset %}
-                <div class="telefone-linha" data-form-row>
+            <div class="telefone-linha" data-form-row>
                     {% for hidden in tel.hidden_fields %}{{ hidden }}{% endfor %}
                     {{ tel.non_field_errors }}
 
-                    <div class="campo">
+                <div class="campo">
                         <label for="{{ tel.numero.id_for_label }}">Número (com DDD)</label>
                         {{ tel.numero }}
                         {{ tel.numero.errors }}
-                    </div>
-                    <div class="campo">
+                </div>
+                <div class="campo">
                         <label for="{{ tel.tipo.id_for_label }}">Tipo</label>
                         {{ tel.tipo }}
                         {{ tel.tipo.errors }}
-                    </div>
-                    <div class="campo campo-check">
+                </div>
+                <div class="campo campo-check">
                         <label>{{ tel.principal }} Principal</label>
-                    </div>
-                    <div class="telefone-acoes">
+                </div>
+                <div class="telefone-acoes">
                         <span hidden>{{ tel.DELETE }}</span>
                         <button type="button" class="btn-remover" data-remove-row>Remover</button>
-                    </div>
                 </div>
+            </div>
             {% endfor %}
         </div>
 
         <template id="telefone-empty-form">
-            <div class="telefone-linha" data-form-row>
+        <div class="telefone-linha" data-form-row>
                 {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
 
-                <div class="campo">
+            <div class="campo">
                     <label>Número (com DDD)</label>
                     {{ formset.empty_form.numero }}
-                </div>
-                <div class="campo">
+            </div>
+            <div class="campo">
                     <label>Tipo</label>
                     {{ formset.empty_form.tipo }}
-                </div>
-                <div class="campo campo-check">
+            </div>
+            <div class="campo campo-check">
                     <label>{{ formset.empty_form.principal }} Principal</label>
-                </div>
-                <div class="telefone-acoes">
+            </div>
+            <div class="telefone-acoes">
                     <span hidden>{{ formset.empty_form.DELETE }}</span>
                     <button type="button" class="btn-remover" data-remove-row>Remover</button>
-                </div>
             </div>
+        </div>
         </template>
 
         <button type="button" class="btn-secundario" id="btn-add-telefone">
@@ -157,7 +153,6 @@
         </button>
     </section>
 
-    <!-- ENDEREÇO -->
     <section class="card-form">
         <h2 class="card-form-titulo">Endereço</h2>
         <div class="form-grid">

@@ -7,7 +7,7 @@
 }
 
 .topbar p strong {
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
     font-weight: 600;
 }
 
@@ -29,8 +29,8 @@
 }
 
 .neg-resumo .neg-card-pendente .neg-card-icon {
-    background: #fef2f2;
-    color: #dc2626;
+    background: light-dark(#fef2f2, #3b2533);
+    color: light-dark(#dc2626, #fda4af);
 }
 
 .neg-table-container {
@@ -49,7 +49,7 @@
 }
 
 .neg-table td a {
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
 }
 
@@ -68,20 +68,20 @@
 }
 
 .margem-negativa {
-    background: #fdecec;
+    background: light-dark(#fdecec, #3b2533);
 }
 
 .neg-table tbody tr.margem-negativa:hover {
-    background: #fee2e2;
+    background: light-dark(#fee2e2, #3b2533);
 }
 
 .neg-resumo .neg-card strong.valor-negativo, .neg-table .neg-valor strong.valor-negativo {
-    color: #991b1b;
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .status-margem-negativa {
-    background: #fee2e2;
-    color: #991b1b;
+    background: light-dark(#fee2e2, #3b2533);
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .neg-table .neg-valor .neg-status {
@@ -115,7 +115,6 @@
         flex-direction: column;
         align-items: stretch;
     }
-
     .neg-section-header > .neg-action {
         align-self: flex-start;
         white-space: normal;
@@ -127,15 +126,12 @@
         grid-template-columns: minmax(0, 1fr);
         gap: 12px;
     }
-
     .neg-card {
         padding: 16px;
     }
-
     .neg-section-header > .neg-action {
         width: 100%;
     }
-
     .topbar h1 {
         font-size: 24px;
     }

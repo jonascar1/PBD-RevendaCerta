@@ -7,7 +7,7 @@
 .preco-card {
     width: 100%;
     max-width: 650px;
-    background: #ffffff;
+    background: light-dark(#ffffff, #121c2e);
     border-radius: 16px;
     padding: 32px;
     box-sizing: border-box;
@@ -24,18 +24,18 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: #7a8494;
+    color: light-dark(#7a8494, #a0b1c8);
 }
 
 .preco-header h1 {
     margin: 0;
     font-size: 28px;
-    color: #172033;
+    color: light-dark(#172033, #eef4fc);
 }
 
 .preco-header p {
     margin: 8px 0 0;
-    color: #6b7280;
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 14px;
 }
 
@@ -49,23 +49,23 @@
 .preco-info > div {
     padding: 18px;
     border-radius: 12px;
-    background: #f5f7fb;
+    background: light-dark(#f5f7fb, #121c2e);
 }
 
 .preco-info span {
     display: block;
     margin-bottom: 7px;
     font-size: 13px;
-    color: #7a8494;
+    color: light-dark(#7a8494, #a0b1c8);
 }
 
 .preco-info strong {
     font-size: 18px;
-    color: #172033;
+    color: light-dark(#172033, #eef4fc);
 }
 
 .preco-form {
-    border-top: 1px solid #e6e9ef;
+    border-top: 1px solid light-dark(#e6e9ef, #29384e);
     padding-top: 26px;
 }
 
@@ -78,14 +78,14 @@
 .campo-preco label {
     font-size: 14px;
     font-weight: 600;
-    color: #273247;
+    color: light-dark(#273247, #eef4fc);
 }
 
 .campo-preco input {
     width: 100%;
     box-sizing: border-box;
     padding: 13px 14px;
-    border: 1px solid #d5dae3;
+    border: 1px solid light-dark(#d5dae3, #29384e);
     border-radius: 9px;
     font-size: 16px;
     outline: none;
@@ -114,8 +114,8 @@
 }
 
 .btn-cancelar-preco {
-    color: #4b5563;
-    background: #eef1f5;
+    color: light-dark(#4b5563, #a0b1c8);
+    background: light-dark(#eef1f5, #19263a);
 }
 
 .btn-salvar-preco {

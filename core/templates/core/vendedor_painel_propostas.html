@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_propostas.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_painel_propostas.css' %}?v=rc4-cbb6d0966b14">
 {% endblock %}
 
 {% block content %}
@@ -61,51 +61,51 @@
 
         <div class="prop-card prop-lista">
             {% for proposta in propostas %}
-                <article class="prop-linha">
-                    <div class="prop-info-col">
+            <article class="prop-linha">
+                <div class="prop-info-col">
                         <span class="prop-principal">{{ proposta.cliente }}</span>
                         <span class="prop-secundario">Cliente</span>
-                    </div>
+                </div>
 
-                    <div class="prop-info-col">
+                <div class="prop-info-col">
                         <span class="prop-principal">{{ proposta.veiculo.marca }} {{ proposta.veiculo.modelo }}</span>
                         <span class="prop-secundario">{{ proposta.veiculo.placa|default:"Placa não informada" }}</span>
-                    </div>
+                </div>
 
-                    <div class="prop-info-col">
+                <div class="prop-info-col">
                         <span class="prop-valor">R$ {{ proposta.valor_oferecido|floatformat:2 }}</span>
                         <span class="prop-secundario">Valor oferecido</span>
-                    </div>
+                </div>
 
-                    <div class="prop-info-col prop-desconto-col">
+                <div class="prop-info-col prop-desconto-col">
                         <span class="prop-valor">R$ {{ proposta.desconto_embutido|default:0|floatformat:2 }}</span>
                         <span class="prop-secundario">{{ proposta.desconto_percentual|default:0|floatformat:2 }}% de desconto</span>
-                    </div>
+                </div>
 
-                    <div class="prop-status-col">
+                <div class="prop-status-col">
                         <span class="prop-badge prop-badge-{{ proposta.situacao|lower }}">
                             {{ proposta.get_situacao_display|default:proposta.situacao }}
                         </span>
-                    </div>
+                </div>
 
-                    <div class="prop-detalhes-col">
+                <div class="prop-detalhes-col">
                         <a class="prop-btn prop-btn-secundario prop-btn-pequeno"
                            href="{% url 'detalhes_proposta' proposta.pk %}">Detalhes</a>
-                    </div>
-                </article>
+                </div>
+            </article>
             {% empty %}
-                <div class="prop-vazio">
+            <div class="prop-vazio">
                     <strong>Nenhuma proposta encontrada</strong>
-                    <p>Não há propostas para os filtros selecionados.</p>
+                <p>Não há propostas para os filtros selecionados.</p>
                     <a class="prop-btn prop-btn-primario" href="{% url 'nova_proposta' %}">
                         Criar primeira proposta
                     </a>
-                </div>
+            </div>
             {% endfor %}
         </div>
 
         {% if is_paginated %}
-            <nav class="prop-paginacao" aria-label="Paginação">
+        <nav class="prop-paginacao" aria-label="Paginação">
                 {% if page_obj.has_previous %}
                     <a class="prop-btn prop-btn-pequeno"
                        href="?page={{ page_obj.previous_page_number }}">Anterior</a>
@@ -119,7 +119,7 @@
                     <a class="prop-btn prop-btn-pequeno"
                        href="?page={{ page_obj.next_page_number }}">Próxima</a>
                 {% endif %}
-            </nav>
+        </nav>
         {% endif %}
     </section>
 </div>

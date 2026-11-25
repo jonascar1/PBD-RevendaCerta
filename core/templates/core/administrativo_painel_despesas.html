@@ -1,22 +1,61 @@
-{% extends "core/administrativo_base.html" %}
-{% load static %}
-{% block title %}Despesas | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/administrativo_listagem_despesas.css' %}?v=5">{% endblock %}
-{% block content %}
-<header class="ad-page-header"><div><h1>Despesas</h1><p>Consulte os lançamentos financeiros registrados na loja.</p></div><a class="ad-btn ad-btn-primary" href="#" id="abrir-nova-despesa">+ Nova despesa</a></header>
-<section class="ad-panel"><div class="ad-panel-head"><div><h2>Lançamentos registrados</h2><p class="ad-muted">Despesas ativas, ordenadas pelas mais recentes.</p></div><span class="ad-muted">{{ total_despesas }} lançamento(s)</span></div>
-<form class="ad-filter" method="get"><input type="search" name="busca" value="{{ busca }}" placeholder="Buscar veículo, placa ou descrição"><button type="submit">Buscar</button></form>
-<div class="ad-table-wrap"><table class="ad-table"><thead><tr><th>Descrição</th><th>Veículo</th><th>Data</th><th>Valor</th><th>Ações</th></tr></thead><tbody>
-{% for despesa in despesas %}<tr><td><strong>{{ despesa.descricao }}</strong>{% if despesa.get_categoria_despesa_display %}<small>{{ despesa.get_categoria_despesa_display }}</small>{% endif %}</td><td>{{ despesa.veiculo.marca }} {{ despesa.veiculo.modelo }}<small>{{ despesa.veiculo.placa }}</small></td><td>{{ despesa.data_lancamento|date:'d/m/Y' }}</td><td><strong>R$ {{ despesa.valor|floatformat:2 }}</strong></td><td><a href="{% url 'despesas_veiculo' despesa.veiculo_id %}">Detalhes</a> &nbsp; <a href="{% url 'editar_despesa' despesa.pk %}">Editar</a></td></tr>
-{% empty %}<tr><td colspan="5"><div class="ad-empty">Nenhuma despesa encontrada. Use “Nova despesa” para registrar o primeiro lançamento.</div></td></tr>{% endfor %}
-</tbody></table></div></section>
-<dialog id="dialog-nova-despesa" class="ad-dialog" aria-labelledby="titulo-nova-despesa">
-  <div class="ad-dialog-head"><h2 id="titulo-nova-despesa">Nova despesa</h2><button type="button" id="fechar-nova-despesa" class="ad-dialog-close" aria-label="Fechar">×</button></div>
-  <p>Escolha o veículo ao qual a despesa será vinculada.</p>
-  <label for="veiculo-nova-despesa">Veículo</label>
-  <select id="veiculo-nova-despesa"><option value="">Selecione um veículo</option>{% for veiculo in veiculos %}<option value="{% url 'adicionar_despesa' veiculo.pk %}">{{ veiculo.marca }} {{ veiculo.modelo }} · {{ veiculo.placa }}</option>{% endfor %}</select>
-  <div class="ad-dialog-actions"><button type="button" id="cancelar-nova-despesa" class="ad-btn">Cancelar</button><button type="button" id="continuar-nova-despesa" class="ad-btn ad-btn-primary">Continuar</button></div>
-</dialog>
-{% endblock %}
-
-{% block extra_js %}<script src="{% static 'core/js/administrativo_nova_despesa.js' %}"></script>{% endblock %}
+{% extends "core/administrativo_base.html" %}{% load static %}{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/admin_operacoes.css' %}?v=rc-mobile-1">{% endblock %}{% block content %}<div class="ao">{% include "core/partials/painel_mensagens.html" %}<header><small>ADMINISTRATIVO</small>
+<h1>Despesas</h1>
+<p>Lance cada gasto no veículo e acompanhe seu custo total.</p>
+</header>
+<div class="ao-split">
+    <section class="ao-card">
+        <h2>Veículos</h2>
+        <p>Escolha um veículo</p>
+        <div class="ao-search-row"><input type="search" placeholder="Marca, modelo ou placa" data-vehicle-search aria-label="Buscar veículo"><button type="button" class="ao-filter-toggle" aria-expanded="false" aria-controls="ao-filters">Filtros</button>
+        </div>
+        <div id="ao-filters" class="ao-filters" hidden><label>Marca<select data-filter="marca">
+            <option value="">Todas</option>
+        </select></label><label>Categoria<select data-filter="tipo">
+        <option value="">Todas</option>
+    </select></label><label>Situação<select data-filter="situacao">
+    <option value="">Todas</option>
+</select></label><label>Ordenação<select data-order>
+<option value="asc">A–Z</option>
+<option value="desc">Z–A</option>
+</select></label><button type="button" data-clear-filters>Limpar filtros</button>
+</div>
+<p class="ao-results" aria-live="polite" data-results>
+</p>
+<div class="ao-list" data-vehicles>{% for veiculo in veiculos %}<a class="ao-choice {% if selecionado.pk == veiculo.pk %}active{% endif %}" data-marca="{{ veiculo.marca }}" data-tipo="{{ veiculo.get_tipo_display }}" data-situacao="{{ veiculo.get_situacao_display }}" href="?veiculo={{ veiculo.pk }}"><strong>{{ veiculo.marca }} {{ veiculo.modelo }}</strong><small>{{ veiculo.placa }} · {{ veiculo.get_situacao_display }}</small></a>{% empty %}<p>Nenhum veículo cadastrado.</p>{% endfor %}</div>
+</section>
+<div class="ao-stack">{% if selecionado %}<section class="ao-hero">
+    <h2>{{ selecionado.marca }} {{ selecionado.modelo }}</h2>
+    <p>{{ selecionado.placa }} · {{ selecionado.get_situacao_display }}</p>
+    <div class="ao-stats">
+        <div>Aquisição<strong>R$ {{ selecionado.custo_aquisicao|default_if_none:0|floatformat:2 }}</strong>
+        </div>
+        <div>Despesas<strong>R$ {{ gastos|floatformat:2 }}</strong>
+        </div>
+        <div>Custo total<strong>R$ {{ custo_total|floatformat:2 }}</strong>
+        </div>
+    </div>
+</section>
+<section class="ao-card">
+    <h2>Nova despesa</h2>
+    <p>Tipo, valor, data e descrição</p>
+    <form method="post" action="{% url 'adicionar_despesa' selecionado.pk %}" class="ao-expense">{% csrf_token %}<input type="hidden" name="origem" value="painel">{% for campo in form %}<label>{{ campo.label }}{{ campo }}</label>{% endfor %}<button>Salvar despesa</button>
+    </form>
+</section>
+<section class="ao-card">
+    <h2>Lançamentos registrados</h2>
+    <div class="ao-table">
+        <table>
+            <thead>
+                <tr><th>Descrição</th><th>Data</th><th>Valor</th><th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>{% for despesa in lista %}<tr><td>{{ despesa.descricao }}<small>{{ despesa.get_categoria_despesa_display }}</small></td><td>{{ despesa.data_lancamento|date:"d/m/Y" }}</td><td>R$ {{ despesa.valor|floatformat:2 }}</td><td><a class="rc-action-secondary" href="{% url 'editar_despesa' despesa.pk %}">Editar</a> · <a class="rc-action-secondary rc-action-danger" href="{% url 'excluir_despesa' despesa.pk %}">Excluir</a></td>
+            </tr>{% empty %}<tr><td colspan="4">Nenhuma despesa registrada.</td>
+        </tr>{% endfor %}</tbody>
+    </table>
+</div>
+<div class="ao-detail-footer"><a class="ao-detail-link" href="{% url 'despesas_veiculo' selecionado.pk %}"><i data-lucide="history" aria-hidden="true"></i> Detalhes e histórico do veículo <span aria-hidden="true">→</span></a>
+</div>
+</section>{% else %}<section class="ao-card">Selecione um veículo.</section>{% endif %}</div>
+</div>
+</div>{% endblock %}{% block extra_js %}<script src="{% static 'core/js/admin_operacoes.js' %}"></script>{% endblock %}

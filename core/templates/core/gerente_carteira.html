@@ -4,7 +4,7 @@
 {% block title %}Carteira de clientes | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_carteira.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_carteira.css' %}?v=rc4-021b103822e3">
 {% endblock %}
 
 {% block content %}
@@ -25,13 +25,7 @@
         </a>
     </header>
 
-    {% if messages %}
-        <div class="cart-mensagens">
-            {% for message in messages %}
-                <p class="cart-mensagem">{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">
@@ -62,24 +56,24 @@
         </div>
 
         {% if carteira.linhas %}
-            <div class="cart-tabela-wrap">
-                <table class="cart-tabela">
-                    <thead>
-                        <tr>
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela">
+                <thead>
+                    <tr>
                             <th>Cliente</th>
                             <th>Telefone</th>
                             <th>Último veículo</th>
                             <th>Última compra</th>
                             <th>Tempo decorrido</th>
                             <th>Contatado no mês</th>
-                            <th>Vendedores associados</th>
                             <th>Último contato</th>
                             <th>Retorno</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                            <th>Vendedores associados</th>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for item in carteira.linhas %}
-                            <tr>
+                    <tr>
                                 <td>{{ item.cliente }}</td>
                                 <td>
                                     {% if item.telefone %}
@@ -123,27 +117,27 @@
                                 </td>
                                 <td>
                                     {% for nome in item.vendedores_nomes %}
-                                        <div>{{ nome }}</div>
+                        <div>{{ nome }}</div>
                                     {% empty %}
                                         <span class="cart-muted">Não informado</span>
                                     {% endfor %}
                                 </td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
 
-            <p class="cart-nota">
+        <p class="cart-nota">
                 A quantidade de vendedores considera todos que já realizaram uma venda válida
                 para o cliente. O acompanhamento individual é feito na carteira de cada vendedor.
-            </p>
+        </p>
         {% else %}
-            <div class="cart-vazio">
+        <div class="cart-vazio">
                 <i data-lucide="users"></i>
-                <h3>Carteira vazia</h3>
-                <p>Os clientes entrarão automaticamente após atingir o prazo definido.</p>
-            </div>
+            <h3>Carteira vazia</h3>
+            <p>Os clientes entrarão automaticamente após atingir o prazo definido.</p>
+        </div>
         {% endif %}
     </section>
 

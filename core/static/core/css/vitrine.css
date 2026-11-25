@@ -303,7 +303,8 @@ body.menu-aberto .drawer-menu {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background-image: linear-gradient(90deg, rgba(4, 19, 45, 0.96) 0%, rgba(4, 19, 45, 0.82) 42%, rgba(4, 19, 45, 0.35) 100%), url("/static/core/img/pneu-azul.png?v=2");    background-size: cover;
+    background-image: linear-gradient(90deg, rgba(4, 19, 45, 0.96) 0%, rgba(4, 19, 45, 0.82) 42%, rgba(4, 19, 45, 0.35) 100%), url("/static/core/img/pneu-azul.png?v=2");
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transform: scale(1.01);
@@ -897,27 +898,21 @@ form.filtros {
     .container {
         width: calc(100% - 40px);
     }
-
     .cabecalho-conteudo {
         gap: 18px;
     }
-
     .menu {
         gap: 20px;
     }
-
     .filtros .filtros-campos {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .filtros .filtros-acoes {
         grid-column: 1 / -1;
     }
-
     .trilho-veiculos {
         gap: 12px;
     }
-
     .trilho-veiculos .card-veiculo {
         flex-basis: calc((100% - 36px) / 4);
     }
@@ -928,12 +923,10 @@ form.filtros {
         min-height: 68px;
         gap: 12px;
     }
-
     .menu,
     .botao-whatsapp {
         display: none;
     }
-
     .botao-menu-mobile {
         display: flex;
         flex-shrink: 0;
@@ -944,168 +937,136 @@ form.filtros {
     .container {
         width: calc(100% - 32px);
     }
-
     .secao {
         padding: 55px 0;
     }
-
     .logo {
         font-size: 16px;
         gap: 8px;
     }
-
     .logo-icone {
         width: 38px;
         height: 38px;
     }
-
     .banner {
         min-height: 430px;
     }
-
     .banner-fundo {
         background-image: linear-gradient(90deg, rgba(4, 19, 45, 0.94), rgba(4, 19, 45, 0.7)), url("/static/core/img/pneu-azul.png?v2");
         background-position: 58% center;
     }
-
     .banner-conteudo {
         padding-top: 55px;
         padding-bottom: 70px;
     }
-
     .banner-etiqueta {
         margin-bottom: 17px;
         font-size: 10px;
         letter-spacing: 1.2px;
     }
-
     .banner h1 {
         margin-bottom: 18px;
         font-size: clamp(34px, 9vw, 47px);
         letter-spacing: -1px;
     }
-
     .banner p {
         max-width: 440px;
         margin-bottom: 24px;
         font-size: 13px;
         line-height: 1.8;
     }
-
     .botao-principal {
         min-height: 47px;
         padding: 0 17px;
         font-size: 12px;
     }
-
     .banner-indicador {
         right: 16px;
         bottom: 16px;
         left: 16px;
         font-size: 10px;
     }
-
     .estoque-cabecalho {
         align-items: flex-start;
         flex-direction: column;
         gap: 15px;
         margin-bottom: 23px;
     }
-
     .estoque-cabecalho h2,
     .titulo-centralizado h2 {
         font-size: 29px;
     }
-
     .estoque-cabecalho p,
     .titulo-centralizado p {
         font-size: 13px;
     }
-
     .total-veiculos {
         padding: 7px 10px;
     }
-
     .filtros {
         padding: 16px;
     }
-
     .filtros .filtros-campos {
         grid-template-columns: minmax(0, 1fr);
         gap: 12px;
     }
-
     .filtros .filtros-acoes {
         grid-column: auto;
         width: 100%;
     }
-
     .filtros .botao-filtrar {
         flex: 1;
     }
-
     .carrossel-veiculos {
         gap: 6px;
     }
-
     .seta-carrossel {
         flex-basis: 28px;
         width: 28px;
         height: 28px;
         font-size: 12px;
     }
-
     .trilho-veiculos {
         gap: 10px;
     }
-
     .trilho-veiculos .card-veiculo {
         flex-basis: calc((100% - 10px) / 2);
     }
-
     .card-conteudo {
         padding: 9px;
     }
-
     .card-marca {
         font-size: 9px;
         letter-spacing: 0.6px;
     }
-
     .card-conteudo h3 {
         font-size: 14px;
         line-height: 1.35;
     }
-
     .card-versao {
         margin-bottom: 9px;
         font-size: 10px;
         line-height: 1.45;
     }
-
     .card-preco {
         margin-bottom: 9px;
         font-size: 15px;
         letter-spacing: -0.3px;
     }
-
     .card-detalhes {
         margin-bottom: 10px;
         padding-top: 8px;
     }
-
     .card-detalhes span {
         padding: 4px 5px;
         font-size: 9px;
     }
-
     .botao-card {
         min-height: 36px;
         gap: 4px;
         padding: 0 6px;
         font-size: 9px;
     }
-
     .etiqueta-combustivel {
         top: 5px;
         left: 5px;
@@ -1113,50 +1074,40 @@ form.filtros {
         padding: 4px 5px;
         font-size: 8px;
     }
-
     .titulo-centralizado {
         margin-bottom: 28px;
     }
-
     .etapas {
         grid-template-columns: minmax(0, 1fr);
         gap: 15px;
     }
-
     .etapa {
         padding: 23px;
     }
-
     .etapa-numero {
         width: 43px;
         height: 43px;
         margin-bottom: 16px;
     }
-
     .contato {
         padding: 48px 0;
     }
-
     .contato-conteudo {
         align-items: flex-start;
         flex-direction: column;
         gap: 23px;
     }
-
     .contato h2 {
         font-size: 29px;
     }
-
     .contato p {
         font-size: 13px;
     }
-
     .rodape-conteudo {
         align-items: flex-start;
         flex-direction: column;
         gap: 13px;
     }
-
     .rodape p {
         text-align: left;
         line-height: 1.8;
@@ -1167,38 +1118,30 @@ form.filtros {
     .container {
         width: calc(100% - 24px);
     }
-
     .cabecalho-conteudo {
         gap: 10px;
     }
-
     .logo {
         font-size: 14px;
     }
-
     .logo-icone {
         width: 34px;
         height: 34px;
     }
-
     .banner h1 {
         font-size: 33px;
     }
-
     .carrossel-veiculos {
         gap: 4px;
     }
-
     .seta-carrossel {
         flex-basis: 24px;
         width: 24px;
         height: 24px;
     }
-
     .card-conteudo {
         padding: 7px;
     }
-
     .card-preco {
         font-size: 14px;
     }
@@ -1213,6 +1156,7 @@ form.filtros {
 }
 
 /* Ajuste automatico logo/icone */
+
 .logo img, .logo-icone img {
     display: block;
     max-width: 100%;
@@ -1220,14 +1164,15 @@ form.filtros {
     object-fit: contain;
 }
 
-
 /* Banner principal: movimento horizontal, sem interferir no estoque */
+
 .banner-carrossel {
     position: relative;
     display: block;
     min-height: 490px;
     overflow: hidden;
 }
+
 .banner-carrossel .banner-slide {
     position: absolute;
     inset: 0;
@@ -1243,24 +1188,34 @@ form.filtros {
     transition: transform 650ms cubic-bezier(.22,.61,.36,1);
     will-change: transform;
 }
+
 .banner-carrossel .banner-slide.ativo {
     transform: translateX(0);
     pointer-events: auto;
     z-index: 2;
 }
+
 .banner-carrossel .banner-slide .banner-conteudo {
     position: relative;
     z-index: 1;
     width: min(1180px, calc(100% - 48px));
 }
-.banner-carrossel .banner-slide-inicial { background: var(--azul-escuro); }
-.banner-carrossel .banner-slide-inicial .banner-fundo { z-index: 0; }
+
+.banner-carrossel .banner-slide-inicial {
+    background: var(--azul-escuro);
+}
+
+.banner-carrossel .banner-slide-inicial .banner-fundo {
+    z-index: 0;
+}
+
 .banner-carrossel .banner-citroen {
     background-image: linear-gradient(90deg, rgba(7,17,34,.98) 0%, rgba(7,17,34,.92) 32%, rgba(7,17,34,.55) 55%, rgba(7,17,34,0) 80%), url('/static/core/img/aircross.png');
     background-size: cover;
     background-position: right center;
     background-repeat: no-repeat;
 }
+
 .banner-carrossel .banner-paginacao {
     position: absolute;
     z-index: 5;
@@ -1272,6 +1227,7 @@ form.filtros {
     gap: 12px;
     transform: translateX(-50%);
 }
+
 .banner-carrossel .banner-ponto,
 .banner-carrossel .banner-ponto.ativo {
     display: block;
@@ -1286,7 +1242,11 @@ form.filtros {
     cursor: pointer;
     transition: background 200ms ease;
 }
-.banner-carrossel .banner-ponto.ativo { background: #fff; }
+
+.banner-carrossel .banner-ponto.ativo {
+    background: #fff;
+}
+
 .banner-carrossel .banner-seta {
     position: absolute;
     z-index: 5;
@@ -1306,31 +1266,57 @@ form.filtros {
     transform: translateY(-50%);
     transition: background 200ms ease;
 }
-.banner-carrossel .banner-seta:hover { background: rgba(4,19,41,.8); }
-.banner-carrossel .banner-anterior { left: 18px; }
-.banner-carrossel .banner-proximo { right: 18px; }
+
+.banner-carrossel .banner-seta:hover {
+    background: rgba(4,19,41,.8);
+}
+
+.banner-carrossel .banner-anterior {
+    left: 18px;
+}
+
+.banner-carrossel .banner-proximo {
+    right: 18px;
+}
+
 .banner-carrossel .banner-seta:focus-visible,
 .banner-carrossel .banner-ponto:focus-visible {
     outline: 3px solid #60a5fa;
     outline-offset: 4px;
 }
+
 @media (max-width: 680px) {
-    .banner-carrossel { min-height: 430px; }
-    .banner-carrossel .banner-slide .banner-conteudo { width: calc(100% - 92px); }
+    .banner-carrossel {
+        min-height: 430px;
+    }
+    .banner-carrossel .banner-slide .banner-conteudo {
+        width: calc(100% - 92px);
+    }
     .banner-carrossel .banner-citroen {
         background-image: linear-gradient(180deg, rgba(7,17,34,.95), rgba(7,17,34,.8) 55%, rgba(7,17,34,.35)), url('/static/core/img/aircross.png');
         background-position: center bottom;
     }
-    .banner-carrossel .banner-seta { width: 34px; height: 34px; font-size: 18px; }
-    .banner-carrossel .banner-anterior { left: 8px; }
-    .banner-carrossel .banner-proximo { right: 8px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .banner-carrossel .banner-slide { transition: none; }
+    .banner-carrossel .banner-seta {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+    .banner-carrossel .banner-anterior {
+        left: 8px;
+    }
+    .banner-carrossel .banner-proximo {
+        right: 8px;
+    }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .banner-carrossel .banner-slide {
+        transition: none;
+    }
+}
 
 /* Ajustes finais do banner Aircross — imagem à esquerda, texto à direita */
+
 .banner-carrossel .banner-citroen {
     padding: 0;
     border-radius: 0;
@@ -1339,6 +1325,7 @@ form.filtros {
     background-position: center center;
     background-repeat: no-repeat;
 }
+
 .banner-carrossel .banner-citroen .banner-conteudo {
     display: flex;
     flex-direction: column;
@@ -1348,8 +1335,16 @@ form.filtros {
     padding-top: 45px;
     padding-bottom: 45px;
 }
-.banner-carrossel .banner-citroen h1 { max-width: 100%; font-size: clamp(34px, 3.5vw, 58px); }
-.banner-carrossel .banner-citroen p { max-width: 460px; }
+
+.banner-carrossel .banner-citroen h1 {
+    max-width: 100%;
+    font-size: clamp(34px, 3.5vw, 58px);
+}
+
+.banner-carrossel .banner-citroen p {
+    max-width: 460px;
+}
+
 .banner-carrossel .banner-seta {
     width: 32px;
     height: 32px;
@@ -1359,8 +1354,13 @@ form.filtros {
     color: rgba(255,255,255,.82);
     opacity: .55;
 }
+
 .banner-carrossel .banner-seta:hover,
-.banner-carrossel .banner-seta:focus-visible { opacity: 1; background: rgba(4,19,41,.45); }
+.banner-carrossel .banner-seta:focus-visible {
+    opacity: 1;
+    background: rgba(4,19,41,.45);
+}
+
 .banner-carrossel .banner-ponto,
 .banner-carrossel .banner-ponto.ativo {
     width: 9px;
@@ -1370,8 +1370,15 @@ form.filtros {
     box-shadow: none;
     transform: none;
 }
-.banner-carrossel .banner-ponto { background: rgba(255,255,255,.4); }
-.banner-carrossel .banner-ponto.ativo { background: #fff; }
+
+.banner-carrossel .banner-ponto {
+    background: rgba(255,255,255,.4);
+}
+
+.banner-carrossel .banner-ponto.ativo {
+    background: #fff;
+}
+
 @media (max-width: 680px) {
     .banner-carrossel .banner-citroen {
         background-image: linear-gradient(180deg, rgba(4,15,34,.68) 0%, rgba(4,15,34,.48) 48%, rgba(4,15,34,.15) 100%), url('/static/core/img/aircross.png');
@@ -1383,10 +1390,13 @@ form.filtros {
         padding-bottom: 40px;
         justify-content: flex-start;
     }
-    .banner-carrossel .banner-citroen h1 { font-size: clamp(32px, 8vw, 44px); }
+    .banner-carrossel .banner-citroen h1 {
+        font-size: clamp(32px, 8vw, 44px);
+    }
 }
 
 /* Banner Aircross: proporcao original 1920x720 e texto livre na direita */
+
 @media (min-width: 681px) {
     .banner.banner-carrossel {
         height: auto;
@@ -1426,6 +1436,7 @@ form.filtros {
         max-width: none;
     }
 }
+
 @media (max-width: 680px) {
     .banner-carrossel .banner-citroen .banner-conteudo {
         width: calc(100% - 100px);
@@ -1433,9 +1444,14 @@ form.filtros {
         margin: 0 auto;
     }
     .banner-carrossel .banner-citroen h1,
-    .banner-carrossel .banner-citroen p { width: 100%; max-width: none; }
+    .banner-carrossel .banner-citroen p {
+        width: 100%;
+        max-width: none;
+    }
 }
+
 /* BANNER PRINCIPAL */
+
 .banner.banner-carrossel {
     position: relative;
     width: 100%;
@@ -1446,6 +1462,7 @@ form.filtros {
 }
 
 /* Cada slide ocupa toda a largura do banner */
+
 .banner-carrossel .banner-slide {
     position: absolute;
     top: 0;
@@ -1458,6 +1475,7 @@ form.filtros {
 }
 
 /* Imagem do Aircross */
+
 .banner-carrossel .banner-citroen {
     background-image: url("/static/core/img/aircross.png");
     background-size: cover;
@@ -1466,6 +1484,7 @@ form.filtros {
 }
 
 /* Ajuste mobile */
+
 @media (max-width: 680px) {
     .banner.banner-carrossel {
         height: 430px;
@@ -1473,7 +1492,6 @@ form.filtros {
         max-height: 430px;
     }
 }
-
 
 /* Melhorar a legibilidade dos textos do Aircross */
 
@@ -1493,27 +1511,26 @@ form.filtros {
     color: #ffffff;
     opacity: 1;
     font-weight: 600;
-    text-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.95),
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95),
         0 2px 10px rgba(0, 0, 0, 0.75);
 }
 
 /* Escurecimento suave apenas na área do texto */
+
 .banner-carrossel .banner-citroen {
-    background-image:
-        linear-gradient(
+    background-image: linear-gradient(
             90deg,
             transparent 45%,
             rgba(4, 13, 30, 0.12) 60%,
             rgba(4, 13, 30, 0.65) 100%
         ),
         url("/static/core/img/aircross.png");
-
     background-size: cover;
     background-position: center center;
 }
 
 /* Organiza o conteúdo do banner Aircross */
+
 .banner-carrossel .banner-citroen .banner-conteudo {
     display: flex;
     flex-direction: column;
@@ -1548,162 +1565,1238 @@ form.filtros {
     border-radius: 8px;
 }
 
-
 /* NOVAS PÁGINAS PÚBLICAS — estilos isolados da vitrine */
-@media (min-width: 769px) {
-  .cabecalho-conteudo { display:grid; grid-template-columns:minmax(260px,1fr) auto minmax(260px,1fr); gap:22px; }
-  .cabecalho-conteudo > .logo { justify-self:start; }
-  .cabecalho-conteudo > .menu { justify-self:center; gap:clamp(15px,2vw,30px); }
-  .cabecalho-conteudo > .botao-whatsapp { justify-self:end; }
-}
-form.filtros { border:1px solid transparent; background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#dbeafe,#cbd5e1 55%,#93c5fd) border-box; box-shadow:0 12px 34px rgba(15,35,70,.07); }
-.estoque-explorar-link { display:flex; justify-content:flex-end; margin:-14px 0 24px; }
-.estoque-explorar-link a { color:var(--azul); font-weight:800; text-decoration:none; }
-.estoque-explorar-link a:hover { text-decoration:underline; }
-.explorar-hero { background:linear-gradient(125deg,#071b3b,#113d7a); color:white; padding:62px 0 58px; }
-.explorar-hero h1 { font-size:clamp(32px,4vw,52px); line-height:1.2; }
-.explorar-hero p { color:#dbeafe; margin-top:12px; }
-.explorar-secao { background:var(--fundo); padding:42px 0 90px; min-height:60vh; }
-.filtros-explorar { margin-bottom:32px !important; }
-.explorar-busca { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
-.explorar-busca label { font-size:14px; font-weight:800; }
-.explorar-busca input { width:100%; height:48px; border:1px solid #dce5f1; border-radius:10px; padding:0 15px; outline:none; }
-.explorar-busca input:focus { border-color:var(--azul); box-shadow:0 0 0 3px rgba(23,101,232,.12); }
-.filtros .explorar-filtros-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
-.explorar-acoes { display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:22px; }
-.explorar-acoes .botao-filtrar,.explorar-acoes .botao-limpar { min-height:44px; padding:0 20px; }
-.explorar-resultados { display:flex; justify-content:space-between; align-items:end; gap:16px; margin:32px 0 20px; }
-.explorar-resultados h2 { font-size:26px; color:var(--azul-escuro); }
-.explorar-resultados p,.explorar-resultados > span { color:var(--texto-suave); font-size:14px; }
-.explorar-grade { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; }
-.explorar-card { width:100%; min-width:0; display:flex; flex-direction:column; overflow:hidden; background:#fff; border:1px solid #e2e8f0; border-radius:14px; box-shadow:0 5px 20px rgba(15,35,70,.05); }
-.explorar-card .card-foto { width:100%; height:auto; aspect-ratio:4/3; }
-.explorar-card .card-foto img { width:100%; height:100%; object-fit:cover; }
-.explorar-card .card-conteudo { flex:1; display:flex; flex-direction:column; padding:18px; }
-.explorar-card .card-preco { margin-top:auto; }
-.explorar-card .botao-card { margin-top:15px; }
-.explorar-vazio { grid-column:1/-1; padding:55px 20px; text-align:center; background:white; border-radius:14px; }
-.explorar-paginacao { display:flex; flex-wrap:wrap; justify-content:center; gap:9px; margin-top:40px; }
-.explorar-paginacao a,.explorar-paginacao span { display:grid; place-items:center; min-width:40px; min-height:40px; padding:0 13px; background:#fff; border:1px solid #dbe4f0; border-radius:9px; text-decoration:none; color:#172033; font-weight:700; }
-.explorar-paginacao .pagina-atual { background:var(--azul); border-color:var(--azul); color:#fff; }
-.pagina-institucional { padding:90px 0 120px; max-width:850px; min-height:55vh; }
-.pagina-institucional h1 { font-size:clamp(34px,4vw,48px); margin-bottom:20px; color:var(--azul-escuro); }
-.pagina-institucional h2 { font-size:23px; margin:28px 0 8px; }
-.pagina-institucional p { color:#475569; margin-bottom:16px; }
-.pagina-institucional .botao-principal { margin-top:16px; }
-/* Combobox pesquisável; select nativo permanece disponível se JS não carregar */
-.combo-raiz { position:relative; width:100%; min-width:0; }
-.combo-raiz select { position:absolute !important; width:1px !important; height:1px !important; opacity:0; pointer-events:none; }
-.combo-gatilho { display:flex; align-items:center; justify-content:space-between; width:100%; height:46px; padding:0 13px; background:#fff; border:1px solid #dce5f1; border-radius:8px; cursor:pointer; text-align:left; color:#172033; }
-.combo-gatilho:focus-visible { outline:3px solid #bfdbfe; border-color:var(--azul); }
-.combo-menu { position:absolute; z-index:90; top:calc(100% + 6px); left:0; right:0; padding:8px; background:#fff; border:1px solid #dbe4f0; border-radius:12px; box-shadow:0 16px 36px rgba(15,35,70,.18); }
-.combo-menu[hidden] { display:none; }
-.combo-pesquisa { display:block; width:100%; height:38px; padding:0 10px; border:1px solid #dbe4f0; border-radius:7px; margin-bottom:7px; outline:none; }
-.combo-opcoes { max-height:240px; overflow:auto; }
-.combo-opcao { width:100%; padding:10px 11px; border:0; background:transparent; border-radius:7px; text-align:left; cursor:pointer; color:#172033; }
-.combo-opcao:hover,.combo-opcao:focus-visible { background:#eff6ff; outline:none; }
-.combo-opcao[aria-selected=true] { color:#1d4ed8; font-weight:800; background:#eff6ff; }
-.combo-vazio { padding:12px; color:#64748b; font-size:13px; }
-@media (max-width:1100px) { .explorar-grade { grid-template-columns:repeat(3,minmax(0,1fr)); } .filtros .explorar-filtros-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:700px) { .explorar-grade { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } .explorar-card .card-conteudo { padding:12px; } .explorar-card .card-foto { aspect-ratio:1/1; } .explorar-hero { padding:40px 0; } }
-@media (max-width:450px) { .explorar-grade { grid-template-columns:1fr; } .filtros .explorar-filtros-grid { grid-template-columns:1fr; } .explorar-acoes { flex-wrap:wrap; } }
 
-.card-veiculo .card-preco,.card-veiculo h3 {color:#111!important;}
-.card-veiculo h3 {white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;}
-.card-foto {position:relative;}
-.etiqueta-marca {position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;background:#fff;color:#111;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:700;box-shadow:0 2px 8px #0002;}
-.card-foto .logo-fabricante,.logo-fabricante {width:22px!important;height:22px!important;object-fit:contain!important;flex:none;}
-.combo-opcao {display:flex;align-items:center;gap:8px;}
-.card-detalhes {flex-wrap:wrap;}
-.relacionados {padding-bottom:60px;}
-.relacionados h2 {margin:30px 0 18px;}
+@media (min-width: 769px) {
+    .cabecalho-conteudo {
+        display: grid;
+        grid-template-columns: minmax(260px,1fr) auto minmax(260px,1fr);
+        gap: 22px;
+    }
+    .cabecalho-conteudo > .logo {
+        justify-self: start;
+    }
+    .cabecalho-conteudo > .menu {
+        justify-self: center;
+        gap: clamp(15px,2vw,30px);
+    }
+    .cabecalho-conteudo > .botao-whatsapp {
+        justify-self: end;
+    }
+}
+
+form.filtros {
+    border: 1px solid transparent;
+    background: linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#dbeafe,#cbd5e1 55%,#93c5fd) border-box;
+    box-shadow: 0 12px 34px rgba(15,35,70,.07);
+}
+
+.estoque-explorar-link {
+    display: flex;
+    justify-content: flex-end;
+    margin: -14px 0 24px;
+}
+
+.estoque-explorar-link a {
+    color: var(--azul);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.estoque-explorar-link a:hover {
+    text-decoration: underline;
+}
+
+.explorar-hero {
+    background: linear-gradient(125deg,#071b3b,#113d7a);
+    color: white;
+    padding: 62px 0 58px;
+}
+
+.explorar-hero h1 {
+    font-size: clamp(32px,4vw,52px);
+    line-height: 1.2;
+}
+
+.explorar-hero p {
+    color: #dbeafe;
+    margin-top: 12px;
+}
+
+.explorar-secao {
+    background: var(--fundo);
+    padding: 42px 0 90px;
+    min-height: 60vh;
+}
+
+.filtros-explorar {
+    margin-bottom: 32px !important;
+}
+
+.explorar-busca {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.explorar-busca label {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.explorar-busca input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #dce5f1;
+    border-radius: 10px;
+    padding: 0 15px;
+    outline: none;
+}
+
+.explorar-busca input:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(23,101,232,.12);
+}
+
+.filtros .explorar-filtros-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+}
+
+.explorar-acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.explorar-acoes .botao-filtrar,.explorar-acoes .botao-limpar {
+    min-height: 44px;
+    padding: 0 20px;
+}
+
+.explorar-resultados {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    margin: 32px 0 20px;
+}
+
+.explorar-resultados h2 {
+    font-size: 26px;
+    color: var(--azul-escuro);
+}
+
+.explorar-resultados p,.explorar-resultados > span {
+    color: var(--texto-suave);
+    font-size: 14px;
+}
+
+.explorar-grade {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 22px;
+}
+
+.explorar-card {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(15,35,70,.05);
+}
+
+.explorar-card .card-foto {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+}
+
+.explorar-card .card-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.explorar-card .card-conteudo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+}
+
+.explorar-card .card-preco {
+    margin-top: auto;
+}
+
+.explorar-card .botao-card {
+    margin-top: 15px;
+}
+
+.explorar-vazio {
+    grid-column: 1/-1;
+    padding: 55px 20px;
+    text-align: center;
+    background: white;
+    border-radius: 14px;
+}
+
+.explorar-paginacao {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 40px;
+}
+
+.explorar-paginacao a,.explorar-paginacao span {
+    display: grid;
+    place-items: center;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 13px;
+    background: #fff;
+    border: 1px solid #dbe4f0;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #172033;
+    font-weight: 700;
+}
+
+.explorar-paginacao .pagina-atual {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: #fff;
+}
+
+.pagina-institucional {
+    padding: 90px 0 120px;
+    max-width: 850px;
+    min-height: 55vh;
+}
+
+.pagina-institucional h1 {
+    font-size: clamp(34px,4vw,48px);
+    margin-bottom: 20px;
+    color: var(--azul-escuro);
+}
+
+.pagina-institucional h2 {
+    font-size: 23px;
+    margin: 28px 0 8px;
+}
+
+.pagina-institucional p {
+    color: #475569;
+    margin-bottom: 16px;
+}
+
+.pagina-institucional .botao-principal {
+    margin-top: 16px;
+}
+
+/* Combobox pesquisável; select nativo permanece disponível se JS não carregar */
+
+.combo-raiz {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.combo-raiz select {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.combo-gatilho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+    background: #fff;
+    border: 1px solid #dce5f1;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    color: #172033;
+}
+
+.combo-gatilho:focus-visible {
+    outline: 3px solid #bfdbfe;
+    border-color: var(--azul);
+}
+
+.combo-menu {
+    position: absolute;
+    z-index: 90;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #dbe4f0;
+    border-radius: 12px;
+    box-shadow: 0 16px 36px rgba(15,35,70,.18);
+}
+
+.combo-menu[hidden] {
+    display: none;
+}
+
+.combo-pesquisa {
+    display: block;
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid #dbe4f0;
+    border-radius: 7px;
+    margin-bottom: 7px;
+    outline: none;
+}
+
+.combo-opcoes {
+    max-height: 240px;
+    overflow: auto;
+}
+
+.combo-opcao {
+    width: 100%;
+    padding: 10px 11px;
+    border: 0;
+    background: transparent;
+    border-radius: 7px;
+    text-align: left;
+    cursor: pointer;
+    color: #172033;
+}
+
+.combo-opcao:hover,.combo-opcao:focus-visible {
+    background: #eff6ff;
+    outline: none;
+}
+
+.combo-opcao[aria-selected=true] {
+    color: #1d4ed8;
+    font-weight: 800;
+    background: #eff6ff;
+}
+
+.combo-vazio {
+    padding: 12px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media (max-width:1100px) {
+    .explorar-grade {
+        grid-template-columns: repeat(3,minmax(0,1fr));
+    }
+    .filtros .explorar-filtros-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}
+
+@media (max-width:700px) {
+    .explorar-grade {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 12px;
+    }
+    .explorar-card .card-conteudo {
+        padding: 12px;
+    }
+    .explorar-card .card-foto {
+        aspect-ratio: 1/1;
+    }
+    .explorar-hero {
+        padding: 40px 0;
+    }
+}
+
+@media (max-width:450px) {
+    .explorar-grade {
+        grid-template-columns: 1fr;
+    }
+    .filtros .explorar-filtros-grid {
+        grid-template-columns: 1fr;
+    }
+    .explorar-acoes {
+        flex-wrap: wrap;
+    }
+}
+
+.card-veiculo .card-preco,.card-veiculo h3 {
+    color: #111!important;
+}
+
+.card-veiculo h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+
+.card-foto {
+    position: relative;
+}
+
+.etiqueta-marca {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    color: #111;
+    padding: 5px 8px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px #0002;
+}
+
+.card-foto .logo-fabricante,.logo-fabricante {
+    width: 22px!important;
+    height: 22px!important;
+    object-fit: contain!important;
+    flex: none;
+}
+
+.combo-opcao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-detalhes {
+    flex-wrap: wrap;
+}
+
+.relacionados {
+    padding-bottom: 60px;
+}
+
+.relacionados h2 {
+    margin: 30px 0 18px;
+}
 
 /* Identidade pública e hero — etapa 1 */
-:root {--fundo:#f1f5f9;--texto:#101b30;--texto-suave:#526176;--sombra:0 12px 30px rgba(15,35,70,.09);--gradiente-acao:linear-gradient(115deg,#1958d8,#248ed8);}
-body {font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-.cabecalho {opacity:1;background:rgba(248,250,252,.97);}
-.cabecalho-conteudo {min-height:72px;}
-.cabecalho .logo {align-items:center;line-height:1;}
-.cabecalho .menu a {font-size:14px;font-weight:600;}
-.cabecalho .botao-whatsapp {background:var(--gradiente-acao);color:white;border:0;border-radius:13px;box-shadow:0 6px 18px #1765e829;}
-.cabecalho .botao-whatsapp img {filter:brightness(0) invert(1);}
-@media(min-width:769px) and (max-width:1050px){.cabecalho-conteudo{grid-template-columns:auto 1fr auto;gap:12px}.cabecalho-conteudo>.menu{gap:12px}.cabecalho .logo{gap:5px}.cabecalho .logo-icone{width:34px;height:34px}}
-.banner.banner-carrossel {display:block;width:100%;height:clamp(470px,36vw,600px);min-height:0;max-height:none;background:#071329;}
-.banner-carrossel .banner-slide {display:block;position:absolute;inset:0;width:100%;height:100%;min-height:0;transform:none;opacity:0;visibility:visible;transition:opacity 1s ease;pointer-events:none;overflow:hidden;background:none;z-index:1;will-change:opacity;}
-.banner-carrossel .banner-slide.ativo {opacity:1;transform:none;z-index:2;pointer-events:auto;}
-.banner-carrossel .banner-slide .banner-fundo {position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;transform:scale(1);}
-.banner-carrossel .banner-slide-inicial .banner-fundo {background-image:linear-gradient(90deg,rgba(3,12,34,.93),rgba(3,12,34,.67) 42%,rgba(3,12,34,.12)),linear-gradient(0deg,rgba(3,12,34,.7),transparent 65%),url('../img/bigposter.jpeg');}
-.banner-carrossel .banner-citroen .banner-fundo {background-image:linear-gradient(270deg,rgba(3,12,34,.94),rgba(3,12,34,.75) 24%,rgba(3,12,34,.12) 60%),linear-gradient(0deg,rgba(3,12,34,.5),transparent 65%),url('../img/carrossel5.jpeg');}
-.banner-carrossel .ativo .banner-fundo {animation:hero-zoom 8s linear both;}
-@keyframes hero-zoom {from{transform:scale(1)}to{transform:scale(1.045)}}
-.hero-layout {position:relative;z-index:1;height:100%;display:flex;align-items:center;padding-bottom:48px;}
-.hero-texto {width:min(100%,590px);}
-.banner-citroen .hero-texto {margin-left:auto;text-align:right;width:min(100%,520px);}
-.banner-carrossel .hero-texto :is(h1,h2) {font-size:clamp(36px,3.65vw,58px);line-height:1.08;letter-spacing:-1.8px;color:#fff;font-weight:800;margin:0 0 20px;max-width:none;}
-.banner-carrossel .hero-texto :is(h1,h2) span {display:block;color:#69c3ff;background:linear-gradient(100deg,#3aa8ff,#a0ddff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.banner-carrossel .hero-texto .banner-etiqueta {color:#78ccff;margin-bottom:18px;}
-.banner-carrossel .hero-texto p {color:#f1f5f9;font-size:16px;line-height:1.6;margin:0 0 28px;max-width:none;text-shadow:0 1px 4px #071329;}
-.hero-acoes {display:flex;gap:12px;flex-wrap:wrap;}
-.banner-citroen .hero-acoes {justify-content:flex-end;}
-.hero-acoes .botao-principal,.vender-painel .botao-principal {background:var(--gradiente-acao);border:0;border-radius:13px;gap:10px;min-height:48px;padding:0 20px;font-weight:650;}
-.hero-acoes svg,.vender-painel svg {width:17px;height:17px;}
-.hero-secundario {display:inline-flex;align-items:center;justify-content:center;padding:0 20px;min-height:48px;border:1px solid #ffffff66;background:#ffffff18;border-radius:13px;color:white;text-decoration:none;font-size:15px;backdrop-filter:blur(6px);}
-.hero-secundario:hover {background:#ffffff30;}
-.banner-carrossel .ativo .hero-texto>* {animation:hero-rise .65s ease both;}
-.banner-carrossel .ativo .hero-texto>:nth-child(2){animation-delay:.12s}.banner-carrossel .ativo .hero-texto>:nth-child(3){animation-delay:.24s}.banner-carrossel .ativo .hero-texto>:nth-child(4){animation-delay:.36s}
-@keyframes hero-rise {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.hero-rodape {position:absolute;z-index:5;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.hero-atendimento {display:flex;align-items:center;gap:8px;color:#e2e8f0;text-decoration:none;font-size:12px;}.hero-atendimento svg{width:16px;color:#60c5ff;}
-.hero-controles {display:flex;align-items:center;gap:9px;}
-.banner-carrossel .hero-controles .banner-ponto,.banner-carrossel .hero-controles .banner-ponto.ativo {position:relative;width:9px;height:9px;min-width:9px;border:0;border-radius:50%;padding:0;cursor:pointer;background:#ffffff65;}.banner-carrossel .hero-controles .banner-ponto.ativo{background:#fff;}
-.banner-carrossel .hero-controles .banner-seta {position:static;transform:none;opacity:1;width:36px;height:36px;border:1px solid #ffffff55;border-radius:50%;background:#ffffff16;color:white;display:grid;place-items:center;padding:0;cursor:pointer;}.hero-controles .banner-seta svg{width:18px;height:18px;}.banner-carrossel .hero-controles .banner-seta:hover{background:#ffffff35;}
-.vender-vitrine {background:var(--fundo);padding:64px 0;}.vender-painel {border-radius:22px;overflow:hidden;min-height:340px;display:flex;align-items:center;padding:clamp(26px,5vw,60px);background:linear-gradient(90deg,#06112bea,#06112b70),url('../img/carrosel3.jpeg') center/cover;color:white;box-shadow:0 18px 32px #0f234625;}.vender-painel h2{font-size:clamp(30px,3.4vw,46px);line-height:1.12;margin-bottom:16px;color:white;}.vender-painel p{max-width:430px;color:#e2e8f0;margin-bottom:24px;}.vender-painel .banner-etiqueta{color:#78ccff;}
-@media(max-width:680px){.banner.banner-carrossel{height:500px;}.hero-layout{align-items:flex-end;padding-bottom:90px;}.banner-citroen .hero-texto{text-align:left;margin:0;width:100%;}.banner-citroen .hero-acoes{justify-content:flex-start;}.banner-carrossel .hero-texto :is(h1,h2){font-size:clamp(30px,8vw,42px);}.banner-carrossel .hero-texto p{font-size:14px;margin-bottom:18px;}.banner-carrossel .banner-slide .banner-fundo{background-position:40% center;}.banner-carrossel .banner-citroen .banner-fundo{background-image:linear-gradient(0deg,#071329 4%,#071329cc 38%,#07132915 100%),url('../img/carrossel5.jpeg');}.hero-atendimento{display:none;}.hero-rodape{justify-content:flex-end;}.hero-acoes .botao-principal,.hero-secundario{font-size:13px;padding:0 12px;}.vender-vitrine{padding:40px 0;}}
-@media(prefers-reduced-motion:reduce){.banner-carrossel .banner-slide{transition:none}.banner-carrossel .ativo .banner-fundo,.banner-carrossel .ativo .hero-texto>*{animation:none}}
+
+:root {
+    --fundo: #f1f5f9;
+    --texto: #101b30;
+    --texto-suave: #526176;
+    --sombra: 0 12px 30px rgba(15,35,70,.09);
+    --gradiente-acao: linear-gradient(115deg,#1958d8,#248ed8);
+}
+
+body {
+    font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.cabecalho {
+    opacity: 1;
+    background: rgba(248,250,252,.97);
+}
+
+.cabecalho-conteudo {
+    min-height: 72px;
+}
+
+.cabecalho .logo {
+    align-items: center;
+    line-height: 1;
+}
+
+.cabecalho .menu a {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cabecalho .botao-whatsapp {
+    background: var(--gradiente-acao);
+    color: white;
+    border: 0;
+    border-radius: 13px;
+    box-shadow: 0 6px 18px #1765e829;
+}
+
+.cabecalho .botao-whatsapp img {
+    filter: brightness(0) invert(1);
+}
+
+@media(min-width:769px) and (max-width:1050px) {
+    .cabecalho-conteudo {
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+    }
+    .cabecalho-conteudo>.menu {
+        gap: 12px;
+    }
+    .cabecalho .logo {
+        gap: 5px;
+    }
+    .cabecalho .logo-icone {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+.banner.banner-carrossel {
+    display: block;
+    width: 100%;
+    height: clamp(470px,36vw,600px);
+    min-height: 0;
+    max-height: none;
+    background: #071329;
+}
+
+.banner-carrossel .banner-slide {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    transform: none;
+    opacity: 0;
+    visibility: visible;
+    transition: opacity 1s ease;
+    pointer-events: none;
+    overflow: hidden;
+    background: none;
+    z-index: 1;
+    will-change: opacity;
+}
+
+.banner-carrossel .banner-slide.ativo {
+    opacity: 1;
+    transform: none;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.banner-carrossel .banner-slide .banner-fundo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scale(1);
+}
+
+.banner-carrossel .banner-slide-inicial .banner-fundo {
+    background-image: linear-gradient(90deg,rgba(3,12,34,.93),rgba(3,12,34,.67) 42%,rgba(3,12,34,.12)),linear-gradient(0deg,rgba(3,12,34,.7),transparent 65%),url('../img/bigposter.jpeg');
+}
+
+.banner-carrossel .banner-citroen .banner-fundo {
+    background-image: linear-gradient(270deg,rgba(3,12,34,.94),rgba(3,12,34,.75) 24%,rgba(3,12,34,.12) 60%),linear-gradient(0deg,rgba(3,12,34,.5),transparent 65%),url('../img/carrossel5.jpeg');
+}
+
+.banner-carrossel .ativo .banner-fundo {
+    animation: hero-zoom 8s linear both;
+}
+
+@keyframes hero-zoom {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.045);
+    }
+}
+
+.hero-layout {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-bottom: 48px;
+}
+
+.hero-texto {
+    width: min(100%,590px);
+}
+
+.banner-citroen .hero-texto {
+    margin-left: auto;
+    text-align: right;
+    width: min(100%,520px);
+}
+
+.banner-carrossel .hero-texto :is(h1,h2) {
+    font-size: clamp(36px,3.65vw,58px);
+    line-height: 1.08;
+    letter-spacing: -1.8px;
+    color: #fff;
+    font-weight: 800;
+    margin: 0 0 20px;
+    max-width: none;
+}
+
+.banner-carrossel .hero-texto :is(h1,h2) span {
+    display: block;
+    color: #69c3ff;
+    background: linear-gradient(100deg,#3aa8ff,#a0ddff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.banner-carrossel .hero-texto .banner-etiqueta {
+    color: #78ccff;
+    margin-bottom: 18px;
+}
+
+.banner-carrossel .hero-texto p {
+    color: #f1f5f9;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: none;
+    text-shadow: 0 1px 4px #071329;
+}
+
+.hero-acoes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.banner-citroen .hero-acoes {
+    justify-content: flex-end;
+}
+
+.hero-acoes .botao-principal,.vender-painel .botao-principal {
+    background: var(--gradiente-acao);
+    border: 0;
+    border-radius: 13px;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 20px;
+    font-weight: 650;
+}
+
+.hero-acoes svg,.vender-painel svg {
+    width: 17px;
+    height: 17px;
+}
+
+.hero-secundario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    min-height: 48px;
+    border: 1px solid #ffffff66;
+    background: #ffffff18;
+    border-radius: 13px;
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    backdrop-filter: blur(6px);
+}
+
+.hero-secundario:hover {
+    background: #ffffff30;
+}
+
+.banner-carrossel .ativo .hero-texto>* {
+    animation: hero-rise .65s ease both;
+}
+
+.banner-carrossel .ativo .hero-texto>:nth-child(2) {
+    animation-delay: .12s;
+}
+
+.banner-carrossel .ativo .hero-texto>:nth-child(3) {
+    animation-delay: .24s;
+}
+
+.banner-carrossel .ativo .hero-texto>:nth-child(4) {
+    animation-delay: .36s;
+}
+
+@keyframes hero-rise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-rodape {
+    position: absolute;
+    z-index: 5;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hero-atendimento {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.hero-atendimento svg {
+    width: 16px;
+    color: #60c5ff;
+}
+
+.hero-controles {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.banner-carrossel .hero-controles .banner-ponto,.banner-carrossel .hero-controles .banner-ponto.ativo {
+    position: relative;
+    width: 9px;
+    height: 9px;
+    min-width: 9px;
+    border: 0;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background: #ffffff65;
+}
+
+.banner-carrossel .hero-controles .banner-ponto.ativo {
+    background: #fff;
+}
+
+.banner-carrossel .hero-controles .banner-seta {
+    position: static;
+    transform: none;
+    opacity: 1;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ffffff55;
+    border-radius: 50%;
+    background: #ffffff16;
+    color: white;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.hero-controles .banner-seta svg {
+    width: 18px;
+    height: 18px;
+}
+
+.banner-carrossel .hero-controles .banner-seta:hover {
+    background: #ffffff35;
+}
+
+.vender-vitrine {
+    background: var(--fundo);
+    padding: 64px 0;
+}
+
+.vender-painel {
+    border-radius: 22px;
+    overflow: hidden;
+    min-height: 340px;
+    display: flex;
+    align-items: center;
+    padding: clamp(26px,5vw,60px);
+    background: linear-gradient(90deg,#06112bea,#06112b70),url('../img/carrosel3.jpeg') center/cover;
+    color: white;
+    box-shadow: 0 18px 32px #0f234625;
+}
+
+.vender-painel h2 {
+    font-size: clamp(30px,3.4vw,46px);
+    line-height: 1.12;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.vender-painel p {
+    max-width: 430px;
+    color: #e2e8f0;
+    margin-bottom: 24px;
+}
+
+.vender-painel .banner-etiqueta {
+    color: #78ccff;
+}
+
+@media(max-width:680px) {
+    .banner.banner-carrossel {
+        height: 500px;
+    }
+    .hero-layout {
+        align-items: flex-end;
+        padding-bottom: 90px;
+    }
+    .banner-citroen .hero-texto {
+        text-align: left;
+        margin: 0;
+        width: 100%;
+    }
+    .banner-citroen .hero-acoes {
+        justify-content: flex-start;
+    }
+    .banner-carrossel .hero-texto :is(h1,h2) {
+        font-size: clamp(30px,8vw,42px);
+    }
+    .banner-carrossel .hero-texto p {
+        font-size: 14px;
+        margin-bottom: 18px;
+    }
+    .banner-carrossel .banner-slide .banner-fundo {
+        background-position: 40% center;
+    }
+    .banner-carrossel .banner-citroen .banner-fundo {
+        background-image: linear-gradient(0deg,#071329 4%,#071329cc 38%,#07132915 100%),url('../img/carrossel5.jpeg');
+    }
+    .hero-atendimento {
+        display: none;
+    }
+    .hero-rodape {
+        justify-content: flex-end;
+    }
+    .hero-acoes .botao-principal,.hero-secundario {
+        font-size: 13px;
+        padding: 0 12px;
+    }
+    .vender-vitrine {
+        padding: 40px 0;
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .banner-carrossel .banner-slide {
+        transition: none;
+    }
+    .banner-carrossel .ativo .banner-fundo,.banner-carrossel .ativo .hero-texto>* {
+        animation: none;
+    }
+}
 
 /* Cards e animações de entrada */
-.card-veiculo {border-radius:18px;box-shadow:0 4px 14px #10213a12;transition:box-shadow .3s ease,transform .3s ease;}
-.card-veiculo:hover {box-shadow:0 12px 26px #10213a24;}
-.card-veiculo .card-foto > img {transition:transform .55s ease;}
-.card-veiculo .card-foto:hover > img {transform:scale(1.035);}
-.card-foto .etiqueta-marca:hover,.card-foto .etiqueta-marca *:hover,.card-foto .etiqueta-categoria:hover {transform:none;}
-.etiqueta-categoria {position:absolute;bottom:10px;left:10px;background:#fff;color:#172033;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:650;}
-.card-veiculo .card-conteudo {padding:15px;gap:10px;}
-.card-veiculo .card-conteudo h3 {margin:0;color:#111!important;}
-.card-veiculo .card-detalhes {border:0;padding:0;margin:0;gap:8px 10px;min-height:48px;align-content:start;}
-.card-veiculo .card-detalhes span {display:inline-flex;align-items:center;gap:4px;background:none;padding:0;font-size:11px;color:#475569;}
-.card-detalhes svg {width:13px;height:13px;flex:none;}
-.card-valor {margin-top:auto;border-top:1px solid #dbe4ef;padding-top:10px;display:flex;flex-direction:column;gap:2px;}
-.card-valor small {font-size:11px;color:#526176;}
-.card-veiculo .card-preco {margin:0;color:#111!important;font-size:clamp(16px,1.4vw,21px);}
-.card-veiculo .botao-card {margin:2px 0 0;background:#e0eaf8;color:#17345c;border-radius:12px;font-weight:650;transition:background .25s,color .25s,box-shadow .25s;}
-.card-veiculo .botao-card:hover,.card-veiculo .botao-card:focus-visible {background:var(--gradiente-acao);color:#fff;transform:none;}
-.botao-card svg {width:15px;height:15px;}
-.filtros {box-shadow:0 8px 24px #10213a0b;}
-.reveal-pendente {opacity:0;transform:translateY(18px);}
-.reveal-elemento {transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);transition-delay:var(--reveal-delay,0ms);}
-.reveal-elemento:focus-within {opacity:1;transform:none;transition-delay:0ms;}
-@media(prefers-reduced-motion:reduce){.reveal-pendente{opacity:1;transform:none}.reveal-elemento,.card-veiculo,.card-veiculo .card-foto > img{transition:none!important}}
+
+.card-veiculo {
+    border-radius: 18px;
+    box-shadow: 0 4px 14px #10213a12;
+    transition: box-shadow .3s ease,transform .3s ease;
+}
+
+.card-veiculo:hover {
+    box-shadow: 0 12px 26px #10213a24;
+}
+
+.card-veiculo .card-foto > img {
+    transition: transform .55s ease;
+}
+
+.card-veiculo .card-foto:hover > img {
+    transform: scale(1.035);
+}
+
+.card-foto .etiqueta-marca:hover,.card-foto .etiqueta-marca *:hover,.card-foto .etiqueta-categoria:hover {
+    transform: none;
+}
+
+.etiqueta-categoria {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #fff;
+    color: #172033;
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.card-veiculo .card-conteudo {
+    padding: 15px;
+    gap: 10px;
+}
+
+.card-veiculo .card-conteudo h3 {
+    margin: 0;
+    color: #111!important;
+}
+
+.card-veiculo .card-detalhes {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    gap: 8px 10px;
+    min-height: 48px;
+    align-content: start;
+}
+
+.card-veiculo .card-detalhes span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    padding: 0;
+    font-size: 11px;
+    color: #475569;
+}
+
+.card-detalhes svg {
+    width: 13px;
+    height: 13px;
+    flex: none;
+}
+
+.card-valor {
+    margin-top: auto;
+    border-top: 1px solid #dbe4ef;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-valor small {
+    font-size: 11px;
+    color: #526176;
+}
+
+.card-veiculo .card-preco {
+    margin: 0;
+    color: #111!important;
+    font-size: clamp(16px,1.4vw,21px);
+}
+
+.card-veiculo .botao-card {
+    margin: 2px 0 0;
+    background: #e0eaf8;
+    color: #17345c;
+    border-radius: 12px;
+    font-weight: 650;
+    transition: background .25s,color .25s,box-shadow .25s;
+}
+
+.card-veiculo .botao-card:hover,.card-veiculo .botao-card:focus-visible {
+    background: var(--gradiente-acao);
+    color: #fff;
+    transform: none;
+}
+
+.botao-card svg {
+    width: 15px;
+    height: 15px;
+}
+
+.filtros {
+    box-shadow: 0 8px 24px #10213a0b;
+}
+
+.reveal-pendente {
+    opacity: 0;
+    transform: translateY(18px);
+}
+
+.reveal-elemento {
+    transition: opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--reveal-delay,0ms);
+}
+
+.reveal-elemento:focus-within {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0ms;
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .reveal-pendente {
+        opacity: 1;
+        transform: none;
+    }
+    .reveal-elemento,.card-veiculo,.card-veiculo .card-foto > img {
+        transition: none!important;
+    }
+}
 
 /* Etapa 4 — catálogo */
-.explorar-hero {padding:56px 0 74px;background:radial-gradient(ellipse at 85% 0%,#244d83,transparent 65%),linear-gradient(120deg,#09162f,#152c50);}
-.explorar-hero h1 {font-size:clamp(30px,4vw,48px);letter-spacing:-.035em;line-height:1.12;}
-.explorar-secao {padding-top:0;}
-.explorar-secao > .container {width:min( calc(100% - 40px),1320px);max-width:1320px;}
-.filtros-explorar {position:relative;top:-24px;z-index:3;padding:26px!important;border-radius:20px!important;overflow:visible!important;margin-bottom:0!important;}
-.filtros-ajuda {color:#526176;font-size:14px;margin:0 0 22px;}
-.explorar-busca input {height:52px;border-radius:13px;background:#f8fafc;}
-.explorar-acoes .botao-filtrar {display:inline-flex;align-items:center;gap:8px;background:var(--gradiente-acao);border-radius:12px;}
-.explorar-acoes svg {width:17px;height:17px;}
-.explorar-grade {gap:24px;align-items:stretch;}
-.explorar-grade .card-veiculo {width:100%;min-width:0;max-width:none;}
-.explorar-grade .card-foto {aspect-ratio:4/3;height:auto;}
-.explorar-grade .card-conteudo {padding:18px;}
-.explorar-grade .card-detalhes {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
-.explorar-grade .card-detalhes span {font-size:12px;}
-.explorar-grade .card-preco {font-size:22px;}
-.explorar-paginacao a:hover {border-color:#1765e8;background:#eff6ff;}
-.combo-gatilho {gap:8px;justify-content:flex-start;}
-.combo-gatilho > span:last-child {margin-left:auto;}
-.combo-menu {min-width:100%;}
-@media(max-width:700px){.explorar-secao > .container {width:calc(100% - 24px)}.filtros-explorar{padding:16px!important}.explorar-grade{gap:14px}.explorar-grade .card-conteudo{padding:12px}.explorar-grade .card-preco{font-size:18px}.explorar-resultados{align-items:flex-start}.explorar-grade .card-detalhes{grid-template-columns:1fr}}
+
+.explorar-hero {
+    padding: 56px 0 74px;
+    background: radial-gradient(ellipse at 85% 0%,#244d83,transparent 65%),linear-gradient(120deg,#09162f,#152c50);
+}
+
+.explorar-hero h1 {
+    font-size: clamp(30px,4vw,48px);
+    letter-spacing: -.035em;
+    line-height: 1.12;
+}
+
+.explorar-secao {
+    padding-top: 0;
+}
+
+.explorar-secao > .container {
+    width: min( calc(100% - 40px),1320px);
+    max-width: 1320px;
+}
+
+.filtros-explorar {
+    position: relative;
+    top: -24px;
+    z-index: 3;
+    padding: 26px!important;
+    border-radius: 20px!important;
+    overflow: visible!important;
+    margin-bottom: 0!important;
+}
+
+.filtros-ajuda {
+    color: #526176;
+    font-size: 14px;
+    margin: 0 0 22px;
+}
+
+.explorar-busca input {
+    height: 52px;
+    border-radius: 13px;
+    background: #f8fafc;
+}
+
+.explorar-acoes .botao-filtrar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gradiente-acao);
+    border-radius: 12px;
+}
+
+.explorar-acoes svg {
+    width: 17px;
+    height: 17px;
+}
+
+.explorar-grade {
+    gap: 24px;
+    align-items: stretch;
+}
+
+.explorar-grade .card-veiculo {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.explorar-grade .card-foto {
+    aspect-ratio: 4/3;
+    height: auto;
+}
+
+.explorar-grade .card-conteudo {
+    padding: 18px;
+}
+
+.explorar-grade .card-detalhes {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+.explorar-grade .card-detalhes span {
+    font-size: 12px;
+}
+
+.explorar-grade .card-preco {
+    font-size: 22px;
+}
+
+.explorar-paginacao a:hover {
+    border-color: #1765e8;
+    background: #eff6ff;
+}
+
+.combo-gatilho {
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.combo-gatilho > span:last-child {
+    margin-left: auto;
+}
+
+.combo-menu {
+    min-width: 100%;
+}
+
+@media(max-width:700px) {
+    .explorar-secao > .container {
+        width: calc(100% - 24px);
+    }
+    .filtros-explorar {
+        padding: 16px!important;
+    }
+    .explorar-grade {
+        gap: 14px;
+    }
+    .explorar-grade .card-conteudo {
+        padding: 12px;
+    }
+    .explorar-grade .card-preco {
+        font-size: 18px;
+    }
+    .explorar-resultados {
+        align-items: flex-start;
+    }
+    .explorar-grade .card-detalhes {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animação do banner de venda e troca de veículos */
+
+.vender-painel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #06112b;
+}
+
+.vender-painel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, #06112bea, #06112b70),
+        url('../img/carrosel3.jpeg') center / cover no-repeat;
+    animation: hero-zoom 8s ease-in-out infinite alternate;
+    transform-origin: center;
+    pointer-events: none;
+}
+
+.vender-painel > div {
+    position: relative;
+    z-index: 1;
+}
+
+/* Acessibilidade */
+
+@media (prefers-reduced-motion: reduce) {
+    .vender-painel::before {
+        animation: none;
+    }
+}
+
+/* RC mobile: revisão dos breakpoints */
+
+@media(max-width:639px) {
+    .banner.banner-carrossel {
+        height: 78svh;
+        min-height: 520px;
+        max-height: 780px;
+    }
+    .banner-carrossel .hero-layout {
+        align-items: center;
+        padding-bottom: 64px;
+    }
+    .hero-acoes {
+        flex-wrap: wrap;
+    }
+    .hero-acoes>a {
+        min-height: 44px;
+    }
+    .hero-rodape {
+        justify-content: flex-start;
+    }
+    .filtros .filtros-campos,.filtros .explorar-filtros-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 12px;
+    }
+    .filtros .filtro-campo {
+        min-width: 0;
+    }
+    .filtros .filtro-campo :is(input,select,.combo-gatilho) {
+        width: 100%;
+        min-width: 0;
+        font-size: 14px;
+    }
+    .filtros .filtros-acoes {
+        grid-column: 1/-1;
+        display: flex;
+    }
+    .explorar-acoes {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 8px;
+    }
+    .explorar-acoes>* {
+        min-width: 0;
+        padding-inline: 8px;
+    }
+    .explorar-grade {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 12px;
+    }
+    .explorar-grade .card-veiculo {
+        min-width: 0;
+    }
+    .explorar-grade .card-conteudo {
+        padding: 10px;
+        min-width: 0;
+    }
+    .explorar-grade .card-conteudo h3 {
+        font-size: 14px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+    .explorar-grade .card-preco {
+        font-size: clamp(13px,3.7vw,18px);
+        overflow-wrap: anywhere;
+    }
+    .explorar-grade .card-detalhes span {
+        font-size: 11px;
+        overflow-wrap: anywhere;
+    }
+    .explorar-grade .botao-card {
+        font-size: 12px;
+        padding-inline: 5px;
+        min-height: 44px;
+    }
+    .explorar-grade .etiqueta-categoria {
+        display: none;
+    }
+    .explorar-grade .etiqueta-marca {
+        max-width: 90%;
+        font-size: 10px;
+    }
+    .explorar-paginacao {
+        flex-wrap: wrap;
+    }
+}
+
+@media(min-width:640px) and (max-width:1023px) {
+    .explorar-grade {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}

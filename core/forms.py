@@ -17,7 +17,6 @@ from .models import (
     EtapaDocumentacao,
     FotoAvaliacaoTroca,
     LancamentoFinanceiro,
-    PerfilVendedor,
     Procura,
     Proposta,
     TelefoneCliente,
@@ -37,9 +36,7 @@ COMBUSTIVEIS = [
 ]
 
 
-# ==============================================================================
 # Funções Auxiliares de Validação e Formatação
-# ==============================================================================
 
 def _brl(valor):
     """Formata um Decimal no padrão monetário brasileiro (ex.: 'R$ 1.234,56')."""
@@ -95,9 +92,7 @@ def validar_cnpj(valor):
     return numeros[13] == segundo
 
 
-# ==============================================================================
 # Base e Campos Reutilizáveis
-# ==============================================================================
 
 class BaseForm:
     """
@@ -181,9 +176,7 @@ class MultipleImageField(forms.ImageField):
         return [limpar(data, initial)] if data else []
 
 
-# ==============================================================================
 # Autenticação
-# ==============================================================================
 
 class LoginForm(BaseForm, forms.Form):
     """Formulário de autenticação de usuários."""
@@ -205,9 +198,7 @@ class LoginForm(BaseForm, forms.Form):
     )
 
 
-# ==============================================================================
 # Vendedores
-# ==============================================================================
 
 class _VendedorComercialMixin(forms.Form):
     """Campos comerciais compartilhados entre cadastro e edição de vendedor."""
@@ -287,9 +278,7 @@ class VendedorEdicaoForm(BaseForm, _VendedorComercialMixin):
     )
 
 
-# ==============================================================================
 # Veículos e Preço
-# ==============================================================================
 
 class VeiculoForm(BaseForm, forms.ModelForm):
     """Cadastro de veículo no estoque com suporte a múltiplas fotos."""
@@ -487,9 +476,7 @@ class PrecoVendaForm(BaseForm, forms.Form):
         return preco
 
 
-# ==============================================================================
 # Clientes
-# ==============================================================================
 
 class ClienteForm(BaseForm, forms.ModelForm):
     """Cadastro e edição de clientes PF e PJ com sanitização de campos por tipo."""
@@ -656,9 +643,7 @@ TelefoneClienteFormSet = inlineformset_factory(
 )
 
 
-# ==============================================================================
 # Propostas e Composição de Pagamento
-# ==============================================================================
 
 class PropostaForm(BaseForm, forms.ModelForm):
     """
@@ -946,9 +931,7 @@ class ConfirmarPropostaForm(BaseForm, forms.Form):
     """Formulário vazio para proteção CSRF na confirmação de proposta."""
 
 
-# ==============================================================================
 # Avaliações de Troca
-# ==============================================================================
 
 class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
     """Laudo técnico e financeiro de veículo ofertado como parte de pagamento."""
@@ -1021,9 +1004,7 @@ class FotoAvaliacaoTrocaForm(BaseForm, forms.ModelForm):
         fields = ["imagem", "descricao"]
 
 
-# ==============================================================================
 # Operações de Reserva, Venda, Entrega e Documentação
-# ==============================================================================
 
 class ReservaForm(BaseForm, forms.Form):
     """Reserva manual de veículo para cliente cadastrado ou avulso."""
@@ -1280,9 +1261,7 @@ class EtapaDocumentacaoForm(BaseForm, forms.Form):
         return data
 
 
-# ==============================================================================
 # Despesas Operacionais
-# ==============================================================================
 
 class DespesaForm(BaseForm, forms.ModelForm):
     """Lançamento de despesa vinculada a um veículo."""
@@ -1350,9 +1329,7 @@ class DespesaEditarForm(DespesaForm):
         self.fields["descricao"].widget = forms.TextInput()
 
 
-# ==============================================================================
 # Carteira de Clientes e Procuras
-# ==============================================================================
 
 class ConfiguracaoCarteiraForm(BaseForm, forms.ModelForm):
     """Configuração do prazo de inatividade para elegibilidade de recompra."""

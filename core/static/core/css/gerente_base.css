@@ -6,8 +6,8 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fb;
-    color: #1f2937;
+    background: light-dark(#f5f7fb, #121c2e);
+    color: light-dark(#1f2937, #eef4fc);
 }
 
 .layout {
@@ -38,7 +38,7 @@ body {
 }
 
 .logo span {
-    color: #2864e8;
+    color: light-dark(#2864e8, #78b5ff);
 }
 
 .perfil {
@@ -68,7 +68,7 @@ body {
 }
 
 .perfil small {
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 12px;
 }
 
@@ -84,7 +84,7 @@ body {
     gap: 12px;
     padding: 12px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
     text-decoration: none;
     font-size: 14px;
     transition: 0.2s;
@@ -126,7 +126,6 @@ body {
     .sidebar {
         width: 210px;
     }
-
     .main-content {
         margin-left: 210px;
         width: calc(100% - 210px);
@@ -140,17 +139,14 @@ body {
         width: 100%;
         min-height: auto;
     }
-
     .layout {
         flex-direction: column;
     }
-
     .main-content {
         margin-left: 0;
         width: 100%;
         padding: 20px 16px;
     }
-
     .topbar {
         align-items: flex-start;
         gap: 15px;
@@ -167,13 +163,13 @@ body {
         overflow-y: auto;
         overscroll-behavior-y: contain;
     }
-
     .sidebar-bottom {
         flex-shrink: 0;
     }
 }
 
 /* Ajuste automatico logo/icone */
+
 .logo img, .logo-icone img {
     display: block;
     max-width: 100%;

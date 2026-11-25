@@ -1,19 +1,5 @@
-/**
- * Alterna a visibilidade do campo de senha na tela de autenticação.
- */
-(function () {
-    "use strict";
-
-    const passwordInput = document.getElementById("password");
-    const togglePassword = document.getElementById("togglePassword");
-
-    if (!passwordInput || !togglePassword) return;
-
-    togglePassword.addEventListener("click", function () {
-        const oculto = passwordInput.type === "password";
-
-        passwordInput.type = oculto ? "text" : "password";
-        togglePassword.textContent = oculto ? "Ocultar" : "Mostrar";
-        togglePassword.setAttribute("aria-pressed", String(oculto));
-    });
-})();
+(() => { const p = document.querySelector('#loginForm input[type=password]'), b = document.getElementById('togglePassword'); function icons() { window.lucide?.createIcons(); } if (p && b) {
+    b.addEventListener('click', () => { const show = p.type === 'password'; p.type = show ? 'text' : 'password'; b.setAttribute('aria-pressed', String(show)); b.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha'); b.innerHTML = window.lucide ? `<i data-lucide="${show ? 'eye-off' : 'eye'}"></i>` : (show ? 'Ocultar' : 'Mostrar'); icons(); });
+    if (!window.lucide)
+        b.textContent = 'Mostrar';
+} icons(); })();

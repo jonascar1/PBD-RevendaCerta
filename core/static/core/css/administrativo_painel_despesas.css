@@ -11,18 +11,18 @@
 }
 
 .topo p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
 .badge-perfil {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 8px;
     padding: 10px 16px;
     font-size: 12px;
     font-weight: bold;
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }
 
 .secao {
@@ -39,7 +39,7 @@
 }
 
 .titulo-secao p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
@@ -50,22 +50,22 @@
 }
 
 .resumo-card {
-    background: white;
-    border: 1px solid #e1e5eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
     padding: 20px;
 }
 
 .resumo-titulo {
     display: block;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
     margin-bottom: 10px;
 }
 
 .resumo-card strong {
     font-size: 28px;
-    color: #142033;
+    color: light-dark(#142033, #eef4fc);
 }
 
 .cards {
@@ -75,8 +75,8 @@
 }
 
 .card {
-    background: white;
-    border: 1px solid #e1e5eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
     min-height: 105px;
     padding: 18px;
@@ -101,7 +101,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #eef4ff;
+    background: light-dark(#eef4ff, #1a3455);
     flex-shrink: 0;
     margin-right: 10px;
 }
@@ -127,18 +127,18 @@
 
 .card-texto p {
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .seta {
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
     font-size: 20px;
     margin-left: 10px;
 }
 
 .vazio {
-    background: white;
-    border: 1px solid #e1e5eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
     padding: 35px;
     text-align: center;
@@ -157,7 +157,7 @@
 }
 
 .vazio p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 12px;
 }
 
@@ -165,7 +165,6 @@
     .cards {
         grid-template-columns: 1fr;
     }
-
     .resumo {
         grid-template-columns: 1fr;
     }

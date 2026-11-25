@@ -5,7 +5,7 @@
 {% block title %}Negociações | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_painel_negociacoes.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_negociacoes.css' %}?v=rc4-7589eab1271f">
 {% endblock %}
 
 {% block content %}
@@ -17,76 +17,66 @@
     </div>
 </header>
 
-{% if messages %}
-<section class="neg-messages">
-    {% for message in messages %}
-        <div class="neg-message">
-            {{ message }}
-        </div>
-    {% endfor %}
-</section>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
-<!-- INDICADORES -->
 <section class="neg-resumo">
 
     <a href="{% url 'negociacoes_gerente' %}" class="neg-card">
-        <div class="neg-card-icon">
+    <div class="neg-card-icon">
             <i data-lucide="files"></i>
-        </div>
-        <div>
+    </div>
+    <div>
             <span>Total de propostas</span>
             <strong>{{ indicadores.total }}</strong>
-        </div>
+    </div>
     </a>
 
     <a href="{% url 'negociacoes_gerente' %}?situacao=PENDENTE"
        class="neg-card neg-card-pendente">
-        <div class="neg-card-icon">
+    <div class="neg-card-icon">
             <i data-lucide="clock-3"></i>
-        </div>
-        <div>
+    </div>
+    <div>
             <span>Aguardando aprovação</span>
             <strong>{{ indicadores.aguardando }}</strong>
-        </div>
+    </div>
     </a>
 
     <a href="{% url 'negociacoes_gerente' %}?situacao=APROVADA"
        class="neg-card">
-        <div class="neg-card-icon">
+    <div class="neg-card-icon">
             <i data-lucide="badge-check"></i>
-        </div>
-        <div>
+    </div>
+    <div>
             <span>Aprovadas</span>
             <strong>{{ indicadores.aprovadas }}</strong>
-        </div>
+    </div>
     </a>
 
     <a href="{% url 'negociacoes_gerente' %}?situacao=RECUSADA"
        class="neg-card">
-        <div class="neg-card-icon">
+    <div class="neg-card-icon">
             <i data-lucide="ban"></i>
-        </div>
-        <div>
+    </div>
+    <div>
             <span>Recusadas</span>
             <strong>{{ indicadores.recusadas }}</strong>
-        </div>
+    </div>
     </a>
 
     <a href="{% url 'negociacoes_gerente' %}?situacao=CONTRAPROPOSTA"
        class="neg-card">
-        <div class="neg-card-icon">
+    <div class="neg-card-icon">
             <i data-lucide="handshake"></i>
-        </div>
-        <div>
+    </div>
+    <div>
             <span>Contrapropostas</span>
             <strong>{{ indicadores.contrapropostas }}</strong>
-        </div>
+    </div>
     </a>
 
 </section>
 
-<!-- LISTAGEM -->
 <section class="neg-section">
 
     <div class="neg-section-header">
@@ -102,19 +92,19 @@
                 <option value="">Todas as situações</option>
 
                 {% for valor, rotulo in situacoes %}
-                    <option value="{{ valor }}"
+                <option value="{{ valor }}"
                         {% if situacao_selecionada == valor %}selected{% endif %}>
                         {{ rotulo }}
-                    </option>
+            </option>
                 {% endfor %}
-            </select>
-        </form>
-    </div>
+        </select>
+    </form>
+</div>
 
-    <div class="neg-table-container">
-        <table class="neg-table">
-            <thead>
-                <tr>
+<div class="neg-table-container">
+    <table class="neg-table">
+        <thead>
+            <tr>
                     <th>Proposta</th>
                     <th>Cliente</th>
                     <th>Veículo</th>
@@ -122,18 +112,18 @@
                     <th>Valor oferecido</th>
                     <th>Situação</th>
                     <th>Ação</th>
-                </tr>
-            </thead>
+            </tr>
+        </thead>
 
-            <tbody>
+        <tbody>
                 {% for proposta in propostas %}
-                <tr>
+            <tr>
                     <td>
                         <strong>#{{ proposta.pk }}</strong>
                         <small>{{ proposta.criada_em|date:"d/m/Y" }}</small>
                                        <td>
                         <strong>
-                            <a href="{% url 'historico_cliente' proposta.cliente_id %}">{{ proposta.cliente }}</a>
+                            <a class="rc-inline-link" href="{% url 'historico_cliente' proposta.cliente_id %}?origem=negociacoes">{{ proposta.cliente }}</a>
                         </strong>
                     </td>
                         <strong>
@@ -173,20 +163,20 @@
                             <span class="neg-sem-acao">Sem ação pendente</span>
                         {% endif %}
                     </td>
-                </tr>
+            </tr>
 
                 {% empty %}
-                <tr>
+            <tr>
                     <td colspan="7" class="neg-empty">
                         <i data-lucide="inbox"></i>
                         <strong>Nenhuma proposta encontrada</strong>
                         <span>Não existem propostas para esse filtro.</span>
                     </td>
-                </tr>
+            </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
+</div>
 
 </section>
 

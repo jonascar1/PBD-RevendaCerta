@@ -2,3 +2,6 @@ venv/
 git
 media/
 expiracao.log
+
+# Script local de populacao do banco de demonstracao
+/core/management/commands/popular_demo.py

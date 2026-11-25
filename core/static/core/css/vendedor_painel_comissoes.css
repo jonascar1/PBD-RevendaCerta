@@ -25,7 +25,7 @@
 }
 
 .clientes-card .contador-clientes strong {
-    color: #1d4ed8;
+    color: light-dark(#1d4ed8, #78b5ff);
     font-size: 20px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -53,7 +53,7 @@
 }
 
 .clientes-tabela td:nth-child(5) strong {
-    color: #15803d;
+    color: light-dark(#15803d, #86efac);
     font-weight: 700;
 }
 
@@ -79,9 +79,9 @@
 
 .clientes-card .sem-registros {
     padding: 16px 20px;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-    color: #6b7280;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
+    background: light-dark(#f9fafb, #121c2e);
+    color: light-dark(#6b7280, #a0b1c8);
     font-size: 12px;
     line-height: 1.6;
     overflow-wrap: anywhere;
@@ -98,12 +98,10 @@
     .clientes-card .clientes-header {
         padding: 16px;
     }
-
     .clientes-card .contador-clientes {
         width: 100%;
         justify-content: space-between;
     }
-
     .clientes-card .sem-registros {
         padding: 14px 16px;
     }
@@ -114,16 +112,13 @@
         flex-direction: column;
         gap: 12px;
     }
-
     .clientes-cabecalho h1 {
         font-size: 24px;
     }
-
     .clientes-card .contador-clientes {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .clientes-card .contador-clientes strong {
         font-size: 22px;
     }

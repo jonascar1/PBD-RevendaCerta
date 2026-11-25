@@ -6,7 +6,14 @@ from . import views
 from .metas_views import configurar_metas
 from .alcada_views import alcadas_lote
 
+from .preferencias_views import preferencias_view
+
+from .consultas_views import clientes_gerente, vendas_painel
+
 urlpatterns = [
+    path("painel/gerente/clientes/", clientes_gerente, name="clientes_gerente"),
+    path("painel/vendas/", vendas_painel, name="vendas_painel"),
+    path("painel/configuracoes/", preferencias_view, name="preferencias"),
     path("painel/gerente/veiculos/alcadas/", alcadas_lote, name="alcadas_lote"),
     path("painel/gerente/metas/", configurar_metas, name="configurar_metas"),
     # Autenticação e Painel Geral
@@ -54,6 +61,7 @@ urlpatterns = [
     path("painel/administrativo/despesas/<int:despesa_id>/editar/", views.editar_despesa_view, name="editar_despesa"),
     path("painel/administrativo/despesas/<int:despesa_id>/excluir/", views.excluir_despesa_view, name="excluir_despesa"),
     path("painel/administrativo/despesas/veiculo/<int:veiculo_id>/excluidas/", views.despesas_excluidas_veiculo_view, name="despesas_excluidas_veiculo"),
+    path("painel/administrativo/entregas/", views.entregas_administrativo_view, name="entregas_administrativo"),
     path("painel/administrativo/documentacao/", views.documentacao_pendente_view, name="documentacao_pendente"),
     path("painel/administrativo/documentacao/etapas/<int:etapa_id>/atualizar/", views.atualizar_etapa_documentacao_view, name="atualizar_etapa_documentacao"),
 

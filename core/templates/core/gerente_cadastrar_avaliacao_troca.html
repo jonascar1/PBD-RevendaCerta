@@ -7,7 +7,7 @@ Cadastrar avaliação de troca | REVENDA CERTA
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_avaliacao_troca.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_cadastrar_avaliacao_troca.css' %}?v=rc-font-1">
 {% endblock %}
 
 {% block content %}
@@ -19,21 +19,12 @@ Cadastrar avaliação de troca | REVENDA CERTA
     </div>
 </header>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message message-{{ message.tags }}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+{% include "core/partials/painel_mensagens.html" %}
 
 <form method="POST" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {{ form.non_field_errors }}
 
-    <!-- IDENTIFICAÇÃO DO VEÍCULO -->
     <section class="card">
         <div class="card-header">
             <h2>Dados do veículo</h2>
@@ -104,7 +95,7 @@ Cadastrar avaliação de troca | REVENDA CERTA
                 {{ form.quilometragem.errors }}
             </div>
         </div>
-        
+
         <div class="campo-opcionais" >
             <label for="{{ form.opcionais.id_for_label }}">Opcionais</label>
             <small>Informe os principais opcionais do veículo.</small>
@@ -114,7 +105,6 @@ Cadastrar avaliação de troca | REVENDA CERTA
     </section>
 
 
-    <!-- CONDIÇÕES DO VEÍCULO -->
     <section class="card">
         <div class="card-header">
             <h2>Condições e documentação</h2>
@@ -156,7 +146,6 @@ Cadastrar avaliação de troca | REVENDA CERTA
         </div>
     </section>
 
-    <!-- AVALIAÇÃO FINANCEIRA -->
     <section class="card">
         <div class="card-header">
             <h2>Valor da avaliação</h2>
@@ -180,7 +169,6 @@ Cadastrar avaliação de troca | REVENDA CERTA
     </section>
 
 
-    <!-- FOTOS DO VEÍCULO -->
     <section class="card">
 
         <div class="campo fotos-campo">
@@ -222,27 +210,26 @@ Cadastrar avaliação de troca | REVENDA CERTA
 
             {{ form.fotos.errors }}
 
-            <!-- PRÉ-VISUALIZAÇÃO -->
             <div
                 id="preview-fotos"
                 class="preview-fotos"
-            ></div>
+            >
+        </div>
 
-            <div class="aviso-fotos">
+        <div class="aviso-fotos">
                 <i data-lucide="info"></i>
                 <span>
                     Arraste as fotos para alterar a ordem.
                     A primeira será considerada a principal.
                 </span>
-            </div>
-
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- AÇÕES -->
-    <div class="acoes">
+<div class="acoes">
         <a href="{% url 'avaliacoes_troca' %}" class="btn-voltar">
             Cancelar
         </a>
@@ -250,7 +237,7 @@ Cadastrar avaliação de troca | REVENDA CERTA
         <button type="submit" class="btn-salvar">
             Cadastrar avaliação
         </button>
-    </div>
+</div>
 </form>
 
 {% endblock content %}

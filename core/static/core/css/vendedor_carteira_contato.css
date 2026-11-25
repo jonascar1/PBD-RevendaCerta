@@ -11,11 +11,11 @@
 .cart-campo textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 8px;
     font: inherit;
     font-size: 15px;
-    background: #fff;
+    background: light-dark(#fff, #121c2e);
 }
 
 .cart-campo textarea {
@@ -29,6 +29,6 @@
 
 .cart-campo select:focus,
 .cart-campo textarea:focus {
-    outline: 2px solid #bfdbfe;
+    outline: 2px solid light-dark(#bfdbfe, #385982);
     border-color: #2563eb;
 }

@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_relatorios.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/gerente_relatorios.css' %}?v=rc-mobile-1">
 {% endblock %}
 
 {% block content %}
@@ -52,7 +52,7 @@
     </form>
 
     {% for erro in erros %}
-        <p class="erro-relatorio">{{ erro }}</p>
+    <p class="erro-relatorio">{{ erro }}</p>
     {% endfor %}
 
     <div class="indicadores-relatorios">
@@ -106,17 +106,17 @@
 
                 <tbody>
                     {% for linha in relatorio_vendas.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% empty %}
-                        <tr>
+                    <tr>
                             <td colspan="4">
                                 Nenhuma venda encontrada no período.
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -138,17 +138,17 @@
 
                 <tbody>
                     {% for linha in relatorio_vendedores.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% empty %}
-                        <tr>
+                    <tr>
                             <td colspan="5">
                                 Nenhuma venda encontrada no período.
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -170,17 +170,17 @@
 
                 <tbody>
                     {% for linha in relatorio_margens.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% empty %}
-                        <tr>
+                    <tr>
                             <td colspan="7">
                                 Nenhuma margem encontrada no período.
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -212,17 +212,17 @@
 
                 <tbody>
                     {% for linha in relatorio_despesas.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% empty %}
-                        <tr>
+                    <tr>
                             <td colspan="3">
                                 Nenhuma despesa encontrada no período.
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -244,11 +244,11 @@
 
                 <tbody>
                     {% for linha in relatorio_contatos.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -308,17 +308,17 @@
 
                 <tbody>
                     {% for linha in relatorio_estoque.linhas %}
-                        <tr>
+                    <tr>
                             {% for valor in linha %}
                                 <td>{{ valor }}</td>
                             {% endfor %}
-                        </tr>
+                    </tr>
                     {% empty %}
-                        <tr>
+                    <tr>
                             <td colspan="7">
                                 Nenhum veículo encontrado.
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

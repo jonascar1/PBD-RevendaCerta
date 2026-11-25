@@ -1,124 +1,78 @@
 const origens = document.querySelectorAll('input[name="origem"]');
-
 const campoCusto = document.getElementById("campo-custo");
 const custoAquisicao = document.getElementById("custo_aquisicao");
-
 const campoRepasse = document.getElementById("campo-repasse");
 const valorRepasse = document.getElementById("valor_repasse");
-
 function atualizarOrigem() {
-
-    const origemSelecionada = document.querySelector(
-        'input[name="origem"]:checked'
-    );
-
+    const origemSelecionada = document.querySelector('input[name="origem"]:checked');
     if (!origemSelecionada) {
         return;
     }
-
     const origem = origemSelecionada.value;
-
     if (origem === "CONSIGNADO") {
-
         // Consignado não possui custo de aquisição
         custoAquisicao.disabled = false;
-
         campoCusto.classList.add("campo-desabilitado");
-
         // No consignado, o repasse é obrigatório
         valorRepasse.disabled = false;
-
         campoRepasse.classList.remove("campo-desabilitado");
-
-    } else {
-
+    }
+    else {
         // Comprado ou troca precisam de custo
         custoAquisicao.disabled = false;
-
         campoCusto.classList.remove("campo-desabilitado");
-
         // Repasse não é necessário nesses casos
         valorRepasse.disabled = false;
-
         campoRepasse.classList.add("campo-desabilitado");
     }
 }
-
-
 origens.forEach(function (origem) {
     origem.addEventListener("change", atualizarOrigem);
 });
-
-
 atualizarOrigem();
-
 const inputFotos = document.getElementById("fotos");
 const previewFotos = document.getElementById("preview-fotos");
-
 let arquivosSelecionados = [];
 let indiceArrastado = null;
-
 const areaUpload = document.getElementById("area-upload");
-
 areaUpload.addEventListener("dragover", function (event) {
     event.preventDefault();
     areaUpload.classList.add("arrastando-arquivos");
 });
-
 areaUpload.addEventListener("dragleave", function () {
     areaUpload.classList.remove("arrastando-arquivos");
 });
-
 areaUpload.addEventListener("drop", function (event) {
     event.preventDefault();
-
     areaUpload.classList.remove("arrastando-arquivos");
-
     const arquivos = Array.from(event.dataTransfer.files);
-
     const imagens = arquivos.filter(function (arquivo) {
         return arquivo.type.startsWith("image/");
     });
-
     arquivosSelecionados = [
         ...arquivosSelecionados,
         ...imagens
     ];
-
     atualizarInput();
     atualizarPreview();
 });
-
-
 inputFotos.addEventListener("change", function () {
-
     const novosArquivos = Array.from(this.files);
-
     arquivosSelecionados = [
         ...arquivosSelecionados,
         ...novosArquivos
     ];
-
     atualizarInput();
     atualizarPreview();
 });
-
-
 function atualizarPreview() {
-
     previewFotos.innerHTML = "";
-
     arquivosSelecionados.forEach((arquivo, index) => {
-
         const reader = new FileReader();
-
         reader.onload = function (e) {
-
             const item = document.createElement("div");
-
             item.className = "foto-preview";
             item.draggable = true;
-
             item.innerHTML = `
                 <img
                     src="${e.target.result}"
@@ -126,12 +80,9 @@ function atualizarPreview() {
                 >
 
                 ${index === 0 &&
-                document.querySelectorAll(
-                    ".foto-existente:not([style*='display: none'])"
-                ).length === 0
-                    ? '<span class="foto-principal">Principal</span>'
-                    : ''
-                }
+                document.querySelectorAll(".foto-existente:not([style*='display: none'])").length === 0
+                ? '<span class="foto-principal">Principal</span>'
+                : ''}
 
                 <button
                     type="button"
@@ -140,133 +91,74 @@ function atualizarPreview() {
                     ×
                 </button>
             `;
-
-
-            const botaoRemover =
-                item.querySelector(".remover-foto");
-
+            const botaoRemover = item.querySelector(".remover-foto");
             botaoRemover.addEventListener("click", function () {
-
-                const indiceAtual =
-                    Array.from(previewFotos.children)
+                const indiceAtual = Array.from(previewFotos.children)
                     .indexOf(item);
-
                 removerFoto(indiceAtual);
             });
-
-
             item.addEventListener("dragstart", function () {
-
                 indiceArrastado =
                     Array.from(previewFotos.children)
-                    .indexOf(item);
-
+                        .indexOf(item);
                 item.classList.add("arrastando");
             });
-
-
             item.addEventListener("dragend", function () {
-
                 item.classList.remove("arrastando");
-
                 indiceArrastado = null;
             });
-
-
             item.addEventListener("dragover", function (event) {
-
                 event.preventDefault();
             });
-
-
             item.addEventListener("drop", function (event) {
-
                 event.preventDefault();
-
-                const indiceDestino =
-                    Array.from(previewFotos.children)
+                const indiceDestino = Array.from(previewFotos.children)
                     .indexOf(item);
-
-                if (
-                    indiceArrastado === null ||
-                    indiceArrastado === indiceDestino
-                ) {
+                if (indiceArrastado === null ||
+                    indiceArrastado === indiceDestino) {
                     return;
                 }
-
-
-                const arquivoMovido =
-                    arquivosSelecionados[indiceArrastado];
-
-
-                arquivosSelecionados.splice(
-                    indiceArrastado,
-                    1
-                );
-
-
-                arquivosSelecionados.splice(
-                    indiceDestino,
-                    0,
-                    arquivoMovido
-                );
-
-
+                const arquivoMovido = arquivosSelecionados[indiceArrastado];
+                arquivosSelecionados.splice(indiceArrastado, 1);
+                arquivosSelecionados.splice(indiceDestino, 0, arquivoMovido);
                 atualizarInput();
                 atualizarPreview();
             });
-
-
             previewFotos.appendChild(item);
         };
-
-
         reader.readAsDataURL(arquivo);
     });
 }
-
-
 function removerFoto(index) {
-
     arquivosSelecionados.splice(index, 1);
-
     atualizarInput();
     atualizarPreview();
 }
-
-
 function atualizarInput() {
-
     const dataTransfer = new DataTransfer();
-
     arquivosSelecionados.forEach(function (arquivo) {
-
         dataTransfer.items.add(arquivo);
     });
-
     inputFotos.files = dataTransfer.files;
 }
-
 // As exclusões só são aplicadas quando o formulário é salvo.
 const galeriaExistente = document.getElementById("fotos-existentes-container");
 const fotosExcluir = document.getElementById("fotos-excluir");
 const ordemFotos = document.getElementById("ordem-fotos");
 const fotoPrincipalInput = document.getElementById("foto-principal");
-
 function fotosAtivas() {
     return galeriaExistente
         ? [...galeriaExistente.querySelectorAll(".foto-existente:not(.pendente-exclusao)")]
         : [];
 }
-
 function fixarPrincipalNoInicio() {
-    if (!galeriaExistente || !fotoPrincipalInput) return;
+    if (!galeriaExistente || !fotoPrincipalInput)
+        return;
     const principal = fotosAtivas().find(foto => foto.dataset.fotoId === fotoPrincipalInput.value);
     if (principal && galeriaExistente.firstElementChild !== principal) {
         galeriaExistente.insertBefore(principal, galeriaExistente.firstElementChild);
     }
 }
-
 function atualizarGaleriaExistente() {
     const ativas = fotosAtivas();
     if (!ativas.some(foto => foto.dataset.fotoId === fotoPrincipalInput.value)) {
@@ -306,7 +198,6 @@ function atualizarGaleriaExistente() {
         });
     }
 }
-
 if (galeriaExistente) {
     galeriaExistente.addEventListener("dragstart", function (event) {
         const foto = event.target.closest(".foto-existente");
@@ -316,10 +207,10 @@ if (galeriaExistente) {
         }
     }, true);
 }
-
 if (galeriaExistente) {
     const inicial = galeriaExistente.querySelector('.selecionar-principal[aria-pressed="true"]');
-    if (inicial) fotoPrincipalInput.value = inicial.closest(".foto-existente").dataset.fotoId;
+    if (inicial)
+        fotoPrincipalInput.value = inicial.closest(".foto-existente").dataset.fotoId;
     galeriaExistente.addEventListener("click", event => {
         const estrela = event.target.closest(".selecionar-principal");
         if (estrela && galeriaExistente.contains(estrela)) {
@@ -341,11 +232,9 @@ if (galeriaExistente) {
     });
     atualizarGaleriaExistente();
 }
-
 // Reordenação das fotos já cadastradas (não interfere nos controles de estrela/exclusão).
 if (galeriaExistente) {
     let fotoArrastada = null;
-
     galeriaExistente.addEventListener("dragstart", event => {
         if (event.target.closest("button")) {
             event.preventDefault();
@@ -361,28 +250,30 @@ if (galeriaExistente) {
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", foto.dataset.fotoId);
     });
-
     galeriaExistente.addEventListener("dragover", event => {
         const destino = event.target.closest(".foto-existente");
-        if (!fotoArrastada || !destino || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value) return;
+        if (!fotoArrastada || !destino || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value)
+            return;
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
     });
-
     galeriaExistente.addEventListener("drop", event => {
         const destino = event.target.closest(".foto-existente");
-        if (!fotoArrastada || !destino || destino === fotoArrastada || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value) return;
+        if (!fotoArrastada || !destino || destino === fotoArrastada || destino.classList.contains("pendente-exclusao") || destino.dataset.fotoId === fotoPrincipalInput.value)
+            return;
         event.preventDefault();
         const elementos = [...galeriaExistente.children];
         const origem = elementos.indexOf(fotoArrastada);
         const alvo = elementos.indexOf(destino);
-        if (origem < alvo) destino.after(fotoArrastada);
-        else destino.before(fotoArrastada);
+        if (origem < alvo)
+            destino.after(fotoArrastada);
+        else
+            destino.before(fotoArrastada);
         atualizarGaleriaExistente();
     });
-
     galeriaExistente.addEventListener("dragend", () => {
-        if (fotoArrastada) fotoArrastada.classList.remove("foto-arrastando");
+        if (fotoArrastada)
+            fotoArrastada.classList.remove("foto-arrastando");
         fotoArrastada = null;
     });
 }

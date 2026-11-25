@@ -12,28 +12,22 @@
 }
 
 .titulo-secao p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
     margin: 0;
 }
-
 
 /* =========================
    FORMULÁRIO
 ========================= */
 
 .formulario-card {
-    background: white;
-
-    border: 1px solid #e1e5eb;
-
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e1e5eb, #29384e);
     border-radius: 10px;
-
     padding: 24px;
-
     max-width: 700px;
 }
-
 
 /* =========================
    CAMPOS
@@ -45,54 +39,37 @@
 
 .campo label {
     display: block;
-
     font-size: 13px;
-
     font-weight: 600;
-
-    color: #1e293b;
-
+    color: light-dark(#1e293b, #eef4fc);
     margin-bottom: 7px;
 }
 
 .campo input,
 .campo textarea {
     width: 100%;
-
     box-sizing: border-box;
-
     padding: 11px 12px;
-
-    border: 1px solid #cbd5e1;
-
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 7px;
-
-    background: white;
-
-    color: #1e293b;
-
+    background: light-dark(white, #121c2e);
+    color: light-dark(#1e293b, #eef4fc);
     font-family: inherit;
-
     font-size: 14px;
-
     outline: none;
-
     transition: 0.2s;
 }
 
 .campo input:focus,
 .campo textarea:focus {
     border-color: #2864e8;
-
     box-shadow: 0 0 0 2px rgba(40, 100, 232, 0.10);
 }
 
 .campo textarea {
     resize: vertical;
-
     min-height: 100px;
 }
-
 
 /* =========================
    AÇÕES
@@ -100,20 +77,13 @@
 
 .acoes-formulario {
     display: flex;
-
     justify-content: flex-end;
-
     align-items: center;
-
     gap: 10px;
-
     margin-top: 25px;
-
     padding-top: 20px;
-
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid light-dark(#e5e7eb, #29384e);
 }
-
 
 /* =========================
    BOTÕES
@@ -122,97 +92,106 @@
 .botao-principal,
 .botao-secundario {
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
-
     padding: 10px 16px;
-
     border-radius: 7px;
-
     font-size: 13px;
-
     font-weight: 600;
-
     text-decoration: none;
-
     cursor: pointer;
-
     transition: 0.2s;
 }
-
 
 /* Botão salvar */
 
 .botao-principal {
     background: #2864e8;
-
     color: white;
-
     border: 1px solid #2864e8;
 }
 
 .botao-principal:hover {
     background: #1f56d0;
-
     border-color: #1f56d0;
 }
-
 
 /* Botão cancelar */
 
 .botao-secundario {
-    background: white;
-
-    color: #334155;
-
-    border: 1px solid #cbd5e1;
+    background: light-dark(white, #121c2e);
+    color: light-dark(#334155, #eef4fc);
+    border: 1px solid light-dark(#cbd5e1, #29384e);
 }
 
 .botao-secundario:hover {
-    background: #f8fafc;
-
-    border-color: #94a3b8;
+    background: light-dark(#f8fafc, #121c2e);
+    border-color: light-dark(#94a3b8, #29384e);
 }
-
 
 /* =========================
    RESPONSIVIDADE
 ========================= */
 
 @media (max-width: 700px) {
-
     .formulario-card {
         padding: 18px;
     }
-
     .acoes-formulario {
         flex-direction: column-reverse;
-
         align-items: stretch;
     }
-
     .botao-principal,
     .botao-secundario {
         width: 100%;
     }
-
 }
+
 /* v6: campo categoria alinhado aos demais campos do formulário */
-.formulario-card .campo { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
-.formulario-card .campo label { display: block; font-size: 13px; font-weight: 600; color: #1e293b; }
+
+.formulario-card .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 20px;
+}
+
+.formulario-card .campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: light-dark(#1e293b, #eef4fc);
+}
+
 .formulario-card .campo select,
 .formulario-card .campo input,
 .formulario-card .campo textarea {
-  display: block; width: 100%; box-sizing: border-box; min-height: 43px;
-  padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 7px;
-  background: #fff; color: #1e293b; font: inherit; font-size: 14px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 43px;
+    padding: 10px 12px;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
+    border-radius: 7px;
+    background: light-dark(#fff, #121c2e);
+    color: light-dark(#1e293b, #eef4fc);
+    font: inherit;
+    font-size: 14px;
 }
-.formulario-card .campo select { appearance: auto; cursor: pointer; }
-.formulario-card .campo select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.10); }
+
+.formulario-card .campo select {
+    appearance: auto;
+    cursor: pointer;
+}
+
+.formulario-card .campo select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
 
 /* v7: centralizar o conjunto título + formulário na área principal */
+
 .titulo-secao,
 .formulario-card {
     width: min(100%, 700px);
@@ -221,8 +200,18 @@
     margin-left: auto;
     margin-right: auto;
 }
-.titulo-secao { text-align: center; margin-bottom: 22px; }
-.formulario-card { padding: 24px; }
+
+.titulo-secao {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.formulario-card {
+    padding: 24px;
+}
+
 @media (max-width: 600px) {
-    .formulario-card { padding: 18px; }
+    .formulario-card {
+        padding: 18px;
+    }
 }

@@ -70,9 +70,7 @@ from .models import (
 )
 
 
-# ==============================================================================
 # Funções Auxiliares
-# ==============================================================================
 
 def adicionar_erros_de_validacao(form, erro, renomear=None):
     """Converte um ValidationError do model em erros vinculados aos campos do form."""
@@ -154,9 +152,7 @@ def _veiculos_disponiveis_para_procura():
     )
 
 
-# ==============================================================================
 # Autenticação, Painel Geral e Vitrine Pública
-# ==============================================================================
 
 def login_view(request):
     """Autentica o usuário e valida se o cadastro está ativo."""
@@ -384,41 +380,121 @@ def vitrine_veiculo_detalhe_view(request, pk):
     outros = estoque.exclude(pk=pk)
     mesma_marca = list(outros.filter(marca__iexact=veiculo.marca).order_by("-criado_em")[:4])
     candidatos = outros.exclude(pk__in=[v.pk for v in mesma_marca])
-    recomendados = sorted(candidatos, key=lambda v: (v.tipo != veiculo.tipo, v.combustivel != veiculo.combustivel, abs((v.preco_venda or 0) - (veiculo.preco_venda or 0))))[:4]
+    recomendados = sorted(candidatos, key=lambda v: (v.tipo != veiculo.tipo, v.combustivel != veiculo.combustivel, abs((v.preco_venda or 0) - (veiculo.preco_venda or 0))))[:12]
     numero = getattr(settings, "WHATSAPP_NUMERO", "")
     mensagem = f"Olá! Vim pelo site Revenda Certa e tenho interesse no {veiculo.marca} {veiculo.modelo}, ano {veiculo.ano_modelo}. Gostaria de mais informações.\n{request.build_absolute_uri()}"
     whatsapp = f"https://wa.me/{numero}?" + urlencode({"text": mensagem})
     return render(request, "core/vitrine_veiculo_detalhe.html", {"whatsapp_numero": numero, "veiculo": veiculo, "fotos": veiculo.fotos.all(), "mesma_marca": mesma_marca, "recomendados": recomendados, "whatsapp_veiculo": whatsapp})
 
 
-# ==============================================================================
 # Vendedor
-# ==============================================================================
 
 @perfil_requerido("VENDEDOR")
 def painel_vendedor_view(request):
     from .dashboard_metrics import seller_metrics
     expirar_reservas_vencidas()
     dados = get_object_or_404(PerfilVendedor, usuario=request.user)
+    avisos_procura = AvisoProcura.objects.filter(
+        vendedor=request.user, lido=False,
+    ).select_related("procura", "procura__cliente", "veiculo")
     return render(request, "core/vendedor_painel_inicio.html", {
         "dados": dados, "dashboard": seller_metrics(request.user),
+        "avisos_procura": avisos_procura,
     })
 
 
 @perfil_requerido("VENDEDOR")
 @require_GET
 def veiculos_vendedor_view(request):
-    """Catálogo interno do vendedor; não permite editar o estoque."""
+    """Catálogo interno somente para consulta, com filtros combináveis."""
+    from django.db.models import F
+
     expirar_reservas_vencidas()
-    busca = request.GET.get("busca", "").strip()
-    veiculos = Veiculo.objects.prefetch_related("fotos").order_by("-criado_em")
-    if busca:
-        veiculos = veiculos.filter(
-            Q(marca__icontains=busca) | Q(modelo__icontains=busca)
-            | Q(placa__icontains=busca)
-        )
+    estoque = Veiculo.objects.all()
+    filtros = {campo: request.GET.get(campo, "").strip() for campo in (
+        "busca", "marca", "situacao", "tipo", "cambio", "combustivel",
+        "ano", "preco_min", "preco_max", "ordem",
+    )}
+    veiculos = estoque
+    if filtros["busca"]:
+        for termo in filtros["busca"].split():
+            veiculos = veiculos.filter(
+                Q(marca__icontains=termo) | Q(modelo__icontains=termo)
+                | Q(placa__icontains=termo)
+            )
+
+    def opcoes_distintas(campo):
+        return [(str(v), str(v)) for v in estoque.exclude(**{campo: ""})
+                .exclude(**{f"{campo}__isnull": True}).order_by(campo)
+                .values_list(campo, flat=True).distinct()]
+
+    opcoes = {
+        "marca": opcoes_distintas("marca"),
+        "situacao": Veiculo.Situacao.choices,
+        "tipo": Veiculo.Tipo.choices,
+        "cambio": Veiculo.Cambio.choices,
+        "combustivel": opcoes_distintas("combustivel"),
+        "ano": [(str(ano), str(ano)) for ano in estoque.order_by("-ano_modelo")
+                .values_list("ano_modelo", flat=True).distinct()],
+    }
+    for campo in ("marca", "situacao", "tipo", "cambio", "combustivel", "ano"):
+        valor = filtros[campo]
+        if valor and valor in {str(v) for v, _ in opcoes[campo]}:
+            if campo == "ano":
+                veiculos = veiculos.filter(ano_modelo=int(valor))
+            else:
+                veiculos = veiculos.filter(**{f"{campo}__iexact": valor})
+        elif valor:
+            filtros[campo] = ""
+
+    erros = []
+    limites = {}
+    for campo, label in (("preco_min", "Preço mínimo"), ("preco_max", "Preço máximo")):
+        if filtros[campo]:
+            try:
+                valor = Decimal(filtros[campo].replace(",", "."))
+                if not valor.is_finite() or not Decimal(0) <= valor <= Decimal("9999999999.99"):
+                    raise ValueError
+                if valor != valor.quantize(Decimal("0.01")):
+                    raise ValueError
+                limites[campo] = valor
+                filtros[campo] = format(valor, "f")
+            except (InvalidOperation, ValueError):
+                erros.append(f"{label} inválido. Informe um valor positivo ou zero, com até duas casas decimais.")
+                filtros[campo] = ""
+    if limites.get("preco_min", Decimal(0)) > limites.get("preco_max", Decimal("9999999999.99")):
+        erros.append("O preço mínimo não pode ser maior que o preço máximo.")
+        veiculos = veiculos.none()
+    else:
+        if "preco_min" in limites:
+            veiculos = veiculos.filter(preco_venda__gte=limites["preco_min"])
+        if "preco_max" in limites:
+            veiculos = veiculos.filter(preco_venda__lte=limites["preco_max"])
+
+    ordenacoes = {
+        "recentes": ("Mais recentes", ("-criado_em", "-pk")),
+        "menor_preco": ("Menor preço", (F("preco_venda").asc(nulls_last=True), "pk")),
+        "maior_preco": ("Maior preço", (F("preco_venda").desc(nulls_last=True), "pk")),
+        "ano_novo": ("Ano mais novo", ("-ano_modelo", "-pk")),
+        "ano_antigo": ("Ano mais antigo", ("ano_modelo", "pk")),
+        "menor_km": ("Menor quilometragem", ("quilometragem", "pk")),
+    }
+    if filtros["ordem"] not in ordenacoes:
+        filtros["ordem"] = "recentes"
+    veiculos = veiculos.prefetch_related("fotos").order_by(*ordenacoes[filtros["ordem"]][1])
+    opcoes["ordem"] = [(chave, dados[0]) for chave, dados in ordenacoes.items()]
+    campos_select = [
+        {"nome": chave, "rotulo": rotulo, "opcoes": opcoes[chave], "valor": filtros[chave]}
+        for chave, rotulo in (("marca", "Marca"), ("situacao", "Situação"),
+                              ("tipo", "Categoria"), ("cambio", "Câmbio"),
+                              ("combustivel", "Combustível"), ("ano", "Ano do modelo"))
+    ]
     return render(request, "core/vendedor_veiculos.html", {
-        "veiculos": veiculos, "busca": busca,
+        "veiculos": veiculos, "busca": filtros["busca"], "filtros": filtros,
+        "campos_select": campos_select, "opcoes_ordem": opcoes["ordem"],
+        "erros_filtro": erros,
+        "filtros_ativos": any(v for k, v in filtros.items() if k not in ("busca", "ordem"))
+                          or filtros["ordem"] != "recentes" or bool(erros),
     })
 
 
@@ -1210,26 +1286,12 @@ def marcar_aviso_procura_lido_view(request, aviso_id):
     return redirect("painel_vendedor")
 
 
-# ==============================================================================
 # Administrativo
-# ==============================================================================
 
 @perfil_requerido("ADMINISTRATIVO")
 def painel_administrativo_view(request):
-    """Visão inicial do administrativo com os veículos e resumo de despesas."""
-    veiculos = Veiculo.objects.prefetch_related("fotos").order_by("marca", "modelo")
-    despesas_ativas = LancamentoFinanceiro.objects.filter(
-        tipo=LancamentoFinanceiro.Tipo.DESPESA, excluido=False
-    )
-    return render(request, "core/administrativo_painel_inicio.html", {
-        "veiculos": veiculos,
-        "total_despesas": despesas_ativas.count(),
-        "valor_total": despesas_ativas.aggregate(total=Sum("valor"))["total"] or 0,
-        "veiculos_com_despesas": Veiculo.objects.filter(
-            lancamentos__tipo=LancamentoFinanceiro.Tipo.DESPESA,
-            lancamentos__excluido=False,
-        ).distinct().count(),
-    })
+    from .administrativo_metrics import contexto_administrativo
+    return render(request, "core/administrativo_painel_inicio.html", contexto_administrativo())
 
 
 @perfil_requerido("ADMINISTRATIVO")
@@ -1246,7 +1308,14 @@ def despesas_view(request):
             | Q(veiculo__modelo__icontains=busca) | Q(veiculo__placa__icontains=busca)
         )
     despesas = despesas.order_by("-data_lancamento", "-criado_em")
+    veiculos = Veiculo.objects.order_by("marca", "modelo", "pk")
+    selecionado = veiculos.filter(pk=request.GET.get("veiculo")).first() if request.GET.get("veiculo", "").isdigit() else veiculos.first()
+    lista = despesas.filter(veiculo=selecionado) if selecionado else despesas.none()
+    gastos = despesas_ativas.filter(veiculo=selecionado).aggregate(total=Sum("valor"))["total"] or 0
     return render(request, "core/administrativo_painel_despesas.html", {
+        "selecionado": selecionado, "lista": lista, "gastos": gastos,
+        "custo_total": (selecionado.custo_aquisicao or 0) + gastos if selecionado else 0,
+        "form": DespesaForm(),
         "despesas": despesas,
         "busca": busca,
         "veiculos": Veiculo.objects.order_by("marca", "modelo"),
@@ -1297,6 +1366,9 @@ def adicionar_despesa_view(request, veiculo_id):
             despesa.tipo = LancamentoFinanceiro.Tipo.DESPESA
             despesa.registrado_por = request.user
             despesa.save()
+            if request.POST.get("origem") == "painel":
+                from django.urls import reverse
+                return redirect(reverse("despesas") + f"?veiculo={veiculo.pk}")
             return redirect("despesas_veiculo", veiculo_id=veiculo.id)
     else:
         form = DespesaForm()
@@ -1374,9 +1446,7 @@ def despesas_excluidas_veiculo_view(request, veiculo_id):
     )
 
 
-# ==============================================================================
 # Gerente
-# ==============================================================================
 
 @perfil_requerido("GERENTE")
 def painel_gerente_view(request):
@@ -2411,9 +2481,7 @@ def procuras_gerente_view(request):
     )
 
 
-# ==============================================================================
 # Operações Compartilhadas
-# ==============================================================================
 
 @perfil_requerido("GERENTE")
 def reservar_veiculo_view(request, veiculo_id):
@@ -2732,7 +2800,7 @@ def registrar_entrega_view(request, venda_id):
                 messages.success(
                     request, "Entrega registrada. O veículo foi entregue."
                 )
-                return redirect("detalhes_venda", venda_id=venda.pk)
+                return redirect("entregas_administrativo") if request.user.is_administrativo() else redirect("detalhes_venda", venda_id=venda.pk)
     else:
         form = EntregaVeiculoForm()
 
@@ -2749,9 +2817,33 @@ def registrar_entrega_view(request, venda_id):
                 venda.esta_fechada
                 and venda.veiculo.situacao == Veiculo.Situacao.VENDIDO
                 and entrega_existente is None
+                and set(venda.etapas_documentacao.filter(situacao=EtapaDocumentacao.Situacao.CONCLUIDA).values_list("tipo", flat=True)) == set(EtapaDocumentacao.Tipo.values)
             ),
         },
     )
+
+
+@perfil_requerido("GERENTE", "ADMINISTRATIVO")
+def entregas_administrativo_view(request):
+    aguardando = Venda.objects.filter(
+        situacao=Venda.Situacao.FECHADA,
+        veiculo__situacao=Veiculo.Situacao.VENDIDO,
+        entrega__isnull=True,
+    ).annotate(concluidas=Count("etapas_documentacao", filter=Q(
+        etapas_documentacao__situacao=EtapaDocumentacao.Situacao.CONCLUIDA
+    ))).select_related("cliente", "veiculo").order_by("data", "pk")
+    total = len(EtapaDocumentacao.Tipo.choices)
+    lista = list(aguardando)
+    selecionada = next((v for v in lista if str(v.pk) == request.GET.get("venda")), lista[0] if lista else None)
+    return render(request, "core/administrativo_painel_entregas.html", {
+        "lista": lista, "selecionada": selecionada,
+        "form": EntregaVeiculoForm(),
+        "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
+        "prontas": aguardando.filter(concluidas=total),
+        "bloqueadas": aguardando.exclude(concluidas=total),
+        "historico": EntregaVeiculo.objects.select_related("venda__veiculo", "venda__cliente", "responsavel").order_by("-data_entrega", "-pk"),
+        "total_etapas": total,
+    })
 
 
 @perfil_requerido("GERENTE", "ADMINISTRATIVO")
@@ -2787,9 +2879,24 @@ def documentacao_pendente_view(request):
         .order_by("data", "pk")
     )
 
+    if request.user.is_administrativo():
+        todas = list(EtapaDocumentacao.objects.filter(venda__situacao=Venda.Situacao.FECHADA).select_related("venda__veiculo", "venda__cliente").order_by("venda__data", "venda_id", "id"))
+        grupos = {}
+        fila = []
+        for etapa in todas:
+            grupo = grupos.setdefault(etapa.venda_id, {"venda": etapa.venda, "etapas": [], "concluidas": 0})
+            grupo["etapas"].append(etapa)
+            grupo["concluidas"] += int(etapa.concluida)
+            if not etapa.concluida:
+                etapa.dias = max(0, (timezone.localdate() - etapa.data).days)
+                fila.append(etapa)
+        fila.sort(key=lambda e: (e.data, e.pk))
+        for grupo in grupos.values():
+            grupo["progresso"] = round(100 * grupo["concluidas"] / len(EtapaDocumentacao.Tipo.choices))
+        return render(request, "core/administrativo_painel_documentacao.html", {"base_template": "core/administrativo_base.html", "grupos": grupos.values(), "fila": fila, "situacoes": EtapaDocumentacao.Situacao.choices})
     return render(
         request,
-        "core/administrativo_painel_documentacao.html",
+        "core/gerente_documentacao_legado.html",
         {
             "base_template": "core/administrativo_base.html" if request.user.is_administrativo() else "core/gerente_base.html",
             "etapas": etapas,

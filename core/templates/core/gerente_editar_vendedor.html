@@ -7,50 +7,47 @@
     {% block title %}Editar vendedor | REVENDA CERTA{% endblock %}
 
     {% block extra_css %}
-        <link rel="stylesheet" href="{% static 'core/css/gerente_editar_vendedor.css' %}">
+        <link rel="stylesheet" href="{% static 'core/css/gerente_editar_vendedor.css' %}?v=rc4-d503543f41c7">
     {% endblock %}
 
     {% block content %}
-    <!-- TOPO -->
-                <div class="topo">
+<div class="topo">
 
-                    <div>
+    <div>
 
-                        <h1>Editar vendedor</h1>
+        <h1>Editar vendedor</h1>
 
-                        <p>
+        <p>
                             Atualize os dados, acesso e configurações comerciais deste vendedor.
-                        </p>
+        </p>
 
-                    </div>
+    </div>
 
-                </div>
-
-
-
-                <!-- CARD -->
-                <div class="card">
+</div>
 
 
-                    <!-- INFORMAÇÕES DO VENDEDOR -->
-                    <div class="vendedor-info">
 
-                        <div class="avatar vendedor">
+<div class="card">
+
+
+    <div class="vendedor-info">
+
+        <div class="avatar vendedor">
                             {{ dados.usuario.first_name|first|upper }}
-                        </div>
+        </div>
 
 
-                        <div>
+        <div>
 
-                            <h2>
+            <h2>
                                 {{ dados.usuario.get_full_name|default:dados.usuario.username }}
-                            </h2>
+            </h2>
 
-                            <p>
+            <p>
                                 @{{ dados.usuario.username }}
-                            </p>
+            </p>
 
-                        </div>
+        </div>
 
 
                         {% if dados.usuario.ativo %}
@@ -67,11 +64,11 @@
 
                         {% endif %}
 
-                    </div>
+    </div>
 
 
 
-                    <form method="post" novalidate>
+    <form method="post" novalidate>
 
                         {% csrf_token %}
 
@@ -82,25 +79,25 @@
                             DADOS PESSOAIS
                         =========================== -->
 
-                        <div class="secao">
+        <div class="secao">
 
-                            <div class="secao-titulo">
+            <div class="secao-titulo">
 
-                                <h3>
+                <h3>
                                     Dados pessoais
-                                </h3>
+                </h3>
 
-                                <p>
+                <p>
                                     Informações básicas do vendedor.
-                                </p>
+                </p>
 
-                            </div>
-
-
-                            <div class="form-grid">
+            </div>
 
 
-                                <div class="campo">
+            <div class="form-grid">
+
+
+                <div class="campo">
 
                                     <label for="nome">
                                         Nome
@@ -109,10 +106,10 @@
                                     {{ form.nome }}
 {{ form.nome.errors }}
 
-                                </div>
+                </div>
 
 
-                                <div class="campo">
+                <div class="campo">
 
                                     <label for="email">
                                         E-mail
@@ -121,11 +118,11 @@
                                     {{ form.email }}
 {{ form.email.errors }}
 
-                                </div>
+                </div>
 
-                            </div>
+            </div>
 
-                        </div>
+        </div>
 
 
 
@@ -133,25 +130,25 @@
                             ACESSO
                         =========================== -->
 
-                        <div class="secao">
+        <div class="secao">
 
-                            <div class="secao-titulo">
+            <div class="secao-titulo">
 
-                                <h3>
+                <h3>
                                     Acesso
-                                </h3>
+                </h3>
 
-                                <p>
+                <p>
                                     Controle de acesso do vendedor ao sistema.
-                                </p>
+                </p>
 
-                            </div>
-
-
-                            <div class="form-grid">
+            </div>
 
 
-                                <div class="campo">
+            <div class="form-grid">
+
+
+                <div class="campo">
 
                                     <label for="username">
                                         Usuário
@@ -168,10 +165,10 @@
                                         O nome de usuário não pode ser alterado.
                                     </small>
 
-                                </div>
+                </div>
 
 
-                                <div class="campo">
+                <div class="campo">
 
                                     <label for="ativo">
                                         Status
@@ -184,27 +181,26 @@
                                         Vendedores inativos não conseguem acessar o sistema.
                                     </small>
 
-                                </div>
+                </div>
 
-                            </div>
+            </div>
 
 
 
-                            <!-- SENHA -->
 
-                            <div class="senha-info">
+            <div class="senha-info">
 
-                                <div>
+                <div>
 
                                     <strong>
                                         Senha de acesso
                                     </strong>
 
-                                    <p>
+                    <p>
                                         A senha atual está protegida e não é exibida.
-                                    </p>
+                    </p>
 
-                                </div>
+                </div>
 
 
                                 <button
@@ -214,9 +210,9 @@
                                     Alterar senha
                                 </button>
 
-                            </div>
+            </div>
 
-                        </div>
+        </div>
 
 
 
@@ -224,27 +220,26 @@
                             CONFIGURAÇÕES COMERCIAIS
                         =========================== -->
 
-                        <div class="secao">
-                            
+        <div class="secao">
 
-                            <div class="secao-titulo">
 
-                                <h3>
+            <div class="secao-titulo">
+
+                <h3>
                                     Configurações comerciais
-                                </h3>
+                </h3>
 
-                                <p>
+                <p>
                                     Defina a comissão deste vendedor.
-                                </p>
+                </p>
 
-                            </div>
-
-
-                            <div class="form-grid">
+            </div>
 
 
-                            <!-- COMISSÃO -->
-                                <div class="campo">
+            <div class="form-grid">
+
+
+                <div class="campo">
 
                                     <label for="percentual_comissao">
                                         Percentual de comissão
@@ -254,9 +249,9 @@
                                         Percentual de comissão recebido pelo vendedor em uma venda.
                                     </span>
 
-                                    <div class="input-percentual">
+                    <div class="input-percentual">
 
-                                        
+
 
                                         {{ form.percentual_comissao }}
 
@@ -264,30 +259,28 @@
                                             %
                                         </span>
 
-                                    </div>
+                    </div>
 {{ form.percentual_comissao.errors }}
 
-                                </div>
-
-
-                                
-                            </div>
+                </div>
 
 
 
-                        <!-- AVISO -->
+            </div>
 
-                        <div class="aviso">
+
+
+
+            <div class="aviso">
 
                             <i data-lucide="lock"></i><span>Apenas o gerente pode alterar estes dados.</span>
 
-                        </div>
+            </div>
 
 
 
-                        <!-- BOTÕES -->
 
-                        <div class="acoes">
+            <div class="acoes">
 
                             <a
                                 href="{% url 'vendedores' %}"
@@ -304,12 +297,12 @@
                                 Salvar alterações
                             </button>
 
-                        </div>
+            </div>
 
 
-                    </form>
+        </form>
 
-                </div>
+    </div>
     {% endblock content %}
 
     {% block extra_js %}

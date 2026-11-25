@@ -4,8 +4,8 @@
 }
 
 .excluir-despesa-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#ffffff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 14px;
     padding: 28px;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
@@ -21,30 +21,30 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: #dc2626;
+    color: light-dark(#dc2626, #fda4af);
 }
 
 .excluir-despesa-header h2 {
     margin: 0;
     font-size: 22px;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .excluir-despesa-subtitulo {
     margin: 6px 0 0;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
 }
 
 .excluir-despesa-divider {
     height: 1px;
-    background: #e5e7eb;
+    background: light-dark(#e5e7eb, #19263a);
     margin-bottom: 22px;
 }
 
 .excluir-despesa-info {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: light-dark(#f8fafc, #121c2e);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
     border-radius: 10px;
     padding: 18px;
     margin-bottom: 20px;
@@ -54,11 +54,11 @@
     display: block;
     margin-bottom: 8px;
     font-size: 15px;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .excluir-despesa-meta {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
@@ -67,16 +67,16 @@
     margin-top: 14px;
     font-size: 18px;
     font-weight: 700;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .excluir-despesa-alerta {
     padding: 14px 16px;
     margin-bottom: 22px;
-    border: 1px solid #fecaca;
+    border: 1px solid light-dark(#fecaca, #70404f);
     border-radius: 10px;
-    background: #fef2f2;
-    color: #991b1b;
+    background: light-dark(#fef2f2, #3b2533);
+    color: light-dark(#991b1b, #fda4af);
     font-size: 13px;
     line-height: 1.5;
 }
@@ -84,7 +84,7 @@
 .excluir-despesa-alerta strong {
     display: block;
     margin-bottom: 4px;
-    color: #b91c1c;
+    color: light-dark(#b91c1c, #fda4af);
 }
 
 .excluir-despesa-acoes {
@@ -114,12 +114,12 @@
 }
 
 .btn-cancelar-exclusao {
-    background: #f1f5f9;
-    color: #334155;
+    background: light-dark(#f1f5f9, #19263a);
+    color: light-dark(#334155, #eef4fc);
 }
 
 .btn-cancelar-exclusao:hover {
-    background: #e2e8f0;
+    background: light-dark(#e2e8f0, #19263a);
 }
 
 .topo {
@@ -135,29 +135,27 @@
 }
 
 .topo p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
 .badge-perfil {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 8px;
     padding: 10px 16px;
     font-size: 12px;
     font-weight: bold;
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }
 
 @media (max-width: 600px) {
     .excluir-despesa-card {
         padding: 20px;
     }
-
     .excluir-despesa-acoes {
         flex-direction: column-reverse;
     }
-
     .btn-confirmar-exclusao,
     .btn-cancelar-exclusao {
         width: 100%;

@@ -3,7 +3,7 @@
 
 {% block title %}Minha Carteira · Revenda Certa{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/vendedor_carteira.css' %}?v=rc4-0c631ea60a12">
 {% endblock %}
 {% block content %}
 <div class="cart-pagina">
@@ -14,15 +14,7 @@
         </div>
     </header>
 
-    {% if messages %}
-        <div class="cart-mensagens">
-            {% for message in messages %}
-                <div class="cart-alerta cart-alerta-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    {% include "core/partials/painel_mensagens.html" %}
 
     <div class="cart-indicadores">
         <div class="cart-indicador">
@@ -48,10 +40,10 @@
         </div>
 
         {% if carteira.linhas_hoje %}
-            <div class="cart-tabela-wrap">
-                <table class="cart-tabela">
-                    <thead>
-                        <tr>
+        <div class="cart-tabela-wrap">
+            <table class="cart-tabela">
+                <thead>
+                    <tr>
                             <th>Cliente</th>
                             <th>Telefone</th>
                             <th>Último veículo comprado</th>
@@ -59,11 +51,11 @@
                             <th>Tempo decorrido</th>
                             <th>Retorno</th>
                             <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    </tr>
+                </thead>
+                <tbody>
                         {% for item in carteira.linhas_hoje %}
-                            <tr {% if item.retorno_chegou %}class="cart-linha-retorno"{% endif %}>
+                    <tr {% if item.retorno_chegou %}class="cart-linha-retorno"{% endif %}>
                                 <td>
                                     <a href="{% url 'detalhes_cliente' item.cliente.pk %}" class="cart-link">
                                         {{ item.cliente }}
@@ -99,20 +91,20 @@
                                         Registrar contato
                                     </a>
                                 </td>
-                            </tr>
+                    </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="cart-vazio">
+        <div class="cart-vazio">
                 <i data-lucide="phone-off"></i>
-                <h3>Ninguém para ligar hoje</h3>
-                <p>
+            <h3>Ninguém para ligar hoje</h3>
+            <p>
                     Quando clientes das suas vendas atingirem o prazo configurado,
                     ou um retorno marcado chegar, aparecerão aqui.
-                </p>
-            </div>
+            </p>
+        </div>
         {% endif %}
     </section>
 
@@ -135,7 +127,7 @@
                 </thead>
                 <tbody>
                     {% for item in carteira.linhas_contatadas %}
-                        <tr>
+                    <tr>
                             <td>
                                 <a href="{% url 'detalhes_cliente' item.cliente.pk %}" class="cart-link">
                                     {{ item.cliente }}
@@ -150,7 +142,7 @@
                                     <span class="cart-muted">Próximo mês</span>
                                 {% endif %}
                             </td>
-                        </tr>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

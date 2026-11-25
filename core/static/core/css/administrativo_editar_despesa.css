@@ -4,8 +4,8 @@
 }
 
 .editar-despesa-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: light-dark(#ffffff, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 14px;
     padding: 28px;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
@@ -16,7 +16,7 @@
 }
 
 .editar-despesa-subtitulo {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     margin-bottom: 24px;
 }
 
@@ -31,13 +31,13 @@
     margin-bottom: 7px;
     font-size: 13px;
     font-weight: 600;
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }
 
 .editar-form input {
     width: 100%;
     padding: 11px 13px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 8px;
     font-size: 14px;
     box-sizing: border-box;
@@ -76,12 +76,12 @@
 }
 
 .btn-cancelar-despesa {
-    background: #f1f5f9;
-    color: #334155;
+    background: light-dark(#f1f5f9, #19263a);
+    color: light-dark(#334155, #eef4fc);
 }
 
 .btn-cancelar-despesa:hover {
-    background: #e2e8f0;
+    background: light-dark(#e2e8f0, #19263a);
 }
 
 .editar-despesa-header {
@@ -94,29 +94,29 @@
     font-size: 25px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
 }
 
 .editar-despesa-header h2 {
     margin: 0;
     font-size: 22px;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .editar-despesa-subtitulo {
     margin: 6px 0 0;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 14px;
 }
 
 .editar-despesa-subtitulo span {
     margin: 0 5px;
-    color: #94a3b8;
+    color: light-dark(#94a3b8, #a0b1c8);
 }
 
 .editar-despesa-divider {
     height: 1px;
-    background: #e5e7eb;
+    background: light-dark(#e5e7eb, #19263a);
     margin-bottom: 22px;
 }
 
@@ -133,16 +133,16 @@
 }
 
 .topo p {
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-size: 13px;
 }
 
 .badge-perfil {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: light-dark(white, #121c2e);
+    border: 1px solid light-dark(#e5e7eb, #29384e);
     border-radius: 8px;
     padding: 10px 16px;
     font-size: 12px;
     font-weight: bold;
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
 }

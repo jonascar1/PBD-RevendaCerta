@@ -1,12 +1,12 @@
 :root {
-    --prop-primary: #0f172a;
+    --prop-primary: light-dark(#0f172a, #eef4fc);
     --prop-accent: #2563eb;
     --prop-accent-hover: #1d4ed8;
-    --prop-background: #f4f7fb;
-    --prop-card: #ffffff;
-    --prop-text: #1e293b;
-    --prop-muted: #64748b;
-    --prop-border: #e2e8f0;
+    --prop-background: light-dark(#f4f7fb, #121c2e);
+    --prop-card: light-dark(#ffffff, #121c2e);
+    --prop-text: light-dark(#1e293b, #eef4fc);
+    --prop-muted: light-dark(#64748b, #a0b1c8);
+    --prop-border: light-dark(#e2e8f0, #29384e);
     --prop-radius: 10px;
     --prop-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
     --prop-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -68,7 +68,7 @@
     padding: 0.62rem 1rem;
     border: 1px solid var(--prop-border);
     border-radius: 7px;
-    background: #fff;
+    background: light-dark(#fff, #121c2e);
     color: var(--prop-text);
     font: inherit;
     font-size: 0.875rem;
@@ -81,7 +81,7 @@
 }
 
 .prop-btn:hover {
-    background: #f1f5f9;
+    background: light-dark(#f1f5f9, #19263a);
 }
 
 .prop-btn:focus-visible {
@@ -102,12 +102,12 @@
 }
 
 .prop-btn-secundario {
-    background: #f8fafc;
+    background: light-dark(#f8fafc, #121c2e);
     color: var(--prop-primary);
 }
 
 .prop-btn-secundario:hover {
-    background: #eaf0f7;
+    background: light-dark(#eaf0f7, #19263a);
 }
 
 .prop-btn-pequeno {
@@ -166,7 +166,7 @@
 }
 
 .prop-campo label {
-    color: #334155;
+    color: light-dark(#334155, #eef4fc);
     font-size: 0.875rem;
     font-weight: 600;
 }
@@ -179,9 +179,9 @@
     min-width: 0;
     min-height: 42px;
     padding: 0.62rem 0.75rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 7px;
-    background-color: #fff;
+    background-color: light-dark(#fff, #121c2e);
     color: var(--prop-text);
     font: inherit;
     font-size: 0.875rem;
@@ -199,7 +199,7 @@
 .prop-campo .errorlist {
     margin: 0;
     padding-left: 1.1rem;
-    color: #b91c1c;
+    color: light-dark(#b91c1c, #fda4af);
     font-size: 0.8rem;
 }
 
@@ -222,7 +222,7 @@
     align-items: center;
     gap: 1rem;
     padding: 1.1rem 1.25rem;
-    border-bottom: 1px solid #edf1f5;
+    border-bottom: 1px solid light-dark(#edf1f5, #29384e);
 }
 
 .prop-linha:last-child {
@@ -278,22 +278,22 @@
 .prop-badge-em_analise,
 .prop-badge-analise,
 .prop-badge-pendente {
-    color: #92400e;
-    background: #fef3c7;
+    color: light-dark(#92400e, #fcd38b);
+    background: light-dark(#fef3c7, #392e20);
 }
 
 .prop-badge-aprovada,
 .prop-badge-aprovado,
 .prop-badge-aceita {
-    color: #166534;
-    background: #dcfce7;
+    color: light-dark(#166534, #86efac);
+    background: light-dark(#dcfce7, #14382d);
 }
 
 .prop-badge-recusada,
 .prop-badge-rejeitada,
 .prop-badge-cancelada {
-    color: #991b1b;
-    background: #fee2e2;
+    color: light-dark(#991b1b, #fda4af);
+    background: light-dark(#fee2e2, #3b2533);
 }
 
 .prop-vazio {
@@ -344,11 +344,9 @@
     .prop-filtros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .prop-linha {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-
     .prop-detalhes-col {
         justify-content: flex-start;
     }
@@ -359,45 +357,36 @@
         padding: 1rem;
         gap: 1.25rem;
     }
-
     .prop-cabecalho {
         align-items: flex-start;
     }
-
     .prop-acoes,
     .prop-acoes .prop-btn {
         width: 100%;
     }
-
     .prop-filtros {
         grid-template-columns: 1fr;
         padding: 1rem;
     }
-
     .prop-acoes-filtro {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .prop-acoes-filtro .prop-btn {
         width: 100%;
     }
-
     .prop-linha {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.9rem;
         padding: 1rem;
     }
-
     .prop-status-col,
     .prop-detalhes-col {
         grid-column: 1 / -1;
     }
-
     .prop-detalhes-col .prop-btn {
         width: 100%;
     }
-
     .prop-vazio {
         padding: 2.25rem 1rem;
     }

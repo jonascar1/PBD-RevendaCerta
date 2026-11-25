@@ -6,10 +6,9 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fb;
-    color: #1f2937;
+    background: light-dark(#f5f7fb, #121c2e);
+    color: light-dark(#1f2937, #eef4fc);
 }
-
 
 /* SIDEBAR */
 
@@ -26,7 +25,6 @@ body {
     left: 0;
 }
 
-
 /* LOGO */
 
 .logo {
@@ -39,9 +37,8 @@ body {
 }
 
 .logo span {
-    color: #2864e8;
+    color: light-dark(#2864e8, #78b5ff);
 }
-
 
 /* PERFIL */
 
@@ -72,10 +69,9 @@ body {
 }
 
 .perfil span {
-    color: #9ca3af;
+    color: light-dark(#9ca3af, #a0b1c8);
     font-size: 12px;
 }
-
 
 /* MENU */
 
@@ -88,20 +84,13 @@ body {
 .menu a,
 .menu-inferior a {
     text-decoration: none;
-
-    color: #d1d5db;
-
+    color: light-dark(#d1d5db, #bac9dc);
     padding: 12px;
-
     border-radius: 8px;
-
     font-size: 14px;
-
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     transition: 0.2s;
 }
 
@@ -111,7 +100,7 @@ body {
     gap: 12px;
     padding: 12px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
     text-decoration: none;
     font-size: 14px;
     transition: 0.2s;
@@ -132,7 +121,6 @@ body {
     color: white;
 }
 
-
 /* MENU INFERIOR */
 
 .menu-inferior {
@@ -152,7 +140,7 @@ body {
     gap: 12px;
     padding: 12px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: light-dark(#d1d5db, #bac9dc);
     text-decoration: none;
     font-size: 14px;
     transition: 0.2s;
@@ -162,7 +150,6 @@ body {
     background: #1f2937;
     color: white;
 }
-
 
 /* CONTEÚDO */
 
@@ -175,29 +162,22 @@ body {
 /* RESPONSIVO */
 
 @media (max-width: 900px) {
-
     .sidebar {
         width: 210px;
     }
-
     .conteudo {
         margin-left: 210px;
-
         padding: 25px;
     }
-
     .dados-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
 @media (max-width: 650px) {
-
     .sidebar {
         display: none;
     }
-
     .conteudo {
         margin-left: 0;
         width: 100%;
@@ -206,9 +186,10 @@ body {
 }
 
 /* Evita que conteúdos internos forcem a largura da página. */
-.conteudo { min-width: 0; }
 
-
+.conteudo {
+    min-width: 0;
+}
 
 /* ==============================
    SIDEBAR - TELAS BAIXAS
@@ -224,14 +205,24 @@ body {
 }
 
 /* Links de conteúdo sem sublinhado padrão do navegador */
-.conteudo a {text-decoration:none;}
-.conteudo a:hover {text-decoration:none;}
+
+.conteudo a {
+    text-decoration: none;
+}
+
+.conteudo a:hover {
+    text-decoration: none;
+}
 
 /* Remove sublinhado padrão de links dos cards e ações */
+
 .conteudo a,.conteudo a:visited,.conteudo a:hover,
-.conteudo a *,.conteudo a:hover * {text-decoration:none!important;}
+.conteudo a *,.conteudo a:hover * {
+    text-decoration: none!important;
+}
 
 /* Ajuste automatico logo/icone */
+
 .logo img, .logo-icone img {
     display: block;
     max-width: 100%;

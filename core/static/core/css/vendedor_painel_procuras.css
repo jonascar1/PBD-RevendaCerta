@@ -26,31 +26,31 @@
 }
 
 .proc-status-aberta {
-    background: #dbeafe;
-    color: #1e40af;
+    background: light-dark(#dbeafe, #1a3455);
+    color: light-dark(#1e40af, #78b5ff);
 }
 
 .proc-status-atendida {
-    background: #dcfce7;
-    color: #166534;
+    background: light-dark(#dcfce7, #14382d);
+    color: light-dark(#166534, #86efac);
 }
 
 .proc-status-vencida {
-    background: #fef3c7;
-    color: #92400e;
+    background: light-dark(#fef3c7, #392e20);
+    color: light-dark(#92400e, #fcd38b);
 }
 
 .proc-status-encerrada {
-    background: #e5e7eb;
-    color: #374151;
+    background: light-dark(#e5e7eb, #19263a);
+    color: light-dark(#374151, #eef4fc);
 }
 
 .proc-filtro select {
     height: 40px;
     padding: 0 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid light-dark(#cbd5e1, #29384e);
     border-radius: 8px;
-    background: #fff;
+    background: light-dark(#fff, #121c2e);
     font-size: 13px;
 }
 

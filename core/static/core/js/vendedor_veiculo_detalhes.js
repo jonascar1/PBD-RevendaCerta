@@ -8,7 +8,6 @@ function trocarFoto(url, elemento) {
     });
     elemento.classList.add("ativa");
 }
-
 // Galeria: substitui o antigo onclick inline.
 document.querySelectorAll("[data-foto-url]").forEach((elemento) => {
     elemento.addEventListener("click", () => trocarFoto(elemento.dataset.fotoUrl, elemento));

@@ -136,14 +136,11 @@ def calcular_carteira(vendedor=None, hoje=None):
         retorno_chegou = retorno is not None and retorno <= hoje
         contatado_mes = cliente_id in ids_contatados
 
-        # "Não quer agora": sai da fila até a data de retorno pedida.
+        # Respeita a data de retorno agendada, independentemente do resultado do contato.
         adiado = (
-            ultimo is not None
-            and ultimo.resultado == ContatoCarteira.Resultado.NAO_QUER_AGORA
-            and retorno is not None
+            retorno is not None
             and retorno > hoje
         )
-
         linhas.append(
             {
                 "cliente": dados["cliente"],

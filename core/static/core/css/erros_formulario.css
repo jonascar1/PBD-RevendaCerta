@@ -5,7 +5,7 @@ ul.errorlist {
 }
 
 ul.errorlist li {
-    color: #dc2626 !important;
+    color: light-dark(#dc2626, #fda4af) !important;
     font-size: 13px !important;
     font-weight: 500 !important;
     line-height: 1.35 !important;
@@ -14,7 +14,7 @@ ul.errorlist li {
 
 ul.errorlist li::before {
     content: "* " !important;
-    color: #dc2626 !important;
+    color: light-dark(#dc2626, #fda4af) !important;
     font-weight: 700 !important;
 }
 
@@ -25,7 +25,7 @@ ul.errorlist li::before {
 ul.errorlist.nonfield {
     margin: 0 0 16px !important;
     padding: 10px 12px !important;
-    background: #fef2f2 !important;
-    border: 1px solid #fecaca !important;
+    background: light-dark(#fef2f2, #3b2533) !important;
+    border: 1px solid light-dark(#fecaca, #70404f) !important;
     border-radius: 8px !important;
 }

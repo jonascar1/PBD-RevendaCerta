@@ -8,13 +8,13 @@
 .topo-detalhes h1 {
     font-size: 24px;
     font-weight: 700;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
     margin-bottom: 4px;
 }
 
 .topo-detalhes p {
     font-size: 14px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .topo-acoes {
@@ -35,13 +35,13 @@
 }
 
 .btn-voltar {
-    background-color: #f1f5f9;
-    color: #334155;
-    border: 1px solid #e2e8f0;
+    background-color: light-dark(#f1f5f9, #19263a);
+    color: light-dark(#334155, #eef4fc);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
 }
 
 .btn-voltar:hover {
-    background-color: #e2e8f0;
+    background-color: light-dark(#e2e8f0, #19263a);
 }
 
 .btn-editar {
@@ -60,8 +60,8 @@
 }
 
 .card-info {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
+    background-color: light-dark(#ffffff, #121c2e);
+    border: 1px solid light-dark(#e2e8f0, #29384e);
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -73,7 +73,7 @@
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid light-dark(#f1f5f9, #29384e);
 }
 
 .card-cabecalho h3 {
@@ -82,13 +82,13 @@
     gap: 8px;
     font-size: 16px;
     font-weight: 600;
-    color: #0f172a;
+    color: light-dark(#0f172a, #eef4fc);
 }
 
 .card-cabecalho h3 svg {
     width: 20px;
     height: 20px;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
 }
 
 .info-grid {
@@ -100,13 +100,13 @@
 .info-item span {
     display: block;
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     margin-bottom: 4px;
 }
 
 .info-item strong {
     font-size: 14px;
-    color: #1e293b;
+    color: light-dark(#1e293b, #eef4fc);
 }
 
 .tabela-responsive {
@@ -121,23 +121,23 @@
 }
 
 .tabela th {
-    background-color: #f8fafc;
-    color: #475569;
+    background-color: light-dark(#f8fafc, #121c2e);
+    color: light-dark(#475569, #a0b1c8);
     font-weight: 600;
     padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid light-dark(#e2e8f0, #29384e);
 }
 
 .tabela td {
     padding: 12px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid light-dark(#f1f5f9, #29384e);
+    color: light-dark(#334155, #eef4fc);
 }
 
 .sub-info {
     display: block;
     font-size: 12px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
 }
 
 .badge {
@@ -149,23 +149,23 @@
 }
 
 .status-ativo {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: light-dark(#dcfce7, #14382d);
+    color: light-dark(#166534, #86efac);
 }
 
 .status-inativo {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background-color: light-dark(#fee2e2, #3b2533);
+    color: light-dark(#991b1b, #fda4af);
 }
 
 .status-vendido, .status-entregue {
-    background-color: #dbeafe;
-    color: #1e40af;
+    background-color: light-dark(#dbeafe, #1a3455);
+    color: light-dark(#1e40af, #78b5ff);
 }
 
 .contador-badge {
-    background-color: #f1f5f9;
-    color: #475569;
+    background-color: light-dark(#f1f5f9, #19263a);
+    color: light-dark(#475569, #a0b1c8);
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 12px;
@@ -176,7 +176,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #2563eb;
+    color: light-dark(#2563eb, #78b5ff);
     text-decoration: none;
     font-weight: 500;
 }
@@ -187,27 +187,27 @@
 
 .sem-registros {
     font-size: 14px;
-    color: #64748b;
+    color: light-dark(#64748b, #a0b1c8);
     font-style: italic;
     margin: 8px 0;
 }
 
 .badge.status-aguardando {
-    background-color: var(--warning-bg, #fffbe6);
-    color: var(--warning-color, #d46b08);
-    border: 1px solid var(--warning-border, #ffe58f);
+    background-color: var(--warning-bg, light-dark(#fffbe6, #392e20));
+    color: var(--warning-color, light-dark(#d46b08, #fcd38b));
+    border: 1px solid var(--warning-border, light-dark(#ffe58f, #67502e));
 }
 
 .badge.status-ativa {
-    background-color: var(--success-bg, #f6ffed);
-    color: var(--success-color, #389e0d);
-    border: 1px solid var(--success-border, #b7eb8f);
+    background-color: var(--success-bg, light-dark(#f6ffed, #14382d));
+    color: var(--success-color, light-dark(#389e0d, #86efac));
+    border: 1px solid var(--success-border, light-dark(#b7eb8f, #2d5947));
 }
 
 .badge.status-cancelada {
-    background-color: var(--danger-bg, #fff1f0);
-    color: var(--danger-color, #cf1322);
-    border: 1px solid var(--danger-border, #ffa39e);
+    background-color: var(--danger-bg, light-dark(#fff1f0, #3b2533));
+    color: light-dark(var(--danger-color, #cf1322), #fda4af);
+    border: 1px solid var(--danger-border, light-dark(#ffa39e, #70404f));
 }
 
 .cliente-container,
@@ -230,18 +230,15 @@
         align-items: flex-start;
         gap: 16px;
     }
-
     .topo-acoes {
         width: 100%;
         flex-wrap: wrap;
     }
-
     .topo-acoes .btn-voltar,
     .topo-acoes .btn-editar {
         min-height: 44px;
         justify-content: center;
     }
-
     .card-cabecalho {
         flex-wrap: wrap;
         gap: 10px;
@@ -252,11 +249,9 @@
     .info-grid {
         grid-template-columns: minmax(0, 1fr);
     }
-
     .topo-acoes {
         flex-direction: column;
     }
-
     .topo-acoes .btn-voltar,
     .topo-acoes .btn-editar {
         width: 100%;
