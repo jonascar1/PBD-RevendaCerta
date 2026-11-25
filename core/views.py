@@ -10,10 +10,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Count, Max, ProtectedError, Q, Sum
+from django.db.models import Count, Exists, Max, OuterRef, ProtectedError, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST
 
 from .carteira import calcular_carteira, obter_configuracao_carteira
@@ -154,8 +155,12 @@ def _veiculos_disponiveis_para_procura():
 
 # Autenticação, Painel Geral e Vitrine Pública
 
+@never_cache
 def login_view(request):
     """Autentica o usuário e valida se o cadastro está ativo."""
+    if request.user.is_authenticated:
+        return redirect("painel")
+
     if request.method == "POST":
         form = LoginForm(request.POST)
 
@@ -177,6 +182,12 @@ def login_view(request):
         form = LoginForm()
 
     return render(request, "core/login.html", {"form": form})
+
+
+@never_cache
+def csrf_failure_view(request, reason=""):
+    """Apresenta uma resposta 403 sem expor detalhes internos do CSRF."""
+    return render(request, "core/csrf_failure.html", status=403)
 
 
 @login_required
@@ -231,7 +242,8 @@ def vitrine_view(request):
             "criado_em",
         )
         .prefetch_related("fotos")
-        .order_by("-criado_em")
+        .annotate(tem_fotos=Exists(FotoVeiculo.objects.filter(veiculo_id=OuterRef("pk"))))
+        .order_by("-tem_fotos", "-criado_em", "-pk")
     )
 
     if marca:
@@ -338,7 +350,10 @@ def explorar_view(request):
         "mais_antigos": ("criado_em", "pk"),
         "recentes": ("-criado_em", "-pk"),
     }
-    veiculos = veiculos.prefetch_related("fotos").order_by(
+    veiculos = veiculos.prefetch_related("fotos").annotate(
+        tem_fotos=Exists(FotoVeiculo.objects.filter(veiculo_id=OuterRef("pk")))
+    ).order_by(
+        "-tem_fotos",
         *ordenacoes.get(filtros["ordem"], ordenacoes["recentes"])
     )
     pagina = Paginator(veiculos, 12).get_page(request.GET.get("pagina"))

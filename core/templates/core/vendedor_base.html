@@ -5,6 +5,7 @@
 <html lang="pt-br" data-rc-theme-scope="panel" data-rc-theme-user="{{ request.user.pk|stringformat:'s' }}">
 
 <head>
+    <script src="{% static 'core/js/painel_navegacao_segura.js' %}?v=2"></script>
     <script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script>
 
     <meta charset="UTF-8">
@@ -28,7 +29,7 @@
     <link rel="stylesheet" href="{% static 'core/css/painel_ajustes_navegacao.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'core/css/painel_feedback.css' %}?v=3">
     <link rel="stylesheet" href="{% static 'core/css/painel_mobile_compacto.css' %}?v=4">
-    <link rel="stylesheet" href="{% static 'core/css/painel_controles.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'core/css/painel_controles.css' %}?v=3">
     <link rel="stylesheet" href="{% static 'core/css/painel_componentes.css' %}?v=rc-tipografia-2">
     <script defer src="{% static 'core/js/painel_combobox.js' %}?v=3"></script>
 </head>

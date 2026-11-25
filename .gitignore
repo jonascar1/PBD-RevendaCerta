@@ -5,3 +5,15 @@ expiracao.log
 
 # Script local de populacao do banco de demonstracao
 /core/management/commands/popular_demo.py
+
+# Python and deployment
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+staticfiles/
+*.backup
+*.dump
+*.sqlite3

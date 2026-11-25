@@ -3,3 +3,10 @@
     if (!window.lucide)
         b.textContent = 'Mostrar';
 } icons(); })();
+
+// Revalida o formulário restaurado pelo histórico do navegador.
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});

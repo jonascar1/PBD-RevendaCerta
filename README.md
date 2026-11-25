@@ -177,7 +177,7 @@ python manage.py runserver
 | Página | Endereço |
 |---|---|
 | Vitrine pública | http://127.0.0.1:8000/ |
-| Login da equipe | http://127.0.0.1:8000/accounts/login/ |
+| Login da equipe | http://127.0.0.1:8000/login/ |
 | Django Admin | http://127.0.0.1:8000/admin/ |
 
 Após o login, cada perfil é redirecionado ao seu painel: Gerente, Vendedor ou Administrativo.
