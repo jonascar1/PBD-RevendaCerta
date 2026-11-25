@@ -2474,6 +2474,9 @@ class Procura(models.Model):
     @classmethod
     def cruzar_com_veiculo(cls, veiculo):
         """Gera avisos para vendedores cujas procuras abertas combinam com o veículo."""
+        if veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+            return 0
+
         cls.encerrar_vencidas()
 
         criados = 0

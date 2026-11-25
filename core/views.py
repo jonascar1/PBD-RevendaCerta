@@ -394,8 +394,12 @@ def painel_vendedor_view(request):
     from .dashboard_metrics import seller_metrics
     expirar_reservas_vencidas()
     dados = get_object_or_404(PerfilVendedor, usuario=request.user)
+    avisos_procura = AvisoProcura.objects.filter(
+        vendedor=request.user, lido=False,
+    ).select_related("procura", "procura__cliente", "veiculo")
     return render(request, "core/vendedor_painel_inicio.html", {
         "dados": dados, "dashboard": seller_metrics(request.user),
+        "avisos_procura": avisos_procura,
     })
 
 

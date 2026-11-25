@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="{% static 'core/css/gerente_paginas.css' %}?v=rc-gp-2">
     <link rel="stylesheet" href="{% static 'core/css/painel_ajustes_navegacao.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'core/css/painel_feedback.css' %}?v=2">
-    <link rel="stylesheet" href="{% static 'core/css/painel_mobile_compacto.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'core/css/painel_mobile_compacto.css' %}?v=4">
 </head>
 
 <body class="rc-panel-body{% if request.resolver_match.url_name == 'veiculos' or request.resolver_match.url_name == 'negociacoes_gerente' or request.resolver_match.url_name == 'margens' or request.resolver_match.url_name == 'relatorios_gerente' or request.resolver_match.url_name == 'documentacao_pendente' or request.resolver_match.url_name == 'carteira_gerente' or request.resolver_match.url_name == 'procuras_gerente' or request.resolver_match.url_name == 'vendedores' %} rc-gp{% endif %}{% if request.resolver_match.url_name == 'margens' %} rc-gp-margens{% endif %}" data-pref-user="{{ request.user.pk|stringformat:'s' }}">

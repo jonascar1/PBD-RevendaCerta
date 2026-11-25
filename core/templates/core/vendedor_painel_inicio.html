@@ -1,7 +1,7 @@
 {% extends 'core/vendedor_base.html' %}
 {% load static i18n %}
 {% block title %}Painel do Vendedor | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc4-a2ce074a721e">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc4-a2ce074a721e"><link rel="stylesheet" href="{% static 'core/css/avisos_procura_dashboard.css' %}?v=1">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
     <header class="rd-intro"><small>PAINEL DO VENDEDOR</small>
@@ -9,6 +9,30 @@
         <p>Suas vendas de {% language "pt-br" %}{% now "F" %}{% endlanguage %}, sua meta e os carros que merecem atenção agora.</p>
     </header>
 {% include "core/partials/painel_mensagens.html" %}
+    {% if avisos_procura %}
+    <section class="rd-card rd-avisos" aria-labelledby="rd-avisos-titulo">
+        <header>
+            <div><h2 id="rd-avisos-titulo">Novos veículos compatíveis</h2>
+                <p>Veículos liberados que correspondem às suas procuras.</p></div>
+            <span class="rd-aviso-contagem">{{ avisos_procura|length }} pendente(s)</span>
+        </header>
+        {% for aviso in avisos_procura %}
+        <article class="rd-aviso-item">
+            <div class="rd-aviso-texto">
+                <strong>{{ aviso.veiculo }}</strong>
+                <p>Procura de {{ aviso.procura.cliente }} · {{ aviso.veiculo.get_situacao_display }}</p>
+            </div>
+            <div class="rd-aviso-acoes">
+                <a href="{% url 'detalhes_veiculo_vendedor' aviso.veiculo_id %}">Ver veículo</a>
+                <form method="post" action="{% url 'marcar_aviso_procura_lido' aviso.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Marcar como lido</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% endif %}
     <div id="rd-kpis" class="rd-grid">
     </div>
     <div class="rd-grid rd-main">

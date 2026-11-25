@@ -2,7 +2,7 @@
 @media (max-width: 900px) {
     .rc-panel-body main:is(.conteudo,.main-content) { box-sizing: border-box; padding: 12px !important; }
     .rc-panel-body main > *, .rc-panel-body main :is(.card,.card-info,.cart-painel,.prop-card,.ao-card,.rd-card,.ra-card,.neg-section,.rc-consulta-card) { min-width: 0; max-width: 100%; box-sizing: border-box; }
-    .rc-panel-body .rc-mobile-toggle { min-height: 44px; padding: 8px 12px; font-size: 14px; }
+    .rc-panel-body .rc-mobile-toggle { min-height: 60px; padding: 12px 16px; font-size: 16px; }
     .rc-panel-body .rc-topbar { padding: 4px 0 10px; margin-bottom: 12px; gap: 6px; }
     .rc-panel-body .rc-top-actions { margin-left: auto; }
     .rc-panel-body .rc-store-preview { padding: 6px 9px; min-height: 36px; }

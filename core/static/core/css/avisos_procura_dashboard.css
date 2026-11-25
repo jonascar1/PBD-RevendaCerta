@@ -1,0 +1,16 @@
+/* Avisos de procura no dashboard do vendedor. */
+.rc-dashboard .rd-avisos { margin-bottom: 20px; }
+.rc-dashboard .rd-aviso-contagem { color: light-dark(#1d4ed8,#93c5fd); font-size: 13px; font-weight: 700; }
+.rc-dashboard .rd-aviso-item { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.rc-dashboard .rd-aviso-texto { min-width: 0; overflow-wrap: anywhere; flex: 1 1 220px; }
+.rc-dashboard .rd-aviso-acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; max-width: 100%; }
+.rc-dashboard .rd-aviso-acoes form { margin: 0; max-width: 100%; }
+.rc-dashboard .rd-aviso-acoes :is(a,button) { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 8px 12px; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; text-align: center; }
+.rc-dashboard .rd-aviso-acoes a { background: #2563eb; color: #fff; border: 1px solid #2563eb; }
+.rc-dashboard .rd-aviso-acoes button { background: light-dark(#fff,#121c2e); color: inherit; border: 1px solid var(--border); }
+.rc-dashboard .rd-aviso-acoes :is(a,button):focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+@media (max-width: 680px) {
+    .rc-dashboard .rd-avisos { padding: 12px; margin-bottom: 12px; }
+    .rc-dashboard .rd-aviso-texto { flex-basis: 100%; }
+    .rc-dashboard .rd-aviso-acoes { width: 100%; }
+}
