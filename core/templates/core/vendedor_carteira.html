@@ -121,7 +121,7 @@
                     <tr>
                         <th>Cliente</th>
                         <th>Último contato</th>
-                        <th>Canal</th>
+                        <th>Canal / responsável</th>
                         <th>Voltar a falar em</th>
                     </tr>
                 </thead>
@@ -134,7 +134,7 @@
                                 </a>
                             </td>
                             <td>{{ item.ultimo_contato.realizado_em|date:"d/m/Y" }}</td>
-                            <td>{{ item.ultimo_contato.get_canal_display }}</td>
+                            <td>{{ item.ultimo_contato.get_canal_display }} · {{ item.ultimo_contato.vendedor.get_full_name|default:item.ultimo_contato.vendedor.username }}</td>
                             <td>
                                 {% if item.retorno %}
                                     {{ item.retorno|date:"d/m/Y" }}

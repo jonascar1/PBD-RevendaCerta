@@ -86,7 +86,7 @@
         </div>
 
         <form method="get" class="neg-filter">
-            <label for="filtro-situacao">Situação</label>
+            <label for="filtro-situacao">Situação / aprovação</label>
 
             <select name="situacao" id="filtro-situacao" data-auto-submit="true">
                 <option value="">Todas as situações</option>
@@ -110,7 +110,7 @@
                     <th>Veículo</th>
                     <th>Vendedor</th>
                     <th>Valor oferecido</th>
-                    <th>Situação</th>
+                    <th>Aprovação</th>
                     <th>Ação</th>
             </tr>
         </thead>
@@ -119,13 +119,15 @@
                 {% for proposta in propostas %}
             <tr>
                     <td>
-                        <strong>#{{ proposta.pk }}</strong>
+                        <strong><span class="rc-record-id">Nº {{ proposta.pk }}</span></strong>
                         <small>{{ proposta.criada_em|date:"d/m/Y" }}</small>
-                                       <td>
+                    </td>
+                    <td>
                         <strong>
-                            <a class="rc-inline-link" href="{% url 'historico_cliente' proposta.cliente_id %}?origem=negociacoes">{{ proposta.cliente }}</a>
+                            <a class="rc-inline-link rc-client-link" href="{% url 'historico_cliente' proposta.cliente_id %}?origem=negociacoes">{{ proposta.cliente }}</a>
                         </strong>
                     </td>
+                    <td>
                         <strong>
                             {{ proposta.veiculo.marca }}
                             {{ proposta.veiculo.modelo }}
@@ -160,7 +162,7 @@
                                 <i data-lucide="arrow-right"></i>
                             </a>
                         {% else %}
-                            <span class="neg-sem-acao">Sem ação pendente</span>
+                            <a class="neg-action" href="{% url 'decidir_proposta' proposta.pk %}">Detalhes <i data-lucide="eye"></i></a>
                         {% endif %}
                     </td>
             </tr>

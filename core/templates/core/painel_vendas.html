@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load static %}
 {% block title %}Vendas | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-font-1">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-polimento-1">{% endblock %}
 {% block content %}
 <section class="rc-consulta">
     <header class="rc-consulta-header">
@@ -32,12 +32,12 @@
                 <tbody>
                 {% for venda in pagina %}
                 <tr>
-                    <td><strong>#{{ venda.pk }}</strong><small>{{ venda.data|date:"d/m/Y" }}</small></td>
+                    <td><strong><span class="rc-record-id">Nº {{ venda.pk }}</span></strong><small>{{ venda.data|date:"d/m/Y" }}</small></td>
                     <td>{{ venda.cliente.nome_exibicao }}</td>
                     <td><strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</strong><small>{{ venda.veiculo.placa }}</small></td>
                     <td class="rc-consulta-valor">R$ {{ venda.valor_venda|floatformat:2 }}</td>
                     <td><span class="rc-consulta-status {% if venda.esta_fechada %}rc-ok{% else %}rc-danger{% endif %}">{{ venda.get_situacao_display }}</span>{% if venda.entrega %}<small>Entregue</small>{% endif %}</td>
-                    <td>{% for etapa in venda.etapas_documentacao.all %}<div class="rc-consulta-etapa">{{ etapa.get_tipo_display }} <span class="rc-consulta-status {% if etapa.situacao == 'CONCLUIDA' %}rc-ok{% else %}rc-pending{% endif %}">{{ etapa.get_situacao_display }}</span></div>{% empty %}—{% endfor %}</td>
+                    <td>{% for etapa in venda.etapas_documentacao.all %}<div class="rc-consulta-etapa"><span>{{ etapa.get_tipo_display }}</span> <span class="rc-consulta-status {% if etapa.situacao == 'CONCLUIDA' %}rc-ok{% else %}rc-pending{% endif %}">{{ etapa.get_situacao_display }}</span></div>{% empty %}—{% endfor %}</td>
                     <td><a class="rc-consulta-btn rc-action" href="{% url 'detalhes_venda' venda.pk %}">Ver detalhes <i data-lucide="chevron-right"></i></a></td>
                 </tr>
                 {% empty %}

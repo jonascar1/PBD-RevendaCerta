@@ -1,12 +1,12 @@
 {% extends base_template %}
 {% load static %}
 
-{% block title %}Venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
+{% block title %}Venda Nº {{ venda.pk }} | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_venda.css' %}?v=rc4-84c85f416331">
-<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-font-1">
+<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-polimento-1">
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 
 <header class="topo">
     <div>
-        <h1>Venda #{{ venda.pk }}</h1>
+        <h1>Venda Nº {{ venda.pk }}</h1>
         <p>
             {{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} ·
             {{ venda.cliente.nome_exibicao }}
@@ -66,7 +66,7 @@
                 </div>
                 <div class="info-item">
                     <span>Proposta de origem</span>
-                    <strong>#{{ venda.proposta_id }}</strong>
+                    <strong><span class="rc-record-id">Nº {{ venda.proposta_id }}</span></strong>
                 </div>
             </div>
         </div>

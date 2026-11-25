@@ -1,12 +1,45 @@
 {% extends 'core/gerente_base.html' %}
 {% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/metas.css' %}?v=rc4-6394b06689ad">{% endblock %}
-{% block content %}<section class="meta-panel"><a class="rc-action-secondary" href="{% url 'painel_gerente' %}">← Voltar ao painel</a>
-<h1>Configurar metas mensais</h1>
-<form method="get"><label for="mes">Mês de referência</label><input id="mes" name="mes" type="month" value="{{ mes }}" required><button>Carregar mês</button>
-</form>
-<form method="post" action="?mes={{ mes }}">{% csrf_token %}<p>Deixe a meta individual em branco para utilizar a meta padrão.</p>{{ form.as_p }}<button type="submit">Salvar metas</button>
-</form>
-<h2>Histórico de alterações</h2>{% for h in historico %}<details><summary>{{ h.criado_em|date:'d/m/Y H:i' }} — {{ h.gerente }}</summary>
-<p>Antes: {{ h.anterior }}</p>
-<p>Depois: {{ h.novo }}</p></details>{% empty %}<p>Nenhuma alteração registrada.</p>{% endfor %}</section>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/metas.css' %}?v=2">{% endblock %}
+{% block content %}
+<section class="meta-panel">
+    {% include 'core/partials/painel_mensagens.html' %}
+    <header class="meta-topo">
+        <div><h1>Configurar metas mensais</h1><p>Defina os objetivos de vendas da loja e da equipe.</p></div>
+        <a class="rc-action-secondary" href="{% url 'painel_gerente' %}">← Voltar ao painel</a>
+    </header>
+    <form method="get" class="meta-card meta-mes">
+        <div><label for="mes">Mês de referência</label><input id="mes" name="mes" type="month" value="{{ mes }}" required></div>
+        <button type="submit">Carregar mês</button>
+    </form>
+    <form method="post" action="?mes={{ mes }}" class="meta-card">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <h2>Metas gerais</h2>
+        <div class="meta-grid">
+            <div>{{ form.loja.label_tag }}{{ form.loja }}{{ form.loja.errors }}</div>
+            <div>{{ form.padrao.label_tag }}{{ form.padrao }}{{ form.padrao.errors }}</div>
+        </div>
+        <h2>Metas individuais</h2>
+        <p>Deixe o campo em branco para utilizar a meta padrão por vendedor.</p>
+        {% for campo in form %}
+            {% if campo.name != 'loja' and campo.name != 'padrao' %}
+                <div class="meta-vendedor"><div>{{ campo.label_tag }}{{ campo.errors }}</div>{{ campo }}</div>
+            {% endif %}
+        {% endfor %}
+        <div class="meta-acoes"><button type="submit">Salvar metas</button></div>
+    </form>
+    <section class="meta-card">
+        <h2>Histórico de alterações</h2>
+        {% for h in historico %}
+            <details><summary>{{ h.criado_em|date:'d/m/Y H:i' }} — {{ h.gerente }}</summary>
+                <div class="meta-historico">
+                    <p>Meta da loja: {{ h.anterior.loja|default_if_none:'—'|default:'—' }} → {{ h.novo.loja }}</p>
+                    <p>Meta padrão: {{ h.anterior.padrao|default:'—' }} → {{ h.novo.padrao }}</p>
+                    {% for linha in h.mudancas_individuais %}<p>{{ linha.nome }}: {{ linha.antes }} → {{ linha.depois }}</p>{% endfor %}
+                </div>
+            </details>
+        {% empty %}<p>Nenhuma alteração registrada.</p>{% endfor %}
+    </section>
+</section>
+{% endblock %}

@@ -7,7 +7,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
 <link rel="stylesheet" href="{% static 'core/css/gerente_historico_cliente.css' %}?v=rc4-5c9836a3d498">
-<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-font-1">
+<link rel="stylesheet" href="{% static 'core/css/consultas_painel.css' %}?v=rc-polimento-1">
 {% endblock %}
 
 {% block content %}
@@ -24,7 +24,7 @@
     </div>
 
     <div class="topo-acoes">
-        <a href="{% if request.GET.origem == 'veiculos' %}{% url 'veiculos' %}{% elif request.GET.origem == 'negociacoes' %}{% url 'negociacoes_gerente' %}{% elif request.GET.origem == 'procuras' %}{% url 'procuras_gerente' %}{% elif request.GET.origem == 'vendas' %}{% url 'vendas_painel' %}{% else %}{% url 'clientes_gerente' %}{% endif %}" class="btn-voltar">
+        <a href="{% if request.GET.origem == 'veiculos' %}{% url 'veiculos' %}{% elif request.GET.origem == 'negociacoes' %}{% url 'negociacoes_gerente' %}{% elif request.GET.origem == 'procuras' %}{% url 'procuras_gerente' %}{% elif request.GET.origem == 'carteira' %}{% url 'carteira_gerente' %}{% elif request.GET.origem == 'vendas' %}{% url 'vendas_painel' %}{% else %}{% url 'clientes_gerente' %}{% endif %}" class="btn-voltar">
             <i data-lucide="chevron-left"></i> Voltar
         </a>
     </div>
@@ -96,7 +96,7 @@
                     </td>
                     <td>{{ venda.data|date:"d/m/Y" }}</td>
                     <td>R$ {{ venda.valor_venda|floatformat:2 }}</td>
-                    <td><a href="{% url 'detalhes_venda' venda.pk %}">#{{ venda.pk }}</a></td>
+                    <td><a href="{% url 'detalhes_venda' venda.pk %}"><span class="rc-record-id">Nº {{ venda.pk }}</span></a></td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="4" class="hist-vazio">Este cliente ainda não comprou nenhum veículo.</td>
@@ -126,12 +126,12 @@
                     <td>
                         <strong>{{ troca.troca_descricao|default:"—" }}</strong>
                         {% if troca.avaliacao_troca %}
-                            <small>Avaliação #{{ troca.avaliacao_troca.pk }}</small>
+                            <small>Avaliação Nº {{ troca.avaliacao_troca.pk }}</small>
                         {% endif %}
                     </td>
                     <td>R$ {{ troca.valor|floatformat:2 }}</td>
                     <td>{{ troca.venda.data|date:"d/m/Y" }}</td>
-                    <td><a href="{% url 'detalhes_venda' troca.venda_id %}">#{{ troca.venda_id }}</a></td>
+                    <td><a href="{% url 'detalhes_venda' troca.venda_id %}"><span class="rc-record-id">Nº {{ troca.venda_id }}</span></a></td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="4" class="hist-vazio">Este cliente nunca entregou um veículo na troca.</td>
@@ -160,7 +160,7 @@
                 {% for item in resumo.nao_fechadas %}
                 <tr>
                     <td>
-                        <strong>#{{ item.proposta.pk }}</strong>
+                        <strong><span class="rc-record-id">Nº {{ item.proposta.pk }}</span></strong>
                         <small>{{ item.proposta.data|date:"d/m/Y" }}</small>
                     </td>
                     <td>{{ item.proposta.veiculo.marca }} {{ item.proposta.veiculo.modelo }}</td>
@@ -190,7 +190,7 @@
             <tbody>
                 {% for proposta in resumo.em_andamento %}
                 <tr>
-                    <td><strong>#{{ proposta.pk }}</strong><small>{{ proposta.data|date:"d/m/Y" }}</small></td>
+                    <td><strong><span class="rc-record-id">Nº {{ proposta.pk }}</span></strong><small>{{ proposta.data|date:"d/m/Y" }}</small></td>
                     <td>{{ proposta.veiculo.marca }} {{ proposta.veiculo.modelo }}</td>
                     <td>R$ {{ proposta.valor_oferecido|floatformat:2 }}</td>
                     <td>{{ proposta.get_situacao_display }}</td>

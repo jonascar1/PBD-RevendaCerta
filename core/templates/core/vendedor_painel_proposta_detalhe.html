@@ -55,7 +55,7 @@
                 </div>
                 <div class="prop-dado"><span>Situação</span><strong><span class="prop-badge prop-badge-{{ proposta.situacao|lower }}">{{ proposta.get_situacao_display|default:proposta.situacao }}</span></strong>
                 </div>
-                <div class="prop-dado"><span>Identificador</span><strong>#{{ proposta.pk }}</strong>
+                <div class="prop-dado"><span>Identificador</span><strong><span class="rc-record-id">Nº {{ proposta.pk }}</span></strong>
                 </div>
                 {% if proposta.contato_origem %}
                 <div class="prop-dado">
@@ -161,7 +161,7 @@
         <div class="prop-dados-grid">
             <div class="prop-dado">
                         <span>Venda</span>
-                        <strong>#{{ venda.pk }}</strong>
+                        <strong><span class="rc-record-id">Nº {{ venda.pk }}</span></strong>
             </div>
             <div class="prop-dado">
                         <span>Data</span>
@@ -276,6 +276,14 @@
 
 <section class="prop-card prop-card-p prop-span-total">
     <h2 class="prop-card-titulo">Composição do pagamento</h2>
+    {% if composicao_pendente and proposta.status_aprovacao == "APROVADA" and proposta.situacao != "CANCELADA" and not venda %}
+    <div class="rc-feedback warning" role="alert">
+        <strong>Composição de pagamento pendente</strong>
+        <p>Valor negociado: R$ {{ proposta.valor_oferecido|floatformat:2 }} · Total informado: R$ {{ proposta.soma_composicao|floatformat:2 }}.</p>
+        <p>Diferença (valor negociado menos composição): R$ {{ proposta.diferenca|floatformat:2 }}. Ajuste os pagamentos antes de fechar a venda.</p>
+        <a class="rc-inline-link" href="{% url 'editar_proposta' proposta.pk %}">Ajustar composição</a>
+    </div>
+    {% endif %}
     <div class="prop-tabela-wrap">
         <table class="prop-tabela">
             <thead>

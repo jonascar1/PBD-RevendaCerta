@@ -3,6 +3,16 @@
     const d = JSON.parse(document.getElementById('rd-data').textContent), $ = id => document.getElementById('rd-' + id), k = d.kpis, blue = '#2563eb', teal = '#08bfb5', colors = ['#2563eb', '#08bfb5', '#f4af2c', '#fa5952', '#8b5cf6', '#38bdf8', '#64748b'], bands = ['#22c55e', '#eab308', '#f97316', '#ef4444'], reduced = matchMedia('(prefers-reduced-motion: reduce)').matches, money = n => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), compact = n => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 1 }), esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])), sum = (a, f) => a.reduce((s, x) => s + f(x), 0), empty = '<div class="rd-empty">Sem registros no período.</div>', bar = (v, c) => `<div class="rd-track"><div class="rd-bar" style="width:${Math.max(0, Math.min(100, v))}%;background:${c}"></div></div>`;
     const cards = [['receipt', 'Minhas vendas no mês', k.sales, `${k.previous_sales} no mês passado`, k.sales_delta, blue, 'unidades'], ['badge-dollar-sign', 'Meu faturamento no mês', k.revenue, `${compact(k.previous_revenue)} no mês passado`, k.revenue_delta, teal, 'faturamento'], ['handshake', 'Propostas em aberto', k.open, 'Clientes aguardando retorno', null, '#f59e0b'], ['medal', 'Posição na equipe', k.position, `de ${k.team_size} vendedores neste mês`, null, '#38bdf8']];
     $('kpis').innerHTML = cards.map(([icon, label, value, hint, delta, color, spark], i) => `<section class="rd-card rd-3 rd-kpi" style="--accent:${color};animation-delay:${i * 55}ms"><span class="rd-icon"><i data-lucide="${icon}"></i></span>${delta === null ? '' : `<span class="rd-delta" style="${delta < 0 ? 'color:#dc2626;background:#fef2f2' : ''}">${delta >= 0 ? '↗' : '↘'} ${Math.abs(delta)}%</span>`}<p>${label}</p><strong data-count="${value}" data-rank="${i === 3}" data-money="${i === 1}">${i === 1 ? compact(value) : i === 3 ? value + 'º' : value}</strong><p>${hint}</p>${spark ? `<div class="rd-spark"><canvas id="rd-spark${i}"></canvas></div>` : ''}</section>`).join('');
+    $('kpis').querySelectorAll('.rd-kpi').forEach((card, i) => {
+        const href = $('kpis').getAttribute('data-link-' + i);
+        if (!href) return;
+        const link = document.createElement('a');
+        link.href = href;
+        link.className = card.className + ' rc-kpi-link';
+        link.style.cssText = card.style.cssText;
+        while (card.firstChild) link.appendChild(card.firstChild);
+        card.replaceWith(link);
+    });
     if (window.lucide)
         lucide.createIcons();
     if (!reduced)

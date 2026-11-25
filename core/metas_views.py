@@ -44,4 +44,13 @@ def configurar_metas(request):
             HistoricoMeta.objects.create(mensal=m,gerente=request.user,anterior=anterior,novo=snapshot())
         messages.success(request,"Metas salvas com sucesso.")
         return redirect("painel_gerente")
-    return render(request,"core/configurar_metas.html",{"form":form,"mes":mes.strftime("%Y-%m"),"historico":HistoricoMeta.objects.filter(mensal=meta).select_related("gerente").order_by("-criado_em") if meta else []})
+    historico = list(HistoricoMeta.objects.filter(mensal=meta).select_related("gerente").order_by("-criado_em")) if meta else []
+    nomes = {str(v.pk): v.get_full_name() or v.username for v in Usuario.objects.filter(perfil="VENDEDOR")}
+    for h in historico:
+        antes = h.anterior.get("individuais", {})
+        depois = h.novo.get("individuais", {})
+        h.mudancas_individuais = [
+            {"nome": nomes.get(k, f"Vendedor #{k}"), "antes": antes.get(k, "Padrão"), "depois": depois.get(k, "Padrão")}
+            for k in sorted(antes.keys() | depois.keys()) if antes.get(k) != depois.get(k)
+        ]
+    return render(request, "core/configurar_metas.html", {"form": form, "mes": mes.strftime("%Y-%m"), "historico": historico})

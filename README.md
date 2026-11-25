@@ -1,30 +1,76 @@
-# PBD — Venda de Veículos
+<div align="center">
 
-Sistema de gestão para revenda de veículos: perfis de usuário (gerente, vendedor, administrativo), cadastro de veículos, reservas, propostas, margem e comissão.
+# Revenda Certa
 
-## Pré-requisitos
+**Sistema web de gestão de revenda de veículos com vitrine pública**
 
-Antes de começar, tenha instalado na sua máquina:
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-- **Python 3.12+** — confira rodando `python3 --version`
-- **PostgreSQL** (versão 14 ou superior) — confira rodando `psql --version`
-- **Git**
-
-Se algum desses não estiver instalado, procure "como instalar [nome] no [seu sistema operacional]" antes de continuar.
+</div>
 
 ---
 
-## Passo 1 — Clonar o repositório
+## Sobre o projeto
+
+Este projeto consiste em um sistema web completo para gestão de revenda de veículos, desenvolvido para a disciplina de **Projeto de Banco de Dados** da **UFRPE (UAST)**, sob orientação do professor **Heldon José**, utilizando Python, Django, HTML, CSS e JavaScript.
+
+A proposta acompanha o ciclo de vida de cada veículo desde a aquisição até a entrega, controlando custos, despesas, avaliação de veículos na troca, reservas com prazo, fila de espera, propostas, contrapropostas e alçada de aprovação de descontos, até o cálculo da margem real da operação e das comissões. Além do fechamento da venda, o sistema mantém o cliente em uma carteira de relacionamento voltada à fidelização e ao retorno ao longo do tempo.
+
+A solução reúne a vitrine pública e a área de gestão em uma aplicação conectada ao mesmo banco de dados. Ambos os integrantes colaboraram em todas as etapas do desenvolvimento.
+
+## Autores
+
+Um sistema web desenvolvido por **Jonas Carneiro** e **Dowglas Hademar** na disciplina de Projeto de Banco de Dados da UFRPE (UAST), sob orientação do professor **Heldon José**.
+
+---
+
+## Funcionalidades
+
+- **Vitrine pública:** catálogo com filtros, galeria de fotos e contato direto pelo WhatsApp.
+- **Estoque:** cadastro de veículos com origem (comprado, troca ou consignado), fotos e histórico completo.
+- **Reservas e fila de espera:** reservas com prazo de expiração e promoção automática da fila.
+- **Propostas:** composição de pagamento, alçada de desconto por veículo, aprovação, recusa e contraproposta do gerente.
+- **Vendas:** fechamento atômico, contrato imprimível, documentação pós-venda e checklist de entrega.
+- **Financeiro:** despesas por veículo, margem real recalculada e comissão dos vendedores.
+- **Carteira de clientes e procuras:** relacionamento para recompra e avisos de veículos compatíveis.
+- **Relatórios:** exportação em Excel, PDF e CSV.
+- **Perfis de acesso:** Gerente, Vendedor e Administrativo, com tema claro e escuro.
+
+---
+
+## Pré-requisitos
+
+| Ferramenta | Versão recomendada |
+|---|---|
+| [Python](https://www.python.org/downloads/) | 3.10 ou superior |
+| [PostgreSQL](https://www.postgresql.org/download/) | 13 ou superior |
+| [Git](https://git-scm.com/downloads) | qualquer versão recente |
+
+> O projeto carrega Lucide, Chart.js, jsPDF e Google Fonts por CDN. Mantenha a conexão com a internet ativa ao usá-lo.
+
+---
+
+## Como executar
+
+### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/jonascar1/PBD-Vendadeveiculos.git
-cd PBD-Vendadeveiculos
-git checkout development
+git clone <URL-DO-REPOSITORIO>
+cd <NOME-DA-PASTA>
 ```
 
-## Passo 2 — Criar e ativar o ambiente virtual
+### 2. Crie e ative o ambiente virtual
 
-O ambiente virtual isola as dependências deste projeto do resto do seu sistema.
+**Windows (PowerShell):**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
 **Linux / macOS:**
 ```bash
@@ -32,123 +78,151 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-**Windows (PowerShell):**
-```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
-```
-
-Você vai saber que funcionou porque o terminal passa a mostrar `(venv)` no começo da linha.
-
-## Passo 3 — Instalar as dependências
-
-Com o ambiente virtual ativo, rode:
+### 3. Instale as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Isso instala automaticamente o Django e tudo mais que o projeto precisa, nas versões corretas — sem precisar instalar um por um.
+### 4. Configure as variáveis de ambiente
 
-## Passo 4 — Configurar o banco de dados PostgreSQL
+Credenciais e chaves secretas **não ficam no código**. Elas ficam em um arquivo `.env` local, que nunca é versionado.
 
-Entre no PostgreSQL como superusuário:
+Copie o modelo:
+
+**Windows:**
+```bash
+copy .env.example .env
+```
+
+**Linux / macOS:**
+```bash
+cp .env.example .env
+```
+
+Gere uma chave secreta nova:
 
 ```bash
-sudo -u postgres psql
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
-*(no Windows, abra o "SQL Shell (psql)" que veio com a instalação)*
 
-Dentro do `psql`, rode (troque a senha se quiser, mas anote o que usar):
+Abra o `.env` e preencha os valores:
+
+```env
+DJANGO_SECRET_KEY=cole-aqui-a-chave-gerada
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+
+DB_NAME=revendacerta
+DB_USER=revendacerta_user
+DB_PASSWORD=escolha-uma-senha-forte
+DB_HOST=localhost
+DB_PORT=5432
+
+WHATSAPP_NUMERO=5587999999999
+```
+
+> `DJANGO_DEBUG=True` é necessário para rodar localmente, pois é o que faz o servidor de desenvolvimento servir arquivos estáticos e as fotos enviadas. Nunca use `True` em produção.
+
+### 5. Crie o banco de dados no PostgreSQL
+
+Abra o `psql` (ou o pgAdmin) e execute, usando **os mesmos valores** do seu `.env`:
 
 ```sql
-CREATE DATABASE bdveiculos;
-CREATE USER devdj WITH PASSWORD 'dj123';
-GRANT ALL PRIVILEGES ON DATABASE bdveiculos TO devdj;
-ALTER DATABASE bdveiculos OWNER TO devdj;
-
-\c bdveiculos
-
-ALTER SCHEMA public OWNER TO devdj;
-
-\q
+CREATE USER revendacerta_user WITH PASSWORD 'escolha-uma-senha-forte';
+CREATE DATABASE revendacerta OWNER revendacerta_user;
 ```
 
-> Se você quiser usar outro nome de banco, usuário ou senha, tudo bem — só precisa deixar consistente com o próximo passo.
-
-## Passo 5 — Configurar as variáveis do projeto
-
-Na raiz do projeto, existe um arquivo `config/settings.py`. Confira se a seção `DATABASES` bate com o que você criou no banco:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bdveiculos',
-        'USER': 'devdj',
-        'PASSWORD': 'dj123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
-
-## Passo 6 — Rodar as migrations
-
-Isso cria todas as tabelas no banco de dados a partir dos models do projeto:
+### 6. Aplique as migrações
 
 ```bash
 python manage.py migrate
 ```
 
-Se der erro de permissão (`permission denied for schema public`), volte ao Passo 4 e confirme que rodou o `ALTER SCHEMA public OWNER TO devdj;` **depois** do `\c bdveiculos` (é fácil esquecer essa troca de banco no meio do processo).
+### 7. Crie o usuário Gerente
 
-## Passo 7 — Criar seu usuário administrador
+O sistema usa um modelo de usuário próprio, com perfil obrigatório. Por isso, não use `createsuperuser`. Abra o shell do Django:
 
 ```bash
-python manage.py createsuperuser
+python manage.py shell
 ```
 
-Preencha usuário, e-mail (pode deixar em branco) e senha quando pedido.
+E execute:
 
-## Passo 8 — Rodar o servidor
+```python
+from core.models import Usuario
+
+Usuario.objects.create_user(
+    username="gerente",
+    password="defina-uma-senha-forte",
+    first_name="Gerente",
+    perfil="GERENTE",
+)
+```
+
+Para criar também um usuário **Administrativo**, repita o comando com `perfil="ADMINISTRATIVO"`.
+
+> Os vendedores são cadastrados pelo próprio gerente no painel, em **Vendedores > Cadastrar vendedor**.
+
+### 8. Inicie o servidor
 
 ```bash
 python manage.py runserver
 ```
 
-Abra o navegador em: **http://127.0.0.1:8000/login/**
+---
 
-Se a tela de login aparecer, está tudo funcionando.
+## Acessos
+
+| Página | Endereço |
+|---|---|
+| Vitrine pública | http://127.0.0.1:8000/ |
+| Login da equipe | http://127.0.0.1:8000/accounts/login/ |
+| Django Admin | http://127.0.0.1:8000/admin/ |
+
+Após o login, cada perfil é redirecionado ao seu painel: Gerente, Vendedor ou Administrativo.
 
 ---
 
-## Estrutura do projeto
+## Expiração de reservas (opcional)
+
+As reservas vencidas são encerradas automaticamente ao navegar pelo sistema. Para processá-las também por comando, por exemplo em um agendador de tarefas, execute:
+
+```bash
+python manage.py expirar_reservas
+```
+
+---
+
+## Segurança
+
+- O arquivo `.env` está no `.gitignore` e **nunca deve ser enviado ao repositório**. Compartilhe apenas o `.env.example`, que contém valores fictícios.
+- Cada pessoa que rodar o projeto deve gerar a própria `DJANGO_SECRET_KEY`.
+- Em produção, use `DJANGO_DEBUG=False`, informe o domínio real em `DJANGO_ALLOWED_HOSTS` e configure um servidor para arquivos estáticos e de mídia.
+
+---
+
+## Estrutura resumida
 
 ```
-PBD-Venda-de-Ve-culos/
-├── config/              # Configurações do Django (settings, urls principal)
-├── core/                # App principal: models, views, urls, templates
-│   ├── models.py        # Usuario, PerfilVendedor, Veiculo, Reserva, etc.
-│   ├── views.py         # Login, painéis por perfil
-│   ├── urls.py          # Rotas do app
-│   ├── decorators.py    # Checagem de permissão por perfil (sempre no servidor)
-│   └── templates/core/  # Telas HTML
-├── requirements.txt     # Dependências do projeto
+├── config/              # Configurações do projeto Django
+├── core/
+│   ├── models.py        # Regras de domínio
+│   ├── views.py         # Views dos painéis
+│   ├── forms.py         # Formulários e validações
+│   ├── migrations/      # Migrações do banco
+│   ├── templates/core/  # Páginas HTML
+│   ├── static/core/     # CSS, JS e imagens
+│   └── management/      # Comandos personalizados
+├── .env.example         # Modelo de variáveis de ambiente
+├── requirements.txt
 └── manage.py
 ```
 
-## Problemas comuns
+---
 
-| Erro | Causa provável | Solução |
-|---|---|---|
-| `ModuleNotFoundError: No module named 'django'` | Ambiente virtual não está ativo | Rode `source venv/bin/activate` de novo |
-| `permission denied for schema public` | Permissões do Postgres não configuradas | Repita o Passo 4 com atenção ao `\c bdveiculos` |
-| `django.db.utils.OperationalError: could not connect to server` | PostgreSQL não está rodando | Linux: `sudo service postgresql start` |
-| Template não encontrado (`TemplateDoesNotExist`) | Arquivo HTML fora da pasta certa | Confirme que está em `core/templates/core/` |
+## Instituição
 
-## Fluxo de trabalho no Git
-
-- A branch principal de desenvolvimento é `development` — sempre trabalhe a partir dela, não de `main`.
-- Antes de começar a mexer no código: `git pull origin development`
-- Depois de terminar uma parte: `git add .`, `git commit -m "descrição do que foi feito"`, `git push origin development`
+**Universidade Federal Rural de Pernambuco**
+Unidade Acadêmica de Serra Talhada (UAST)
+Disciplina: Projeto de Banco de Dados · Orientação: Prof. Heldon José

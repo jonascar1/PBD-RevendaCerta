@@ -391,7 +391,7 @@
 }
 
 .rc-panel-body.rc-dark .sidebar .menu-item.active {
-    background: linear-gradient(105deg,#205dcc,#3088ed);
+    background: #2563eb;
     color: white;
     box-shadow: 0 7px 20px #2563eb27;
 }

@@ -80,7 +80,7 @@
                 {% for linha in linhas %}
                 <tr {% if linha.margem.negativa %}class="margem-negativa"{% endif %}>
                     <td>
-                        <strong><a href="{% url 'detalhes_venda' linha.venda.pk %}">#{{ linha.venda.pk }}</a></strong>
+                        <strong><a href="{% url 'detalhes_venda' linha.venda.pk %}"><span class="rc-record-id">Nº {{ linha.venda.pk }}</span></a></strong>
                         <small>{{ linha.venda.data|date:"d/m/Y" }}</small>
                     </td>
 

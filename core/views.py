@@ -907,6 +907,7 @@ def detalhes_proposta_view(request, proposta_id):
         {
             "proposta": proposta,
             "composicao": proposta.composicao.all(),
+            "composicao_pendente": not proposta.composicao_fecha,
             "decisoes": proposta.decisoes.select_related("feito_por"),
             "historico": proposta.historico.select_related("alterado_por"),
             "reserva": (
@@ -920,7 +921,8 @@ def detalhes_proposta_view(request, proposta_id):
                 proposta_origem=proposta
             ).first(),
             "pode_fechar_venda": (
-                proposta.situacao == Proposta.Situacao.ATIVA
+                proposta.composicao_fecha
+                and proposta.situacao == Proposta.Situacao.ATIVA
                 and autorizada
                 and proposta.veiculo.situacao == Veiculo.Situacao.RESERVADO
                 and ReservaVeiculo.objects.filter(
@@ -1043,7 +1045,10 @@ def aceitar_contraproposta_view(request, proposta_id):
     except PermissionDenied as erro:
         messages.error(request, str(erro))
     else:
-        messages.success(request, "Contraproposta aceita com sucesso!")
+        if proposta.composicao_fecha:
+            messages.success(request, "Contraproposta aceita com sucesso!")
+        else:
+            messages.warning(request, "Contraproposta aceita. Ajuste a composição do pagamento ao novo valor antes de fechar a venda.")
 
     return redirect("detalhes_proposta", proposta_id=proposta.pk)
 
@@ -1177,6 +1182,11 @@ def registrar_contato_carteira_view(request, cliente_id):
             try:
                 contato.full_clean()
                 with transaction.atomic():
+                    Cliente.objects.select_for_update().get(pk=cliente.pk)
+                    fila = calcular_carteira(vendedor=request.user)["linhas_hoje"]
+                    if not any(item["cliente"].pk == cliente.pk for item in fila):
+                        messages.warning(request, "Cliente já contatado ou com retorno agendado.")
+                        return redirect("carteira_vendedor")
                     contato.save()
                     if contato.resultado == ContatoCarteira.Resultado.QUER_VER_OPCOES:
                         Oportunidade.objects.create(
@@ -1939,7 +1949,9 @@ def negociacoes_view(request):
     ).order_by("-criada_em")
 
     situacao = request.GET.get("situacao", "")
-    if situacao in dict(Proposta.Situacao.choices):
+    if situacao in dict(Proposta.StatusAprovacao.choices):
+        propostas = propostas.filter(status_aprovacao=situacao)
+    elif situacao in dict(Proposta.Situacao.choices):
         propostas = propostas.filter(situacao=situacao)
     else:
         situacao = ""
@@ -1965,7 +1977,7 @@ def negociacoes_view(request):
         "core/gerente_painel_negociacoes.html",
         {
             "propostas": propostas,
-            "situacoes": Proposta.Situacao.choices,
+            "situacoes": Proposta.Situacao.choices + Proposta.StatusAprovacao.choices,
             "situacao_selecionada": situacao,
             "indicadores": indicadores,
         },
@@ -2553,7 +2565,7 @@ def reservar_veiculo_view(request, veiculo_id):
             )
 
     except Veiculo.DoesNotExist:
-        return redirect("lista_veiculos")
+        return redirect("veiculos")
     except IntegrityError:
         messages.error(request, "Este veículo já possui uma reserva ativa.")
         return redirect("detalhes_veiculo", veiculo_id=veiculo_id)

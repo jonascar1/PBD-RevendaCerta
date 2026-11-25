@@ -38,7 +38,7 @@
             <tbody>
                 {% for venda in prontas %}
                 <tr>
-                    <td><strong>#{{ venda.pk }}</strong><small>{{ venda.data|date:"d/m/Y" }}</small></td>
+                    <td><strong><span class="rc-record-id">Nº {{ venda.pk }}</span></strong><small>{{ venda.data|date:"d/m/Y" }}</small></td>
                     <td>{{ venda.cliente.nome_exibicao }}</td>
                     <td>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }} — {{ venda.veiculo.placa }}</td>
                     <td>
@@ -85,7 +85,7 @@
                 <tr>
                     <td>
                         <strong>
-                            <a class="rc-inline-link" href="{% url 'detalhes_venda' etapa.venda_id %}">#{{ etapa.venda_id }}</a>
+                            <a class="rc-inline-link" href="{% url 'detalhes_venda' etapa.venda_id %}"><span class="rc-record-id">Nº {{ etapa.venda_id }}</span></a>
                         </strong>
                         <small>{{ etapa.venda.data|date:"d/m/Y" }}</small>
                     </td>

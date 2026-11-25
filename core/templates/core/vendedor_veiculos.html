@@ -1,7 +1,7 @@
 {% extends "core/vendedor_base.html" %}
 {% load static l10n %}
 {% block title %}Veículos | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculos.css' %}?v=rc-filtros-1">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vendedor_veiculos.css' %}?v=rc-polimento-1">{% endblock %}
 {% block content %}
 <header class="vv-header">
     <h1>Veículos</h1>
@@ -49,7 +49,7 @@
 <div class="vv-grid">
 {% for veiculo in veiculos %}
 <a class="vv-card" href="{% url 'detalhes_veiculo_vendedor' veiculo.pk %}">
-{% with foto=veiculo.fotos.all|first %}{% if foto %}<img loading="lazy" decoding="async" src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="vv-no-photo">Sem foto</div>{% endif %}{% endwith %}
+{% with foto=veiculo.fotos.all|first %}{% if foto %}<img loading="lazy" decoding="async" src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}">{% else %}<div class="vv-no-photo rc-car-placeholder" role="img" aria-label="Veículo sem foto"><i data-lucide="car-front"></i></div>{% endif %}{% endwith %}
     <div class="vv-info"><span class="vv-name">{{ veiculo.marca }} {{ veiculo.modelo }}</span><span class="vv-meta">{{ veiculo.ano_modelo|unlocalize }} · {{ veiculo.get_situacao_display }}</span><span class="vv-price">R$ {{ veiculo.preco_venda|floatformat:2 }}</span>
     </div></a>
 {% empty %}<div class="vv-empty"><i data-lucide="car-front" aria-hidden="true"></i><strong>Nenhum veículo encontrado.</strong>

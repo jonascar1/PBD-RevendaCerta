@@ -332,4 +332,4 @@
 .main-content h1, .main-content h2, .main-content h3 { font-family: Sora, Manrope, sans-serif; }
 .main-content :is(input, select, textarea, button) { font-family: Manrope, Arial, sans-serif; }
 
-.main-content .add-button { background: linear-gradient(115deg, #1958d8, #248ed8); }
+.main-content .add-button { background: #2563eb; }

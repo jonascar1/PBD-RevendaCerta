@@ -30,7 +30,7 @@
 .rc-consulta-filtros input, .rc-consulta-filtros select { width: 100%; min-width: 0; min-height: 42px; padding: 9px 12px; border: 1px solid var(--rc-border); border-radius: 10px; background: var(--rc-surface); color: var(--rc-text); font: 500 14px Manrope, sans-serif; }
 .rc-consulta-filtros input { padding-left: 38px; }
 .rc-consulta-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
-.rc-consulta .rc-consulta-btn, .rc-consulta-detalhe .topo-acoes a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid transparent; border-radius: 10px; background: linear-gradient(115deg, #1958d8, #248ed8); color: #fff; text-decoration: none; font: 700 13px Manrope, sans-serif; cursor: pointer; white-space: nowrap; }
+.rc-consulta .rc-consulta-btn, .rc-consulta-detalhe .topo-acoes a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid transparent; border-radius: 10px; background: #2563eb; color: #fff; text-decoration: none; font: 700 13px Manrope, sans-serif; cursor: pointer; white-space: nowrap; }
 .rc-consulta .rc-secondary, .rc-consulta-detalhe .topo-acoes .btn-voltar { background: var(--rc-card); color: var(--rc-blue); border-color: var(--rc-border); }
 .rc-consulta .rc-action { background: light-dark(#e8f0ff, #1a2c4d); color: var(--rc-blue); min-height: 34px; }
 .rc-consulta-btn svg, .rc-consulta-detalhe .topo-acoes svg { width: 16px; height: 16px; }

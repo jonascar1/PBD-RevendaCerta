@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load static %}
 
-{% block title %}Entrega da venda #{{ venda.pk }} | REVENDA CERTA{% endblock %}
+{% block title %}Entrega da venda Nº {{ venda.pk }} | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
@@ -14,7 +14,7 @@
     <div>
         <h1>Entrega do veículo</h1>
         <p>
-            Venda #{{ venda.pk }} · {{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}
+            Venda Nº {{ venda.pk }} · {{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}
             · {{ venda.cliente.nome_exibicao }}
         </p>
     </div>
