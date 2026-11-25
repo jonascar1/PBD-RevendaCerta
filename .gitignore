@@ -17,3 +17,6 @@ staticfiles/
 *.backup
 *.dump
 *.sqlite3
+
+# Logs
+*.log
