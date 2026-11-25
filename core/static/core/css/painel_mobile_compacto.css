@@ -1,0 +1,166 @@
+/* Camada móvel compartilhada. Não altera a vitrine nem o desktop. */
+@media (max-width: 900px) {
+    .rc-panel-body main:is(.conteudo,.main-content) { box-sizing: border-box; padding: 12px !important; }
+    .rc-panel-body main > *, .rc-panel-body main :is(.card,.card-info,.cart-painel,.prop-card,.ao-card,.rd-card,.ra-card,.neg-section,.rc-consulta-card) { min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .rc-panel-body .rc-mobile-toggle { min-height: 44px; padding: 8px 12px; font-size: 14px; }
+    .rc-panel-body .rc-topbar { padding: 4px 0 10px; margin-bottom: 12px; gap: 6px; }
+    .rc-panel-body .rc-top-actions { margin-left: auto; }
+    .rc-panel-body .rc-store-preview { padding: 6px 9px; min-height: 36px; }
+    .rc-panel-body.rc-menu-open { overflow: hidden !important; }
+    .rc-panel-body main :is(.rc-table-scroll,.table-container,.cart-tabela-wrap,.clientes-tabela-container,.neg-table-container,.prop-tabela-wrap,.hist-tabela-wrap,.tabela-responsiva,.tabela-responsive,.ao-table,.ad-table-wrap,.al-scroll,.rc-consulta-tabela) { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+    .rc-panel-body main .rc-table-scroll table { min-width: max-content; }
+    .rc-panel-body main :is(.topo-acoes,.prop-acoes,.cart-acoes,.acoes-formulario,.form-actions,.confirmar-acoes,.acoes-exportacao,.ao-actions,.preco-acoes,.editar-acoes,.excluir-despesa-acoes) { flex-wrap: wrap; gap: 8px; min-width: 0; }
+    .rc-panel-body main :is(.topo-acoes,.prop-acoes,.cart-acoes,.acoes-formulario,.form-actions,.confirmar-acoes,.acoes-exportacao,.ao-actions,.preco-acoes,.editar-acoes,.excluir-despesa-acoes) > :is(a,button) { max-width: 100%; min-height: 42px; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+    .rc-panel-body main :is(input,select,textarea) { box-sizing: border-box; min-width: 0; max-width: 100%; }
+    .rc-panel-body main :is(.form-grid,.prop-form-grid,.prop-pagamento-grid,.prop-grid-form,.detalhes-container,.veiculo-container,.ao-split,.ao-grid,.decisao-grid) > * { min-width: 0; }
+}
+@media (max-width: 680px) {
+    .rc-panel-body main :is(h1,.prop-titulo) { font-size: clamp(22px,6vw,27px); line-height: 1.2; }
+    .rc-panel-body main :is(h2,.prop-card-titulo) { font-size: 18px; line-height: 1.3; }
+    .rc-panel-body main :is(.topo,.topbar,.topo-detalhes,.cart-topo,.cart-cabecalho,.clientes-cabecalho,.prop-cabecalho,.vv-header,.rd-intro,.ra-intro) { gap: 10px; margin-bottom: 14px; }
+    .rc-panel-body main :is(.card,.card-info,.cart-painel,.prop-card,.ao-card,.rd-card,.ra-card,.neg-section,.rc-consulta-card) { border-radius: 14px; }
+    .rc-panel-body main :is(.card-info,.cart-formulario,.prop-card-p,.ao-card,.rd-card,.ra-card) { padding: 12px; }
+    body.rc-panel-body.rc-gp main :is(.neg-section,.cart-painel,.ao-card), body.rc-panel-body.rc-gp .main-content > .card { padding: 12px; border-radius: 14px; }
+    /* Filtros: busca inteira, opções e ações em duas colunas, como na vitrine. */
+    .rc-panel-body main :is(.barra-pesquisa-veiculos,.barra-pesquisa-vendedores,.barra-pesquisa-avaliacoes,.clientes-busca,.prop-filtros,.rc-consulta-filtros,.filtros-relatorios,.neg-filter,.proc-filtro) { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: end; gap: 8px; padding: 10px; min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .rc-panel-body main :is(.barra-pesquisa-veiculos,.barra-pesquisa-vendedores,.barra-pesquisa-avaliacoes,.clientes-busca,.prop-filtros,.rc-consulta-filtros,.filtros-relatorios,.neg-filter,.proc-filtro) > * { min-width: 0; max-width: 100%; width: 100%; margin: 0; box-sizing: border-box; }
+    .rc-panel-body main :is(.campo-pesquisa,.campo-pesquisa-vendedores,.campo-pesquisa-avaliacoes,.campo-busca-cliente,.rc-consulta-search,.prop-acoes-filtro) { grid-column: 1 / -1; }
+    .rc-panel-body main :is(.prop-acoes-filtro,.vv-filter-actions) { display: flex; gap: 8px; }
+    .rc-panel-body main :is(.prop-acoes-filtro,.vv-filter-actions) > * { flex: 1 1 0; min-width: 0; }
+    .rc-panel-body main :is(.barra-pesquisa-veiculos,.barra-pesquisa-vendedores,.barra-pesquisa-avaliacoes,.clientes-busca,.prop-filtros,.rc-consulta-filtros,.filtros-relatorios,.neg-filter,.proc-filtro,.vv-filter-panel,.ao-filters) :is(select,input:not([type=hidden]):not([type=checkbox]):not([type=radio])) { width: 100%; min-height: 42px; font-size: 16px; }
+    .rc-panel-body main :is(.campo-pesquisa,.campo-pesquisa-vendedores,.campo-pesquisa-avaliacoes,.campo-busca-cliente,.vv-input-icon) input { min-height: 0 !important; }
+    .rc-panel-body main :is(.barra-pesquisa-veiculos,.barra-pesquisa-vendedores,.barra-pesquisa-avaliacoes,.clientes-busca,.prop-filtros,.rc-consulta-filtros,.filtros-relatorios,.neg-filter,.proc-filtro) :is(button,a) { min-height: 42px; padding: 8px 6px; white-space: normal; text-align: center; font-size: 13px; }
+    .rc-panel-body main .vv-filter-panel { padding: 12px; border-radius: 14px; }
+    .rc-panel-body main .vv-filter-grid { gap: 8px; }
+    .rc-panel-body main .vv-filter-field label { font-size: 12px; }
+    .rc-panel-body main .vv-filter-details summary { min-height: 44px; }
+    .rc-panel-body main .vv-grid { gap: 8px; }
+    .rc-panel-body main .vv-info { padding: 8px; }
+    /* Indicadores compactos, sem esconder valores. */
+    .rc-panel-body .rc-dashboard #rd-kpis .rd-3 { grid-column: span 6; }
+    .rc-panel-body .rc-dashboard .rd-grid { gap: 8px; }
+    .rc-panel-body .rc-dashboard .rd-kpi { min-height: 0; padding: 10px 10px 12px; }
+    .rc-panel-body .rc-dashboard .rd-kpi:has(.rd-spark) { padding-bottom: 42px; }
+    .rc-panel-body .rc-dashboard .rd-kpi strong, .rc-panel-body .ra-kpi strong { font-size: clamp(17px,4.6vw,23px); overflow-wrap: anywhere; }
+    .rc-panel-body .rc-dashboard .rd-kpi p, .rc-panel-body .ra-kpi p { font-size: 12px; line-height: 1.35; }
+    .rc-panel-body .rc-dashboard .rd-icon, .rc-panel-body .ra-icon { width: 32px; height: 32px; margin-bottom: 6px; }
+    .rc-panel-body .ra-kpis, .rc-panel-body main .cart-indicadores, body.rc-panel-body.rc-gp main .neg-resumo, body.rc-panel-body.rc-gp-margens main .neg-resumo, .rc-panel-body main .indicadores-relatorios { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+    .rc-panel-body .ra-kpi { min-height: 0; padding: 10px; }
+    .rc-panel-body .ra-kpi:has(>svg) { padding-bottom: 48px; }
+    .rc-panel-body .ra-delta { position: static; display: inline-block; }
+    .rc-panel-body main :is(.cart-indicador,.neg-card,.indicador) { padding: 10px; min-width: 0; min-height: 0; overflow-wrap: anywhere; }
+    .rc-panel-body main :is(.cart-indicador,.neg-card,.indicador) strong { font-size: clamp(17px,4.5vw,23px); overflow-wrap: anywhere; }
+    .rc-panel-body main .neg-card { flex-wrap: wrap; gap: 6px; }
+    /* Formulários e detalhes: preservar ordem dos campos e ações. */
+    .rc-panel-body main :is(.form-grid,.prop-form-grid,.prop-pagamento-grid,.prop-grid-form,.detalhes-container,.veiculo-container,.ao-split,.ao-grid,.decisao-grid,.origens) { grid-template-columns: minmax(0,1fr); gap: 10px; }
+    .rc-panel-body main :is(.prop-span-2,.prop-extra-troca,.prop-extra-financiamento) { grid-column: 1 / -1; }
+    .rc-panel-body main :is(.card-cabecalho,.situacao-cabecalho,.ao-doc-heading,.prop-pagamento-topo,.cart-secao-topo) { flex-wrap: wrap; gap: 8px; }
+    .rc-panel-body main :is(.info-grid,.ao-stats) { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+    .rc-panel-body main :is(.info-item,.ao-stats > *) { min-width: 0; overflow-wrap: anywhere; }
+    .rc-panel-body main .miniaturas { max-width: 100%; overflow-x: auto; }
+    .rc-panel-body main .miniatura { flex-shrink: 0; }
+    .rc-panel-body main .foto-principal-container { height: auto; aspect-ratio: 16/10; }
+    .rc-panel-body main .foto-principal-container img { width: 100%; height: 100%; object-fit: contain; }
+    .rc-panel-body main .prop-linha { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 12px; }
+    .rc-panel-body main .prop-linha > * { min-width: 0; overflow-wrap: anywhere; }
+    .rc-panel-body main .rc-table-scroll :is(th,td) { padding: 9px 10px; }
+    .rc-panel-body main .rc-table-scroll :is(a,button) { min-height: 36px; }
+    .rc-panel-body main :is(.messages,.rc-feedback,.prop-aviso) { max-width: 100%; overflow-wrap: anywhere; }
+}
+@media (max-width: 350px) {
+    .rc-panel-body main:is(.conteudo,.main-content) { padding: 9px !important; }
+    .rc-panel-body .rc-dashboard #rd-kpis .rd-3 { grid-column: span 12; }
+    .rc-panel-body .ra-kpis, .rc-panel-body main .cart-indicadores, body.rc-panel-body.rc-gp main .neg-resumo, body.rc-panel-body.rc-gp-margens main .neg-resumo, .rc-panel-body main .indicadores-relatorios, .rc-panel-body main :is(.info-grid,.ao-stats) { grid-template-columns: minmax(0,1fr); }
+}
+
+/* Identidade pontilhada em todas as áreas internas, inclusive no desktop. */
+body.rc-panel-body main:is(.conteudo,.main-content) {
+    background-color: #edf2f8;
+    background-image: radial-gradient(#ccd8e6 .8px, transparent .8px);
+    background-size: 18px 18px;
+}
+body.rc-panel-body.rc-dark main:is(.conteudo,.main-content) {
+    background-color: #090f1d;
+    background-image: radial-gradient(#29384e .8px, transparent .8px);
+    background-size: 18px 18px;
+}
+@media (max-width: 760px) {
+    body.rc-panel-body.rc-gp main :is(header.topbar,header.topo,.cart-topo) {
+        display: flex; flex-direction: column; align-items: stretch;
+        justify-content: flex-start; gap: 10px; margin: 0 0 14px;
+        min-height: 0; height: auto; text-align: left;
+    }
+    body.rc-panel-body.rc-gp main :is(header.topbar,header.topo,.cart-topo) > * {
+        flex: 0 0 auto; min-height: 0; max-width: 100%;
+    }
+    body.rc-panel-body.rc-gp main :is(header.topbar,header.topo,.cart-topo) > div:first-child {
+        flex: 0 0 auto; width: 100%; text-align: left;
+    }
+    body.rc-panel-body.rc-gp main :is(header.topbar,header.topo) > :is(.btn-cadastrar,.add-button) {
+        flex: 0 0 auto; min-height: 42px; height: auto; padding: 9px 12px;
+        align-self: flex-start; max-width: 100%; white-space: normal;
+    }
+    body.rc-panel-body.rc-gp main .neg-resumo { gap: 8px; margin-bottom: 14px; }
+    body.rc-panel-body.rc-gp main .neg-card {
+        display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;
+        justify-content: flex-start; gap: 8px; padding: 10px 8px 10px 12px; text-align: left;
+    }
+    body.rc-panel-body.rc-gp main .neg-card-icon { width: 30px; height: 30px; flex: none; }
+    body.rc-panel-body.rc-gp main .neg-card-icon svg { width: 16px; height: 16px; }
+    body.rc-panel-body.rc-gp main .neg-card > div:last-child { width: auto; min-width: 0; }
+    body.rc-panel-body.rc-gp main .neg-card span { font-size: 11px; line-height: 1.35; overflow-wrap: normal; }
+    body.rc-panel-body.rc-gp main .neg-card strong { text-align: left; font-size: 18px; }
+    body.rc-panel-body.rc-gp main .neg-resumo > .neg-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    body.rc-panel-body.rc-gp main .neg-filter {
+        display: flex; flex-direction: column; align-items: stretch; gap: 4px;
+        padding: 0; margin: 0; background: none; border: 0;
+    }
+    body.rc-panel-body.rc-gp main .neg-filter > * { flex: 0 0 auto; width: 100%; }
+    body.rc-panel-body.rc-gp main .neg-filter select { min-height: 42px; padding: 0 8px; font-size: 14px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos {
+        display: grid; grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 8px; padding: 10px; margin-bottom: 12px;
+    }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > * { min-width: 0; width: 100%; margin: 0; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > .campo-pesquisa,
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > select[name=situacao] { grid-column: 1 / -1; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > select {
+        min-width: 0; height: 42px; padding: 0 8px; font-size: 13px; border-radius: 8px;
+    }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos .campo-pesquisa { padding: 0 8px; border-radius: 8px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos .campo-pesquisa input { font-size: 16px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > button:only-of-type { grid-column: 1 / -1; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos:has(.btn-limpar-busca) > button { grid-column: auto; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > :is(button,a) { min-height: 42px; height: auto; border-radius: 8px; }
+    body.rc-panel-body.rc-gp main .cart-indicadores { margin-bottom: 14px; }
+    body.rc-panel-body.rc-gp main .cart-indicadores > :only-child { grid-column: 1 / -1; }
+}
+@media (max-width: 350px) {
+    body.rc-panel-body.rc-gp main .neg-card { flex-wrap: wrap; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos { grid-template-columns: minmax(0,1fr); }
+}
+
+/* V3: containment of batch forms and mobile drawer. */
+@media (max-width: 900px) {
+    .rc-panel-body .sidebar { display: flex !important; }
+    .rc-panel-body main .al-lote { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .rc-panel-body main .al-lote > *, .rc-panel-body main .al-card { min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .rc-panel-body main .al-card { padding: 12px; }
+    .rc-panel-body main .al-scroll { width: 100%; min-width: 0; max-width: 100%; overflow: auto; }
+    .rc-panel-body main .al-scroll table { min-width: max-content; }
+    .rc-panel-body main .al-scroll th, .rc-panel-body main .al-scroll td { padding: 10px; }
+    .rc-panel-body main .al-lote > .rc-action-secondary { justify-self: start; width: auto; }
+    .rc-panel-body main .al-lote > :is(h1,p) { margin: 0; }
+    .rc-panel-body main .al-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+    .rc-panel-body main .al-row > * { min-width: 0; max-width: 100%; }
+    .rc-panel-body main .al-row label { flex-wrap: wrap; }
+    .rc-panel-body main .al-row label:has(select) { display: grid; gap: 4px; }
+    .rc-panel-body main .al-row :is(select,input:not([type=checkbox])) { width: 100%; min-height: 42px; }
+    .rc-panel-body main .al-row > :is(button,.errorlist), .rc-panel-body main .al-row label:has(input[type=checkbox]) { grid-column: 1 / -1; }
+    .rc-panel-body main #al-form .al-row { grid-template-columns: minmax(0,1fr); }
+    .rc-panel-body main #al-count { margin: 12px 0 8px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos { grid-template-columns: minmax(0,1fr); }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > select { grid-column: 1 / -1; font-size: 16px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > .campo-pesquisa { height: 42px; }
+    body.rc-panel-body.rc-gp main .barra-pesquisa-veiculos > :is(button,a) { grid-column: 1 / -1; }
+}
