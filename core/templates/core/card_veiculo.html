@@ -1,7 +1,7 @@
 {% load static l10n %}
 <article class="card-veiculo {% if grade %}explorar-card{% endif %}">
 <a class="card-foto" href="{% url 'vitrine_veiculo_detalhe' veiculo.pk %}">
-{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}" loading="lazy">{% else %}<div class="sem-foto rc-car-placeholder" role="img" aria-label="Veículo sem foto"><i data-lucide="car-front"></i></div>{% endif %}{% endwith %}
+{% with foto=veiculo.fotos.all|first %}{% if foto %}<img src="{{ foto.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}" loading="lazy">{% else %}<div class="sem-foto rc-car-placeholder" role="img" aria-label="Veículo sem fotos cadastradas"><i data-lucide="car-front"></i><span class="rc-foto-aviso">Veículo sem fotos cadastradas</span></div>{% endif %}{% endwith %}
 <span class="etiqueta-marca" data-marca="{{ veiculo.marca }}">{{ veiculo.marca }}</span>
 <span class="etiqueta-categoria">{{ veiculo.get_tipo_display|default:veiculo.tipo }}</span></a>
     <div class="card-conteudo">

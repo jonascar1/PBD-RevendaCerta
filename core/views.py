@@ -96,6 +96,8 @@ def erros_do_form_como_mensagens(request, form):
 
 def expirar_reservas_vencidas():
     """Encerra sob demanda todas as reservas cujo prazo já expirou."""
+    if getattr(settings, "DEMO_SHARED", False):
+        return
     for reserva in ReservaVeiculo.objects.filter(
         cancelada=False, expira_em__lte=timezone.now()
     ):
@@ -271,6 +273,10 @@ def vitrine_view(request):
     if combustivel:
         veiculos = veiculos.filter(combustivel__icontains=combustivel)
 
+    pagina = Paginator(veiculos, 12).get_page(request.GET.get("pagina", 1))
+    if request.GET.get("fragmento") == "1":
+        return render(request, "core/vitrine_cards.html", {"pagina": pagina})
+
     marcas = (
         estoque.order_by()
         .values_list("marca", flat=True)
@@ -294,7 +300,9 @@ def vitrine_view(request):
         "core/vitrine.html",
         {
             "whatsapp_numero": getattr(settings, "WHATSAPP_NUMERO", ""),
-            "veiculos": veiculos,
+            "veiculos": pagina.object_list,
+            "pagina": pagina,
+            "total_veiculos": pagina.paginator.count,
             "marcas": marcas,
             "anos": anos,
             "combustiveis": combustiveis,
@@ -1238,7 +1246,8 @@ def registrar_contato_carteira_view(request, cliente_id):
 @perfil_requerido("VENDEDOR")
 @require_GET
 def procuras_vendedor_view(request):
-    Procura.encerrar_vencidas()
+    if not getattr(settings, "DEMO_SHARED", False):
+        Procura.encerrar_vencidas()
 
     procuras = (
         Procura.objects.filter(vendedor=request.user)
@@ -1709,7 +1718,7 @@ def detalhes_veiculo_view(request, veiculo_id):
             cancelada=False,
         ).first()
 
-        if reserva:
+        if reserva and not getattr(settings, "DEMO_SHARED", False):
             reserva.expirar()
             reserva.refresh_from_db()
             if reserva.cancelada:
@@ -2462,7 +2471,8 @@ def configurar_carteira_view(request):
 @perfil_requerido("GERENTE")
 @require_GET
 def procuras_gerente_view(request):
-    Procura.encerrar_vencidas()
+    if not getattr(settings, "DEMO_SHARED", False):
+        Procura.encerrar_vencidas()
 
     situacao = request.GET.get("situacao", "")
     procuras = Procura.objects.select_related("cliente", "vendedor")

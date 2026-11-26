@@ -1,100 +1,47 @@
-/* Preferências de aparência independentes da autenticação. */
+/* Tema único para vitrine, login e painéis. */
 (() => {
     const root = document.documentElement;
-    const scope = root.dataset.rcThemeScope;
     const media = matchMedia('(prefers-color-scheme: dark)');
-    const PANEL = 'rc-panel-theme';
-    const SITE = 'rc-site-tema';
+    const key = 'rc-panel-theme';
     const valid = v => ['light', 'dark', 'system'].includes(v);
-    const get = key => { try {
-        return localStorage.getItem(key);
+    const get = k => { try { return localStorage.getItem(k); } catch { return null; } };
+    const cookie = () => document.cookie.split(';').map(x => x.trim()).find(x => x.startsWith('rc_panel_theme='))?.split('=')[1];
+    const read = () => [cookie(), get(key), get('rc-site-tema') === 'escuro' ? 'dark' : get('rc-site-tema') === 'claro' ? 'light' : null].find(valid);
+    let theme = read();
+    function write(v) {
+        theme = v;
+        let ok = false;
+        try { localStorage.setItem(key, v); ok = true; } catch {}
+        try { document.cookie = 'rc_panel_theme=' + v + '; Path=/; Max-Age=31536000; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch {}
+        return ok || cookie() === v;
     }
-    catch {
-        return null;
-    } };
-    const set = (key, value) => { try {
-        localStorage.setItem(key, value);
-        return true;
+    const url = new URL(location.href);
+    const incoming = url.searchParams.get('rc_theme');
+    if (valid(incoming)) {
+        write(incoming);
+        url.searchParams.delete('rc_theme');
+        history.replaceState(history.state, '', url);
     }
-    catch {
-        return false;
-    } };
-    const old = id => { try {
-        return JSON.parse(get('rc-preferences-v1:' + id) || '{}').theme;
-    }
-    catch {
-        return null;
-    } };
-    // A cookie is a fallback independent of Django's session cookie.
-    const cookiePanel = () => document.cookie.split(';').map(x => x.trim()).find(x => x.startsWith('rc_panel_theme='))?.split('=')[1];
-    const readPanel = () => { const v = get(PANEL); return valid(v) ? v : cookiePanel(); };
-    const writePanel = value => {
-        const ok = set(PANEL, value);
-        try {
-            document.cookie = 'rc_panel_theme=' + value + '; Path=/; Max-Age=31536000; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
-        }
-        catch { }
-        return ok || cookiePanel() === value;
-    };
-    let panel = readPanel();
-    if (!valid(panel) && scope === 'panel') {
-        const previous = old(root.dataset.rcThemeUser);
-        if (valid(previous)) {
-            panel = previous;
-            writePanel(panel);
-        }
-    }
-    let site = get(SITE) === 'escuro' ? 'dark' : 'light';
-    const isDark = theme => theme === 'dark' || (theme === 'system' && media.matches);
+    const dark = () => theme === 'dark' || (theme === 'system' && media.matches);
     function apply() {
-        const theme = scope === 'site' ? site : valid(panel) ? panel : 'light';
-        root.dataset.rcTheme = isDark(theme) ? 'dark' : 'light';
-        if (scope === 'panel')
-            document.body?.classList.toggle('rc-dark', isDark(theme));
-        document.querySelectorAll('[data-rc-site-toggle]').forEach(button => {
-            const dark = site === 'dark';
-            button.setAttribute('aria-pressed', String(dark));
-            const label = dark ? 'Mudar para o modo claro' : 'Mudar para o modo escuro';
-            button.setAttribute('aria-label', label);
-            button.title = label;
+        root.dataset.rcTheme = dark() ? 'dark' : 'light';
+        if (root.dataset.rcThemeScope === 'panel') document.body?.classList.toggle('rc-dark', dark());
+        document.querySelectorAll('[data-rc-site-toggle]').forEach(b => {
+            const label = dark() ? 'Mudar para o modo claro' : 'Mudar para o modo escuro';
+            b.setAttribute('aria-pressed', String(dark())); b.setAttribute('aria-label', label); b.title = label;
+        });
+        document.querySelectorAll('a[data-rc-theme-transfer]').forEach(a => {
+            const target = new URL(a.href, location.href);
+            target.searchParams.set('rc_theme', theme || 'light'); a.href = target.href;
         });
     }
-    window.RCTheme = {
-        panel: () => valid(panel) ? panel : 'light',
-        hasPanel: () => valid(panel),
-        setPanel: theme => { if (!valid(theme))
-            return false; panel = theme; const ok = writePanel(theme); apply(); return ok; },
-        apply
-    };
-    if (valid(panel))
-        writePanel(panel);
+    function refresh() { theme = read(); apply(); dispatchEvent(new Event('rc-panel-theme-change')); }
+    window.RCTheme = {panel: () => theme || 'light', hasPanel: () => valid(theme), setPanel: v => { if (!valid(v)) return false; const ok = write(v); apply(); return ok; }, apply};
     apply();
     document.addEventListener('DOMContentLoaded', apply);
-    document.addEventListener('click', event => {
-        if (!event.target.closest('[data-rc-site-toggle]') || scope !== 'site')
-            return;
-        site = site === 'dark' ? 'light' : 'dark';
-        set(SITE, site === 'dark' ? 'escuro' : 'claro');
-        apply();
-    });
+    document.addEventListener('click', e => { if (e.target.closest('[data-rc-site-toggle]')) { write(dark() ? 'light' : 'dark'); apply(); } });
     media.addEventListener('change', apply);
-    addEventListener('storage', event => {
-        if (event.key === SITE || event.key === null)
-            site = get(SITE) === 'escuro' ? 'dark' : 'light';
-        if (event.key === PANEL || event.key === null) {
-            panel = readPanel();
-            if (scope === 'panel')
-                dispatchEvent(new Event('rc-panel-theme-change'));
-        }
-        apply();
-    });
-    addEventListener('pageshow', event => {
-        if (!event.persisted)
-            return;
-        panel = readPanel();
-        site = get(SITE) === 'escuro' ? 'dark' : 'light';
-        if (scope === 'panel')
-            dispatchEvent(new Event('rc-panel-theme-change'));
-        apply();
-    });
+    addEventListener('storage', e => { if (e.key === key || e.key === null) refresh(); });
+    addEventListener('pageshow', refresh);
+    addEventListener('focus', refresh);
 })();

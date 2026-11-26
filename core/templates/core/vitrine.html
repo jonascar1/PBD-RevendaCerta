@@ -1,8 +1,12 @@
 {% extends 'core/publico_base.html' %}
 {% load static l10n %}
 {% block titulo %}Encontre seu próximo carro | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_refinada.css' %}?v=rc-polimento-1">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_refinada.css' %}?v=rc-paginacao-1">{% endblock %}
 {% block conteudo %}
+<aside class="rc-aviso-academico" aria-label="Aviso de projeto acadêmico">
+    <div class="container"><strong>Projeto acadêmico — Ambiente demonstrativo.</strong>
+    Os anúncios, preços e dados comerciais são ilustrativos e não representam ofertas reais de venda.</div>
+</aside>
 
 <section class="banner banner-carrossel" aria-label="Destaques da Revenda Certa" aria-roledescription="carrossel">
     <div class="banner-slide banner-slide-inicial ativo" aria-hidden="false">
@@ -68,8 +72,8 @@
             </div>
 
                 <span class="total-veiculos">
-                    {{ veiculos|length }}
-                    {% if veiculos|length == 1 %}veículo{% else %}veículos{% endif %}
+                    {{ total_veiculos }}
+                    {% if total_veiculos == 1 %}veículo{% else %}veículos{% endif %}
                 </span>
         </div>
 
@@ -132,7 +136,7 @@
     <div class="estoque-explorar-link"><a href="{% url 'explorar' %}">Ver catálogo completo <span aria-hidden="true">→</span></a>
     </div>
 
-    <div class="carrossel-veiculos" id="carrossel-veiculos">
+    <div class="carrossel-veiculos" id="carrossel-veiculos" data-proxima-pagina="{% if pagina.has_next %}{{ pagina.next_page_number|unlocalize }}{% endif %}">
 
                 <button class="seta-carrossel anterior"
                         type="button"
@@ -171,6 +175,7 @@
                 </button>
 
     </div><!-- fecha .carrossel-veiculos -->
+    <p id="vitrine-carregamento" role="status" aria-live="polite"></p>
 
 </div><!-- fecha .container -->
 </section><!-- fecha .estoque -->
@@ -272,6 +277,6 @@
 {% endblock %}
 {% block extra_js %}
 <script src="{% static 'core/js/vitrine_refinada.js' %}?v=1" defer></script>
-<script src="{% static 'core/js/vitrine_2.js' %}?v=rc-mobile-2"></script>
+<script src="{% static 'core/js/vitrine_2.js' %}?v=rc-paginacao-1"></script>
 <script src="{% static 'core/js/vitrine_banner.js' %}" defer></script>
 {% endblock %}

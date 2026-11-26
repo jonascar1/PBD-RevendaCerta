@@ -377,3 +377,5 @@
 .cart-secao-espaco {
     margin-top: 24px;
 }
+
+.cart-pagina .cart-cabecalho p.cart-muted { color: var(--muted, #64748b); }

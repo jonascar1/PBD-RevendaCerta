@@ -549,3 +549,7 @@
         order: 0;
     }
 }
+
+.rc-aviso-academico { padding: 12px 0; border-bottom: 1px solid currentColor; font-size: .875rem; line-height: 1.5; }
+#vitrine-carregamento { text-align: center; font-size: .875rem; }
+#vitrine-carregamento:empty { display: none; }
