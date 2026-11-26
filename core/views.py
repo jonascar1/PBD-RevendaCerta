@@ -237,6 +237,7 @@ def vitrine_view(request):
             "cor",
             "combustivel",
             "cambio",
+            "tipo",
             "quilometragem",
             "preco_venda",
             "criado_em",
