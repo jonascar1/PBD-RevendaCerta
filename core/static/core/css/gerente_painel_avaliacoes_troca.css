@@ -332,4 +332,17 @@
 .main-content h1, .main-content h2, .main-content h3 { font-family: Sora, Manrope, sans-serif; }
 .main-content :is(input, select, textarea, button) { font-family: Manrope, Arial, sans-serif; }
 
-.main-content .add-button { background: linear-gradient(115deg, #1958d8, #248ed8); }
+.main-content .add-button { background: #2563eb; }
+
+/* Estado geral: alinhamento e indicadores exclusivos desta tabela. */
+.avaliacoes-tabela th.col-estado-geral,
+.avaliacoes-tabela td.col-estado-geral { text-align: center; vertical-align: middle; }
+.avaliacoes-tabela .estado-geral {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 76px; min-height: 26px; box-sizing: border-box;
+    font-family: inherit; white-space: nowrap;
+}
+.avaliacoes-tabela .estado-excelente,
+.avaliacoes-tabela .estado-bom { background: light-dark(#dcfce7, #153b2a); color: light-dark(#166534, #86efac); }
+.avaliacoes-tabela .estado-regular { background: light-dark(#fef3c7, #45351b); color: light-dark(#92400e, #fde68a); }
+.avaliacoes-tabela .estado-ruim { background: light-dark(#fee2e2, #49252c); color: light-dark(#991b1b, #fca5a5); }

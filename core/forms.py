@@ -941,6 +941,8 @@ class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
     class Meta:
         model = AvaliacaoTroca
         fields = [
+            "tipo",
+            "cambio",
             "placa",
             "chassi",
             "renavam",
@@ -969,6 +971,8 @@ class AvaliacaoTrocaForm(BaseForm, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["renavam"].required = True
+        self.fields["tipo"].required = True
+        self.fields["cambio"].required = True
 
     def clean_renavam(self):
         renavam = self.cleaned_data.get("renavam", "").strip()

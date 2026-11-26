@@ -107,8 +107,6 @@ def calcular_carteira(vendedor=None, hoje=None):
         cliente_id__in=elegiveis
     ).select_related("vendedor")
 
-    if vendedor is not None:
-        contatos = contatos.filter(vendedor=vendedor)
 
     # Em passagem única (mais recente -> mais antigo), extrai o último contato,
     # os clientes atendidos no mês corrente e os vendedores que realizaram contato.
@@ -117,9 +115,10 @@ def calcular_carteira(vendedor=None, hoje=None):
     contatos_por_vendedor = {}
 
     for contato in contatos.order_by("-realizado_em", "-pk"):
-        ultimo_contato.setdefault(contato.cliente_id, contato)
-
         data_contato = timezone.localtime(contato.realizado_em).date()
+        if not elegiveis[contato.cliente_id]["ultima_venda"].data <= data_contato <= hoje:
+            continue
+        ultimo_contato.setdefault(contato.cliente_id, contato)
         if inicio_mes <= data_contato < proximo_mes:
             ids_contatados.add(contato.cliente_id)
             contatos_por_vendedor.setdefault(contato.cliente_id, set()).add(
@@ -161,7 +160,8 @@ def calcular_carteira(vendedor=None, hoje=None):
                 "retorno_chegou": retorno_chegou,
                 "adiado": adiado,
                 "para_ligar_hoje": (
-                    retorno_chegou or (not contatado_mes and not adiado)
+                    (retorno_chegou and (vendedor is None or ultimo.vendedor_id == vendedor.pk))
+                    or (retorno is None and not contatado_mes)
                 ),
             }
         )

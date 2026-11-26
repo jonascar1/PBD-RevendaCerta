@@ -3,6 +3,10 @@ Django settings for config project.
 """
 
 from pathlib import Path
+import os
+
+import dj_database_url
+from dotenv import load_dotenv
 
 
 # ==========================================================
@@ -10,22 +14,29 @@ from pathlib import Path
 # ==========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
+def env_list(name, default=""):
+    return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+
+PRODUCTION = os.getenv("DJANGO_ENV", "local") == "production"
 
 
 # ==========================================================
 # SECURITY
 # ==========================================================
 
-SECRET_KEY = 'django-insecure-3ehq1sx8n+__delbi+d^_)u0w4i6^hkr0q-wefrqc$$7_bs6js'
-
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    '192.168.1.70',
-    '192.168.1.101',
-]
+SECRET_KEY = os.environ["SECRET_KEY"]
+DEBUG = not PRODUCTION
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1,192.168.1.70,192.168.1.101")
+if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(os.environ["RENDER_EXTERNAL_HOSTNAME"])
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
+if PRODUCTION:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # ==========================================================
@@ -55,10 +66,12 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.middleware.PrivateNavigationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -96,17 +109,17 @@ TEMPLATES = [
 # ==========================================================
 # DATABASE — POSTGRESQL
 # ==========================================================
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'revendacerta_demo',
-        'USER': 'devdj',
-        'PASSWORD': 'dj123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+if PRODUCTION or os.getenv("DATABASE_URL"):
+    DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"], conn_max_age=0, ssl_require=True)}
+else:
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "revendacerta_demo"),
+        "USER": os.getenv("DB_USER", "devdj"),
+        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+    }}
 
 
 # ==========================================================
@@ -151,8 +164,6 @@ LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
-USE_L10N = True
-
 USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
@@ -182,6 +193,27 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+if PRODUCTION:
+    STORAGES["staticfiles"] = {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"}
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": os.environ["R2_ACCESS_KEY_ID"],
+            "secret_key": os.environ["R2_SECRET_ACCESS_KEY"],
+            "bucket_name": os.environ["R2_BUCKET_NAME"],
+            "endpoint_url": os.environ["R2_ENDPOINT_URL"],
+            "region_name": "auto",
+            "signature_version": "s3v4",
+            "default_acl": None,
+            "file_overwrite": False,
+            "querystring_auth": True,
+        },
+    }
+
 
 # ==========================================================
 # EMAIL
@@ -199,3 +231,15 @@ MAILERS = {
 # ==========================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Authentication routes
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "painel"
+LOGOUT_REDIRECT_URL = "login"
+
+# Resposta personalizada para falhas de CSRF.
+CSRF_FAILURE_VIEW = "core.views.csrf_failure_view"
+
+# Optional link to a separately deployed demonstration service.
+DEMO_PUBLIC_URL = os.getenv("DEMO_PUBLIC_URL", "")
+TEMPLATES[0]["OPTIONS"]["context_processors"].append("core.demo_link.demo_link")

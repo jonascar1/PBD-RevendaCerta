@@ -10,3 +10,5 @@
 
 .rc-panel-body main a.rc-inline-link { color: light-dark(#1958d8,#93c5fd); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .rc-panel-body main a.rc-inline-link:focus-visible { outline: 2px solid #248ed8; outline-offset: 3px; }
+.rc-panel-body main a.rc-inline-link:hover { color: light-dark(#1746a2,#bfdbfe); text-decoration: underline; }
+.rc-panel-body main a.rc-inline-link { overflow-wrap: anywhere; }

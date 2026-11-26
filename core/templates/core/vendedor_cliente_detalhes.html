@@ -207,7 +207,7 @@
         {% for venda in vendas %}
         <p>
                 <strong>{{ venda.veiculo.marca }} {{ venda.veiculo.modelo }}</strong>
-                — {{ venda.veiculo.placa }} · venda #{{ venda.pk }}
+                — {{ venda.veiculo.placa }} · venda Nº {{ venda.pk }}
                 de {{ venda.data|date:"d/m/Y" }}
         </p>
 

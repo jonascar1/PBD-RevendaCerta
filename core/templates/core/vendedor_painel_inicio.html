@@ -33,7 +33,7 @@
         {% endfor %}
     </section>
     {% endif %}
-    <div id="rd-kpis" class="rd-grid">
+    <div id="rd-kpis" class="rd-grid" data-link-0="{% url 'minhas_comissoes' %}" data-link-1="{% url 'minhas_comissoes' %}" data-link-2="{% url 'propostas' %}">
     </div>
     <div class="rd-grid rd-main">
         <section class="rd-card rd-8">
@@ -98,4 +98,4 @@
 {{ dashboard|json_script:'rd-data' }}
 {% endblock %}
 {% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-<script src="{% static 'core/js/dashboard_vendedor.js' %}?v=rc4-1320511b3781"></script>{% endblock %}
+<script src="{% static 'core/js/dashboard_vendedor.js' %}?v=rc-controls-1"></script>{% endblock %}

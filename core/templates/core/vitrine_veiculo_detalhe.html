@@ -1,6 +1,6 @@
 {% extends 'core/publico_base.html' %}{% load static l10n %}
 {% block titulo %}{{ veiculo.marca }} {{ veiculo.modelo }} | Revenda Certa{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}?v=rc-mobile-1">
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}?v=rc-polimento-1">
 <style>
 
 /* Layout protegido da página de detalhes */
@@ -17,7 +17,7 @@
 .vd .vd-miniatura { flex: 0 0 100px; height: 74px; }
 .vd .vd-miniatura img { width: 100%; height: 100%; object-fit: cover; }
 .vd .vd-preco { color: #111; }
-.vd .vd-acoes a.vd-interesse { background: var(--gradiente-acao, linear-gradient(115deg,#1958d8,#248ed8)); color: white; }
+.vd .vd-acoes a.vd-interesse { background: #2563eb; color: white; }
 @media (max-width: 950px) { .vd .vd-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .vd .vd-miniatura { flex-basis: 82px; height: 60px; } }
 
@@ -54,7 +54,7 @@
 </section>
 <div class="container vd-grid">
     <section class="vd-painel vd-galeria" aria-label="Galeria de fotos">
-        <div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<p>Foto indisponível</p>{% endif %}</div>
+        <div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<div class="rc-car-placeholder" role="img" aria-label="Veículo sem foto"><i data-lucide="car-front"></i></div>{% endif %}</div>
 {% if fotos %}<div class="vd-miniaturas">{% for foto in fotos %}<button type="button" class="vd-miniatura{% if forloop.first %} ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}" aria-label="Ver foto {{ forloop.counter }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"><img src="{{ foto.imagem.url }}" alt="" loading="lazy"></button>{% endfor %}</div>{% endif %}</section>
         <section class="vd-painel vd-info">
             <p class="vd-marca">{{ veiculo.marca }}</p>

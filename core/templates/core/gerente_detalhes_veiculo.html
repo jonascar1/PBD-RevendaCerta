@@ -8,6 +8,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/gerente_detalhes_veiculo.css' %}?v=rc4-2385e2e6d058">
+<link rel="stylesheet" href="{% static 'core/css/painel_veiculo_vitrine.css' %}?v=rc-polimento-1">
 {% endblock %}
 
 {% block content %}
@@ -27,46 +28,10 @@
 
 {% include "core/partials/painel_mensagens.html" %}
 
-<section class="detalhes-container">
+{% include "core/partials/veiculo_apresentacao.html" with fotos=veiculo.fotos.all %}
+<section class="detalhes-container rc-vd-gerente">
 
     <div class="galeria">
-
-        <div class="foto-principal-container">
-
-            {% if fotos %}
-                <img
-                    id="foto-principal"
-                    src="{{ fotos.0.imagem.url }}"
-                    alt="Foto do {{ veiculo.marca }} {{ veiculo.modelo }}"
-                >
-            {% else %}
-            <div class="sem-foto">
-                    <span><i data-lucide="image-off"></i></span>
-                <p>Nenhuma foto cadastrada</p>
-            </div>
-            {% endif %}
-
-        </div>
-
-
-        {% if fotos %}
-        <div class="miniaturas">
-
-            {% for foto in fotos %}
-                <button
-                    type="button"
-                    class="miniatura {% if forloop.first %}ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}"
-                >
-                    <img
-                        src="{{ foto.imagem.url }}"
-                        alt="Foto {{ forloop.counter }}"
-                    >
-                </button>
-            {% endfor %}
-
-        </div>
-        {% endif %}
-
         <div class="card-info situacao-card">
 
             <div class="situacao-cabecalho">
@@ -307,23 +272,7 @@
 
 <div class="informacoes">
 
-    <div class="titulo-veiculo">
-
-        <div>
-
-                <span class="label-veiculo">
-                    VEÍCULO
-                </span>
-
-            <h2>
-                    {{ veiculo.marca }} {{ veiculo.modelo }}
-            </h2>
-
-            <p>
-                    {{ veiculo.ano_fabricacao|unlocalize }}/{{ veiculo.ano_modelo|unlocalize }}
-            </p>
-
-        </div>
+    <div class="titulo-veiculo"><h3>Ações do veículo</h3>
         <div class="acoes-identificacao">
                 <a href="{% url 'editar_veiculo' veiculo.id %}" class="btn-preco">
                     <i data-lucide="pencil"></i> Editar veículo
@@ -337,7 +286,7 @@
                     <i data-lucide="history"></i> Histórico do veículo
                 </a>
                 {% if venda %}
-                <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">Ver venda #{{ venda.pk }}</a>
+                <a href="{% url 'detalhes_venda' venda.pk %}" class="btn-voltar">Ver venda Nº {{ venda.pk }}</a>
                 {% if request.user.is_gerente %}
                 <a href="{% url 'historico_cliente' venda.cliente_id %}?origem=veiculos" class="btn-voltar">Histórico do cliente</a>
                 {% endif %}
@@ -352,67 +301,34 @@
 
         <div class="info-grid">
 
-            <div class="info-item">
-                    <span>Placa</span>
-                    <strong>{{ veiculo.placa }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Chassi</span>
+            <div class="info-item"><i data-lucide="scan-line"></i><span>Chassi</span>
                     <strong>{{ veiculo.chassi }}</strong>
             </div>
 
-            <div class="info-item">
-                    <span>Renavam</span>
+            <div class="info-item"><i data-lucide="file-text"></i><span>Renavam</span>
                     <strong>{{ veiculo.renavam }}</strong>
             </div>
 
-            <div class="info-item">
-                    <span>Marca</span>
-                    <strong>{{ veiculo.marca }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Modelo</span>
-                    <strong>{{ veiculo.modelo }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Ano de fabricação</span>
-                    <strong>{{ veiculo.ano_fabricacao|unlocalize }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Ano modelo</span>
-                    <strong>{{ veiculo.ano_modelo|unlocalize }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Cor</span>
-                    <strong>{{ veiculo.cor }}</strong>
-            </div>
+            
 
-            <div class="info-item">
-                    <span>Combustível</span>
-                    <strong>{{ veiculo.combustivel }}</strong>
-            </div>
-            <div class="info-item">
-                    <span>Tipo</span>
-                    <strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong>
-            </div>
+            
+            
 
-            <div class="info-item">
-                    <span>Câmbio</span>
-                    <strong>{{ veiculo.get_cambio_display|default:"Não informado" }}</strong>
-            </div>
-            <div class="info-item">
-                    <span>Quilometragem</span>
-                    <strong>{{ veiculo.quilometragem }} km</strong>
-            </div>
+            
+            
 
                 {% if veiculo.cliente_comprador %}
-            <div class="info-item">
-                    <span>Cliente Comprador</span>
+            <div class="info-item"><i data-lucide="user"></i><span>Cliente Comprador</span>
                     <strong>{{ veiculo.cliente_comprador.nome|default:veiculo.cliente_comprador.razao_social }}</strong>
             </div>
                 {% endif %}
@@ -428,14 +344,11 @@
 
         <div class="info-grid">
 
-            <div class="info-item">
-                    <span>Origem</span>
+            <div class="info-item"><i data-lucide="truck"></i><span>Origem</span>
                     <strong>{{ veiculo.get_origem_display }}</strong>
             </div>
 
-            <div class="info-item">
-
-                    <span>Custo de aquisição</span>
+            <div class="info-item"><i data-lucide="wallet"></i><span>Custo de aquisição</span>
 
                     <strong>
                         {% if veiculo.custo_aquisicao %}
@@ -447,9 +360,7 @@
 
             </div>
 
-            <div class="info-item">
-
-                    <span>Valor de repasse</span>
+            <div class="info-item"><i data-lucide="banknote"></i><span>Valor de repasse</span>
 
                     <strong>
                         {% if veiculo.valor_repasse %}
@@ -461,17 +372,7 @@
 
             </div>
 
-            <div class="info-item">
-                    <span>Preço de venda</span>
-
-                    <strong>
-                        {% if veiculo.preco_venda %}
-                            R$ {{ veiculo.preco_venda|floatformat:2 }}
-                        {% else %}
-                            Ainda não definido
-                        {% endif %}
-                    </strong>
-            </div>
+            
 
         </div>
 
@@ -487,8 +388,7 @@
 
         <div class="info-grid">
 
-            <div class="info-item">
-                    <span>Custo de aquisição</span>
+            <div class="info-item"><i data-lucide="wallet"></i><span>Custo de aquisição</span>
 
                     <strong>
                         {% if veiculo.custo_aquisicao %}
@@ -500,8 +400,7 @@
             </div>
 
 
-            <div class="info-item">
-                    <span>Despesas registradas</span>
+            <div class="info-item"><i data-lucide="receipt"></i><span>Despesas registradas</span>
 
                     <strong>
                         R$ {{ total_despesas|floatformat:2 }}
@@ -509,8 +408,7 @@
             </div>
 
 
-            <div class="info-item custo-total">
-                    <span>Custo total acumulado</span>
+            <div class="info-item custo-total"><i data-lucide="calculator"></i><span>Custo total acumulado</span>
 
                     <strong>
                         R$ {{ custo_total|floatformat:2 }}
@@ -559,25 +457,7 @@
     </div>
 
 
-    <div class="card-info">
-
-        <h3>Opcionais</h3>
-
-            {% if veiculo.opcionais %}
-
-        <p class="opcionais">
-                    {{ veiculo.opcionais }}
-        </p>
-
-            {% else %}
-
-        <p class="sem-informacao">
-                    Nenhum opcional informado.
-        </p>
-
-            {% endif %}
-
-    </div>
+    
 
 </div>
 
@@ -600,7 +480,7 @@
 
             <div class="historico-reservas__topo">
 
-                        <strong>Reserva #{{ item.pk }}</strong>
+                        <strong>Reserva Nº {{ item.pk }}</strong>
 
                         {% if item.cancelada %}
 
@@ -640,7 +520,7 @@
                         {% if item.proposta_origem %}
                 <p>
                                 <strong>Proposta:</strong>
-                                #{{ item.proposta_origem.pk }}
+                                Nº {{ item.proposta_origem.pk }}
                 </p>
                         {% endif %}
 
@@ -691,7 +571,7 @@
     {% for proposta in propostas_pendentes %}
     <div class="historico-reservas__item">
         <p>
-                <strong>Proposta #{{ proposta.pk }}</strong>
+                <strong>Proposta Nº {{ proposta.pk }}</strong>
                 — {{ proposta.get_situacao_display }}
         </p>
 
@@ -745,6 +625,6 @@
 
 {% block extra_js %}
 
-<script src="{% static 'core/js/gerente_detalhes_veiculo.js' %}"></script>
+<script src="{% static 'core/js/painel_veiculo_vitrine.js' %}?v=1" defer></script>
 
 {% endblock extra_js %}

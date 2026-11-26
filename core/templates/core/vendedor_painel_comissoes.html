@@ -46,7 +46,7 @@
                     {% for venda in vendas %}
                     <tr>
                         <td>
-                            <strong>#{{ venda.pk }}</strong>
+                            <strong><span class="rc-record-id">Nº {{ venda.pk }}</span></strong>
                             <small>{{ venda.data|date:"d/m/Y" }}</small>
                         </td>
                         <td>{{ venda.cliente.nome_exibicao }}</td>

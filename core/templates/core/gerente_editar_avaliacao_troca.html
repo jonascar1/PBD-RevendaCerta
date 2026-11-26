@@ -33,6 +33,8 @@
         </div>
 
         <div class="form-grid">
+            <div class="campo"><label for="{{ form.tipo.id_for_label }}">Tipo de veículo</label>{{ form.tipo }}{{ form.tipo.errors }}</div>
+            <div class="campo"><label for="{{ form.cambio.id_for_label }}">Câmbio</label>{{ form.cambio }}{{ form.cambio.errors }}</div>
             <div class="campo">
                     <label for="placa">Placa</label>
                     {{ form.placa }}

@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from core import views_exportacao
 
@@ -17,7 +18,8 @@ urlpatterns = [
     path("painel/gerente/veiculos/alcadas/", alcadas_lote, name="alcadas_lote"),
     path("painel/gerente/metas/", configurar_metas, name="configurar_metas"),
     # Autenticação e Painel Geral
-    path("accounts/login/", views.login_view, name="login"),
+    path("login/", views.login_view, name="login"),
+    path("accounts/login/", RedirectView.as_view(pattern_name="login", query_string=True)),
     path("accounts/logout/", views.logout_view, name="logout"),
     path("painel/", views.painel_view, name="painel"),
 

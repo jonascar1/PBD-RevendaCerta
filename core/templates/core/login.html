@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html><html lang="pt-br" data-rc-theme-scope="login"><head><script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar | Revenda Certa</title>
-<link rel="icon" href="{% static 'core/img/favicon.svg' %}"><link rel="stylesheet" href="{% static 'core/css/marca.css' %}"><link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}"><link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-mobile-1"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1"></head>
+<link rel="icon" href="{% static 'core/img/favicon.svg' %}"><link rel="stylesheet" href="{% static 'core/css/marca.css' %}"><link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}"><link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-polimento-1"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1"></head>
 <body>
 <div class="login-layout">
     <aside class="login-showroom">
@@ -20,7 +20,8 @@
                     <div class="login-field"><i data-lucide="lock"></i>{{ form.password }}<button type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false"><i data-lucide="eye"></i></button>
                     </div>{{ form.password.errors }}</div><button type="submit" class="login-button"><i data-lucide="log-in"></i> Entrar</button>
                 </form>
+                {% if demo_public_url %}<p class="login-help"><a href="{{ demo_public_url }}">Experimentar demonstração gratuita por 24 horas</a></p>{% endif %}
                 <p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>
             </section>
         </main>
-    </div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=4"></script></body></html>
+    </div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=5"></script></body></html>

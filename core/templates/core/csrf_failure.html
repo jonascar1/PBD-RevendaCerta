@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-rc-theme-scope="login">
+<head>
+    <script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sessão de formulário inválida | Revenda Certa</title>
+    <link rel="icon" href="{% static 'core/img/favicon.svg' %}">
+    <link rel="stylesheet" href="{% static 'core/css/marca.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-polimento-1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1">
+</head>
+<body>
+    <div class="login-layout">
+        <aside class="login-showroom">
+            <div class="login-copy"><small>REVENDA CERTA</small><h2>Proteção dos seus dados.</h2></div>
+        </aside>
+        <main class="login-main">
+            <a class="login-back" href="{% url 'vitrine' %}">Voltar para o site</a>
+            <section class="login-card">
+                <a class="login-brand" href="{% url 'vitrine' %}"><img src="{% static 'core/img/logorevendacerta.svg' %}" alt=""><span class="fonte-marca">REVENDA CERTA</span></a>
+                <h1>Não foi possível enviar o formulário</h1>
+                <p class="subtitle">A verificação de segurança falhou. Abra novamente a página e tente outra vez. O pedido não foi processado.</p>
+                {% if request.user.is_authenticated %}
+                    <a class="login-button" href="{% url 'painel' %}">Voltar ao painel</a>
+                {% else %}
+                    <a class="login-button" href="{% url 'login' %}">Voltar ao login</a>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

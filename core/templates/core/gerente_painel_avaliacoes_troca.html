@@ -6,7 +6,7 @@
 {% block title %}Avaliações de troca | REVENDA CERTA{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/gerente_painel_avaliacoes_troca.css' %}?v=rc-font-1">
+<link rel="stylesheet" href="{% static 'core/css/gerente_painel_avaliacoes_troca.css' %}?v=rc-estado-2">
 {% endblock extra_css %}
 
 {% block content %}
@@ -69,7 +69,7 @@
                         <th>Veículo</th>
                         <th>Placa</th>
                         <th>Quilometragem</th>
-                        <th>Estado geral</th>
+                        <th class="col-estado-geral">Estado geral</th>
                         <th>Valor avaliado</th>
                         <th>Data</th>
                         <th>Ação</th>
@@ -118,8 +118,8 @@
                             {{ avaliacao.quilometragem }} km
                         </td>
 
-                        <td>
-                            <span class="estado-geral">
+                        <td class="col-estado-geral">
+                            <span class="estado-geral estado-{{ avaliacao.estado_geral|lower }}">
                                 {{ avaliacao.get_estado_geral_display }}
                             </span>
                         </td>

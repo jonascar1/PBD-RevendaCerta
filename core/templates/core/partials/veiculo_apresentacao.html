@@ -1,0 +1,28 @@
+{% load l10n %}
+<div class="vd rc-vd-interno"><div class="vd-grid">
+    <section class="vd-painel vd-galeria" aria-label="Galeria de fotos">
+        <div class="vd-foto">{% if fotos %}<img id="foto-principal" src="{{ fotos.0.imagem.url }}" alt="{{ veiculo.marca }} {{ veiculo.modelo }}"><button type="button" class="vd-seta vd-prev" aria-label="Foto anterior"><i data-lucide="chevron-left"></i></button><button type="button" class="vd-seta vd-next" aria-label="Próxima foto"><i data-lucide="chevron-right"></i></button><span class="vd-contador" aria-live="polite"><i data-lucide="images"></i><span class="vd-contador-texto">1 / {{ fotos|length }}</span></span>{% else %}<div class="rc-car-placeholder" role="img" aria-label="Veículo sem foto"><i data-lucide="car-front"></i></div>{% endif %}</div>
+{% if fotos %}<div class="vd-miniaturas">{% for foto in fotos %}<button type="button" class="vd-miniatura{% if forloop.first %} ativa{% endif %}" data-foto-url="{{ foto.imagem.url }}" aria-label="Ver foto {{ forloop.counter }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"><img src="{{ foto.imagem.url }}" alt="" loading="lazy"></button>{% endfor %}</div>{% endif %}</section>
+        <section class="vd-painel vd-info">
+            <p class="vd-marca">{{ veiculo.marca }}</p>
+            <h2>{{ veiculo.marca }} {{ veiculo.modelo }}</h2><p class="rc-vd-status">{{ veiculo.get_situacao_display }}</p><span class="vd-label">Preço de venda</span>
+            <p class="vd-preco">{% if veiculo.preco_venda %}R$ {{ veiculo.preco_venda|floatformat:2 }}{% else %}Consulte o preço{% endif %}</p>
+            <div class="vd-ficha">
+                <div><i data-lucide="calendar"></i><span><small>Ano de fabricação</small><strong>{{ veiculo.ano_fabricacao|unlocalize|default:'Não informado' }}</strong></span>
+                </div>
+                <div><i data-lucide="calendar-days"></i><span><small>Ano do modelo</small><strong>{{ veiculo.ano_modelo|unlocalize|default:'Não informado' }}</strong></span>
+                </div>
+                <div><i data-lucide="gauge"></i><span><small>Quilometragem</small><strong>{% if veiculo.quilometragem != None %}{{ veiculo.quilometragem|localize }} km{% else %}Não informada{% endif %}</strong></span>
+                </div>
+                <div><i data-lucide="fuel"></i><span><small>Combustível</small><strong>{{ veiculo.get_combustivel_display|default:veiculo.combustivel }}</strong></span>
+                </div>
+                <div><i data-lucide="settings-2"></i><span><small>Câmbio</small><strong>{{ veiculo.get_cambio_display|default:veiculo.cambio }}</strong></span>
+                </div>
+                <div><i data-lucide="palette"></i><span><small>Cor</small><strong>{{ veiculo.cor|default:'Não informada' }}</strong></span>
+                </div>
+            </div>
+{% if veiculo.opcionais %}<h3 class="vd-op-title">Opcionais e equipamentos</h3>
+            <div class="vd-opcionais">{{ veiculo.opcionais|linebreaksbr }}</div>{% endif %}
+
+<div class="vd-ficha rc-vd-identificacao"><div><i data-lucide="credit-card"></i><span><small>Placa</small><strong>{{ veiculo.placa }}</strong></span></div><div><i data-lucide="car-front"></i><span><small>Categoria</small><strong>{{ veiculo.get_tipo_display|default:"Não informado" }}</strong></span></div></div>
+</section></div></div>

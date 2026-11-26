@@ -50,7 +50,7 @@ Veículos | REVENDA CERTA
     <div class="section-header veiculos-header">
         <span class="contador-veiculos">
             {{ veiculos|length }}
-            {% if vendedores|length == 1 %}
+            {% if veiculos|length == 1 %}
                 veiculo encontrado
             {% else %}
                 veiculos encontrados
@@ -151,7 +151,7 @@ Veículos | REVENDA CERTA
                                         <img src="{{ foto.imagem.url }}" alt="{{ v.marca }} {{ v.modelo }}">
                                     {% endif %}
                                 {% empty %}
-                                    <i data-lucide="image-off"></i>
+                                    <i data-lucide="car-front"></i>
                                 {% endfor %}
                     </div>
 

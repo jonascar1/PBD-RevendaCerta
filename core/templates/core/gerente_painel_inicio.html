@@ -9,7 +9,7 @@
         <p>Veja como a loja está indo em {% language "pt-br" %}{% now "F" %}{% endlanguage %}: vendas, estoque e equipe em um só lugar.</p>
     </header>
 {% include "core/partials/painel_mensagens.html" %}
-    <div id="rd-kpis" class="rd-grid">
+    <div id="rd-kpis" class="rd-grid" data-link-0="{% url 'vendas_painel' %}" data-link-1="{% url 'vendas_painel' %}" data-link-2="{% url 'veiculos' %}?situacao=DISPONIVEL">
     </div>
     <div class="rd-grid rd-main">
         <section class="rd-card rd-8">
@@ -88,4 +88,4 @@
 </div>
 {{ dashboard|json_script:'rd-data' }}
 {% endblock %}
-{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard.js' %}?v=rc4-294e4c221334"></script>{% endblock %}
+{% block extra_js %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script><script src="{% static 'core/js/dashboard.js' %}?v=rc-controls-1"></script>{% endblock %}

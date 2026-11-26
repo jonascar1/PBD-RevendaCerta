@@ -502,7 +502,7 @@
 }
 
 .vd .vd-acoes a.vd-interesse {
-    background: var(--gradiente-acao, linear-gradient(115deg,#1958d8,#248ed8));
+    background: #2563eb;
     color: white;
 }
 
@@ -657,3 +657,6 @@
         overflow-wrap: anywhere;
     }
 }
+
+.rc-car-placeholder {display:grid;place-items:center;width:100%;height:100%;min-height:100px;background:light-dark(#eaf0f7,#19263a);color:light-dark(#64748b,#a0b1c8);}
+.rc-car-placeholder svg {width:48px;height:48px;stroke-width:1.5;}

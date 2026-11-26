@@ -1,7 +1,7 @@
 {% extends base_painel %}{% block title %}Configurações | Revenda Certa{% endblock %}{% block content %}<div class="rc-settings">
 <header><small>CONFIGURAÇÕES</small>
     <h1>Deixe o painel do seu jeito</h1>
-    <p>O tema da equipe fica salvo neste navegador, inclusive após sair. Nome, foto e tamanho do texto são preferências da sua conta.</p>
+    <p>O tema da equipe fica salvo neste navegador, inclusive após sair. Nome exibido e tamanho do texto ficam neste navegador. A foto é salva na sua conta.</p>
 </header>
 <section>
     <h2>Aparência</h2>
@@ -20,9 +20,10 @@
 <section>
     <h2>Seu perfil</h2>
     <p>{{ request.user.get_perfil_display }}</p>
-    <div class="rc-profile-settings">
+    <div class="rc-profile-settings" data-photo-url="{% url 'preferencias' %}">
+        <form id="rc-photo-csrf" hidden>{% csrf_token %}</form>
         <div>
-            <div class="rc-pref-avatar" data-pref-avatar>{{ request.user.username|first|upper }}</div><label class="rc-upload">Enviar foto<input type="file" id="rc-photo" accept="image/jpeg,image/png"></label><button type="button" id="rc-remove-photo">Remover</button>
+            <div class="rc-pref-avatar" data-pref-avatar>{% if request.user.foto_perfil %}<img src="{{ request.user.foto_perfil.url }}" alt="">{% else %}{{ request.user.username|first|upper }}{% endif %}</div><label class="rc-upload">Enviar foto<input type="file" id="rc-photo" accept="image/jpeg,image/png"></label><button type="button" id="rc-remove-photo">Remover</button>
             <p>JPG ou PNG, até 5 MB.</p>
         </div>
         <div><label for="rc-display-name">Nome exibido</label><input id="rc-display-name" maxlength="60" placeholder="{{ request.user.get_full_name|default:request.user.username }}">
@@ -32,7 +33,7 @@
 </section>
 <section>
     <h2>Voltar ao padrão</h2>
-    <p>Restaura o tema da equipe e as preferências desta conta neste navegador.</p><button type="button" id="rc-reset"><i data-lucide="rotate-ccw"></i> Restaurar configurações</button>
+    <p>Restaura o tema e as preferências locais, sem remover a foto da conta.</p><button type="button" id="rc-reset"><i data-lucide="rotate-ccw"></i> Restaurar configurações</button>
     <p id="rc-pref-status" role="status">
     </p>
 </section>

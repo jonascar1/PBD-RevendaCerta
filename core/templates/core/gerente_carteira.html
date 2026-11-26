@@ -74,7 +74,7 @@
                 <tbody>
                         {% for item in carteira.linhas %}
                     <tr>
-                                <td>{{ item.cliente }}</td>
+                                <td><a class="rc-inline-link" href="{% url 'historico_cliente' item.cliente.pk %}?origem=carteira">{{ item.cliente }}</a></td>
                                 <td>
                                     {% if item.telefone %}
                                         <a href="tel:{{ item.telefone }}" class="cart-link">
