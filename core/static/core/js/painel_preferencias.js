@@ -99,6 +99,7 @@
                 method: 'POST', body: data, credentials: 'same-origin',
                 headers: {'X-CSRFToken': q('#rc-photo-csrf input').value}
             });
+            if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Não foi possível alterar a foto.');
             const result = await response.json();
             if (!response.ok) throw new Error(result.erro || 'Não foi possível salvar a foto.');
             photo = result.foto;

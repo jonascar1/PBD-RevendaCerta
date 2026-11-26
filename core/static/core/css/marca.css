@@ -64,3 +64,6 @@
         font-size: 15px;
     }
 }
+
+.rc-panel-body .sidebar a.logo { text-decoration: none; color: inherit; }
+.rc-panel-body .sidebar a.logo:focus-visible { outline: 2px solid #60a5fa; outline-offset: 3px; }

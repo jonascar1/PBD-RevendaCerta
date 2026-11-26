@@ -1,0 +1,1 @@
+{% load l10n %}<div data-lote-veiculos data-proxima-pagina="{% if pagina.has_next %}{{ pagina.next_page_number|unlocalize }}{% endif %}">{% for veiculo in pagina %}{% include "core/card_veiculo.html" %}{% endfor %}</div>

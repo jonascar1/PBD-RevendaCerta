@@ -1,6 +1,6 @@
 {% load static %}
-<!DOCTYPE html><html lang="pt-br" data-rc-theme-scope="login"><head><script src="{% static 'core/js/tema_rc.js' %}?v=rc6-2"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar | Revenda Certa</title>
-<link rel="icon" href="{% static 'core/img/favicon.svg' %}"><link rel="stylesheet" href="{% static 'core/css/marca.css' %}"><link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}"><link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-polimento-1"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1"></head>
+<!DOCTYPE html><html lang="pt-br" data-rc-theme-scope="login"><head><script src="{% static 'core/js/tema_rc.js' %}?v=rc7-1"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar | Revenda Certa</title>
+<link rel="icon" href="{% static 'core/img/favicon.svg' %}"><link rel="stylesheet" href="{% static 'core/css/marca.css' %}"><link rel="stylesheet" href="{% static 'core/css/erros_formulario.css' %}"><link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=rc-polimento-1"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'core/css/tema_publico.css' %}?v=rc5-1"><link rel="stylesheet" href="{% static 'core/css/demo_shared.css' %}?v=4"></head>
 <body>
 <div class="login-layout">
     <aside class="login-showroom">
@@ -11,17 +11,17 @@
     </aside>
     <main class="login-main"><a class="login-back" href="{% url 'vitrine' %}"><i data-lucide="arrow-left"></i> Voltar para o site</a>
         <section class="login-card"><a class="login-brand" href="{% url 'vitrine' %}"><img src="{% static 'core/img/logorevendacerta.svg' %}" alt=""><span class="fonte-marca">REVENDA CERTA</span></a>
-            <h1>Bem-vindo de volta</h1>
-            <p class="subtitle">Entre com seu usuário para acessar o painel.</p>
+            <h1>{% if request.demo_shared %}Explore o Revenda Certa{% else %}Bem-vindo de volta{% endif %}</h1>
+            <p class="subtitle">{% if request.demo_shared %}Ambiente acadêmico, somente para consulta.{% else %}Entre com seu usuário para acessar o painel.{% endif %}</p>{% if not request.demo_shared %}
 {% if messages %}<div class="messages" role="alert">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
             <form method="post" id="loginForm" novalidate>{% csrf_token %}{{ form.non_field_errors }}<div class="input-group"><label for="{{ form.username.id_for_label }}">Usuário</label>
                 <div class="login-field"><i data-lucide="user"></i>{{ form.username }}</div>{{ form.username.errors }}</div>
                 <div class="input-group"><label for="{{ form.password.id_for_label }}">Senha</label>
                     <div class="login-field"><i data-lucide="lock"></i>{{ form.password }}<button type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false"><i data-lucide="eye"></i></button>
                     </div>{{ form.password.errors }}</div><button type="submit" class="login-button"><i data-lucide="log-in"></i> Entrar</button>
-                </form>
-                {% if demo_public_url %}<p class="login-help"><a href="{{ demo_public_url }}">Experimentar demonstração gratuita por 24 horas</a></p>{% endif %}
-                <p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>
+                </form>{% endif %}
+                {% if demo_roles %}<section class="rc-demo-login"><h2>Explorar demonstração</h2><p>Escolha um perfil para navegar com dados fictícios, somente para consulta.</p><div class="rc-demo-roles">{% for role in demo_roles %}<a href="{{ role.url }}" data-rc-theme-transfer><i data-lucide="{{ role.icon }}"></i><span>{{ role.label }}</span></a>{% endfor %}</div></section>{% endif %}
+                {% if not request.demo_shared %}<p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>{% endif %}
             </section>
         </main>
     </div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=5"></script></body></html>
