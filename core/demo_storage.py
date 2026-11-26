@@ -49,7 +49,10 @@ class DemoStorage(Storage):
             size=getattr(content,'size',None)
             if size is None or size>5*1024**2: raise PermissionDenied('Arquivo excede 5 MiB.')
             folder=Path(settings.MEDIA_ROOT)/'demos'/scope
-            used=sum(p.stat().st_size for p in folder.rglob('*') if p.is_file())
+            if settings.DEBUG:
+                used=sum(p.stat().st_size for p in folder.rglob('*') if p.is_file())
+            else:
+                used=sum(obj.size for obj in self.backend.bucket.objects.filter(Prefix='demos/'+scope+'/'))
             if used+size>50*1024**2: raise PermissionDenied('Limite de 50 MiB atingido.')
             name = 'demos/' + scope + '/' + name
         return self.backend.save(self._check(name, True), content, max_length=max_length)
@@ -69,4 +72,8 @@ class DemoStorage(Storage):
         return self.backend.size(self._check(name))
 
     def url(self, name):
-        return self.backend.url(self._check(name))
+        checked = self._check(name)
+        if _scope.get() and checked.startswith('demos/'):
+            from urllib.parse import quote
+            return '/media/' + quote(checked, safe='/')
+        return self.backend.url(checked)

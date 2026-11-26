@@ -21,7 +21,7 @@ class Command(BaseCommand):
         before = snapshot()
         created = []
         try:
-            with override_settings(ALLOWED_HOSTS=['testserver']):
+            with override_settings(ALLOWED_HOSTS=['testserver'], SECURE_SSL_REDIRECT=False):
                 clients = [Client(enforce_csrf_checks=True), Client(enforce_csrf_checks=True)]
                 for client in clients:
                     require(client.get('/demo/entrar/').status_code==200,'Entrada indisponível')

@@ -1,5 +1,6 @@
 """Provisionamento local, sem acesso HTTP; registro dentro do schema isolado."""
-import os
+from core.demo_guard import require_demo_database
+from django.contrib.contenttypes.models import ContentType
 import secrets
 import uuid
 from django.conf import settings
@@ -14,14 +15,13 @@ class Command(BaseCommand):
     help = 'Cria uma demonstração local isolada com três contas e validade de 24 horas.'
 
     def handle(self, *args, **kwargs):
-        if (not settings.DEBUG or os.getenv('DATABASE_URL') or connection.vendor != 'postgresql'
-                or connection.settings_dict['HOST'] not in ('localhost', '127.0.0.1', '::1', '')):
-            raise CommandError('Permitido somente no PostgreSQL local.')
+        require_demo_database()
         original = dict(connection.settings_dict.get('OPTIONS', {}))
         schema = 'demo_' + uuid.uuid4().hex
         quoted = connection.ops.quote_name(schema)
         created = False
         def select(name):
+            ContentType.objects.clear_cache()
             connection.close()
             connection.settings_dict['OPTIONS'] = {**original, 'options': '-c search_path=' + name}
             with connection.cursor() as cursor:
@@ -57,5 +57,6 @@ class Command(BaseCommand):
                     cursor.execute('DROP SCHEMA ' + quoted + ' CASCADE')
             raise
         finally:
+            ContentType.objects.clear_cache()
             connection.close()
             connection.settings_dict['OPTIONS'] = original

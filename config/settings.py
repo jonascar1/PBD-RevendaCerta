@@ -239,3 +239,7 @@ LOGOUT_REDIRECT_URL = "login"
 
 # Resposta personalizada para falhas de CSRF.
 CSRF_FAILURE_VIEW = "core.views.csrf_failure_view"
+
+# Optional link to a separately deployed demonstration service.
+DEMO_PUBLIC_URL = os.getenv("DEMO_PUBLIC_URL", "")
+TEMPLATES[0]["OPTIONS"]["context_processors"].append("core.demo_link.demo_link")

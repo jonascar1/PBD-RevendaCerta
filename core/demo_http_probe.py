@@ -1,5 +1,6 @@
 """Local HTTP isolation probe. Not installed in the production middleware stack."""
 import re
+from django.contrib.contenttypes.models import ContentType
 from contextlib import contextmanager
 from django.core import signing
 from django.db import connection
@@ -16,6 +17,7 @@ def schema_scope(name):
     if name != 'public' and not PATTERN.fullmatch(name):
         raise ValueError('Schema inválido')
     original = dict(connection.settings_dict.get('OPTIONS', {}))
+    ContentType.objects.clear_cache()
     connection.close()
     try:
         connection.settings_dict['OPTIONS'] = {**original, 'options': '-c search_path=' + name}
@@ -25,6 +27,7 @@ def schema_scope(name):
                 raise ValueError('Schema inexistente ou search_path inválido')
         yield
     finally:
+        ContentType.objects.clear_cache()
         connection.close()
         connection.settings_dict['OPTIONS'] = original
 

@@ -1,4 +1,4 @@
-import os
+from core.demo_guard import require_demo_database
 from datetime import date, timedelta
 from decimal import Decimal as D
 from django.conf import settings
@@ -16,7 +16,8 @@ class Command(BaseCommand):
         parser.add_argument('--confirmar', action='store_true')
     def handle(self, *args, **opts):
         name = opts['schema']
-        if not settings.DEBUG or os.getenv('DATABASE_URL') or connection.vendor != 'postgresql' or connection.settings_dict['HOST'] not in ('localhost','127.0.0.1','::1','') or not PATTERN.fullmatch(name):
+        require_demo_database()
+        if not PATTERN.fullmatch(name):
             raise CommandError('Somente demonstração PostgreSQL local.')
         # Read only catalog attributes and existing photo references, never personal data.
         fields = ('marca','modelo','tipo','ano_fabricacao','ano_modelo','cor','combustivel','cambio','quilometragem','preco_venda')
@@ -35,18 +36,28 @@ class Command(BaseCommand):
             a=Usuario.objects.get(username='administrativo',perfil='ADMINISTRATIVO')
             hoje=timezone.localdate()
             carros=[]
+            fotos_lote=[]
+            custos_lote=[]
             for i in range(len(catalog)+4):
                 attrs, fotos=catalog[i%len(catalog)]
                 v=Veiculo(**attrs,placa=f'DMX{i+1000:04d}',chassi=f'9RXDEMA{i+1000000000:010d}',renavam=f'990000{i:05d}',origem='COMPRADO',custo_aquisicao=(attrs['preco_venda']*D('.8')).quantize(D('.01')),situacao='DISPONIVEL',status='DISPONIVEL',criado_por=g,tipo_alcada='PERCENTUAL',valor_alcada=3)
-                v.full_clean(); v.save(); carros.append(v)
-                LancamentoFinanceiro.objects.create(veiculo=v,tipo='CUSTO_AQUISICAO',valor=v.custo_aquisicao,registrado_por=g)
+                # Dados sintéticos: validação de campos e clean; unicidade e FKs pelo PostgreSQL.
+                v.full_clean(exclude=['criado_por'], validate_unique=False, validate_constraints=False)
+                carros.append(v)
+            Veiculo.objects.bulk_create(carros)
+            for i,v in enumerate(carros):
+                _, fotos=catalog[i%len(catalog)]
+                custos_lote.append(LancamentoFinanceiro(veiculo=v,tipo='CUSTO_AQUISICAO',valor=v.custo_aquisicao,registrado_por=g))
                 if i<len(catalog):
                     for j,(key,ordem,principal) in enumerate(fotos):
-                        FotoVeiculo.objects.create(veiculo=v,imagem=key,ordem=j,principal=j==0)
+                        fotos_lote.append(FotoVeiculo(veiculo=v,imagem=key,ordem=j,principal=j==0))
+            LancamentoFinanceiro.objects.bulk_create(custos_lote)
+            FotoVeiculo.objects.bulk_create(fotos_lote)
             clientes=[]
             for i in range(8):
                 c=Cliente(tipo='PF',nome=f'Cliente fictício {i+1:02d}',cpf=f'000000{i+10000:05d}',data_nascimento=date(1990,1,1),email=f'cliente{i+1}@demo.invalid',cidade='Flores',estado='PE')
-                c.full_clean(); c.save(); clientes.append(c)
+                c.full_clean(validate_unique=False, validate_constraints=False); clientes.append(c)
+            Cliente.objects.bulk_create(clientes)
             for i,v in enumerate(carros[-4:]):
                 c=clientes[i]; p=Proposta(veiculo=v,cliente=c,vendedor=s,valor_oferecido=v.preco_venda)
                 p.full_clean(); p.save(usuario=s)

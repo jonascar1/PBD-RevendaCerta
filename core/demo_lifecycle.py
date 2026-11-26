@@ -1,5 +1,6 @@
-"""Local-only lifecycle; serialized across local worker processes."""
-import fcntl
+"""Lifecycle serialized by a PostgreSQL advisory lock."""
+from .demo_guard import require_demo_database
+from django.core.files.storage import storages
 import io
 import os
 import shutil
@@ -13,11 +14,16 @@ from .demo_http_probe import PATTERN, schema_scope
 
 @contextmanager
 def lifecycle_lock():
-    if not settings.DEBUG or os.getenv('DATABASE_URL') or connection.settings_dict['HOST'] not in ('localhost','127.0.0.1','::1',''):
-        raise CommandError('Somente ambiente local.')
-    with open(Path(settings.BASE_DIR)/'.demo-lifecycle.lock','a') as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    require_demo_database()
+    # Dedicated connection: schema_scope closes the ordinary ORM connection.
+    lock = connection.copy(alias='demo_lifecycle_lock')
+    try:
+        with lock.cursor() as cursor:
+            cursor.execute('SET statement_timeout = 120000')
+            cursor.execute('SELECT pg_advisory_lock(%s)', [723019481])
         yield
+    finally:
+        lock.close()
 
 def schemas():
     with schema_scope('public'), connection.cursor() as c:
@@ -31,6 +37,13 @@ def expiry(name):
 
 def drop(name):
     if not PATTERN.fullmatch(name): raise ValueError('Schema inválido')
+    if not settings.DEBUG:
+        backend = storages['media_original']
+        prefix = 'demos/' + name + '/'
+        for obj in backend.bucket.objects.filter(Prefix=prefix):
+            obj.delete()
+        if any(backend.bucket.objects.filter(Prefix=prefix).limit(1)):
+            raise CommandError('Falha na limpeza de mídia remota.')
     root=Path(settings.MEDIA_ROOT).resolve()/'demos'
     folder=root/name
     if root.is_symlink() or folder.is_symlink(): raise CommandError('Caminho de mídia inseguro.')
@@ -63,6 +76,8 @@ def provision(replace=None):
                 c.execute('UPDATE demo_lifecycle SET expira_em=%s WHERE id=1',[deadline])
             drop(replace)
         return name
-    except Exception:
-        if name and name in schemas(): drop(name)
+    except BaseException:
+        # Inclui Ctrl+C; o lock impede criação concorrente por outro provisionamento.
+        for incomplete in set(schemas()) - existing:
+            drop(incomplete)
         raise

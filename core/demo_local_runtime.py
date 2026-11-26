@@ -76,11 +76,15 @@ class DemoLocalMiddleware:
         with lifecycle_lock():
             return self.handle(request)
     def handle(self,request):
-        if request.path_info=='/demo/entrar/':
+        if request.path_info in ('/demo/entrar/', '/login/', '/accounts/login/'):
+            if request.path_info != '/demo/entrar/':
+                return redirect('/demo/entrar/')
             # CSRF decorator handles this entry independently of the downstream stack.
             response=entry(request)
             add_never_cache_headers(response)
             return response
+        if request.path_info == '/' and not request.COOKIES.get(COOKIE):
+            return redirect('/demo/entrar/')
         try:
             name=signing.loads(request.COOKIES.get(COOKIE,''),salt=SALT,max_age=86400)
             if not isinstance(name,str) or not PATTERN.fullmatch(name): raise ValueError()

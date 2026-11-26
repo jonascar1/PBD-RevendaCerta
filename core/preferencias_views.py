@@ -49,7 +49,10 @@ def preferencias_view(request):
             else:
                 conta.foto_perfil = ""
             conta.save(update_fields=["foto_perfil"])
-            if anterior and anterior.startswith(f"perfis/{conta.pk}/"):
+            from .demo_storage import _scope
+            scope = _scope.get()
+            prefix = f"demos/{scope}/perfis/{conta.pk}/" if scope else f"perfis/{conta.pk}/"
+            if anterior and anterior.startswith(prefix):
                 transaction.on_commit(lambda: storage.delete(anterior), robust=True)
         return JsonResponse({"foto": conta.foto_perfil.url if conta.foto_perfil else ""})
     return render(request, "core/preferencias.html", {"base_painel": f"core/{perfil}_base.html"})
