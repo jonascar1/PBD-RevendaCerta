@@ -119,7 +119,7 @@
                         <div class="seller">
 
                             <div class="seller-icon">
-                                            {{ v.usuario.first_name|first|upper }}
+                                            {% if v.usuario.foto_perfil %}<img src="{{ v.usuario.foto_perfil.url }}" alt="Foto do vendedor" class="seller-photo" loading="lazy">{% else %}{{ v.usuario.first_name|default:v.usuario.username|first|upper }}{% endif %}
                             </div>
 
                             <div>

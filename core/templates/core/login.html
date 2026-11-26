@@ -11,17 +11,17 @@
     </aside>
     <main class="login-main"><a class="login-back" href="{% url 'vitrine' %}"><i data-lucide="arrow-left"></i> Voltar para o site</a>
         <section class="login-card"><a class="login-brand" href="{% url 'vitrine' %}"><img src="{% static 'core/img/logorevendacerta.svg' %}" alt=""><span class="fonte-marca">REVENDA CERTA</span></a>
-            <h1>{% if request.demo_shared %}Explore o Revenda Certa{% else %}Bem-vindo de volta{% endif %}</h1>
-            <p class="subtitle">{% if request.demo_shared %}Ambiente acadêmico, somente para consulta.{% else %}Entre com seu usuário para acessar o painel.{% endif %}</p>{% if not request.demo_shared %}
+            <h1>Bem-vindo de volta</h1>
+            <p class="subtitle">Entre com seu usuário para acessar o painel.</p>
 {% if messages %}<div class="messages" role="alert">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
-            <form method="post" id="loginForm" novalidate>{% csrf_token %}{{ form.non_field_errors }}<div class="input-group"><label for="{{ form.username.id_for_label }}">Usuário</label>
+            <form method="post" {% if request.demo_shared %}action="{% url 'demo_perfil' %}"{% endif %} id="loginForm" novalidate>{% csrf_token %}{{ form.non_field_errors }}<div class="input-group"><label for="{{ form.username.id_for_label }}">Usuário</label>
                 <div class="login-field"><i data-lucide="user"></i>{{ form.username }}</div>{{ form.username.errors }}</div>
                 <div class="input-group"><label for="{{ form.password.id_for_label }}">Senha</label>
                     <div class="login-field"><i data-lucide="lock"></i>{{ form.password }}<button type="button" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false"><i data-lucide="eye"></i></button>
                     </div>{{ form.password.errors }}</div><button type="submit" class="login-button"><i data-lucide="log-in"></i> Entrar</button>
-                </form>{% endif %}
+                </form>
                 {% if demo_roles %}<section class="rc-demo-login"><h2>Explorar demonstração</h2><p>Escolha um perfil para navegar com dados fictícios, somente para consulta.</p><div class="rc-demo-roles">{% for role in demo_roles %}<a href="{{ role.url }}" data-rc-theme-transfer><i data-lucide="{{ role.icon }}"></i><span>{{ role.label }}</span></a>{% endfor %}</div></section>{% endif %}
-                {% if not request.demo_shared %}<p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>{% endif %}
+                {% if request.demo_shared %}<p class="login-help">Use somente credenciais fictícias neste ambiente.</p>{% endif %}<p class="login-help">Problemas para acessar? Fale com o gerente da loja.</p>
             </section>
         </main>
     </div><script src="https://unpkg.com/lucide@0.469.0"></script><script src="{% static 'core/js/login.js' %}?v=5"></script></body></html>

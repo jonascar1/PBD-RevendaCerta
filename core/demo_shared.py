@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, HASH_SESSION_KEY, logout
 from django.core.exceptions import PermissionDenied
 from django.db import connection, DatabaseError
@@ -18,24 +19,36 @@ class ReadOnlyStorage(DemoStorage):
 @csrf_protect
 def choose_role(request):
     from .models import Usuario
+    from .forms import LoginForm
+    form = LoginForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST':
+        if 'perfil' not in request.POST:
+            if form.is_valid():
+                role = form.cleaned_data['username']
+                user = Usuario.objects.filter(username=role, perfil=role.upper(), ativo=True, is_superuser=False).first() if role in ('gerente', 'vendedor', 'administrativo') else None
+                if user and check_password(form.cleaned_data['password'], user.password):
+                    return enter_role(request, user)
+                form.add_error(None, 'Usuário ou senha demonstrativa inválidos.')
+            return render(request, 'core/login.html', {'form': form})
         role = request.POST.get('perfil', '')
         if role not in ('gerente', 'vendedor', 'administrativo'):
             return HttpResponseForbidden('Perfil inválido.')
         user = Usuario.objects.filter(username=role, perfil=role.upper(), ativo=True, is_superuser=False).first()
         if not user:
             return HttpResponseForbidden('Perfil indisponível.')
-        # Cookie session only; avoid login signal writing last_login.
-        request.session.flush()
-        request.session[SESSION_KEY] = str(user.pk)
-        request.session[BACKEND_SESSION_KEY] = 'django.contrib.auth.backends.ModelBackend'
-        request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-        rotate_token(request)
-        return redirect('painel')
+        return enter_role(request, user)
     role = request.GET.get('perfil', '')
     if role in ('gerente', 'vendedor', 'administrativo'):
         return render(request, 'core/demo_shared.html', {'selected_role': role})
-    return render(request, 'core/login.html')
+    return render(request, 'core/login.html', {'form': form})
+
+def enter_role(request, user):
+    request.session.flush()
+    request.session[SESSION_KEY] = str(user.pk)
+    request.session[BACKEND_SESSION_KEY] = 'django.contrib.auth.backends.ModelBackend'
+    request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+    rotate_token(request)
+    return redirect('painel')
 
 class ReadOnlyMiddleware:
     def __init__(self, get_response):

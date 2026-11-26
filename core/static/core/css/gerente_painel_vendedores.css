@@ -360,3 +360,6 @@ td {
         flex: 1;
     }
 }
+
+.seller-photo { width: 40px; height: 40px; border-radius: 25%; object-fit: cover; display: block; }
+.seller-icon:has(.seller-photo) { width: 40px; height: 40px; flex-shrink: 0; }

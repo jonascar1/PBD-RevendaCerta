@@ -73,7 +73,7 @@ class DemoStorage(Storage):
 
     def url(self, name):
         checked = self._check(name)
-        if _scope.get() and checked.startswith('demos/'):
+        if settings.DEBUG and _scope.get() and checked.startswith('demos/'):
             from urllib.parse import quote
             return '/media/' + quote(checked, safe='/')
         return self.backend.url(checked)
