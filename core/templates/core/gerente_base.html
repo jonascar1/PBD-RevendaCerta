@@ -53,10 +53,18 @@
                 {% include "core/includes/marca.html" %}
         </div>
 
+        {% if request.demo_expira_em %}
+        <div style="padding:12px; margin:8px; border:1px solid #64748b; border-radius:8px; font-size:12px;">
+            <strong>Modo demonstração</strong><br>
+            Expira: {{ request.demo_expira_em|date:"d/m H:i" }}<br>
+            <a href="/demo/perfil/" style="color:inherit; text-decoration:underline;">Alternar perfil</a><br>
+            <a href="/demo/entrar/" style="color:inherit; text-decoration:underline;">Gerenciar demonstração</a>
+        </div>
+        {% endif %}
         <div class="perfil">
 
             <div class="perfil-icon">
-                    {{ request.user.first_name|first|upper }}
+                    {% if request.user.foto_perfil %}<img src="{{ request.user.foto_perfil.url }}" alt="">{% else %}{{ request.user.first_name|default:request.user.username|first|upper }}{% endif %}
             </div>
 
             <div>
@@ -186,7 +194,7 @@
     {% block extra_js %}
     {% endblock %}
 
-<script src="{% static 'core/js/painel_preferencias.js' %}?v=rc6-3"></script>
+<script src="{% static 'core/js/painel_preferencias.js' %}?v=rc-foto-1"></script>
 <script src="{% static 'core/js/painel_drawer.js' %}?v=1"></script>
 </body>
 

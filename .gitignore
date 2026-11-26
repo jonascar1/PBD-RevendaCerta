@@ -20,3 +20,7 @@ staticfiles/
 
 # Logs
 *.log
+
+.demo-lifecycle.lock
+
+/doc/

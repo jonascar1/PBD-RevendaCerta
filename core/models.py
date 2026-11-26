@@ -36,6 +36,7 @@ class Usuario(AbstractUser):
 
     perfil = models.CharField(max_length=20, choices=Perfil.choices)
     ativo = models.BooleanField(default=True)
+    foto_perfil = models.ImageField(upload_to="perfis/", blank=True, max_length=255)
 
     def is_gerente(self):
         return self.perfil == self.Perfil.GERENTE
@@ -1321,6 +1322,9 @@ class DecisaoProposta(models.Model):
 class AvaliacaoTroca(models.Model):
     """Laudo técnico e financeiro de veículo oferecido como parte do pagamento."""
 
+    tipo = models.CharField(max_length=12, choices=Veiculo.Tipo.choices, blank=True, default="")
+    cambio = models.CharField(max_length=12, choices=Veiculo.Cambio.choices, blank=True, default="")
+
     class EstadoGeral(models.TextChoices):
         EXCELENTE = "EXCELENTE", "Excelente"
         BOM = "BOM", "Bom"
@@ -1694,6 +1698,8 @@ class Venda(models.Model):
                     recebido = Veiculo(
                         placa=a.placa,
                         chassi=a.chassi,
+                        tipo=a.tipo,
+                        cambio=a.cambio,
                         renavam=a.renavam,
                         marca=a.marca,
                         modelo=a.modelo,

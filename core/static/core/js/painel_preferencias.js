@@ -15,15 +15,18 @@
     }
     const q = s => document.querySelector(s), qa = s => document.querySelectorAll(s), media = matchMedia('(prefers-color-scheme: dark)'), status = q('#rc-pref-status');
     const name = q('.sidebar .perfil strong'), original = name?.textContent.trim(), avatar = q('.sidebar .perfil :is(.avatar,.perfil-icon,.perfil-avatar)'), initial = avatar?.textContent.trim();
-    function drawAvatar(el, fallback) { if (!el)
-        return; el.replaceChildren(); if (/^data:image\/jpeg;base64,/.test(p.photo)) {
-        const im = document.createElement('img');
-        im.src = p.photo;
-        im.alt = '';
-        el.append(im);
+    let photo = avatar?.querySelector('img')?.getAttribute('src') || '';
+    delete p.photo;
+    function drawAvatar(el, fallback) {
+        if (!el) return;
+        el.replaceChildren();
+        if (photo) {
+            const im = document.createElement('img');
+            im.src = photo;
+            im.alt = '';
+            el.append(im);
+        } else el.textContent = (p.name || fallback || original || '?').charAt(0).toUpperCase();
     }
-    else
-        el.textContent = (p.name || fallback || '?').charAt(0).toUpperCase(); }
     function themeCharts() {
         const ChartLib = window.Chart;
         if (!ChartLib || !ChartLib.instances)
@@ -85,31 +88,36 @@
         input.value = p.name;
         input.oninput = () => { p.name = input.value.slice(0, 60).trim(); save(); };
     }
-    const file = q('#rc-photo');
-    if (file)
-        file.onchange = async () => { const f = file.files[0]; file.value = ''; if (!f)
-            return; if (!['image/jpeg', 'image/png'].includes(f.type) || f.size > 5 * 1024 * 1024) {
-            status.textContent = 'Escolha JPG ou PNG de até 5 MB.';
-            return;
-        } const url = URL.createObjectURL(f); try {
-            const im = new Image();
-            im.src = url;
-            await im.decode();
-            const side = Math.min(im.width, im.height), canvas = document.createElement('canvas');
-            canvas.width = canvas.height = 256;
-            canvas.getContext('2d').drawImage(im, (im.width - side) / 2, (im.height - side) / 2, side, side, 0, 0, 256, 256);
-            p.photo = canvas.toDataURL('image/jpeg', .85);
-            save();
+    const file = q('#rc-photo'), remove = q('#rc-remove-photo');
+    async function changePhoto(action, image) {
+        const data = new FormData();
+        data.append('acao', action);
+        if (image) data.append('foto', image);
+        file.disabled = remove.disabled = true;
+        try {
+            const response = await fetch(q('[data-photo-url]').dataset.photoUrl, {
+                method: 'POST', body: data, credentials: 'same-origin',
+                headers: {'X-CSRFToken': q('#rc-photo-csrf input').value}
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.erro || 'Não foi possível salvar a foto.');
+            photo = result.foto;
+            apply();
+            status.textContent = photo ? 'Foto salva na conta.' : 'Foto removida.';
+        } catch (error) {
+            status.textContent = error.message || 'Não foi possível salvar a foto.';
+        } finally { file.disabled = remove.disabled = false; }
+    }
+    if (file) file.onchange = () => {
+        const f = file.files[0]; file.value = '';
+        if (!f) return;
+        if (!['image/jpeg', 'image/png'].includes(f.type) || f.size > 5 * 1024 * 1024) {
+            status.textContent = 'Escolha JPG ou PNG de até 5 MB.'; return;
         }
-        catch {
-            status.textContent = 'Não foi possível abrir a imagem.';
-        }
-        finally {
-            URL.revokeObjectURL(url);
-        } };
-    q('#rc-remove-photo')?.addEventListener('click', () => { p.photo = ''; save(); });
-    q('#rc-reset')?.addEventListener('click', () => { p = { theme: 'light', size: 'normal', name: '', photo: '' }; window.RCTheme?.setPanel('light'); if (input)
-        input.value = ''; save(); });
+        changePhoto('enviar_foto', f);
+    };
+    remove?.addEventListener('click', () => changePhoto('remover_foto'));
+    q('#rc-reset')?.addEventListener('click', () => { p = { theme: 'light', size: 'normal', name: '' }; window.RCTheme?.setPanel('light'); if (input) input.value = ''; save(); });
     qa('main table').forEach(table => { if (table.parentElement.matches('.rc-table-scroll,.al-scroll,.table-container'))
         return; const wrap = document.createElement('div'); wrap.className = 'rc-table-scroll'; table.before(wrap); wrap.append(table); });
 })();
