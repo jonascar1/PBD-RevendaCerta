@@ -606,3 +606,16 @@ html[data-rc-theme="dark"] .ri .ri-repository-icon { background: #e3edfc; color:
     .ri .ri-repository-copy { flex: 1 1 calc(100% - 76px); }
     .ri .ri-repository-link { width: 100%; }
 }
+
+/* Contatos dos desenvolvedores. */
+.ri .ri-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 18px; }
+.ri .ri-social a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 12px; border: 1px solid #dce5ef; border-radius: 10px; background: #f0f5fa; color: #17263d; font-size: 13px; font-weight: 650; text-decoration: none; transition: background .2s, transform .2s; }
+.ri .ri-social a svg { width: 17px; height: 17px; flex: none; }
+.ri .ri-social a.ri-social-linkedin { color: #0a66c2; }
+.ri .ri-social a.ri-social-email { color: #b42318; }
+.ri .ri-social a:hover { background: #e2ecfa; transform: translateY(-2px); }
+.ri .ri-social a:focus-visible { outline: 3px solid #5899f3; outline-offset: 3px; }
+html[data-rc-theme="dark"] .ri .ri-social a { background: #17263d; border-color: #34445d; color: #e3edfc; }
+html[data-rc-theme="dark"] .ri .ri-social a.ri-social-linkedin { color: #8cc5ff; }
+html[data-rc-theme="dark"] .ri .ri-social a.ri-social-email { color: #ffb4ab; }
+html[data-rc-theme="dark"] .ri .ri-social a:hover { background: #293c58; }

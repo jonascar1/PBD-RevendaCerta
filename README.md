@@ -78,6 +78,11 @@ A solução reúne a vitrine pública e a área de gestão em uma aplicação co
 
 Um sistema web desenvolvido por **Jonas Carneiro** e **Dowglas Hademar** na disciplina de Projeto de Banco de Dados da UFRPE (UAST), sob orientação do professor **Heldon José**.
 
+| Desenvolvedor | GitHub | LinkedIn | E-mail |
+|---|---|---|---|
+| **Jonas Carneiro** | [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/jonascar1) | [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jonas-carneiro/) | [![E-mail](https://img.shields.io/badge/E--mail-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:jonascarneiro16@gmail.com) |
+| **Dowglas Hademar** | [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/Dowglas-Hademar) | [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dowglas-hademar/) | [![E-mail](https://img.shields.io/badge/E--mail-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:dowglashademar0@gmail.com) |
+
 ---
 
 ## Funcionalidades
