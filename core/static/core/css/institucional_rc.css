@@ -572,3 +572,37 @@
 .ri-avatar { width: 160px; height: 160px; overflow: hidden; }
 .ri-avatar img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .ri-avatar-dowglas img { object-fit: contain; }
+
+
+/* Repositório do projeto: componente exclusivo da página Sobre nós. */
+.ri .ri-repository { padding-bottom: 48px; }
+.ri .ri-repository-card {
+    display: flex; align-items: center; gap: 22px;
+    padding: 26px; border: 1px solid #dce5ef; border-radius: 22px;
+    background: #f0f5fa; color: #101b30;
+}
+.ri .ri-repository-icon {
+    display: grid; place-items: center; flex: 0 0 58px; height: 58px;
+    border-radius: 16px; background: #10213d; color: #fff;
+}
+.ri .ri-repository-icon svg { width: 30px; height: 30px; }
+.ri .ri-repository-copy { flex: 1; min-width: 0; }
+.ri .ri-repository-copy h2 { font-size: clamp(19px, 2.4vw, 26px); margin: 5px 0; }
+.ri .ri-repository-copy p { margin: 0; color: #526176; font-size: 15px; }
+.ri .ri-repository-link {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    padding: 13px 18px; border-radius: 12px; background: #2165df; color: #fff;
+    text-decoration: none; font-weight: 650; white-space: nowrap;
+    transition: background .2s, transform .2s;
+}
+.ri .ri-repository-link svg { width: 18px; height: 18px; }
+.ri .ri-repository-link:hover { background: #174da9; transform: translateY(-2px); }
+.ri .ri-repository-link:focus-visible { outline: 3px solid #5899f3; outline-offset: 3px; }
+html[data-rc-theme="dark"] .ri .ri-repository-card { background: #17263d; border-color: #34445d; color: #f1f5ff; }
+html[data-rc-theme="dark"] .ri .ri-repository-copy p { color: #c0cde0; }
+html[data-rc-theme="dark"] .ri .ri-repository-icon { background: #e3edfc; color: #10213d; }
+@media (max-width: 700px) {
+    .ri .ri-repository-card { flex-wrap: wrap; gap: 14px; padding: 20px; }
+    .ri .ri-repository-copy { flex: 1 1 calc(100% - 76px); }
+    .ri .ri-repository-link { width: 100%; }
+}

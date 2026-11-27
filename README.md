@@ -11,7 +11,58 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
+![Render](https://img.shields.io/badge/Render-000000?style=for-the-badge&logo=render&logoColor=white)
+![Neon](https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=black)
+![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+
+**[Acessar a demonstração online](https://revendacerta-demo.onrender.com/)**
+
 </div>
+
+---
+
+## Demonstração online
+
+**[Acesse o Revenda Certa](https://revendacerta-demo.onrender.com/)**
+
+A demonstração é uma versão pública do sistema, disponibilizada para apresentação e avaliação acadêmica, sem necessidade de instalação local. Ela utiliza dados fictícios para representar o cotidiano de uma revenda de veículos.
+
+É possível navegar pela vitrine, consultar o catálogo e as fotografias dos veículos e explorar os painéis internos. Para conhecer a área de gestão, clique em **Entrar** e escolha um dos perfis na seção **Explorar demonstração**:
+
+| Perfil | O que é possível conhecer |
+|---|---|
+| Gerente | Indicadores, estoque, equipe, propostas, vendas, margens e relatórios. |
+| Vendedor | Clientes, reservas, propostas, carteira de clientes e comissões. |
+| Administrativo | Documentação, despesas e acompanhamento das entregas. |
+
+O ambiente online é compartilhado e funciona em modo **somente leitura**. Operações que alteram registros são bloqueadas para preservar os dados e permitir que todos os visitantes encontrem o mesmo cenário. Essa restrição é específica da demonstração; o sistema executado localmente com as configurações normais permite as operações de gestão conforme as permissões de cada perfil.
+
+Os anúncios, preços e dados comerciais são ilustrativos e não constituem ofertas reais de venda.
+
+> O serviço está hospedado no plano gratuito do Render e pode hibernar por inatividade. O primeiro acesso após esse período pode demorar enquanto a aplicação reinicia automaticamente.
+
+---
+
+## Tecnologias utilizadas
+
+| Categoria | Tecnologia | Finalidade |
+|---|---|---|
+| Backend | Python 3.12 e Django 5.2 | Lógica de negócio, autenticação, permissões e acesso aos dados. |
+| Frontend | HTML5, CSS3 e JavaScript | Interface responsiva e interações. |
+| Banco de dados | PostgreSQL | Persistência relacional, integridade e transações. |
+| Visualização | Chart.js e Lucide | Gráficos e ícones. |
+| Relatórios | openpyxl, ReportLab e jsPDF | Geração de planilhas e documentos. |
+| Versionamento | Git e GitHub | Controle de versões e colaboração. |
+
+### Infraestrutura da demonstração online
+
+| Serviço | Finalidade |
+|---|---|
+| [Render](https://render.com/) | Hospedagem da aplicação Django com Gunicorn e WhiteNoise para arquivos estáticos. |
+| [Neon](https://neon.com/) | Hospedagem do banco PostgreSQL, com schema separado e usuário de consulta somente leitura para a demonstração. |
+| [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/) | Armazenamento de objetos para fotografias de veículos e demais mídias, com acesso controlado. |
+
+Esses serviços compõem a infraestrutura da versão online e não são obrigatórios para executar o sistema localmente.
 
 ---
 
@@ -47,7 +98,7 @@ Um sistema web desenvolvido por **Jonas Carneiro** e **Dowglas Hademar** na disc
 
 | Ferramenta | Versão recomendada |
 |---|---|
-| [Python](https://www.python.org/downloads/) | 3.10 ou superior |
+| [Python](https://www.python.org/downloads/) | 3.12 (utilizada no projeto) |
 | [PostgreSQL](https://www.postgresql.org/download/) | 13 ou superior |
 | [Git](https://git-scm.com/downloads) | qualquer versão recente |
 
@@ -60,8 +111,8 @@ Um sistema web desenvolvido por **Jonas Carneiro** e **Dowglas Hademar** na disc
 ### 1. Clone o repositório
 
 ```bash
-git clone <URL-DO-REPOSITORIO>
-cd <NOME-DA-PASTA>
+git clone https://github.com/jonascar1/PBD-RevendaCerta.git
+cd PBD-RevendaCerta
 ```
 
 ### 2. Crie e ative o ambiente virtual
@@ -193,13 +244,11 @@ python manage.py expirar_reservas
 
 ---
 
-## Demonstração online
+## Configuração da demonstração (manutenção)
 
-Acesse https://revendacerta-demo.onrender.com/ para consultar a vitrine e experimentar os três perfis com dados fictícios. O serviço utiliza `config.demo_shared_settings`, um schema PostgreSQL separado no Neon, uma conta de banco somente leitura e imagens no R2. Alterações permanentes são bloqueadas.
+O serviço público utiliza `config.demo_shared_settings`, com schema PostgreSQL separado, usuário de banco somente leitura e acesso controlado às mídias no R2. Não execute migrations com essas configurações.
 
-O módulo `config.demo_production_settings` é reservado aos comandos administrativos de população, com conexão direta ao Neon e `ENABLE_REMOTE_DEMOS=1`. Não deve ser usado para hospedar o site. O módulo de consulta não deve executar migrations. Credenciais devem ser configuradas fora do Git.
-
-O plano gratuito do Render pode hibernar por inatividade e reiniciar automaticamente no próximo acesso.
+O módulo `config.demo_production_settings` é reservado aos comandos administrativos de população e manutenção, com conexão direta ao Neon e `ENABLE_REMOTE_DEMOS=1`. Não deve ser utilizado para hospedar o site. As credenciais devem permanecer fora do Git.
 
 ---
 
@@ -232,6 +281,12 @@ O plano gratuito do Render pode hibernar por inatividade e reiniciar automaticam
 
 ## Instituição
 
-**Universidade Federal Rural de Pernambuco**
-Unidade Acadêmica de Serra Talhada (UAST)
-Disciplina: Projeto de Banco de Dados · Orientação: Prof. Heldon José
+<p align="center">
+  <img src="docs/imagens/ufrpe.png" alt="Universidade Federal Rural de Pernambuco" width="200">
+</p>
+
+<p align="center">
+  Unidade Acadêmica de Serra Talhada (UAST)<br>
+  Bacharelado em Sistemas de Informação<br>
+  Projeto de Banco de Dados · Prof. Heldon José
+</p>
