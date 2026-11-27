@@ -24,3 +24,12 @@ staticfiles/
 .demo-lifecycle.lock
 
 /doc/
+
+# Arquivos locais e credenciais
+.ruff_cache/
+*.env
+*.pem
+*.key
+*.p12
+*.sql.gz
+*.zip

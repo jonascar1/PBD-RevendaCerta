@@ -507,3 +507,22 @@
 .rd-meta-link:hover {
     background: light-dark(#eff6ff, #1a3455);
 }
+
+
+/* Apenas o painel do gerente: dois cartões compactos em telas móveis. */
+@media (min-width: 380px) and (max-width: 800px) {
+    .rd-gerente > .rd-card:first-child { order: -3; }
+    .rd-gerente > .rd-mobile-meta, .rd-gerente > .rd-mobile-categoria {
+        order: -2;
+        grid-column: span 6;
+        min-width: 0;
+        padding: 10px;
+        overflow-wrap: anywhere;
+    }
+    .rd-gerente .rd-mobile-meta .rd-gauge { height: 130px; margin: 10px auto; }
+    .rd-gerente .rd-mobile-meta .rd-gauge-label strong { font-size: 24px; }
+    .rd-gerente .rd-mobile-meta .rd-pair, .rd-gerente .rd-mobile-categoria #rd-legend { grid-template-columns: minmax(0, 1fr); }
+    .rd-gerente .rd-mobile-categoria .rd-donut { height: 130px; margin-top: 10px; }
+    .rd-gerente .rd-mobile-categoria .rd-donut strong { font-size: 22px; }
+    .rd-gerente .rd-mobile-categoria .rd-legend-item { padding: 5px; }
+}

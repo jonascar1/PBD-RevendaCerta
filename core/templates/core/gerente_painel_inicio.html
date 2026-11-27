@@ -1,7 +1,7 @@
 {% extends 'core/gerente_base.html' %}
 {% load static i18n %}
 {% block title %}Painel do Gerente | REVENDA CERTA{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc4-a2ce074a721e">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}?v=rc-mobile-graficos-1">{% endblock %}
 {% block content %}
 <div class="rc-dashboard">
     <header class="rd-intro"><small>PAINEL DO GERENTE</small>
@@ -11,7 +11,7 @@
 {% include "core/partials/painel_mensagens.html" %}
     <div id="rd-kpis" class="rd-grid" data-link-0="{% url 'vendas_painel' %}" data-link-1="{% url 'vendas_painel' %}" data-link-2="{% url 'veiculos' %}?situacao=DISPONIVEL">
     </div>
-    <div class="rd-grid rd-main">
+    <div class="rd-grid rd-main rd-gerente">
         <section class="rd-card rd-8">
             <header>
                 <div>
@@ -29,7 +29,7 @@
             <div class="rd-chart"><canvas id="rd-sales"></canvas>
             </div>
         </section>
-        <section class="rd-card rd-4">
+        <section class="rd-card rd-4 rd-mobile-meta">
             <h2>Meta mensal</h2>
             <p>{{ dashboard.days_left }} dias para fechar o mês</p>
             <div id="rd-goal">
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </section>
-        <section class="rd-card rd-4">
+        <section class="rd-card rd-4 rd-mobile-categoria">
             <h2>Vendas por categoria</h2>
             <p>Carros vendidos por tipo nos últimos 12 meses</p>
             <div class="rd-donut"><canvas id="rd-category"></canvas>

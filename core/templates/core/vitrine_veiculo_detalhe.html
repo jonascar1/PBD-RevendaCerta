@@ -1,5 +1,13 @@
 {% extends 'core/publico_base.html' %}{% load static l10n %}
 {% block titulo %}{{ veiculo.marca }} {{ veiculo.modelo }} | Revenda Certa{% endblock %}
+{% block metadados %}
+<meta property="og:title" content="{{ veiculo.marca }} {{ veiculo.modelo }} | Revenda Certa">
+<meta property="og:description" content="{{ veiculo.ano_modelo }} • {{ veiculo.get_combustivel_display }} • Confira as fotos e detalhes na Revenda Certa.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Revenda Certa">
+<meta property="og:url" content="{{ og_url }}">
+{% if og_imagem %}<meta property="og:image" content="{{ og_imagem }}">{% endif %}
+{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'core/css/vitrine_veiculo_detalhe.css' %}?v=rc-polimento-1">
 <style>
 

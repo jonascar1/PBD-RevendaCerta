@@ -28,6 +28,7 @@ urlpatterns = [
     path("explorar/", views.explorar_view, name="explorar"),
     path("vender/", views.vender_publico_view, name="vender_publico"),
     path("sobre-nos/", views.sobre_nos_view, name="sobre_nos"),
+    path("vitrine/veiculo/<int:pk>/imagem/", views.vitrine_veiculo_imagem_view, name="vitrine_veiculo_imagem"),
     path("vitrine/veiculo/<int:pk>/", views.vitrine_veiculo_detalhe_view, name="vitrine_veiculo_detalhe"),
 
     # Vendedor

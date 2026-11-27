@@ -408,7 +408,23 @@ def vitrine_veiculo_detalhe_view(request, pk):
     numero = getattr(settings, "WHATSAPP_NUMERO", "")
     mensagem = f"Olá! Vim pelo site Revenda Certa e tenho interesse no {veiculo.marca} {veiculo.modelo}, ano {veiculo.ano_modelo}. Gostaria de mais informações.\n{request.build_absolute_uri()}"
     whatsapp = f"https://wa.me/{numero}?" + urlencode({"text": mensagem})
-    return render(request, "core/vitrine_veiculo_detalhe.html", {"whatsapp_numero": numero, "veiculo": veiculo, "fotos": veiculo.fotos.all(), "mesma_marca": mesma_marca, "recomendados": recomendados, "whatsapp_veiculo": whatsapp})
+    fotos = list(veiculo.fotos.all())
+    og_url = request.build_absolute_uri(reverse("vitrine_veiculo_detalhe", args=[pk]))
+    og_imagem = request.build_absolute_uri(reverse("vitrine_veiculo_imagem", args=[pk])) if any(f.imagem for f in fotos) else ""
+    return render(request, "core/vitrine_veiculo_detalhe.html", {"whatsapp_numero": numero, "veiculo": veiculo, "fotos": veiculo.fotos.all(), "mesma_marca": mesma_marca, "recomendados": recomendados, "whatsapp_veiculo": whatsapp, "og_url": og_url, "og_imagem": og_imagem})
+
+
+@require_GET
+def vitrine_veiculo_imagem_view(request, pk):
+    """URL estável de compartilhamento; somente fotos de veículos públicos."""
+    from django.http import Http404
+    veiculo = get_object_or_404(_veiculos_disponiveis_para_procura(), pk=pk)
+    foto = veiculo.fotos.exclude(imagem="").order_by("-principal", "ordem", "pk").first()
+    if not foto:
+        raise Http404("Fotografia indisponível.")
+    response = redirect(request.build_absolute_uri(foto.imagem.url))
+    response["Cache-Control"] = "no-store"
+    return response
 
 
 # Vendedor
