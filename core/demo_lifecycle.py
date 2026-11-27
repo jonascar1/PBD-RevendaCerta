@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.management import call_command, CommandError
 from django.db import connection
 from django.utils import timezone
-from .demo_http_probe import PATTERN, schema_scope
+from .demo_schema import PATTERN, schema_scope
 
 @contextmanager
 def lifecycle_lock():
@@ -30,10 +30,11 @@ def schemas():
         c.execute('SELECT nspname FROM pg_namespace')
         return [n for n, in c.fetchall() if PATTERN.fullmatch(n)]
 
-def expiry(name):
-    with schema_scope(name), connection.cursor() as c:
-        c.execute('SELECT expira_em FROM demo_lifecycle WHERE id=1')
-        return c.fetchone()[0]
+def active():
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT expira_em FROM demo_lifecycle WHERE id=1')
+        row = cursor.fetchone()
+    return bool(row and row[0] > timezone.now())
 
 def drop(name):
     if not PATTERN.fullmatch(name): raise ValueError('Schema inválido')
@@ -51,19 +52,9 @@ def drop(name):
     with schema_scope('public'), connection.cursor() as c:
         c.execute('DROP SCHEMA '+connection.ops.quote_name(name)+' CASCADE')
 
-def cleanup():
-    removed=[]
-    for name in schemas():
-        if expiry(name)<=timezone.now():
-            drop(name); removed.append(name)
-    return removed
-
-def provision(replace=None):
-    cleanup()
+def provision():
     existing=set(schemas())
-    if replace and replace not in existing: raise CommandError('Demonstração expirada.')
-    if len(existing)>=10 and not replace: raise CommandError('Limite de 10 demonstrações atingido.')
-    deadline=expiry(replace) if replace else None
+    if len(existing)>=10: raise CommandError('Limite de 10 demonstrações atingido.')
     name=None
     try:
         call_command('criar_demo_local',stdout=io.StringIO())
@@ -71,10 +62,6 @@ def provision(replace=None):
         if len(new)!=1: raise CommandError('Criação inesperada.')
         name=new.pop()
         call_command('popular_demo_local',name,confirmar=True,stdout=io.StringIO())
-        if deadline:
-            with schema_scope(name), connection.cursor() as c:
-                c.execute('UPDATE demo_lifecycle SET expira_em=%s WHERE id=1',[deadline])
-            drop(replace)
         return name
     except BaseException:
         # Inclui Ctrl+C; o lock impede criação concorrente por outro provisionamento.

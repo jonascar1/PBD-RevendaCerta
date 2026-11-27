@@ -4,9 +4,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.files.storage import storages
 from django.db import connection, transaction
 from django.utils import timezone
-from core.demo_http_probe import PATTERN, schema_scope
+from core.demo_schema import PATTERN, schema_scope
 from core.demo_lifecycle import lifecycle_lock
-from core.demo_local_runtime import active
+from core.demo_lifecycle import active
 from core.models import (Usuario, Veiculo, FotoVeiculo, Cliente, Proposta, ComposicaoPagamento,
     ReservaVeiculo, Venda, LancamentoFinanceiro, EntregaVeiculo, MetaMensal, MetaIndividual,
     ConfiguracaoCarteira, HistoricoProposta, HistoricoSituacaoVeiculo, Procura)

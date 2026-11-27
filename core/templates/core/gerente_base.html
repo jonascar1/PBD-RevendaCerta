@@ -53,14 +53,7 @@
                 {% include "core/includes/marca.html" %}
         </a>
 
-        {% if request.demo_shared %}<div class="rc-demo-sidebar"><strong><i data-lucide="eye"></i> Modo demonstração</strong><p>Somente consulta</p><a href="{% url 'demo_perfil' %}"><i data-lucide="repeat-2"></i> Alternar perfil</a></div>{% elif request.demo_expira_em %}
-        <div style="padding:12px; margin:8px; border:1px solid #64748b; border-radius:8px; font-size:12px;">
-            <strong>Modo demonstração</strong><br>
-            Expira: {{ request.demo_expira_em|date:"d/m H:i" }}<br>
-            <a href="/demo/perfil/" style="color:inherit; text-decoration:underline;">Alternar perfil</a><br>
-            <a href="/demo/entrar/" style="color:inherit; text-decoration:underline;">Gerenciar demonstração</a>
-        </div>
-        {% endif %}
+        {% if request.demo_shared %}<div class="rc-demo-sidebar"><strong><i data-lucide="eye"></i> Modo demonstração</strong><p>Somente consulta</p><a href="{% url 'demo_perfil' %}"><i data-lucide="repeat-2"></i> Alternar perfil</a></div>{% endif %}
         <div class="perfil">
 
             <div class="perfil-icon">

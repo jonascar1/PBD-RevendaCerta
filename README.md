@@ -109,9 +109,9 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 Abra o `.env` e preencha os valores:
 
 ```env
-DJANGO_SECRET_KEY=cole-aqui-a-chave-gerada
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+SECRET_KEY=cole-aqui-a-chave-gerada
+DJANGO_ENV=local
+ALLOWED_HOSTS=127.0.0.1,localhost
 
 DB_NAME=revendacerta
 DB_USER=revendacerta_user
@@ -119,10 +119,9 @@ DB_PASSWORD=escolha-uma-senha-forte
 DB_HOST=localhost
 DB_PORT=5432
 
-WHATSAPP_NUMERO=5587999999999
 ```
 
-> `DJANGO_DEBUG=True` é necessário para rodar localmente, pois é o que faz o servidor de desenvolvimento servir arquivos estáticos e as fotos enviadas. Nunca use `True` em produção.
+> `DJANGO_ENV=local` é necessário para rodar localmente, pois é o que faz o servidor de desenvolvimento servir arquivos estáticos e as fotos enviadas. Em produção, utilize `DJANGO_ENV=production`.
 
 ### 5. Crie o banco de dados no PostgreSQL
 
@@ -194,11 +193,21 @@ python manage.py expirar_reservas
 
 ---
 
+## Demonstração online
+
+Acesse https://revendacerta-demo.onrender.com/ para consultar a vitrine e experimentar os três perfis com dados fictícios. O serviço utiliza `config.demo_shared_settings`, um schema PostgreSQL separado no Neon, uma conta de banco somente leitura e imagens no R2. Alterações permanentes são bloqueadas.
+
+O módulo `config.demo_production_settings` é reservado aos comandos administrativos de população, com conexão direta ao Neon e `ENABLE_REMOTE_DEMOS=1`. Não deve ser usado para hospedar o site. O módulo de consulta não deve executar migrations. Credenciais devem ser configuradas fora do Git.
+
+O plano gratuito do Render pode hibernar por inatividade e reiniciar automaticamente no próximo acesso.
+
+---
+
 ## Segurança
 
 - O arquivo `.env` está no `.gitignore` e **nunca deve ser enviado ao repositório**. Compartilhe apenas o `.env.example`, que contém valores fictícios.
-- Cada pessoa que rodar o projeto deve gerar a própria `DJANGO_SECRET_KEY`.
-- Em produção, use `DJANGO_DEBUG=False`, informe o domínio real em `DJANGO_ALLOWED_HOSTS` e configure um servidor para arquivos estáticos e de mídia.
+- Cada pessoa que rodar o projeto deve gerar a própria `SECRET_KEY`.
+- Em produção, use `DJANGO_ENV=production`, informe o domínio real em `ALLOWED_HOSTS` e configure um servidor para arquivos estáticos e de mídia.
 
 ---
 

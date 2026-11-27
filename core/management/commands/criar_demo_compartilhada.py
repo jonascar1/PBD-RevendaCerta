@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 from core.demo_lifecycle import lifecycle_lock, provision
-from core.demo_http_probe import schema_scope
+from core.demo_schema import schema_scope
 
 class Command(BaseCommand):
     help = 'Cria uma base fictícia compartilhada para o serviço de consulta.'
